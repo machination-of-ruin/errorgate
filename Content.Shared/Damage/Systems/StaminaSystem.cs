@@ -39,11 +39,17 @@ public sealed partial class StaminaSystem : EntitySystem
     [Dependency] private readonly SharedPopupSystem _popup = default!;
     [Dependency] private readonly SharedStunSystem _stunSystem = default!;
     [Dependency] private readonly SharedAudioSystem _audio = default!;
+    [Dependency] private readonly StatusEffectsSystem _statusEffect = default!;
 
     /// <summary>
     /// How much of a buffer is there between the stun duration and when stuns can be re-applied.
     /// </summary>
-    private static readonly TimeSpan StamCritBufferTime = TimeSpan.FromSeconds(3f);
+    private static readonly TimeSpan StamCritBufferTime = TimeSpan.FromSeconds(0f); // ERRORGATE no cooldown
+
+    /// <summary>
+    /// How much stamina will be set to after coming out of stamina crit.
+    /// </summary>
+    private static readonly float StaminaAfterCrit = 0f; // ERRORGATE no cooldown
 
     public override void Initialize()
     {
@@ -330,15 +336,6 @@ public sealed partial class StaminaSystem : EntitySystem
                 component.NextUpdate = nextUpdate;
         }
 
-        var slowdownThreshold = component.CritThreshold / 2f;
-
-        // If we go above n% then apply slowdown
-        if (oldDamage < slowdownThreshold &&
-            component.StaminaDamage > slowdownThreshold)
-        {
-            _stunSystem.TrySlowdown(uid, TimeSpan.FromSeconds(3), true, 0.8f, 0.8f);
-        }
-
         SetStaminaAlert(uid, component);
 
         if (!component.Critical)
@@ -396,10 +393,26 @@ public sealed partial class StaminaSystem : EntitySystem
         {
             // Just in case we have active but not stamina we'll check and account for it.
             if (!stamQuery.TryGetComponent(uid, out var comp) ||
-                comp.StaminaDamage <= 0f && !comp.Critical)
+                comp.StaminaDamage <= 0f && !comp.Critical && comp.ActiveDrains.Count == 0)
             {
                 RemComp<ActiveStaminaComponent>(uid);
                 continue;
+            }
+
+            var slowdownThreshold = comp.CritThreshold - comp.CritThreshold / 5f; // ERRORGATE SLOW on 20% stamina
+
+            // If we go above n% then apply slowdown
+            if (comp.StaminaDamage > slowdownThreshold && !_statusEffect.HasStatusEffect(uid, "SlowedDown"))
+            {
+                _stunSystem.TrySlowdown(uid, TimeSpan.FromSeconds(4.5), true, 0.9f, 0.9f);
+            }
+
+            if (comp.ActiveDrains.Count > 0)
+            {
+                foreach (var (source, drainRate) in comp.ActiveDrains)
+                {
+                    TakeStaminaDamage(uid, drainRate * frameTime, comp, source: source, visual: false);
+                }
             }
 
             // Shouldn't need to consider paused time as we're only iterating non-paused stamina components.
@@ -416,8 +429,13 @@ public sealed partial class StaminaSystem : EntitySystem
             }
 
             comp.NextUpdate += TimeSpan.FromSeconds(1f);
-            TakeStaminaDamage(uid, -comp.Decay, comp);
-            Dirty(comp);
+
+            // If there is no active drains, recover stamina.
+            if (comp.ActiveDrains.Count == 0)
+            {
+                TakeStaminaDamage(uid, -comp.Decay, comp);
+            }
+            Dirty(uid, comp);
         }
     }
 
@@ -453,12 +471,33 @@ public sealed partial class StaminaSystem : EntitySystem
         }
 
         component.Critical = false;
-        component.StaminaDamage = 0f;
+        component.StaminaDamage = component.CritThreshold - StaminaAfterCrit; // ERRORGATE
         component.NextUpdate = _timing.CurTime;
         SetStaminaAlert(uid, component);
-        RemComp<ActiveStaminaComponent>(uid);
+        //RemComp<ActiveStaminaComponent>(uid); // ERRORGATE
         Dirty(component);
         _adminLogger.Add(LogType.Stamina, LogImpact.Low, $"{ToPrettyString(uid):user} recovered from stamina crit");
+    }
+
+    public void ToggleStaminaDrain(EntityUid target, float drainRate, bool enabled, EntityUid? source = null)
+    {
+        if (!TryComp<StaminaComponent>(target, out var stamina))
+            return;
+
+        // If theres no source, we assume its the target that caused the drain.
+        var actualSource = source ?? target;
+
+        if (enabled)
+        {
+            stamina.ActiveDrains[actualSource] = drainRate;
+            EnsureComp<ActiveStaminaComponent>(target);
+        }
+        else
+        {
+            stamina.ActiveDrains.Remove(actualSource);
+        }
+
+        Dirty(target, stamina);
     }
 }
 
