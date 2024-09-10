@@ -335,13 +335,13 @@ public sealed partial class StaminaSystem : EntitySystem
                 component.NextUpdate = nextUpdate;
         }
 
-        var slowdownThreshold = component.CritThreshold / 2f;
+        var slowdownThreshold = component.CritThreshold - component.CritThreshold / 5f; // ERRORGATE SLOW on 20%
 
         // If we go above n% then apply slowdown
         if (oldDamage < slowdownThreshold &&
             component.StaminaDamage > slowdownThreshold)
         {
-            _stunSystem.TrySlowdown(uid, TimeSpan.FromSeconds(3), true, 0.8f, 0.8f);
+            _stunSystem.TrySlowdown(uid, TimeSpan.FromSeconds(4.5), true, 0.9f, 0.9f);
         }
 
         SetStaminaAlert(uid, component);
