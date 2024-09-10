@@ -39,6 +39,7 @@ public sealed partial class StaminaSystem : EntitySystem
     [Dependency] private readonly SharedPopupSystem _popup = default!;
     [Dependency] private readonly SharedStunSystem _stunSystem = default!;
     [Dependency] private readonly SharedAudioSystem _audio = default!;
+    [Dependency] private readonly StatusEffectsSystem _statusEffect = default!;
 
     /// <summary>
     /// How much of a buffer is there between the stun duration and when stuns can be re-applied.
@@ -335,15 +336,6 @@ public sealed partial class StaminaSystem : EntitySystem
                 component.NextUpdate = nextUpdate;
         }
 
-        var slowdownThreshold = component.CritThreshold - component.CritThreshold / 5f; // ERRORGATE SLOW on 20%
-
-        // If we go above n% then apply slowdown
-        if (oldDamage < slowdownThreshold &&
-            component.StaminaDamage > slowdownThreshold)
-        {
-            _stunSystem.TrySlowdown(uid, TimeSpan.FromSeconds(4.5), true, 0.9f, 0.9f);
-        }
-
         SetStaminaAlert(uid, component);
 
         if (!component.Critical)
@@ -405,6 +397,14 @@ public sealed partial class StaminaSystem : EntitySystem
             {
                 RemComp<ActiveStaminaComponent>(uid);
                 continue;
+            }
+
+            var slowdownThreshold = comp.CritThreshold - comp.CritThreshold / 5f; // ERRORGATE SLOW on 20% stamina
+
+            // If we go above n% then apply slowdown
+            if (comp.StaminaDamage > slowdownThreshold && !_statusEffect.HasStatusEffect(uid, "SlowedDown"))
+            {
+                _stunSystem.TrySlowdown(uid, TimeSpan.FromSeconds(4.5), true, 0.9f, 0.9f);
             }
 
             if (comp.ActiveDrains.Count > 0)
