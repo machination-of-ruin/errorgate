@@ -234,7 +234,7 @@ namespace Content.Shared.Containers.ItemSlots
         /// </remarks>
         [DataField]
         [Access(typeof(ItemSlotsSystem), Other = AccessPermissions.ReadWriteExecute)]
-        public bool Swap = true;
+        public bool Swap = false; // WWDP immersive interactions
 
         public string? ID => ContainerSlot?.ID;
 
