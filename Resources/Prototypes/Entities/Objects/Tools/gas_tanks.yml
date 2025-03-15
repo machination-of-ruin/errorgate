@@ -9,6 +9,7 @@
   - type: Item
     size: Normal
     sprite: Objects/Tanks/generic.rsi
+    canBeUsedWhileWorn: true # WWDP
   - type: Tag
     tags:
     - GasTank

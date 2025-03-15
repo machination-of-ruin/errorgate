@@ -23,7 +23,6 @@ public abstract class SharedItemSystem : EntitySystem
     [Dependency] private readonly InventorySystem _inventory = default!; // Goobstation
     [Dependency] private readonly IPrototypeManager _prototype = default!;
     [Dependency] private   readonly SharedHandsSystem _handsSystem = default!;
-    [Dependency] private readonly InventorySystem _inventory = default!; // WWDP
     [Dependency] private readonly SharedPopupSystem _popup = default!; // WWDP
     [Dependency] protected readonly SharedContainerSystem Container = default!;
 

@@ -1,1 +1,1 @@
-﻿must-be-in-hand = Должно быть в руке!
+﻿must-be-in-hand = Must be in hand!

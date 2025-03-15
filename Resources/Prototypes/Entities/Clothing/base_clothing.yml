@@ -7,9 +7,6 @@
     size: Normal
     canBeUsedWhileWorn: true # WWDP
   - type: Sprite
-  - type: Clothing
-    # equipDelay: 0.5 - WD EDIT
-    # unequipDelay: 0.5 - WD EDIT
   - type: Tag
     tags:
       - WhitelistChameleon
