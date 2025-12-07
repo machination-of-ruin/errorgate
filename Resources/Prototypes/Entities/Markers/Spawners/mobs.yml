@@ -44,9 +44,9 @@
   - type: ConditionalSpawner
     prototypes:
     - MobCorgiIan
-    - MobCorgiIanOld
-    - MobCorgiLisa
-    - MobCorgiIanPup
+    #- MobCorgiIanOld
+    #- MobCorgiLisa
+    #- MobCorgiIanPup
 
 - type: entity
   name: Dev Mouse Spawner

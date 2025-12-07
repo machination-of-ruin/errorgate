@@ -1,4 +1,9 @@
+# - type: guideEntry
+#   id: MedusaRuleset
+#   name: guide-entry-rules-white-medusa
+#   text: "/ServerInfo/Guidebook/ServerRules/MedusaRules.xml"
+
 - type: guideEntry
-  id: MedusaRuleset
-  name: guide-entry-rules-white-medusa
-  text: "/ServerInfo/Guidebook/ServerRules/MedusaRules.xml"
+  id: ErrorgateRuleset
+  name: ERRORGATE server rules
+  text: "/ServerInfo/Guidebook/ServerRules/ErrorgateRules.xml"

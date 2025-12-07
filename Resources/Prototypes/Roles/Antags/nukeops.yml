@@ -44,7 +44,6 @@
     - DeathAcidifierImplanter
     jumpsuit:
     - DoubleEmergencyOxygenTankFilled
-    - PlushieCarp
 
 - type: startingGear
   id: SyndicateOperativePlasmamanGear

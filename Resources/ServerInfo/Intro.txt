@@ -1,15 +1,5 @@
+Welcome to Space Station 14! You have just started your shift aboard a Nanotrasen space station and along with your crewmates should try to cooperate, perform your job role to the best of your ability and have fun amidst the chaos.
 
-Добро пожаловать на Space Station 14!
+If you have any questions, consult this guide, your colleagues on shift in character or over radio. You can also ask admins for help (AHelp) by hitting the escape key > admin help and typing a message to any online admins.
 
-Ты только что начал свою смену на космической станции NanoTrasen. Вместе с другими членами экипажа тебе предстоит сотрудничать, выполнять свою работу на максимум и — что немаловажно — получать удовольствие (желательно не за счёт других игроков).
-
-Перед началом убедись, что ты ознакомился с правилами сервера (клавиша F1). Если у тебя возникнут вопросы, обратись к этому руководству, своим коллегам прямо на станции, через радио или в Discord. Также можно воспользоваться помощью администраторов: нажми Escape → Admin Help, чтобы написать сообщение любому онлайн-админу. Особенно важно делать это, если ты стал свидетелем нарушения правил.
-
-Повторим: вы — экипаж, команда людей, работающих вместе (даже клоун). Не стоит нападать друг на друга без очень веской причины. Самооборона — допустима, но и в этом случае лучше сообщи в охрану по радио, обезвреди нарушителя и задержи его. НЕ убивай, если ты не антагонист (см. далее про антагонистов).
-
-Режим боя
-
-Вместо старой системы намерений (intents) теперь есть боевой режим. Посмотри назначенную клавишу в настройках управления.
-
-Если режим выключен — ты не сможешь никого атаковать, даже случайно. Больше никаких нелепых ударов ломиком по собственному лицу!
-
+Instead of intents, we have combat mode. Check controls below for its keybind. You can't attack anybody with it off, so no more hitting yourself with your own crowbar.
