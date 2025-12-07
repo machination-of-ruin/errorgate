@@ -5,15 +5,16 @@
   components:
   - type: Item
     size: Normal
+    canBeUsedWhileWorn: true # WWDP
   - type: Sprite
-  - type: Clothing
-    # equipDelay: 0.5 - WD EDIT
-    # unequipDelay: 0.5 - WD EDIT
   - type: Tag
     tags:
       - WhitelistChameleon
   - type: StaticPrice
     price: 10
+  - type: Clothing
+    equipDelay: 0.5 # WWDP
+    unequipDelay: 0.5 # WWDP
   - type: FlavorProfile #yes not every peice of clothing is edible, but this way every edible piece of clothing should have the flavor without me having to track down what specific clothing can and cannot be eaten.
     flavors:
     - fiber

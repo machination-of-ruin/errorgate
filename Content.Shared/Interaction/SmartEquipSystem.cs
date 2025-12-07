@@ -155,6 +155,9 @@ public sealed class SmartEquipSystem : EntitySystem
         // case 2 (storage item):
         if (TryComp<StorageComponent>(slotItem, out var storage))
         {
+            if (!_actionBlocker.CanInteract(uid, slotItem, true)) // WWDP Interactions
+                return;
+
             switch (handItem)
             {
                 case null when storage.Container.ContainedEntities.Count == 0:
@@ -192,6 +195,9 @@ public sealed class SmartEquipSystem : EntitySystem
         // case 3 (itemslot item):
         if (TryComp<ItemSlotsComponent>(slotItem, out var slots))
         {
+            if (!_actionBlocker.CanInteract(uid, slotItem, true)) // WWDP Interactions
+                return;
+
             if (handItem == null)
             {
                 ItemSlot? toEjectFrom = null;
