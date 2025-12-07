@@ -59,7 +59,7 @@
       stripTime: 3
       uiWindowPos: 2,0
       strippingWindowPos: 2,5
-      dependsOn: outerClothing
+      # dependsOn: outerClothing # ERRORGATE belt with no vest
       displayName: Suit Storage
     - name: id
       slotTexture: id
@@ -144,7 +144,7 @@
       stripTime: 3
       uiWindowPos: 2,0
       strippingWindowPos: 2,5
-      dependsOn: outerClothing
+      # dependsOn: outerClothing # ERRORGATE belt with no vest
       dependsOnComponents:
       - type: AllowSuitStorage
       displayName: Suit Storage
