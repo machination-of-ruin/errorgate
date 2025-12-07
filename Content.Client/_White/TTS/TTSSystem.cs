@@ -75,7 +75,7 @@ public sealed class TTSSystem : EntitySystem
 
     private void OnVoiceTypeChanged(CharacterVoiceType voiceType)
     {
-        _clientSideEnabled = voiceType == CharacterVoiceType.TTS;
+        _clientSideEnabled = voiceType == CharacterVoiceType.Bark;
     }
 
     private void OnPlayTTS(PlayTTSEvent ev)

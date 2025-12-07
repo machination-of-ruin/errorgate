@@ -1,7 +1,7 @@
 - type: barkList
   id: default
   voiceList:
-    Meow: []
+    #Meow: []
     Mtt:
     - !type:CharacterGenderRequirement
       gender: Male
@@ -46,4 +46,4 @@
     - !type:CharacterGenderRequirement
       gender: Female
     TxtUnd: []
-    Gav: []
+    #Gav: []

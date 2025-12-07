@@ -61,10 +61,10 @@ public sealed partial class AudioTab : Control
             scale: ContentAudioSystem.AnnouncerMultiplier);
 
         // WD EDIT START
-        Control.AddOptionPercentSlider(
-            WhiteCVars.TTSVolume,
-            SliderVolumeTts,
-            scale: ContentAudioSystem.TTSMultiplier);
+        // Control.AddOptionPercentSlider(
+        //     WhiteCVars.TTSVolume,
+        //     SliderVolumeTts,
+        //     scale: ContentAudioSystem.TTSMultiplier);
 
         Control.AddOptionPercentSlider(
             WhiteCVars.BarkVolume,
@@ -98,7 +98,7 @@ public sealed partial class AudioTab : Control
             [
                 new (CharacterVoiceType.None, Loc.GetString("char-voice-none")),
                 new (CharacterVoiceType.Bark, Loc.GetString("char-voice-bark")),
-                new (CharacterVoiceType.TTS, Loc.GetString("char-voice-tts")),
+                //new (CharacterVoiceType.TTS, Loc.GetString("char-voice-tts")),
             ]);
         // WD EDIT END
         Control.Initialize();

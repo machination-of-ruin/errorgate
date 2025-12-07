@@ -75,13 +75,6 @@
                                     <OptionButton Name="PronounsButton" HorizontalAlignment="Right" />
                                 </BoxContainer>
                                 <!--WD EDIT START-->
-                                <!--TTS-->
-                                <BoxContainer HorizontalExpand="True">
-                                    <Label Text="{Loc 'humanoid-profile-editor-voice-label'}" />
-                                    <Control HorizontalExpand="True"/>
-                                    <OptionButton Name="VoiceButton" HorizontalAlignment="Right" />
-                                    <Button Name="VoicePlayButton" Text="▶" MaxWidth="80" />
-                                </BoxContainer>
                                 <!--BARK-->
                                 <BoxContainer HorizontalExpand="True" Orientation="Horizontal">
                                     <Label Text="{Loc 'humanoid-profile-editor-bark-voice-label'}" />

@@ -1,28 +1,26 @@
 ﻿- type: dataset
   id: RatKingCommandStay
   values:
-    - "Сидеть!"
-    - "Стоять!"
-    - "Замрите!"
+    - "Sit!"
+    - "Stay!"
+    - "Stop!"
 
 - type: dataset
   id: RatKingCommandFollow
   values:
-    - "Рядом!"
-    - "За мной!"
-    - "Пошуршали!"
+    - "Heel!"
+    - "Follow!"
 
 - type: dataset
   id: RatKingCommandCheeseEm
   values:
-    - "Фас!"
-    - "Грызть!"
-    - "Уничтожить!"
-    - "На сыр их!"
+    - "Attack!"
+    - "Sic!"
+    - "Kill!"
+    - "Cheese 'Em!"
 
 - type: dataset
   id: RatKingCommandLoose
   values:
-    - "Свободны!"
-    - "Рассосались!"
-
+    - "Free!"
+    - "Loose!"
