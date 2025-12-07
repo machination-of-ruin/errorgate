@@ -29,4 +29,6 @@
     id: TechnicalAssistantPDA
     # belt: ClothingBeltUtilityEngineering - WD EDIT
     ears: ClothingHeadsetEngineering
-    pocket2: BookEngineersHandbook
+  storage:
+    jumpsuit:
+    - BookEngineersHandbook

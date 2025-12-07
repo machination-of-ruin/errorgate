@@ -32,4 +32,6 @@
     shoes: ClothingShoesColorWhite
     id: MedicalInternPDA
     ears: ClothingHeadsetMedical
-    pocket2: BookMedicalReferenceBook
+  storage:
+    jumpsuit:
+    - BookMedicalReferenceBook

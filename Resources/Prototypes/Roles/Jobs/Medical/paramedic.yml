@@ -41,11 +41,6 @@
     shoes: ClothingShoesColorBlue
     id: ParamedicPDA
     ears: ClothingHeadsetMedical
-    # WD EDIT START
-    # belt: ClothingBeltMedicalEMTFilled
-    # pocket1: HandheldGPSBasic
-    # pocket2: HandheldCrewMonitor
-    # WD EDIT END
   storage:
     back:
     - EmergencyRollerBedSpawnFolded

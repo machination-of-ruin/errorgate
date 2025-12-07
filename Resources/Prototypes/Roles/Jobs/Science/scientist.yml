@@ -31,7 +31,9 @@
     # outerClothing: ClothingOuterCoatRnd - WD EDIT
     id: SciencePDA
     ears: ClothingHeadsetScience
-    pocket1: BookPsionicsGuidebook
+  storage:
+    jumpsuit:
+    - BookPsionicsGuidebook
 
 - type: startingGear
   id: ScientistPlasmamanGear

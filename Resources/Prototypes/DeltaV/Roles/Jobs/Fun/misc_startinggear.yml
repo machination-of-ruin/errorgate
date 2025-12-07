@@ -16,9 +16,11 @@
     neck: ClothingNeckStethoscope
     shoes: ClothingShoesColorWhite
     id: MedicalIDCard
-    pocket1: Brutepack
-    pocket2: GlowstickBase
     belt: ClothingBeltMedical
+  storage:
+    jumpsuit:
+    - Brutepack
+    - GlowstickBase
 
 
 - type: startingGear
@@ -27,8 +29,10 @@
     jumpsuit: ClothingUniformJumpsuitSec
     shoes: ClothingShoesBootsJack
     id: SecurityIDCard
-    pocket1: Flash
-    pocket2: GlowstickBase
+  storage:
+    jumpsuit:
+    - Flash
+    - GlowstickBase
 
 - type: startingGear
   id: OldstationEngi
@@ -38,9 +42,11 @@
     id: EngineeringIDCard
     mask: ClothingMaskBreath
     gloves: ClothingHandsGlovesColorYellowBudget
-    pocket1: EmergencyOxygenTankFilled
-    pocket2: GlowstickBase
     belt: ClothingBeltUtility
+  storage:
+    jumpsuit:
+    - EmergencyOxygenTankFilled
+    - GlowstickBase
 
 - type: startingGear
   id: OldstationScientist
@@ -48,8 +54,10 @@
     jumpsuit: ClothingUniformJumpsuitScientist
     shoes: ClothingShoesColorWhite
     id: ResearchIDCard
-    pocket1: Pen
-    pocket2: GlowstickBase
+  storage:
+    jumpsuit:
+    - Pen
+    - GlowstickBase
 
 #Syndicate Pirate Radio Listener
 
@@ -64,7 +72,9 @@
     gloves: ClothingHandsGlovesCombat
     shoes: ClothingShoesSlippers
     id: SyndiListeningPostPDA
-    pocket1: BaseUplinkRadio20TC
+  storage:
+    jumpsuit:
+    - BaseUplinkRadio20TC
 
 # Mobsters
 
@@ -99,7 +109,6 @@
     outerClothing: ClothingOuterArmorBasicSlim
     id: PassengerPDA
     belt: ClothingBeltSuspendersBlack
-    pocket1: CombatKnife
   inhand:
   - BaseBallBat
   storage:
@@ -108,3 +117,5 @@
     - WeaponSubMachineGunTypewriter
     - WeaponPistolViperWood
     - MagazinePistol
+    jumpsuit:
+    - CombatKnife

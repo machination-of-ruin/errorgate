@@ -29,8 +29,6 @@
     outerClothing: ClothingOuterHardsuitDeathsquad
     shoes: ClothingShoesBootsMagSecAdv # WD EDI: ClothingShoesBootsMagAdv -> ClothingShoesBootsMagSecAdv
     id: DeathsquadPDA
-    pocket1: EnergySword
-    pocket2: EnergyShield
     belt: ClothingBeltMilitaryWebbingDeathsquadFilled # WD EDIT: ClothingBeltMilitaryWebbingMedFilled -> ClothingBeltMilitaryWebbingDeathsquadFilled
   storage:
     back:
@@ -44,3 +42,6 @@
     - Hypospray
     - BluespaceLifelineImplanter # WD EDIT: DeathAcidifierImplanter -> BluespaceLifelineImplanter
     - FreedomImplanter
+    jumpsuit:
+    - EnergySword
+    - EnergyShield

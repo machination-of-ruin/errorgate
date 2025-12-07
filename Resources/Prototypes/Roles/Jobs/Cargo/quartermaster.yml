@@ -58,11 +58,12 @@
     id: QuartermasterPDA
     ears: ClothingHeadsetAltCargo
     belt: BoxFolderClipboard
-    pocket1: AppraisalTool
   storage:
     back:
     # - Flash - WD EDIT
     - TelescopicBaton # WD EDIT
+    jumpsuit:
+    - AppraisalTool
 
 - type: startingGear
   id: QuartermasterPlasmamanGear

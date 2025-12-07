@@ -10,9 +10,7 @@
     outerClothing: ClothingOuterHardsuitERTSecurity
     id: ERTSecurityPDA
     ears: ClothingHeadsetAltCentCom
-    belt: ClothingBeltSecurityFilled
-    pocket1: MagazineRifle
-    pocket2: MagazineRifle
+    belt: ClothingBeltMilitaryWebbingERTLecterFilled
   inhand:
     - WeaponRifleAnnie
   storage:
@@ -23,3 +21,7 @@
     - BoxZiptie
     - CrowbarRed
     - MagazinePistol
+    jumpsuit:
+    - WeaponPistolMk58
+    - MagazinePistol
+    - FlashlightSeclite

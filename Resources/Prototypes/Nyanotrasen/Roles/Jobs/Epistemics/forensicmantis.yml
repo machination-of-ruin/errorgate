@@ -68,13 +68,13 @@
     gloves: ClothingHandsGlovesColorWhite
     # outerClothing: ClothingOuterCoatMantis # WWDP moved to locker
     # belt: ClothingBeltMantis # WWDP moved to locker
-    pocket1: BookPsionicsGuidebook
   storage:
     back:
     - HandLabeler
     - PillMindbreakerToxin
     - BoxFolderGrey
     - RubberStampMantis
+    - BookPsionicsGuidebook
 
 - type: startingGear
   id: ForensicMantisPlasmamanGear

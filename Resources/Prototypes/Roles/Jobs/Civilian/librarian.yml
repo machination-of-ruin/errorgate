@@ -56,11 +56,12 @@
     # outerClothing: ClothingOuterCoatRnd - WD EDIT
     id: LibrarianPDA
     ears: ClothingHeadsetScience
-    pocket1: BookPsionicsGuidebook
-    pocket2: HandLabeler
   storage:
     back:
     - BookRandom
+    jumpsuit:
+    - BookPsionicsGuidebook
+    - HandLabeler
 
 - type: startingGear
   id: LibrarianPlasmamanGear

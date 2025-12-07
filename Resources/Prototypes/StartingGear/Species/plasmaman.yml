@@ -11,7 +11,9 @@
   parent: BasePlasmamanGear
   equipment:
     mask: ClothingMaskBreath
-    pocket2: DoubleEmergencyPlasmaTankFilled
+  storage:
+    jumpsuit:
+    - DoubleEmergencyPlasmaTankFilled
 
 - type: startingGear
   abstract: true

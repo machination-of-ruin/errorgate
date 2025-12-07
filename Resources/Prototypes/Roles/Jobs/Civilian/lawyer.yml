@@ -31,13 +31,13 @@
     shoes: ClothingShoesBootsLaceup
     id: LawyerPDA
     ears: ClothingHeadsetSecurity
-    pocket1: BookSecurity
-    pocket2: BookSpaceLaw
   inhand:
   - BriefcaseBrownFilled
   storage:
-    back:
+    jumpsuit:
     - RubberStampLawyer
+    - BookSecurity
+    - BookSpaceLaw
 
 - type: startingGear
   id: LawyerPlasmamanGear

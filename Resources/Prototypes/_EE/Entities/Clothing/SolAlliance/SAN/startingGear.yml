@@ -8,10 +8,12 @@
     gloves: ClothingHandsMercGlovesCombat
     shoes: ClothingShoesBootsCombatFilled
     id: SANIdCard
-    pocket1: WeaponPistolViperWood
-    pocket2: MagazinePistol
     belt: ClothingBeltMilitaryWebbing
     outerClothing: ClothingOuterVestWebSAN
+  storage:
+    jumpsuit:
+    - WeaponPistolViperWood
+    - MagazinePistol
 
 - type: startingGear
   id: SANMarineOfficer
@@ -23,6 +25,8 @@
     gloves: ClothingHandsMercGlovesCombat
     shoes: ClothingShoesBootsCombatFilled
     id: SANIdCard
-    pocket1: WeaponPistolViperWood
-    pocket2: MagazinePistol
     belt: ClothingBeltSheathSANMarineFilled
+  storage:
+    jumpsuit:
+    - WeaponPistolViperWood
+    - MagazinePistol

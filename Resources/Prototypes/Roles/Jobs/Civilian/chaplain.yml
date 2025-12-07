@@ -56,11 +56,12 @@
     shoes: ClothingShoesColorBlack
     id: ChaplainPDA
     ears: ClothingHeadsetScience
-    pocket1: BookPsionicsGuidebook
   storage:
     back:
     - Bible
     - RubberStampChaplain
+    jumpsuit:
+    - BookPsionicsGuidebook
 
 - type: startingGear
   id: ChaplainPlasmamanGear

@@ -67,8 +67,10 @@
     head: ClothingHeadHatOutlawHat
     outerClothing: ClothingOuterArmorBasicSlim
     back: ClothingBackpackSatchel
-    pocket1: BaseUplinkRadio25TC
-    pocket2: EnergySword
+  storage:
+    jumpsuit:
+    - BaseUplinkRadio25TC
+    - EnergySword
 
 # Nanotrasen Paramilitary Unit Gear
 - type: startingGear
@@ -190,14 +192,15 @@
     shoes: ClothingShoesClownBanana
     jumpsuit: ClothingUniformJumpsuitClownBanana
     mask: ClothingMaskClownBanana
-    pocket1: BikeHorn
-    pocket2: ClownRecorder
   # WD EDIT START
   storage:
     back:
     - BoxHug
     - RubberStampClown
     - CrayonRainbow
+    jumpsuit:
+    - BikeHorn
+    - ClownRecorder
   # WD EDIT END
 
 # Passenger but without the ID, bag, or headset

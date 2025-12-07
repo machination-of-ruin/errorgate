@@ -32,8 +32,11 @@
     id: CentcomPDA
     ears: ClothingHeadsetAltCentCom
     belt: WeaponPistolN1984
-    pocket1: BoxFolderBlack
-    pocket2: PenCentcom
+  storage:
+    jumpsuit:
+    - BoxFolderBlack
+    - PenCentcom
+    - MagazineMagnum
 
 - type: startingGear
   id: CentcomPlasmamanGear

@@ -7,15 +7,20 @@
     shoes: ClothingShoesBootsLaceup
     id: PiratePDA
     belt: ClothingBeltUtility
-    pocket1: AppraisalTool
+  storage:
+    jumpsuit:
+    - AppraisalTool
 
 - type: startingGear
   id: PirateCaptainGear
   parent: PirateGear
   equipment:
     head: ClothingHeadHatPirate
-    pocket2: EnergyCutlass
     outerClothing: ClothingOuterCoatPirate
+  storage:
+    jumpsuit:
+    - AppraisalTool
+    - EnergyCutlass
 
 - type: startingGear
   id: PirateFirstmateGear
