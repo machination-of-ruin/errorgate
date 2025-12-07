@@ -21,7 +21,7 @@ public sealed class MaskSystem : EntitySystem
         base.Initialize();
 
         SubscribeLocalEvent<MaskComponent, ToggleMaskEvent>(OnToggleMask);
-        SubscribeLocalEvent<MaskComponent, GetItemActionsEvent>(OnGetActions);
+        // SubscribeLocalEvent<MaskComponent, GetItemActionsEvent>(OnGetActions); // ERRORGATE
         SubscribeLocalEvent<MaskComponent, GotUnequippedEvent>(OnGotUnequipped);
         SubscribeLocalEvent<MaskComponent, FoldedEvent>(OnFolded);
     }

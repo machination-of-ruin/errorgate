@@ -20,7 +20,7 @@ public sealed class ToggleClothingSystem : EntitySystem
         base.Initialize();
 
         SubscribeLocalEvent<ToggleClothingComponent, MapInitEvent>(OnMapInit);
-        SubscribeLocalEvent<ToggleClothingComponent, GetItemActionsEvent>(OnGetActions);
+        // SubscribeLocalEvent<ToggleClothingComponent, GetItemActionsEvent>(OnGetActions); // ERRORGATE no action
         SubscribeLocalEvent<ToggleClothingComponent, ToggleActionEvent>(OnToggleAction);
         SubscribeLocalEvent<ToggleClothingComponent, ClothingGotUnequippedEvent>(OnUnequipped);
     }
