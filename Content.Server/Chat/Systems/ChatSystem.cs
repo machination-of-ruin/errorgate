@@ -84,7 +84,7 @@ public sealed partial class ChatSystem : SharedChatSystem
     public const float DefaultObfuscationFactor = 0.2f; // Percentage of symbols in a whispered message that can be seen even by "far" listeners
     public readonly Color DefaultSpeakColor = Color.White;
 
-    private bool _loocEnabled = true;
+    private bool _loocEnabled = false;
     private bool _deadLoocEnabled;
     private bool _critLoocEnabled;
     private readonly bool _adminLoocEnabled = true;

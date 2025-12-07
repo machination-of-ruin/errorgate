@@ -467,11 +467,11 @@
     id: VisitorPDA
     back: ClothingBackpackDuffelCargo
     ears: ClothingHeadsetCargo
+    outerClothing: ClothingOuterWinterCargo
   storage:
     jumpsuit:
     - AppraisalTool
     - SpaceCash500
-    outerClothing: ClothingOuterWinterCargo
   inhand:
   - FoodBoxPizzaFilled
   - KnifePlastic
@@ -1237,7 +1237,6 @@
     outerClothing: ClothingOuterPlagueSuit
   storage:
     jumpsuit:
-    - PlushieSharkGrey
     - FoodSnackEnergy
 
 - type: startingGear
@@ -1254,7 +1253,6 @@
     outerClothing: ClothingOuterNunRobe
   storage:
     jumpsuit:
-    - PlushiePenguin
     - DrinkCoconutWaterCarton
 
 - type: startingGear
@@ -1978,10 +1976,10 @@
     id: VisitorPDA
     back: ClothingBackpackSatchelCargo
     #ears: # No headsets.
+    outerClothing: ClothingOuterWinterCargo
   storage:
     jumpsuit:
     - AppraisalTool
-    outerClothing: ClothingOuterWinterCargo
 
 # CHALLENGE
 # carefully consider everything you add to these. These are meant for roles that are placed in survival situations where every item will be a resource.
