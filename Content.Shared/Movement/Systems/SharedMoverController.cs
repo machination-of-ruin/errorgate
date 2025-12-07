@@ -4,6 +4,8 @@ using Content.Shared.ActionBlocker;
 using Content.Shared.Alert;
 using Content.Shared.Bed.Sleep;
 using Content.Shared.CCVar;
+using Content.Shared.Damage.Components;
+using Content.Shared.Damage.Systems;
 using Content.Shared.Friction;
 using Content.Shared.Gravity;
 using Content.Shared.Inventory;
@@ -53,6 +55,7 @@ public abstract partial class SharedMoverController : VirtualController
     [Dependency] protected readonly SharedPhysicsSystem Physics = default!;
     [Dependency] private   readonly SharedTransformSystem _transform = default!;
     [Dependency] private   readonly TagSystem _tags = default!;
+    [Dependency] private   readonly StaminaSystem _staminaSystem = default!; // ERRORGATE
 
     protected EntityQuery<InputMoverComponent> MoverQuery;
     protected EntityQuery<MobMoverComponent> MobMoverQuery;
@@ -315,6 +318,12 @@ public abstract partial class SharedMoverController : VirtualController
 
         // Ensures that players do not spiiiiiiin
         PhysicsSystem.SetAngularVelocity(physicsUid, 0, body: physicsComponent);
+
+        // ERRORGATE DRAIN STAMINA ON SPRINTING
+        if (TryComp<StaminaComponent>(uid, out var stamina))
+        {
+            _staminaSystem.ToggleStaminaDrain(uid, stamina.SprintingStaminaDrainRate, (mover.Sprinting && total.Length() != 0), false);
+        }
     }
 
     public void LerpRotation(EntityUid uid, InputMoverComponent mover, float frameTime)

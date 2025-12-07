@@ -11,6 +11,8 @@ namespace Content.Shared.Damage.Components;
 [RegisterComponent, NetworkedComponent, AutoGenerateComponentState(true), AutoGenerateComponentPause]
 public sealed partial class StaminaComponent : Component
 {
+    public bool SlowdownReset;
+
     /// <summary>
     /// Have we reached peak stamina damage and been paralyzed?
     /// </summary>
@@ -47,6 +49,12 @@ public sealed partial class StaminaComponent : Component
     /// </summary>
     [DataField, AutoNetworkedField]
     public Dictionary<EntityUid, (float DrainRate, bool ModifiesSpeed)> ActiveDrains = new();
+
+    /// <summary>
+    /// How much stamina per second is decreased by sprinting.
+    /// </summary>
+    [ViewVariables(VVAccess.ReadWrite), DataField, AutoNetworkedField]
+    public float SprintingStaminaDrainRate = 10f;
 
     /// <summary>
     /// How long will this mob be stunned for?

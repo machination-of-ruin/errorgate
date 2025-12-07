@@ -405,7 +405,10 @@ public sealed partial class StaminaSystem : EntitySystem
                 RemComp<ActiveStaminaComponent>(uid);
                 continue;
             }
-            if (comp.ActiveDrains.Count > 0)
+
+            var slowdownThreshold = comp.CritThreshold - comp.CritThreshold / 5f; // ERRORGATE SLOW on 20% stamina
+
+            if (comp.ActiveDrains.Count > 0 && comp.StaminaDamage < slowdownThreshold)
                 foreach (var (source, (drainRate, modifiesSpeed)) in comp.ActiveDrains)
                     TakeStaminaDamage(uid,
                     drainRate * frameTime,
@@ -413,6 +416,19 @@ public sealed partial class StaminaSystem : EntitySystem
                     source: source,
                     visual: false,
                     allowsSlowdown: modifiesSpeed);
+
+            // If we go above n% then apply slowdown
+            if (comp.StaminaDamage > slowdownThreshold && !_statusEffect.HasStatusEffect(uid, "SlowedDown"))
+            {
+                if (!comp.SlowdownReset)
+                {
+                    _popup.PopupClient("Too tired!", uid, uid, PopupType.MediumCaution);
+                    comp.SlowdownReset = true;
+                }
+
+                _stunSystem.TrySlowdown(uid, TimeSpan.FromSeconds(4.5), true, 0.9f, 0.9f);
+            }
+
             // Shouldn't need to consider paused time as we're only iterating non-paused stamina components.
             var nextUpdate = comp.NextUpdate;
 
@@ -429,7 +445,10 @@ public sealed partial class StaminaSystem : EntitySystem
             comp.NextUpdate += TimeSpan.FromSeconds(1f);
             // If theres no active drains, recover stamina.
             if (comp.ActiveDrains.Count == 0)
+            {
                 TakeStaminaDamage(uid, -comp.Decay, comp);
+                comp.SlowdownReset = false;
+            }
 
             Dirty(uid, comp);
         }
