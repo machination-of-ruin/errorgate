@@ -1,7 +1,7 @@
 - type: species
   id: Reptilian
   name: species-name-reptilian
-  roundStart: true
+  roundStart: false # ERRORGATE
   prototype: MobReptilian
   # WD EDIT START
   bodyTypes:

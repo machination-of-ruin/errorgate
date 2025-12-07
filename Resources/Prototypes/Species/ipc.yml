@@ -1,7 +1,7 @@
 - type: species
   id: IPC
   name: species-name-ipc
-  roundStart: true
+  roundStart: false # ERRORGATE
   prototype: MobIPC
   # WD EDIT START
   bodyTypes:

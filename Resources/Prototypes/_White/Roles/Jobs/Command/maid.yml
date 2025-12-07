@@ -13,11 +13,11 @@
   #  min: 72000 # 20 ch
   - !type:CharacterOverallTimeRequirement
     min: 7200
-  - !type:CharacterSpeciesRequirement
-    species:
-    - Human
-    - Felinid
-    - Harpy
+  # - !type:CharacterSpeciesRequirement # ERRORGATE HUMAN ONLY
+  #   species:
+  #   - Human
+  #   - Felinid
+  #   - Harpy
   - !type:CharacterSexRequirement
     sex:
     - Female
