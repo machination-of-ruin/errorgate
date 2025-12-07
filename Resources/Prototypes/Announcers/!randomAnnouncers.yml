@@ -1,9 +1,9 @@
 - type: weightedRandom
   id: RandomAnnouncers
   weights:
-    Intern: 0.15
-    MedBot: 0.5
-    Michael: 0.9
-    NEIL: 1
-    VoxFem: 0.55
-    RuOld: 1 # WD EDIT
+    #Intern: 0.15
+    #MedBot: 0.5
+    #Michael: 0.9
+    #NEIL: 1
+    VoxFem: 1 # ERRORGATE only one left
+    # RuOld: 1 # WD EDIT
