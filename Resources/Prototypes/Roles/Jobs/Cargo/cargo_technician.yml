@@ -29,7 +29,9 @@
     shoes: ClothingShoesColorBlack
     id: CargoPDA
     ears: ClothingHeadsetCargo
-    pocket1: AppraisalTool
+  storage:
+    jumpsuit:
+    - AppraisalTool
 
 - type: startingGear
   id: CargoTechPlasmamanGear

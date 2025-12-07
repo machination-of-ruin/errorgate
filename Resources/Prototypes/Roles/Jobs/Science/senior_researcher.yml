@@ -33,4 +33,6 @@
     outerClothing: ClothingOuterCoatLabSeniorResearcher
     id: SeniorResearcherPDA
     ears: ClothingHeadsetScience
-    pocket1: BookPsionicsGuidebook
+  storage:
+    jumpsuit:
+    - BookPsionicsGuidebook

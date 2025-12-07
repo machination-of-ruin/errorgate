@@ -31,7 +31,9 @@
     outerClothing: ClothingOuterCoatRobo
     id: RoboticsPDA
     ears: ClothingHeadsetRobotics
-    pocket1: BookPsionicsGuidebook
+  storage:
+    jumpsuit:
+    - BookPsionicsGuidebook
 
 - type: startingGear
   id: RoboticistPlasmamanGear

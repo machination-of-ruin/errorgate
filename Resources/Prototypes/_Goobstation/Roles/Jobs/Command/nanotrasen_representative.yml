@@ -61,7 +61,9 @@
     id: CentcomPDA
     jumpsuit: ClothingUniformJumpsuitNanotrasenRepresentative
     ears: ClothingHeadsetAltCentCom
-    pocket1: UniqueNanorepLockerTeleporter
+  storage:
+    jumpsuit:
+    - UniqueNanorepLockerTeleporter
 
 - type: startingGear
   id: NanotrasenRepresentativePlasmamanGear

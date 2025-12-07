@@ -27,13 +27,13 @@
     belt: ClothingBeltSuspendersRed
     gloves: ClothingHandsGlovesLatex
     shoes: ClothingShoesColorWhite
-    pocket1: CrayonMime
     mask: ClothingMaskMime
     id: MimePDA
     ears: ClothingHeadsetService
   storage:
     back:
     - RubberStampMime
+    - CrayonMime
 
 - type: startingGear
   id: MimePlasmamanGear

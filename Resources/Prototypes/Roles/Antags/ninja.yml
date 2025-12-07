@@ -22,8 +22,6 @@
     shoes: ClothingShoesSpaceNinja
     id: AgentIDCard
     ears: ClothingHeadsetGrey
-    pocket1: SpiderCharge
-    pocket2: PinpointerStation
     belt: EnergyKatana
     suitstorage: OxygenTankFilled
   inhand:
@@ -31,15 +29,12 @@
   storage:
     back: # belt holds katana so satchel has the tools for sabotaging things
     - BoxSurvival
-    - Crowbar
-    - Wrench
-    - Screwdriver
-    - Wirecutter
-    - Welder
-    - Multitool
-    - FoodSnackDango
-    - FoodSnackDango
     - DrinkSakeBottleFull
+    - FoodSnackDango
+    - FoodSnackDango
+    jumpsuit:
+    - SpiderCharge
+    - PinpointerStation
 
 - type: startingGear
   id: SpaceNinjaPlasmamanGear

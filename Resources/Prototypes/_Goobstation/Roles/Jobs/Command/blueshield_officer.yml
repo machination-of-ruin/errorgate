@@ -73,14 +73,9 @@
     ears: ClothingHeadsetAltCentCom
     gloves: ClothingHandsGlovesCombat
     id: BlueshieldPDA
-    pocket1: UniqueBlueshieldOfficerLockerTeleporter
-#    pocket2: BluespaceLifelineImplanter    #Doesn't need this since its implanted roundstart
-
-    #outerClothing: ClothingBlueshieldArmourVest
-    #ears: ClothingHeadsetAltCommand
-    #belt: ClothingBeltSecurityFilled
-    #pocket1: WeaponPistolMk58
-    #pocket2: DeathAcidifierImplanter
+  storage:
+    jumpsuit:
+    - UniqueBlueshieldOfficerLockerTeleporter
 
 - type: startingGear
   id: BlueshieldPlasmamanGear

@@ -44,6 +44,19 @@
         - ItemMask
         restitution: 0.3
         friction: 0.2
+  - type: Storage # ERRORGATE POCKETS
+    maxItemSize: Normal
+    grid:
+    - 0,0,3,1
+  - type: ContainerContainer
+    containers:
+      storagebase: !type:Container
+        ents: []
+  - type: UserInterface
+    interfaces:
+      enum.StorageUiKey.Key:
+        type: StorageBoundUserInterface
+
 
 - type: entity
   abstract: true

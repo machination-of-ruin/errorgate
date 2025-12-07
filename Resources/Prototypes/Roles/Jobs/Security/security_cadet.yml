@@ -50,7 +50,8 @@
     id: SecurityCadetPDA
     ears: ClothingHeadsetAltSecurityRegular
     # belt: ClothingBeltSecurityFilled - WD EDIT
-    pocket2: BookSecurity
   storage:
     back:
     - WeaponEnergyGunPistolSecurity # WD EDIT
+    jumpsuit:
+    - BookSecurity

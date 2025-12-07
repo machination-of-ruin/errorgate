@@ -39,7 +39,9 @@
   equipment:
     jumpsuit: ClothingUniformEnvirosuitOperative
     head: ClothingHeadEnvirohelmOperative
-    pocket1: DoubleEmergencyPlasmaTankFilled
+  storage:
+    jumpsuit:
+    - DoubleEmergencyPlasmaTankFilled
 
 - type: startingGear
   id: SyndicateOperativeGearExtremelyBasic
@@ -59,8 +61,9 @@
   parent: SyndicateOperativeClothing
   subGear:
   - BoxSurvivalSyndicate
-  equipment:
-    pocket1: WeaponPistolViper
+  storage:
+    jumpsuit:
+    - WeaponPistolViper
   inhand:
   - MedkitCombatFilled
 
@@ -72,20 +75,22 @@
   equipment:
     id: AgentIDCard
     mask: ClothingMaskGasVoiceChameleon
-    pocket1: WeaponPistolViper
+  storage:
+    jumpsuit:
+    - WeaponPistolViper
 
 - type: startingGear
   id: SyndicateReinforcementThief
   parent: SyndicateOperativeClothing
   subGear:
   - BoxSurvivalSyndicate
-  equipment:
-    pocket1: WeaponPistolViper
   inhand:
   - ToolboxSyndicateFilled
   storage:
     back:
     - SyndicateJawsOfLife
+    jumpsuit:
+    - WeaponPistolViper
 
 #Syndicate Operative Outfit - Basic
 - type: startingGear
@@ -94,5 +99,7 @@
   equipment:
     ears: ClothingHeadsetAltSyndicate
     gloves: ClothingHandsGlovesCombat
-    pocket1: BaseUplinkRadio40TC
     id: SyndiPDA
+  storage:
+    jumpsuit:
+    - BaseUplinkRadio40TC

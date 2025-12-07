@@ -78,12 +78,13 @@
     shoes: ClothingShoesColorBrown
     id: RnDPDA
     ears: ClothingHeadsetAltScience
-    pocket1: BookPsionicsGuidebook
-    pocket2: BibleMystagogue
   storage:
     back:
     # - Flash - WD EDIT
     - TelescopicBaton
+    jumpsuit:
+    - BookPsionicsGuidebook
+    - BibleMystagogue
 
 - type: startingGear
   id: ResearchDirectorPlasmamanGear

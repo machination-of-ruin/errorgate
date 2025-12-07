@@ -35,8 +35,6 @@
     gloves: ClothingHandsGlovesCombat
     shoes: ClothingShoesBootsCombatFilled
     id: SyndiPDA
-    pocket1: DoubleEmergencyOxygenTankFilled
-    pocket2: PlushieCarp
     belt: ClothingBeltMilitaryWebbing
   storage:
     back:
@@ -44,6 +42,9 @@
     - WeaponPistolViper
     - PinpointerSyndicateNuclear
     - DeathAcidifierImplanter
+    jumpsuit:
+    - DoubleEmergencyOxygenTankFilled
+    - PlushieCarp
 
 - type: startingGear
   id: SyndicateOperativePlasmamanGear
@@ -51,14 +52,18 @@
   equipment:
     jumpsuit: ClothingUniformEnvirosuitOperative
     head: ClothingHeadEnvirohelmOperative
-    pocket1: DoubleEmergencyPlasmaTankFilled
+  storage:
+    jumpsuit:
+    - DoubleEmergencyPlasmaTankFilled
 
 #Nuclear Operative Gear
 - type: startingGear
   id: SyndicateOperativeGearFull
   parent: SyndicateOperativeGearFullNoUplink
-  equipment:
-    pocket2: BaseUplinkRadio40TC
+  storage:
+    jumpsuit:
+    - DoubleEmergencyOxygenTankFilled
+    - BaseUplinkRadio40TC
 
 #Nuclear Operative Commander Gear
 - type: startingGear
@@ -96,5 +101,7 @@
 - type: startingGear
   id: SyndicateLoneOperativeGearFull
   parent: SyndicateOperativeGearFull
-  equipment:
-    pocket2: BaseUplinkRadio60TC
+  storage:
+    jumpsuit:
+    - DoubleEmergencyOxygenTankFilled
+    - BaseUplinkRadio60TC

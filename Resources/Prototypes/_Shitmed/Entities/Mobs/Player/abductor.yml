@@ -122,9 +122,11 @@
     head: ClothingHeadHelmetAbductor
     outerClothing: ClothingOuterCoatAbductor
     back: ClothingBackpackAbductor
-    pocket1: AbductorGizmo
-    pocket2: WeaponAlien
     suitstorage: Wonderprod
+  storage:
+    jumpsuit:
+    - AbductorGizmo
+    - WeaponAlien
 
 - type: startingGear
   id: AbductorScientistGear
@@ -136,8 +138,10 @@
     head: ClothingHeadMirror
     outerClothing: ClothingOuterCoatAbductor
     back: ClothingBackpackDuffelAbductor
-    pocket1: AbductorGizmo
     suitstorage: WeaponDecloner
+  storage:
+    jumpsuit:
+    - AbductorGizmo
 
 - type: startingGear
   id: AbductorAgentGear
@@ -149,9 +153,11 @@
     head: ClothingHeadHelmetAbductor
     outerClothing: ClothingOuterArmorAbductor
     back: ClothingBackpackAbductor
-    pocket1: Silencer
-    pocket2: WeaponAlien
     suitstorage: Wonderprod
+  storage:
+    jumpsuit:
+    - Silencer
+    - WeaponAlien
 
 # Spawners
 
