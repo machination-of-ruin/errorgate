@@ -1,7 +1,7 @@
 - type: species
   id: Plasmaman
   name: species-name-plasmaman
-  roundStart: true
+  roundStart: false # ERRORGATE
   prototype: MobPlasmaman
   # WD EDIT START
   bodyTypes:
