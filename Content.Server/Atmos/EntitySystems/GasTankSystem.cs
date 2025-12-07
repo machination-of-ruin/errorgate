@@ -42,7 +42,7 @@ namespace Content.Server.Atmos.EntitySystems
             base.Initialize();
             SubscribeLocalEvent<GasTankComponent, ComponentShutdown>(OnGasShutdown);
             SubscribeLocalEvent<GasTankComponent, BeforeActivatableUIOpenEvent>(BeforeUiOpen);
-            SubscribeLocalEvent<GasTankComponent, GetItemActionsEvent>(OnGetActions);
+            //SubscribeLocalEvent<GasTankComponent, GetItemActionsEvent>(OnGetActions); // ERRORGATE no actions
             SubscribeLocalEvent<GasTankComponent, ExaminedEvent>(OnExamined);
             SubscribeLocalEvent<GasTankComponent, ToggleActionEvent>(OnActionToggle);
             SubscribeLocalEvent<GasTankComponent, EntParentChangedMessage>(OnParentChange);

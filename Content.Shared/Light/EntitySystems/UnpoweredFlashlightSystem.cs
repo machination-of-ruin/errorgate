@@ -30,7 +30,7 @@ public sealed class UnpoweredFlashlightSystem : EntitySystem
         base.Initialize();
 
         SubscribeLocalEvent<UnpoweredFlashlightComponent, GetVerbsEvent<ActivationVerb>>(AddToggleLightVerbs);
-        SubscribeLocalEvent<UnpoweredFlashlightComponent, GetItemActionsEvent>(OnGetActions);
+        // SubscribeLocalEvent<UnpoweredFlashlightComponent, GetItemActionsEvent>(OnGetActions); // ERRORGATE
         SubscribeLocalEvent<UnpoweredFlashlightComponent, ToggleActionEvent>(OnToggleAction);
         SubscribeLocalEvent<UnpoweredFlashlightComponent, MindAddedMessage>(OnMindAdded);
         SubscribeLocalEvent<UnpoweredFlashlightComponent, GotEmaggedEvent>(OnGotEmagged);
@@ -52,10 +52,10 @@ public sealed class UnpoweredFlashlightSystem : EntitySystem
         args.Handled = true;
     }
 
-    private void OnGetActions(EntityUid uid, UnpoweredFlashlightComponent component, GetItemActionsEvent args)
-    {
-        args.AddAction(component.ToggleActionEntity);
-    }
+    // private void OnGetActions(EntityUid uid, UnpoweredFlashlightComponent component, GetItemActionsEvent args)
+    // {
+    //     args.AddAction(component.ToggleActionEntity);
+    // }
 
     private void AddToggleLightVerbs(EntityUid uid, UnpoweredFlashlightComponent component, GetVerbsEvent<ActivationVerb> args)
     {

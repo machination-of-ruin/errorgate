@@ -48,7 +48,7 @@ namespace Content.Server.Light.EntitySystems
 
             SubscribeLocalEvent<HandheldLightComponent, ActivateInWorldEvent>(OnActivate);
 
-            SubscribeLocalEvent<HandheldLightComponent, GetItemActionsEvent>(OnGetActions);
+            //SubscribeLocalEvent<HandheldLightComponent, GetItemActionsEvent>(OnGetActions); // ERRORGATE
             SubscribeLocalEvent<HandheldLightComponent, ToggleActionEvent>(OnToggleAction);
 
             SubscribeLocalEvent<HandheldLightComponent, EntInsertedIntoContainerMessage>(OnEntInserted);
@@ -67,10 +67,10 @@ namespace Content.Server.Light.EntitySystems
             UpdateLevel(ent);
         }
 
-        private void OnGetActions(EntityUid uid, HandheldLightComponent component, GetItemActionsEvent args)
-        {
-            args.AddAction(ref component.ToggleActionEntity, component.ToggleAction);
-        }
+        // private void OnGetActions(EntityUid uid, HandheldLightComponent component, GetItemActionsEvent args)
+        // {
+        //     args.AddAction(ref component.ToggleActionEntity, component.ToggleAction);
+        // }
 
         private void OnToggleAction(Entity<HandheldLightComponent> ent, ref ToggleActionEvent args)
         {
