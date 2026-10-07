@@ -179,7 +179,6 @@
     heavyStaminaCost: 0
     maxTargets: 1
   - type: SleepEmitSound
-  - type: SSDIndicator
   - type: StandingState
   - type: Fingerprint
   - type: Dna

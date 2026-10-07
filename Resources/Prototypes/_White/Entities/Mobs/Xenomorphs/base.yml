@@ -131,7 +131,6 @@
     - XenoHivemind
     - Hissing
     - Draconic
-  - type: SSDIndicator
   - type: Emoting
   - type: BodyEmotes
     soundsId: GeneralBodyEmotes

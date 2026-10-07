@@ -25,8 +25,6 @@ public sealed class JobSystem : SharedJobSystem
 
     private void OnRoleAddedEvent(RoleAddedEvent args)
     {
-        MindOnDoGreeting(args.MindId, args.Mind, args);
-
         if (args.RoleTypeUpdate)
             _roles.RoleUpdateMessage(args.Mind);
     }
@@ -35,26 +33,6 @@ public sealed class JobSystem : SharedJobSystem
     {
         if (args.RoleTypeUpdate)
             _roles.RoleUpdateMessage(args.Mind);
-    }
-
-    private void MindOnDoGreeting(EntityUid mindId, MindComponent component, RoleAddedEvent args)
-    {
-        if (args.Silent)
-            return;
-
-        if (!_mind.TryGetSession(mindId, out var session))
-            return;
-
-        if (!MindTryGetJob(mindId, out var prototype))
-            return;
-
-        _chat.DispatchServerMessage(session, Loc.GetString("job-greet-introduce-job-name",
-            ("jobName", CultureInfo.CurrentCulture.TextInfo.ToTitleCase(prototype.LocalizedName))));
-
-        if (prototype.RequireAdminNotify)
-            _chat.DispatchServerMessage(session, Loc.GetString("job-greet-important-disconnect-admin-notify"));
-
-        _chat.DispatchServerMessage(session, Loc.GetString("job-greet-supervisors-warning", ("jobName", prototype.LocalizedName), ("supervisors", Loc.GetString(prototype.Supervisors))));
     }
 
     public void MindAddJob(EntityUid mindId, string jobPrototypeId)
