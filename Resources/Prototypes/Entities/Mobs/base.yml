@@ -63,6 +63,7 @@
   id: MobDamageable
   abstract: true
   components:
+  - type: CombatLogs
   - type: Damageable
     damageContainer: Biological
   - type: Destructible
