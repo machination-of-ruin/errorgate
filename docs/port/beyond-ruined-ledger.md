@@ -1,0 +1,154 @@
+# >>> PORT LEDGER <<<
+
+Notes for replaying the old survival fork (`C:\Games\SS14\errorgate-beyond-ruined`, git remote ref `beyond/master`) onto this repo.
+**Read this before touching a PR. Update it after every PR.** Its job is to stop us doing the same work twice.
+
+Branch: `port/beyond`. Shared history base: `8068dda469` (Sep 2024). PR list: `git log --first-parent --reverse 8068dda469..beyond/master`.
+
+## Rules (learned the hard way)
+
+1. **Check upstream first.** A large part of the old fork was written by the owner and later upstreamed to WWDP (the `Vaaankas` account, git author `vanx`). Before discussing a PR:
+   - search `master` (`git log master -i --grep=<topic>`) and the code (`grep` for the class / prototype ids);
+   - look at the "WWDP PRs by the owner" table below;
+   - open the PR on GitHub (`WWhiteDreamProject/wwdpublic`) with WebFetch if unsure.
+   Mistakes so far: porting `CritDeathSounds` when WWDP already had `MobThresholdSounds` (#915); drafting #20 and #21 as if nothing existed (The Gunnening #285 and right-click gun melee #24 already did it).
+2. **Verify claims with code or a test**, not by reading one code path. (A real examine probe disproved "magazine guns show ammo counts".)
+3. **Discuss every PR with the owner before applying it.** Present: what it does, what upstream already has, numbered questions, a recommendation.
+4. **Never edit RobustToolbox.** Engine-specific changes of the old fork (custom `corrupted-toolbox` v0.96) are dropped.
+5. **Prefer the WWDP version** of a feature over the old fork's homebrew version.
+6. **Narrow test runs** (`--filter`), never the whole integration suite. Always run the YAML linter after prototype/locale changes.
+7. Keep new code in `_ERRORGATE` folders and keep upstream edits small and marked `// ERRORGATE`.
+8. Do not touch the owner's uncommitted design docs; stage files by explicit path.
+
+## Standing decisions
+
+| Topic | Decision |
+|---|---|
+| Species | Humans only. Other species prototypes stay (see `docs/design/humans-only.md`). |
+| Interactions | WWDP "Immersive Interactions" (#288, #351), switchable with `errorgate.immersive_interactions`. The old fork's #19/#22/#27/#51/#72 "must be in hand" family is obsolete. |
+| Death | No ghosts. Death void (`Content.Server/_ERRORGATE/DeathVoid`). `rise` and `respawn` for players, `forcerespawn` for admins. OOC stays readable for the dead. |
+| Observe | Admin only; spectating for non-admins is a later idea. |
+| Presets/jobs | One `ERRORGATE` preset (no rules yet, the AI GOD rule goes there). One selectable job `HumanError`; other jobs hidden from setup, prototypes kept. |
+| Ammo/HUD info | Gunnening (#285) is the baseline: no fire rate or ammo count on guns. Handheld gun and mech ammo HUD counters that upstream left are kept. |
+| Melee/gun bash | Keep upstream behaviour and stats until the melee milestone (#37, #61, #84). |
+| Lobby music | Owner chose to ship the 16-track playlist as is. Attributions state honestly that most are commercial. |
+| Tips | Off by default; real tips come with #91. |
+| LOOC | Off by default; plain OOC stays. |
+| Loot / mobs / despawn / day cycle | Port the **final** versions as one "world systems" milestone, not PR by PR. |
+
+## Ledger
+
+Status: **DONE** = ported (commit), **SKIP** = will not port (reason), **COVERED** = WWDP already has it, **MILESTONE** = port with a group, **TODO** = to discuss.
+
+### Done / decided (#1 to #32)
+
+| PR | Name | Status | Notes |
+|---|---|---|---|
+| 1 | corrupted-toolbox | SKIP | Engine pointer. |
+| 2 | respawn-2 | DONE `765da4a1ee` | Reworked into the death void. |
+| 3 | no-russian | DONE `987cf0980d` | Plus `28c85d3a40` for strings that only existed in ru-RU. |
+| 4 | character-creation | DONE `affa868b99` | Humans only. |
+| 5 | git-cleanup | DONE `65c4227820` | Branding, README, info text, `>>> STYLE <<<` in CLAUDE.md. |
+| 6 | BIGTEXT-engineswitch | DONE `fe48d09605` | Only the combat logs; engine parts dropped. Combat logs rewritten and extended. |
+| 7, 8 | errorgate-solution | SKIP | Solution rename, repo keeps `SpaceStation14.sln`. |
+| 9 | no-combat-mode-popup | COVERED | WWDP already commented the popup out. |
+| 10 | roundstart | DONE `38252cc113` | Spawn flavour removed, SSD indicator and OwO hack removed. Psionics part already gone upstream. |
+| 11 | maptest | DONE `3b96b43e83` | Dev map `EdgeOfEntropyDev`; atmos part already upstream. |
+| 12 | obeserve-button | DONE `98f061a25a` | Admin only. |
+| 13 | no-ghost-in-chasm | DONE `98f061a25a` | Hooks in `MindSystem` send deleted/evicted minds to the void; `rise`. |
+| 14, 53 | (no PR) | n/a | Numbers do not exist in the old repo. |
+| 15 | roles-loadouts | DONE `8ecaea836a` | HumanError job. |
+| 16 | test-engine | SKIP | Engine pointer. |
+| 17 | game-preset | DONE `8ecaea836a` | ERRORGATE preset. |
+| 18 | lobby-decor | DONE `4922de655f` | Music, lobby art. |
+| 19 | disable-slot-swap | SKIP | Replaced by WWDP #288/#351, DONE `e637e60742`. |
+| 20 | Guns-descriptions | DONE `a9b1d5df75` | Only the item size line; rest is the Gunnening. |
+| 21 | Gun-melee | COVERED | Right-click gun melee (WD #24) exists; keep upstream stats and bash cooldown. |
+| 22, 27 | backpack-fix, pocket-gun-fix | SKIP | Patches of the old #19. |
+| 23 | cvar | DONE `75418641b5` | Tips, LOOC, LOOC bubbles off. Screen shake 0.2 was already upstream. |
+| 24 | loot-spawners | MILESTONE | First draft of the loot system (see World systems). |
+| 25 | gunslotvisual | DONE `75418641b5` | Only the 11 missing worn-gun sprites. Prototype path edits dropped (Windows backslashes). |
+| 26 | suitslot-no-suit | DONE `75418641b5` | Human template only. |
+| 28, 29 | gun-cycle | DONE `96154c2a36` | Muzzle flash radius on ammo (default 5), slower shotguns. `AutoCycle` already upstream. |
+| 30 | combatlogs-idetity | DONE `0b1bcb23dc` | Per-weapon verbs; identity masking was already in the new combat logs. |
+| 31 | fix-deathgasp | SKIP | Obsolete (death void text). Deathgasp always plays via `needsCritical: false` (#13). |
+| 32 | realdeathgasp | COVERED `65e07a6e60` | WWDP #915 `MobThresholdSounds`. The void plays the death sound to the player directly. |
+
+### Still to do (#33 to #91 and the reverts)
+
+Hints below come from commit messages, file lists and quick greps. **They are leads, not verdicts: verify before presenting.**
+
+| PR | Name | What it is | Upstream overlap / lead | Plan |
+|---|---|---|---|---|
+| 33, 34, 35 | mobspawner, mob-loot-system(2) | `SmartMobSpawner`, `MobLoot`, `DespawnDeadBody` | none | MILESTONE world systems |
+| 36 | blood-evaporate | Blood, insect blood, vomit and copper blood evaporate in puddles, 10 s tick, no sparkle | none in master (`EvaporationReagents = [Water]`). #65 later widens it to every reagent | TODO, small. Decide scope with #65 |
+| 37 | melee-tweak | RMB disarm instead of heavy attack, no heavy damage examine, thrust wide animation, human punch effect, melee prototype tweaks | Partly overlaps WWDP #264 melee visuals, #623 aiming and hitting. Heavy attack still present in master | MILESTONE melee (with #46, #52, #61, #69, #72, #84) |
+| 38 | character-creation | Remove job/antag/traits/loadout tabs, spawn priority, disclaimer; default to HUMANERROR | WWDP #334 touched departments only. UI part not upstream | TODO. Note jobs are already hidden (#15) |
+| 39 | item-pickup-sounds | Equip rustle for guns and backpacks, gun interact sounds, rifle sound fix | The Gunnening added equip sound collections; WWDP #591 belt gear sounds | Likely COVERED, verify sounds |
+| 40 | no-pointing | Pointing disabled (client and server) | none | TODO, tiny |
+| 41 | body-fixes | Gib does not spawn organs | Master `GibBehavior` uses Shitmed gib args | TODO, check Shitmed `GibContents` first |
+| 42 | weapons-resize | Smaller guns, bat tweaks, sniper fixes | WWDP #284 Weapons Resize (same author) | COVERED, check leftovers |
+| 43 | character-inspect | Character examine rework, only 2 genders | WWDP #269 Better Character Examine | COVERED (system). Gender menu trim is humans-only housekeeping |
+| 44 | no-id-card-verb | Health/bleeding/damage text pushed inline into examine, ID card verb removed, radiation inspect | WWDP keeps health examine as a verb (`SharedHealthExaminableSystem`) | TODO. Pairs with #50 |
+| 45 | embed-fix | Embedded items can be pulled out | WWDP #278 #308 #235 touch embedding, `Embedded` flag not in master | TODO, small |
+| 46, 52 | shove-2, mag-inspect-logs | Separate shove (`ShoveAttackEvent`, flip animation `FlipCharacter`, `FlipAnimationEffect`) | WWDP shove (#280 #295 #304 #315 #347 #565 #582 #978) tunes the disarm-as-shove; no `ShoveAttackEvent` in master | MILESTONE melee. Big decision: keep WWDP shove or replace |
+| 47 | mag-inspect-fix | Ballistic fill delay 0.5 to 1 s, magazine examine tweak | Gunnening shows magazine/chamber | Mostly COVERED, fill delay only |
+| 48 | gun-calibers | "The gunnening" of the old fork: real-world calibers (9x19, 5.56x45, 7.62x39, .357/.44, lapua, 6mm caseless), ammo and gun roster cut, station maps deleted (about 184 files), loot-entry names by caliber | Master uses fictional calibers (`.35 auto`, `.30 rifle`, `.50`); the roster is intact | MILESTONE guns. Very large; decide caliber model first |
+| 49 | 357 | The gunnening part 2 (.357/.44 rename, speed loaders) | same | MILESTONE guns |
+| 50 | no-examine | Damage examine for melee/ranged/thrown pushed inline, magazine examine | WWDP #549 #574 #925 fix damage examine | TODO. Pairs with #44 |
+| 51 | clothes-innteraction | Patch of old must-be-in-hand | n/a | SKIP |
+| 54 | stamina-fix2 | Stamina crit buffer 0, reset to 10%, shove stamina only on dynamic targets | none | TODO, stamina; combine with #82 |
+| 55 | announce | No roundstart announcement | none | TODO, tiny |
+| 56 | revert-engine | Engine revert | n/a | SKIP |
+| 57 | lobby-fixes | Lobby server name ">>> ERRORGATE <<<" | none | TODO, tiny, in the `>>> STYLE <<<` |
+| 58 | loot-tables | 36 loot spawner and table files, starter kits, smaller satchel, no breaking floor | none | MILESTONE world (loot + starter gear) |
+| 59 | playtest-preparation | Main map `EdgeOfEntropy.yml` (94k lines), no flashlight/gas tank actions, identity "Unknown" grammar, butchering allowed, no dreams | Map not in master | MILESTONE world map; the code bits TODO individually |
+| 60, 62, 63, 64 | mob-fixes, loot-spawners, branchchchc x2 | Loot/mob/despawn tweaks, `DespawnItem`, map update | none | MILESTONE world systems |
+| 61 | better-melee | Combined melee attack, 36 melee prototype tweaks | none | MILESTONE melee |
+| 65 | fixes | Executions return (x20 damage), every reagent evaporates, no ghosts (death void covers), no evac shuttle CVars, carps move on water, cold damage examinable, cigarettes in loot | partly covered by #13 | TODO, split |
+| 66 | loot-manager | Loot Manager 1.0 (global loot tables, LootEntries per category) | none | MILESTONE world systems (core) |
+| 67 | deaf-component | `DeafComponent` in `_ERRORGATE/Hearing` | WWDP deafness #265 #270 #384 #390 #395 and `HearingSystem` | COVERED |
+| 68 | no-dmca-revert | **Nine reverts of WWDP "[Port]" PRs + "no-dmca-fixes"** (hobo, maid, e-sword, betrayal knife, aspects, telescope, lying down, blink, uplink discounts, advanced prying, melee block) | All nine exist in master | TODO. Needs one decision per feature, probably for licensing/DMCA reasons. Ask the owner why |
+| 69 | tweaks | Combined melee attack on LMB, extract cartridge action, silenced guns no muzzle flash, stacking | Extract round is in the Gunnening | MILESTONE melee/guns; check |
+| 70 | clothes-rebalance | Inventory rework: item sizes, belts, outer clothing storage | Owner has inventory-size commits in master (belts, waist bags, March 2025) | TODO, verify what is left |
+| 71 | Guns-resprite | Drozd resprite to MP5 | none | TODO, sprites only |
+| 72 | fixes-333 | Revolver spin, outer clothes butcherable, hoodie storage, shove back, chug jug crash | #613 More Butcherable Clothes upstream | TODO, mostly small |
+| 73 | bad-water | Contaminated water reagents/tiles | none | MILESTONE world |
+| 74 | mobs | Walker mobs, mob loot uses the global manager, mob spawner prototypes | none | MILESTONE world systems |
+| 75, 80 | weather, doors | Weather off on concrete, doors and keys, tough airlocks | none | MILESTONE world |
+| 76 | tweaks | Second map prototype Kuznetsk, mask popup fix, circular saw buff, disable pulling items, invisible tiny fan | WWDP #975 pull attempt cooldown | TODO, split |
+| 77 | crafting-cannibalism | Human butchering, bone crafts, campfires despawn, cooking, crafting cull | WWDP #578 Diegetic Crafting, #619 Construction | TODO. Check overlap first |
+| 78 | lootpool | Kuznetsk loot table | none | MILESTONE world |
+| 79 | lights | `DayCycle` (client and server), traps, starvation, all masks hide identity, wield uses identity | WWDP #917 masks hide identity; #305 booby traps exist | MILESTONE world systems (day cycle); the rest TODO |
+| 81 | less-ammo | Guns start empty, randomised magazines, more damage | none | MILESTONE guns / loot |
+| 82 | sprinting-release | Tired popup, accuracy rework, stamina, shotgun spread | WWDP #889 User-Friendly Sprinting is in master | TODO. Combine with #54 |
+| 83 | fixes | Faster butchering/gauze, gaiter ingestion block, sturdier trees, campfire, longer body despawn | none | TODO, small |
+| 84 | brutal-melee | Fire axe, melee balance | WWDP #926 Fix Fireaxe | MILESTONE melee |
+| 85 | bugfix | Cherry-picks (#935, #933, #815, #889) plus "look far", shotgun fix | #935 #933 #815 #889 are all in master | COVERED. "look far" TODO |
+| 86 | tweaks | Misc structure/object tweaks | n/a | TODO, small |
+| 87 | upstream | Footprints port, e-sword fix | Footprints are in master (#1867, #1439 ...) | COVERED |
+| 88 | upstream-chatstack | Chat stacking | `Add Chatstack (#1422)` in master | COVERED |
+| 89 | port-nvg | Night vision overlays | Master has `Content.Shared/Overlays/Switchable/NightVision*` | COVERED, check leftovers |
+| 90 | port-k | Religious headgear | In master (`religious.yml`, `headGroup.yml`) | COVERED |
+| 91 | rules-tips | Rules and tips text | none | TODO. Keep the `>>> STYLE <<<`; replaces tips (#23) |
+
+## Milestones
+
+### World systems (decided: port the final version once)
+`SmartMobSpawner`, `MobLoot`, `Despawn` (dead bodies + items), `LootManager` (final form with `GlobalLootTable`, `LootEntries`, spawners), `DayCycle` (client `LightCycleSystem`, shared `LightCycleComponent`), contaminated water, doors/keys, traps, weather rules, maps (`EdgeOfEntropy`, Kuznetsk). Source of truth: final code under `Content.*/_ERRORGATE` and `Resources/Prototypes/_ERRORGATE` in `beyond/master`. Discuss one system at a time. Needs `docs/design/survival-loop.md` ("loot is finite per wipe").
+
+### Guns (#48, #49, #81, #82, #69 parts)
+Decision first: real-world caliber names and a trimmed roster, or keep WWDP's. This drives loot entries.
+
+### Melee and shove (#37, #46, #52, #61, #69, #72, #84)
+Decision first: keep WWDP shove (disarm based) or the old `ShoveAttackEvent` rework, and whether RMB is disarm/shove for all weapons. Keep upstream bash stats until then.
+
+### Examine (#44, #50)
+Inline examine text instead of verbs. Check WWDP #549/#574/#919/#925 first.
+
+### Reverts (#68)
+Nine WWDP "[Port]" features: telescope, lying down (an upstream better version exists, #815), blink, uplink discounts, aspects, advanced prying, energy sword (WD), melee block, hobo and maid. Ask the owner what to remove and why.
+
+## WWDP PRs by the owner already in master (overlap lookup)
+
+Shove: #280 #295 #304 #315 #347 #565 #582 #978. Examine: #269 #549 #574 #919 #925 #954 #972. Guns: #24 (right-click gun melee) #284 #285 #293 #312 #325 #329 #330 #336 #344 #356 #539 #545 #546 #547 #591 #630 #928 #1003. Melee: #264 #273 #286 #622 #623 #926 #960. Deafness: #265 #270 #384 #390 #395. Crafting: #578 #613 #619. Immersive interactions: #288 #351 (reverted upstream by #358; ported here). Character/identity: #334 #917 #956. Movement and crit: #259 #272 #403 #568 #593 #975. Sounds: #915 (death/crit). Misc removals: #596 popup spam, #962 lobby animations, #972 examine chat logging, #992 MRP+++ popup, #920 slop.
