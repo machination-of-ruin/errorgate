@@ -37,8 +37,6 @@ public abstract class SharedItemSystem : EntitySystem
         SubscribeLocalEvent<ItemComponent, AfterAutoHandleStateEvent>(OnItemAutoState);
         SubscribeLocalEvent<ItemComponent, GettingInteractedWithAttemptEvent>(OnItemInteracted); // WWDP
 
-        SubscribeLocalEvent<ItemComponent, ExaminedEvent>(OnExamine);
-
         SubscribeLocalEvent<ItemToggleSizeComponent, ItemToggledEvent>(OnItemToggle);
     }
 
@@ -151,13 +149,6 @@ public abstract class SharedItemSystem : EntitySystem
             verb.Text = Loc.GetString("pick-up-verb-get-data-text");
 
         args.Verbs.Add(verb);
-    }
-
-    private void OnExamine(EntityUid uid, ItemComponent component, ExaminedEvent args)
-    {
-        // show at end of message generally
-        args.PushMarkup(Loc.GetString("item-component-on-examine-size",
-            ("size", GetItemSizeLocale(component.Size))), priority: -1);
     }
 
     public ItemSizePrototype GetSizePrototype(ProtoId<ItemSizePrototype> id)
