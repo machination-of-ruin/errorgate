@@ -1,79 +1,52 @@
-<div align="center"><img alt="WWDP logo" src="https://raw.githubusercontent.com/WWhiteDreamProject/wwdpublic/master/Resources/Textures/_White/Logo/WWDPDarkSplashIcon.png" width="512px" /></div>
+# MACHINATION OF RUIN >>> ERRORGATE <<< RISE ON THE EDGE OF ENTROPY
+
+<p style='text-align: center;'><img alt="##ERROR" src="Resources/Textures/_White/Logo/dirge.png" width="512px" /></p>
 
 ---
 
-WWDP - форк Einstein Engines, представляющего из себя хард-форк  [Space Station 14](https://github.com/space-wizards/space-station-14), построенный на идеалах и дизайнерском вдохновении семейства серверов BayStation 12 от Space Station 13 с упором на модульный код, который каждый может использовать для создания RP-сервера своей мечты.
+# HUMAN ERROR LED TO THE CREATION OF A FORK OF THE WWDP CODEBASE.
 
-WWDP - один из основных серверов русского коммьюнити, который выступает за идеалы свободы отыгрыша, свободы слова и настоящей классической атмосферы Space Station 13 - хаос, веселье, возможности.
+ERRORGATE: SURVIVE THE HARSH WORLD. PvPvE. NO ROLEPLAY REQUIRED. MAKE ALLIES. MAKE ENEMIES. FIGHT.
+DESIGN NOTES LIVE IN [docs/design/ROADMAP.md](./docs/design/ROADMAP.md).
 
-Space Station 14 - это ремейк SS13, который работает на собственном движке  [Supermatter Engine](https://github.com/Simple-Station/SupermatterEngine), собственном игровом движке, написанном на C#.
+## \>>> LINKS
 
-Поскольку это хард-форк, любой код, взятый из другого апстрима, не может быть напрямую замержен сюда, а должен быть перенесен.
-Весь код, представленный в этом репозитории, может быть изменен по желанию кодербаса Белой Мечты.
+[Steam: Space Station Beyond launcher](https://store.steampowered.com/app/3731580) | [WWDP](https://github.com/WWhiteDreamProject/wwdpublic) | [Einstein Engines](https://github.com/Simple-Station/Einstein-Engines) | [Space Station 14](https://github.com/space-wizards/space-station-14)
 
-## Ссылки
+## \>>> CONTRIBUTING TO THE RUIN
 
-[Steam](https://store.steampowered.com/app/3731580/Space_Station_Beyond/) | [Клиент без Steam](https://github.com/Simple-Station/SimpleStationLauncher/releases/latest) | [Основной репозиторий](https://github.com/Simple-Station/Einstein-Engines) | [Discord](https://discord.gg/vu5VT7ETDX)
+ALWAYS WELCOME, BUT DONT EXPECT ANYTHING
 
-## Контрибуция
+## \>>> BUILD
 
-Внимание, имейте в виду, что при контрибуции, вы автоматически соглашаетесь на условия которые описаны в нашем контрибуторском соглашении!
-Прочитать на английском: [LICENSE-ICLA-EN](./LICENSE-ICLA-EN.txt).
-Прочитать на русском: [LICENSE-ICLA-RU](./LICENSE-ICLA-RU.txt).
+Refer to [the Space Wizards' guide](https://docs.spacestation14.com/en/general-development/setup/setting-up-a-development-environment.html) on setting up a development environment for general information, but keep in mind that MACHINATION OF RUIN >>> ERRORGATE <<< RISE ON THE EDGE OF ENTROPY is not the same and many things may not apply.
+We provide some scripts shown below to make the job easier.
 
-Абсолютно каждый и любой имеет право на контрибуцию в данный репозиторий и мы будем безмерно рады вашему вкладу в наше общее дело, однако, вы должны понимать, что не каждая контрибуция будет принята.
-
-Если вы желаете, чтобы Ваша Контрибуция была принята, ознакомьтесь в первую очередь с [дизайнерскими документами.](https://github.com/WWhiteDreamProject/wwdpublic/discussions/824). Это касается в первую очередь гейм-дизайна различных нововведений, стиля спрайтов и общей атмосферы.
-
-Так как наличие контрибуторского соглашения может насторожить вас, будущих контрибуторов, я, ONIKS, владелец данного билда и его главный архитектор, хочу заверить вас, что в первую очередь - это нужно для защиты вашей же контрибуции.
-
-Так как WWDP полностью придерживается принципов некоммерческого проекта с открытым кодом, мы так-же хотим защитить ваш (и в будущем, наш) код от коммерциализации и неправильного использования. Контрибуция в наш репозиторий будет означать то, что мы сможем использовать все ресурсы WWDP для защиты ваших интересов.
-
-Потому, ваша контрибуция будет означать, что будет сделано всё возможное, чтобы ваши интересы были учтены, и в первую очередь, ваш код не был использован на коммерческих проектах, NSFW-проектах и других проектах, где вы бы не хотели его видеть. Вы всё ещё, однако, будете обладать полными правами на свою оригинальную работу, если вы желаете перелицензировать или продать свою работу. 
-
-## Сборка
-
-Следуйте [гайду от Space Wizards](https://docs.spacestation14.com/en/general-development/setup/setting-up-a-development-environment.html) по настройке рабочей среды, но учитывайте, что наши репозитории отличаются и некоторые вещи могут отличаться.
-Мы предлагаем несколько скриптов, показанных ниже, чтобы облегчить работу.
-
-### Необходимые зависимости
+### DEPENDENCIES
 
 > - Git
-> - .NET SDK 9.0.101
-
+> - .NET SDK 9 or newer (the repo builds with 10.0)
 
 ### Windows
 
-> 1. Склонируйте данный репозиторий
-> 2. Запустите `git submodule update --init --recursive` в командной строке, чтобы скачать движок игры
-> 3. Запускайте `Scripts/bat/buildAllDebug.bat` после любых изменений в коде проекта
-> 4. Запустите `Scripts/bat/runQuickAll.bat`, чтобы запустить клиент и сервер
-> 5. Подключитесь к локальному серверу и играйте
+> 1. Clone this repository
+> 2. Run `git submodule update --init --recursive` in a terminal to download the engine
+> 3. Run `Scripts/bat/buildAllDebug.bat` after making any changes to the source
+> 4. Run `Scripts/bat/runQuickAll.bat` to launch the client and the server
+> 5. Connect to localhost in the client and play
 
 ### Linux
 
-> 1. Склонируйте данный репозиторий.
-> 2. Запустите `git submodule update --init --recursive` в командной строке, чтобы скачать движок игры
-> 3. Запускайте `Scripts/sh/buildAllDebug.sh` после любых изменений в коде проекта
-> 4. Запустите `Scripts/sh/runQuickAll.sh`, чтобы запустить клиент и сервер
-> 5. Подключитесь к локальному серверу и играйте
+> 1. Clone this repository
+> 2. Run `git submodule update --init --recursive` in a terminal to download the engine
+> 3. Run `Scripts/sh/buildAllDebug.sh` after making any changes to the source
+> 4. Run `Scripts/sh/runQuickAll.sh` to launch the client and the server
+> 5. Connect to localhost in the client and play
 
 ### MacOS
 
-> Предположительно, также, как и на Линуксе.
+> I don't know anybody using MacOS to test this, but it's probably roughly the same steps as Linux
 
-## Лицензия
+## \>>> LICENSE
 
-Содержимое, добавленное в этот репозиторий после коммита 87c70a89a67d0521a56388e6b1c3f2cb947943e4 (`17 February 2024 23:00:00 UTC`), распространяется по лицензии GNU Affero General Public License версии 3.0, если не указано иное.
-См. [LICENSE-AGPLv3](./LICENSE-AGPLv3.txt).
-
-Содержимое, добавленное в этот репозиторий до коммита 87c70a89a67d0521a56388e6b1c3f2cb947943e4 (`17 February 2024 23:00:00 UTC`) распространяется по лицензии MIT, если не указано иное.
-См. [LICENSE-MIT](./LICENSE-MIT.txt).
-
-Содержимое, добавленное в этот репозиторий после коммита aa760f196d8e6dfc65136ece0dbbf51b92645ea8 (`28 January 2026 20:00:00 UTC`), распространяется по двойной лицензии GNU Affero General Public License версии 3.0 и WILDCARD WHITE DREAM PROJECT INDIVIDUAL CONTRIBUTOR LICENSE AGREEMENT, если не указано иное.
-См. [LICENSE-ICLA-EN](./LICENSE-ICLA-EN.txt).
-
-Большинство ресурсов лицензировано под [CC-BY-SA 3.0](https://creativecommons.org/licenses/by-sa/3.0/), если не указано иное. Лицензия и авторские права на ресурсах указаны в файле метаданных.
-[Example](./Resources/Textures/Objects/Tools/crowbar.rsi/meta.json).
-
-Обратите внимание, что активы, созданные командой WWDP, лицензированы под некоммерческой [CC-BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/) или аналогичной некоммерческой лицензией и должны быть удалены, если вы хотите использовать этот проект в коммерческих целях. В случае, если в файле метаданных указано иное - укажите нам об этом, прошлая лицензия будет применяться ретроактивно вместе с CC-BY-NC-SA 4.0.
+Please read the [LEGAL.md](./LEGAL.md) file for information on the licenses of the code and assets in this repository.

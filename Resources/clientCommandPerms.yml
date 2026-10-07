@@ -40,6 +40,7 @@
     - replay_stop
     - replay_load
     - saveconfig
+    - fuckrules
 
 - Flags: DEBUG
   Commands:

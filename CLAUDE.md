@@ -4,7 +4,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this is
 
-ERRORGATE: a PvPvE survival game built on SS14, forked from WWDP (WWhiteDreamProject), itself a hard-fork of Einstein Engines / Space Station 14 (C#, RobustToolbox engine). README and PR template are in Russian. It is a **hard fork**: code from other upstreams cannot be merged directly, only ported. The repo is an aggregation of many downstream forks' features (Goobstation, DeltaV, EE, Impstation, Corvax, NF, Shitmed, White, Lavaland, ...), each living in its own folder.
+ERRORGATE: a PvPvE survival game built on SS14, forked from WWDP (WWhiteDreamProject), itself a hard-fork of Einstein Engines / Space Station 14 (C#, RobustToolbox engine). It is a **hard fork**: code from other upstreams cannot be merged directly, only ported. The repo is an aggregation of many downstream forks' features (Goobstation, DeltaV, EE, Impstation, Corvax, NF, Shitmed, White, Lavaland, ...), each living in its own folder.
+
+## >>> STYLE <<<
+
+The `>>> STYLE <<<` is of utmost priority. User-facing project text (README, window title, rules, tips, server info, PR template, announcements) is written in the ERRORGATE voice: ALL-CAPS headings, `>>>` / `<<<` markers (e.g. `## \>>> LINKS` in markdown), terse and ominous, glitch / error / ruin / entropy themes. Match the tone of `README.md` and the title "MACHINATION OF RUIN >>> ERRORGATE <<< RISE ON THE EDGE OF ENTROPY". Do not flatten it into plain corporate prose; keep technical accuracy (build steps, versions) inside it.
 
 ## Design
 
