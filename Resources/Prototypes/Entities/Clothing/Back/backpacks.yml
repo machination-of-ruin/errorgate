@@ -8,6 +8,7 @@
     sprite: Clothing/Back/Backpacks/backpack.rsi
     state: icon
   - type: Item
+    canBeUsedWhileWorn: false # WWDP
     size: Huge
   - type: Clothing
     equipSound: /Audio/_White/Equip/clothingrustle4.ogg # WWDP
@@ -45,6 +46,10 @@
         - ItemMask
         restitution: 0.3
         friction: 0.2
+  - type: HeldSpeedModifier # WWDP slow down with bags in hand
+    mirrorClothingModifier: false
+    sprintModifier: 0.85
+    walkModifier: 0.85
 
 - type: entity
   parent: ClothingBackpack

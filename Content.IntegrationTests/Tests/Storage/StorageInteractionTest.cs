@@ -1,3 +1,4 @@
+using Content.Shared._ERRORGATE.CCVar;
 using Content.Client.UserInterface.Systems.Hotbar.Widgets;
 using Content.Client.UserInterface.Systems.Storage.Controls;
 using Content.IntegrationTests.Tests.Interaction;
@@ -18,6 +19,11 @@ public sealed class StorageInteractionTest : InteractionTest
     [Test]
     public async Task UiInteractTest()
     {
+        // ERRORGATE: this checks the upstream behaviour, which immersive interactions deliberately removes
+        // (no activating items inside containers), so the setting is switched off for this test.
+        await Server.WaitPost(() => Server.CfgMan.SetCVar(ErrorgateCVars.ImmersiveInteractions, false));
+        await RunTicks(5);
+
         var sys = Server.System<SharedContainerSystem>();
 
         await SpawnTarget("ClothingBackpack");
