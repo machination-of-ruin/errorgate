@@ -15,10 +15,10 @@ errorgate-combat-log-part-rightleg = right leg
 errorgate-combat-log-part-rightfoot = right foot
 errorgate-combat-log-where = in the { $part }
 
-errorgate-combat-log-punch = { $attacker } punches you{ $where }!
-errorgate-combat-log-punch-self = You punch yourself{ $where }!
-errorgate-combat-log-hit = { $attacker } hits you{ $where } with the { $weapon }!
-errorgate-combat-log-hit-self = You hit yourself{ $where } with the { $weapon }!
+errorgate-combat-log-melee-unarmed = { $attacker } { $verb } you{ $where }!
+errorgate-combat-log-melee-unarmed-self = You { $verb } yourself{ $where }!
+errorgate-combat-log-melee = { $attacker } { $verb } you{ $where } with the { $weapon }!
+errorgate-combat-log-melee-self = You { $verb } yourself{ $where } with the { $weapon }!
 errorgate-combat-log-shot = { $attacker } shoots you{ $where }! The { $weapon } hits!
 errorgate-combat-log-projectile = The { $weapon } hits you{ $where }!
 errorgate-combat-log-beam-known = { $attacker } hits you{ $where } with a beam of energy!

@@ -17,6 +17,8 @@
     malus: 0.3
     wieldedBonus: 0.3
   - type: MeleeWeapon
+    chatLogVerbRoot: chop
+    chatLogVerbPresent: chops
     animationRotation: 45 # WWDP
     wideAnimationRotation: 135
     swingLeft: true

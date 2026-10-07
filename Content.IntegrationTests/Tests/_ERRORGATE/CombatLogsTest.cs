@@ -99,6 +99,28 @@ public sealed class CombatLogsTest
     }
 
     [Test]
+    public async Task WeaponsUseTheirOwnVerb()
+    {
+        var (pair, victim, attacker, log) = await Setup();
+
+        await pair.Server.WaitPost(() =>
+        {
+            var entMan = pair.Server.EntMan;
+            var knife = entMan.SpawnEntity("CombatKnife", entMan.GetComponent<TransformComponent>(attacker).Coordinates);
+            var blunt = new DamageSpecifier(pair.Server.ProtoMan.Index<DamageTypePrototype>("Blunt"), FixedPoint2.New(10));
+            entMan.EventBus.RaiseLocalEvent(victim, new AttackedEvent(knife, attacker, new EntityCoordinates(victim, default)));
+            entMan.System<DamageableSystem>().TryChangeDamage(victim, blunt, origin: attacker, targetPart: TargetBodyPart.Head);
+        });
+        await pair.RunTicksSync(3);
+
+        var messages = Combat(log);
+        Assert.That(messages, Has.Count.EqualTo(1), string.Join(" | ", log.Messages));
+        Assert.That(messages[0], Does.Contain("stabs you in the head with the"));
+
+        await pair.CleanReturnAsync();
+    }
+
+    [Test]
     public async Task BlindVictimDoesNotSeeTheirAttacker()
     {
         var (pair, victim, attacker, log) = await Setup();

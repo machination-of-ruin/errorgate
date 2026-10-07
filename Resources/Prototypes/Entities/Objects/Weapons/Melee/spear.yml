@@ -36,6 +36,8 @@
       map: ["enum.SolutionContainerLayers.Fill"]
       visible: false
   - type: MeleeWeapon
+    chatLogVerbRoot: stab
+    chatLogVerbPresent: stabs
     animationRotation: -135 # WWDP
     wideAnimationRotation: -135
     range: 1.75

@@ -13,6 +13,8 @@
     types:
     - Knife
   - type: MeleeWeapon
+    chatLogVerbRoot: stab
+    chatLogVerbPresent: stabs
     animationRotation: -135 # WWDP
     wideAnimationRotation: -135
     attackRate: .8

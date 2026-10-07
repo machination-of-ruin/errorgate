@@ -17,6 +17,18 @@ public sealed partial class MeleeWeaponComponent : Component
     // TODO: This is becoming bloated as shit.
     // This should just be its own component for alt attacks.
     /// <summary>
+    /// ERRORGATE: the verb used in the combat log of the attacked player, in the form "you [stab] someone".
+    /// </summary>
+    [DataField]
+    public string ChatLogVerbRoot = "hit";
+
+    /// <summary>
+    /// ERRORGATE: the verb used in the combat log of the attacked player, in the form "someone [stabs] you".
+    /// </summary>
+    [DataField]
+    public string ChatLogVerbPresent = "hits";
+
+    /// <summary>
     /// Does this entity do a disarm on alt attack.
     /// </summary>
     [DataField, AutoNetworkedField]

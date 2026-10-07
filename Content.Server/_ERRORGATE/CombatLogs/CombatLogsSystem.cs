@@ -13,6 +13,7 @@ using Content.Shared.Mobs.Components;
 using Content.Shared.Mobs.Systems;
 using Content.Shared.Projectiles;
 using Content.Shared.Throwing;
+using Content.Shared.Weapons.Melee;
 using Content.Shared.Weapons.Melee.Events;
 using Content.Shared.Weapons.Ranged.Events;
 using Content.Shared.Weapons.Reflect;
@@ -184,14 +185,16 @@ public sealed class CombatLogsSystem : EntitySystem
         switch (hit.Kind)
         {
             case HitKind.Melee when weapon == null:
+                var (unarmedRoot, unarmedPresent) = MeleeVerbs(hit.Attacker);
                 message = self
-                    ? Loc.GetString("errorgate-combat-log-punch-self", ("where", where))
-                    : Loc.GetString("errorgate-combat-log-punch", ("attacker", attacker ?? Someone()), ("where", where));
+                    ? Loc.GetString("errorgate-combat-log-melee-unarmed-self", ("verb", unarmedRoot), ("where", where))
+                    : Loc.GetString("errorgate-combat-log-melee-unarmed", ("attacker", attacker ?? Someone()), ("verb", unarmedPresent), ("where", where));
                 break;
             case HitKind.Melee:
+                var (root, present) = MeleeVerbs(hit.Weapon);
                 message = self
-                    ? Loc.GetString("errorgate-combat-log-hit-self", ("where", where), ("weapon", weapon!))
-                    : Loc.GetString("errorgate-combat-log-hit", ("attacker", attacker ?? Someone()), ("where", where), ("weapon", weapon!));
+                    ? Loc.GetString("errorgate-combat-log-melee-self", ("verb", root), ("where", where), ("weapon", weapon!))
+                    : Loc.GetString("errorgate-combat-log-melee", ("attacker", attacker ?? Someone()), ("verb", present), ("where", where), ("weapon", weapon!));
                 break;
             case HitKind.Projectile:
                 message = attacker != null
@@ -301,6 +304,17 @@ public sealed class CombatLogsSystem : EntitySystem
             else if (!bleeding && _bleeding.Remove(uid) && !dead)
                 Send(uid, Loc.GetString("errorgate-combat-log-bleeding-stop"), 0.1f);
         }
+    }
+
+    /// <summary>
+    ///     The verbs the melee weapon (or the bare hands of the attacker) uses in the log: "stab" / "stabs".
+    /// </summary>
+    private (string Root, string Present) MeleeVerbs(EntityUid? weapon)
+    {
+        if (weapon is { } uid && TryComp<MeleeWeaponComponent>(uid, out var melee))
+            return (melee.ChatLogVerbRoot, melee.ChatLogVerbPresent);
+
+        return ("hit", "hits");
     }
 
     private string Name(EntityUid uid) => MetaData(uid).EntityName;

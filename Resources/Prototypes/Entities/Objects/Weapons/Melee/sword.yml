@@ -9,6 +9,8 @@
   - type: Execution
     doAfterDuration: 4.0
   - type: MeleeWeapon
+    chatLogVerbRoot: slash
+    chatLogVerbPresent: slashes
     animationRotation: -45 # WWDP
     wideAnimationRotation: -135
   - type: Sprite
