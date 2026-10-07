@@ -1,6 +1,7 @@
 using System.Numerics;
 using Content.Server.Chat.Managers;
 using Content.Server.GameTicking;
+using Content.Server._White.MobThresholdSounds;
 using Content.Server.Ghost;
 using Content.Shared._ERRORGATE.DeathVoid;
 using Content.Shared.Actions;
@@ -11,6 +12,7 @@ using Content.Shared.Mind.Components;
 using Content.Shared.Mobs;
 using Content.Shared.Mobs.Systems;
 using Robust.Server.GameObjects;
+using Robust.Shared.Audio.Systems;
 using Robust.Shared.Map;
 using Robust.Shared.Player;
 using Robust.Shared.Prototypes;
@@ -28,6 +30,7 @@ public sealed class DeathVoidSystem : EntitySystem
     private static readonly EntProtoId RespawnAction = "ActionDeadRespawn";
 
     [Dependency] private readonly IChatManager _chat = default!;
+    [Dependency] private readonly SharedAudioSystem _audio = default!;
     [Dependency] private readonly GameTicker _ticker = default!;
     [Dependency] private readonly MapSystem _map = default!;
     [Dependency] private readonly MobStateSystem _mobState = default!;
@@ -114,6 +117,17 @@ public sealed class DeathVoidSystem : EntitySystem
 
         var voidEnt = SpawnVoid(mindId, mind);
         _mind.Visit(mindId, voidEnt, mind);
+        PlayDeathSound(body, mind);
+    }
+
+    /// <summary>
+    ///     WWDP plays the death sound to the body, but the client only plays sounds meant for the entity the player is
+    ///     attached to, and that is the void by now. Play the same sound to the player directly.
+    /// </summary>
+    private void PlayDeathSound(EntityUid body, MindComponent mind)
+    {
+        if (mind.Session is { } session && TryComp<MobThresholdSoundsComponent>(body, out var sounds))
+            _audio.PlayGlobal(sounds.DeathSounds, session);
     }
 
     private EntityUid SpawnVoid(EntityUid mindId, MindComponent mind)

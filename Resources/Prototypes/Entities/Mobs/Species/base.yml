@@ -162,7 +162,6 @@
     state: icon
   - type: AnimationPlayer
   - type: Buckle
-  - type: CritDeathSounds # ERRORGATE heartbeat in crit, death sound
   - type: CombatMode
     canDisarm: true
   - type: MeleeWeapon

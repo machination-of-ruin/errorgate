@@ -1,6 +1,0 @@
-# Sounds carried over from the original ERRORGATE fork, where they came from the White Dream codebase.
-# The original authors are not recorded; replace or credit properly if the source is found.
-- files: ["Death/death.ogg", "Death/death.wav", "Heart/heart.ogg", "Heart/heart2.wav", "Heart/heart3.ogg", "Heart/heart4.ogg"]
-  license: "Unknown"
-  copyright: "Taken from the White Dream codebase by the original ERRORGATE fork. Original author unknown."
-  source: "https://github.com/WWhiteDreamProject/wwdpublic"
