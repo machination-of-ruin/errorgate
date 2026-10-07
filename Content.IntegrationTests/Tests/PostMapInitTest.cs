@@ -82,6 +82,7 @@ namespace Content.IntegrationTests.Tests
         private static readonly string[] GameMaps =
         {
             "Dev",
+            "EdgeOfEntropyDev",
             "TestTeg",
             // "CentCommMain",
             // "CentCommHarmony",
