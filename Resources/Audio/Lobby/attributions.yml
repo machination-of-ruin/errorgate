@@ -1,36 +1,82 @@
-- files: ["01 The Gamble.ogg", "02 Guilty Pleasures.ogg", "03 Jazzcuzzi.ogg", "04 The Walk.ogg", "05 Velvet Bossa.ogg", "06 Colors.ogg", "07 Midnight Jam.ogg", "08 Miles Ahead.ogg", "09 Moody.ogg", "10 Flying Away.ogg", "11 Take It Easy.ogg"]
-  license: "CC-BY-NC-SA-3.0"
-  copyright: "All songs used are produced by Danya Vodovoz, royalty free."
-  source: "https://soundcloud.com/danyavodovoz"
+# ERRORGATE lobby playlist. These tracks were chosen by the project owner. Most are commercial releases and are NOT licensed
+# for redistribution under this repository's license; the owner takes responsibility for their use. Replace or remove on request.
 
-- files: ["atomicamnesiammx.ogg"]
-  license: "CC-BY-NC-SA-3.0"
-  copyright: "Atomic Amnesia MMX by Phillip Dyer. Converted from MP3 to OGG."
-  source: "https://soundcloud.com/3kliksphilip/atomic-amnesia-mmx-1"
+- files: ["Celldweller - Good L_ck (Yo_re F_cked).ogg"]
+  license: "All rights reserved (not licensed for redistribution)"
+  copyright: "Celldweller - Good Luck (You're Fucked). Used at the project owner's discretion."
+  source: "Unknown"
 
-- files: ["Monument.ogg"]
-  license: "CC-BY-NC-SA-3.0"
-  copyright: "Monument by Six Umbrellas."
-  source: "https://sixumbrellas.bandcamp.com/album/the-psychedelic-and"
+- files: ["Crystal Castles - Violent Dreams (Sidewalks and Skeletons REMIX).ogg"]
+  license: "All rights reserved (not licensed for redistribution)"
+  copyright: "Crystal Castles - Violent Dreams (Sidewalks and Skeletons Remix). Used at the project owner's discretion."
+  source: "Unknown"
 
-- files: ["Patricia_Taxxon_-_Chipshop.ogg"]
-  license: "CC-BY-SA-3.0"
-  copyright: "Chipshop by Patricia Taxxon off the album 'Bicycle'"
-  source: "https://patriciataxxon.bandcamp.com/track/chipshop"
+- files: ["Fraunhofer-Diffraction-Last-Light.ogg"]
+  license: "All rights reserved (not licensed for redistribution)"
+  copyright: "Fraunhofer Diffraction - Last Light. Used at the project owner's discretion."
+  source: "Unknown"
 
-- files: ["Patricia_Taxxon_-_Minute.ogg"]
-  license: "CC-BY-SA-3.0"
-  copyright: "Minute by Patricia Taxxon off the album 'Aeroplane'"
-  source: "https://patriciataxxon.bandcamp.com/track/minute"
+- files: ["Fraunhofer Diffraction - Perfection.ogg"]
+  license: "All rights reserved (not licensed for redistribution)"
+  copyright: "Fraunhofer Diffraction - Perfection. Used at the project owner's discretion."
+  source: "Unknown"
 
-- files: ["Black_Heat.ogg"]
-  license: "CC-BY-SA-3.0"
-  copyright: "Black Heat by Ross Bugden, converted from WAV to OGG"
-  source: "https://soundcloud.com/rossbugden/intense-and-upbeat-electronic-trailer-music-black-heat-copyright-and-royalty-free"
+- files: ["Furi-My-only-chance.ogg"]
+  license: "All rights reserved (not licensed for redistribution)"
+  copyright: "Furi OST - My Only Chance. Used at the project owner's discretion."
+  source: "Unknown"
 
-- files: ["the_wizard.ogg"]
-  license: "Custom"
-  copyright: "The Wizard by Chris Remo is used with special permission from the author, under the condition that the project remains non-commercial and open source. The author also requested that a link to his bandcamp be included: https://chrisremo.bandcamp.com/"
-  source: "https://idlethumbs.bandcamp.com/track/the-wizard"
-  # The source is a direct link the the track, but not the "main" bandcamp of the author. Hence the link is also included separately in the copyright.
-  # Got permission from Chris for this song as well on 02/25/25, requires same attributions
+- files: ["LudoWic-Meat-Grinder-_Katana-Zero-OST_.ogg"]
+  license: "All rights reserved (not licensed for redistribution)"
+  copyright: "LudoWic - Meat Grinder (Katana ZERO OST). Used at the project owner's discretion."
+  source: "Unknown"
+
+- files: ["Owl Vision - Holy S.ogg"]
+  license: "All rights reserved (not licensed for redistribution)"
+  copyright: "Owl Vision - Holy S. Used at the project owner's discretion."
+  source: "Unknown"
+
+- files: ["PORTWAVE-_-dǝǝls-ghost-behind.ogg"]
+  license: "All rights reserved (not licensed for redistribution)"
+  copyright: "PORTWAVE - dǝǝls ghost behind. Used at the project owner's discretion."
+  source: "Unknown"
+
+- files: ["SUICIDEWΛVЕ-Night-walks.ogg"]
+  license: "All rights reserved (not licensed for redistribution)"
+  copyright: "SUICIDEWAVE - Night walks. Used at the project owner's discretion."
+  source: "Unknown"
+
+- files: ["Three Days Grace - I Am Machine.ogg"]
+  license: "All rights reserved (not licensed for redistribution)"
+  copyright: "Three Days Grace - I Am Machine. Used at the project owner's discretion."
+  source: "Unknown"
+
+- files: ["пl3nk-visitor.ogg"]
+  license: "All rights reserved (not licensed for redistribution)"
+  copyright: "пl3nk - visitor. Used at the project owner's discretion."
+  source: "Unknown"
+
+- files: ["Oh Shit I'm Feeling It.ogg"]
+  license: "All rights reserved (not licensed for redistribution)"
+  copyright: "Oh Shit I'm Feeling It. Used at the project owner's discretion."
+  source: "Unknown"
+
+- files: ["Daredevil - Doom Eternal.ogg"]
+  license: "All rights reserved (not licensed for redistribution)"
+  copyright: "Mick Gordon - Daredevil (DOOM Eternal). Used at the project owner's discretion."
+  source: "Unknown"
+
+- files: ["The Luna Sequence - Sever Sacrificium.ogg"]
+  license: "All rights reserved (not licensed for redistribution)"
+  copyright: "The Luna Sequence - Sever Sacrificium. Used at the project owner's discretion."
+  source: "Unknown"
+
+- files: ["BONES - CharacterSelect.ogg"]
+  license: "All rights reserved (not licensed for redistribution)"
+  copyright: "BONES - CharacterSelect. Used at the project owner's discretion."
+  source: "Unknown"
+
+- files: ["VYVCH - Vapour Medicine.ogg"]
+  license: "All rights reserved (not licensed for redistribution)"
+  copyright: "VYVCH - Vapour Medicine. Used at the project owner's discretion."
+  source: "Unknown"
