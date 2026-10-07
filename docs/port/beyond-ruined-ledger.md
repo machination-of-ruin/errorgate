@@ -85,7 +85,7 @@ Hints below come from commit messages, file lists and quick greps. **They are le
 | 36 | blood-evaporate | Blood, insect blood, vomit and copper blood evaporate in puddles, 10 s tick, no sparkle | none in master | DONE (small-PR batch). Owner chose scope (b): **every puddle evaporates**, which also covers the evaporation part of #65. Mops still use `EvaporationReagents` (water) |
 | 37 | melee-tweak | RMB disarm instead of heavy attack, no heavy damage examine, thrust wide animation, human punch effect, melee prototype tweaks | Partly overlaps WWDP #264 melee visuals, #623 aiming and hitting. Heavy attack still present in master | MILESTONE melee (with #46, #52, #61, #69, #72, #84) |
 | 38 | character-creation | Remove job/antag/traits/loadout tabs, spawn priority, disclaimer; default to HUMANERROR | WWDP #334 touched departments only. UI part not upstream | TODO. Note jobs are already hidden (#15) |
-| 39 | item-pickup-sounds | Equip rustle for guns and backpacks, gun interact sounds, rifle sound fix | The Gunnening added equip sound collections; WWDP #591 belt gear sounds | Likely COVERED, verify sounds |
+| 39 | item-pickup-sounds | Equip rustle for guns and backpacks, gun interact sounds, rifle sound fix | The Gunnening added equip sound collections; WWDP #591 belt gear sounds | COVERED by the Gunnening (`equip.yml` collections, `EmitSoundOnPickup/Drop` on guns) |
 | 40 | no-pointing | Pointing disabled (client and server) | none | DONE (small-PR batch) |
 | 41 | body-fixes | Gib does not spawn organs | Shitmed gib options | DONE (small-PR batch): default `GibContentsOption.Skip` in `GibBody` and `GibBehavior` (tested, no organs left) |
 | 42 | weapons-resize | Smaller guns, bat tweaks, sniper fixes | WWDP #284 Weapons Resize (same author) | COVERED, check leftovers |
@@ -98,7 +98,7 @@ Hints below come from commit messages, file lists and quick greps. **They are le
 | 49 | 357 | The gunnening part 2 (.357/.44 rename, speed loaders) | same | MILESTONE guns |
 | 50 | no-examine | Damage examine for melee/ranged/thrown pushed inline, magazine examine | WWDP #549 #574 #925 fix damage examine | TODO. Pairs with #44 |
 | 51 | clothes-innteraction | Patch of old must-be-in-hand | n/a | SKIP |
-| 54 | stamina-fix2 | Stamina crit buffer 0, reset to 10%, shove stamina only on dynamic targets | none | TODO, stamina; combine with #82 |
+| 54 | stamina-fix2 | Stamina crit buffer 3 s to 0, recover from crit at 10% (not 100%), no slowdown at half stamina, shove stamina cost only for dynamic/kinematic targets and uses the target's stamina | none | TODO, stamina; combine with the stamina part of #82 |
 | 55 | announce | No roundstart announcement | none | DONE (small-PR batch): `AnnounceRound` removed |
 | 56 | revert-engine | Engine revert | n/a | SKIP |
 | 57 | lobby-fixes | Lobby server name ">>> ERRORGATE <<<" | none | DONE (small-PR batch): `ui-lobby-title` locale string |
@@ -111,7 +111,7 @@ Hints below come from commit messages, file lists and quick greps. **They are le
 | 67 | deaf-component | `DeafComponent` in `_ERRORGATE/Hearing` | WWDP deafness #265 #270 #384 #390 #395 and `HearingSystem` | COVERED |
 | 68 | no-dmca-revert | **Nine reverts of WWDP "[Port]" PRs + "no-dmca-fixes"** (hobo, maid, e-sword, betrayal knife, aspects, telescope, lying down, blink, uplink discounts, advanced prying, melee block) | All nine exist in master | **SKIP, decided: leave all nine as in upstream.** The loot-related part of `no-dmca-fixes` (armor entries, global loot table) is handled with the world systems milestone |
 | 69 | tweaks | Combined melee attack on LMB, extract cartridge action, silenced guns no muzzle flash, stacking | Extract round is in the Gunnening | MILESTONE melee/guns; check |
-| 70 | clothes-rebalance | Inventory rework: item sizes, belts, outer clothing storage | Owner has inventory-size commits in master (belts, waist bags, March 2025) | TODO, verify what is left |
+| 70 | clothes-rebalance | Inventory rework: human template slots moved (pockets removed from the hotbar group, UI positions), "sling" and "light" examine strings, held-bag slowdown, equip delays, storage grids on clothing | Owner has inventory-size commits in master (belts, waist bags, March 2025). Held bag slowdown + delays came with #288 | TODO. Needs a real diff against master before presenting |
 | 71 | Guns-resprite | Drozd resprite to MP5 | none | TODO, sprites only |
 | 72 | fixes-333 | Revolver spin, outer clothes butcherable, hoodie storage, shove back, chug jug crash | #613 More Butcherable Clothes upstream | TODO, mostly small |
 | 73 | bad-water | Contaminated water reagents/tiles | none | MILESTONE world |
@@ -122,11 +122,11 @@ Hints below come from commit messages, file lists and quick greps. **They are le
 | 78 | lootpool | Kuznetsk loot table | none | MILESTONE world |
 | 79 | lights | `DayCycle` (client and server), traps, starvation, all masks hide identity, wield uses identity | WWDP #917 masks hide identity; #305 booby traps exist | MILESTONE world systems (day cycle); the rest TODO |
 | 81 | less-ammo | Guns start empty, randomised magazines, more damage | none | MILESTONE guns / loot |
-| 82 | sprinting-release | Tired popup, accuracy rework, stamina, shotgun spread | WWDP #889 User-Friendly Sprinting is in master | TODO. Combine with #54 |
-| 83 | fixes | Faster butchering/gauze, gaiter ingestion block, sturdier trees, campfire, longer body despawn | none | TODO, small |
+| 82 | sprinting-release | **Movement-based gun accuracy rework**: new `GunComponent.Ergonomics`, spread grows with speed and decays over time (`GunSystem.Update`), crosshair size shows spread, no examine block in combat mode; plus Tired popup and stamina | `Ergonomics` is NOT in master. WWDP #623 (aiming and hitting) and #630 (gunplay) are different tweaks. #889 sprinting is in master | MILESTONE guns (accuracy) + stamina with #54 |
+| 83 | fixes | Butcher delay 8 to 5 s, faster gauze, cloth buff, gaiter ingestion block, sturdier trees, campfire craft, body despawn 5 to 10 min | none | Butchering/despawn with world systems; the rest TODO small |
 | 84 | brutal-melee | Fire axe, melee balance | WWDP #926 Fix Fireaxe | MILESTONE melee |
 | 85 | bugfix | Cherry-picks (#935, #933, #815, #889) plus "look far", shotgun fix | #935 #933 #815 #889 are all in master | COVERED. "look far" TODO |
-| 86 | tweaks | Misc structure/object tweaks | n/a | TODO, small |
+| 86 | tweaks | "Galactic Common" renamed "Common", `SolCommon` removed from humans, power cells and chainsaw tweaks, sprite `unshaded` commented out on many cells, fence/crate tweaks, loot table edits | language system exists upstream | TODO. Split: language rename (humans-only), rest cosmetic |
 | 87 | upstream | Footprints port, e-sword fix | Footprints are in master (#1867, #1439 ...) | COVERED |
 | 88 | upstream-chatstack | Chat stacking | `Add Chatstack (#1422)` in master | COVERED |
 | 89 | port-nvg | Night vision overlays | Master has `Content.Shared/Overlays/Switchable/NightVision*` | COVERED, check leftovers |
