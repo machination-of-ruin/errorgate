@@ -1,5 +1,0 @@
-loadout-name-LoadoutBackpack = серый рюкзак (раскрашиваемое)
-loadout-name-LoadoutBackpackDuffel = серый вещмешок (раскрашиваемое)
-loadout-name-LoadoutBackpackSatchel = серый ранец (раскрашиваемое)
-loadout-name-LoadoutBackpackSatchelPurse = сумочка (раскрашиваемое)
-loadout-name-LoadoutBackpackSatchelPurseFlipped = сумочка на другое плечо (раскрашиваемое)

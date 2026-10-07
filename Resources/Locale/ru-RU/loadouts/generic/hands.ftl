@@ -1,5 +1,0 @@
-loadout-name-LoadoutHandsColorWhite = перчатки (раскрашиваемое)
-loadout-name-LoadoutHandsGlovesFingerlessWhite = гловелетты (раскрашиваемое)
-loadout-name-LoadoutHandsGlovesEvening = оперные перчатки (раскрашиваемое)
-loadout-name-LoadoutHandsGlovesEnviroglovesColor = эко-перчатки (раскрашиваемое)
-loadout-name-LoadoutHandsGlovesEnviroglovesEvening = оперные эко-перчатки (раскрашиваемое)
