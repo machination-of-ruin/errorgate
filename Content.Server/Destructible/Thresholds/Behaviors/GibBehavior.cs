@@ -9,7 +9,7 @@ namespace Content.Server.Destructible.Thresholds.Behaviors
     public sealed partial class GibBehavior : IThresholdBehavior
     {
         [DataField] public GibType GibType = GibType.Gib; // Shitmed Change
-        [DataField] public GibContentsOption GibContents = GibContentsOption.Drop; // Shitmed Change
+        [DataField] public GibContentsOption GibContents = GibContentsOption.Skip; // Shitmed Change, ERRORGATE: no organs on gib
         [DataField("recursive")] private bool _recursive = true;
 
         public void Execute(EntityUid owner, DestructibleSystem system, EntityUid? cause = null)

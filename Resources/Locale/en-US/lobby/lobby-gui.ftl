@@ -1,4 +1,4 @@
-ui-lobby-title = Lobby: {$serverName}
+ui-lobby-title = >>> ERRORGATE <<<
 ui-lobby-ahelp-button = Admin Help
 ui-lobby-changelog-button = Changelog
 ui-lobby-options-button = Options

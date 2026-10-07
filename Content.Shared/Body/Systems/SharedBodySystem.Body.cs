@@ -319,7 +319,7 @@ public partial class SharedBodySystem
         SoundSpecifier? gibSoundOverride = null,
         // Shitmed Change
         GibType gib = GibType.Gib,
-        GibContentsOption contents = GibContentsOption.Drop)
+        GibContentsOption contents = GibContentsOption.Skip) // ERRORGATE: gibbing does not spawn organs
     {
         var gibs = new HashSet<EntityUid>();
 

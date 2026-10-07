@@ -6,7 +6,8 @@ namespace Content.Server.Fluids.EntitySystems;
 
 public sealed partial class PuddleSystem
 {
-    private static readonly TimeSpan EvaporationCooldown = TimeSpan.FromSeconds(1);
+    // ERRORGATE: every puddle evaporates, not only water, and only checked every 10 seconds
+    private static readonly TimeSpan EvaporationCooldown = TimeSpan.FromSeconds(10);
 
     private void OnEvaporationMapInit(Entity<EvaporationComponent> entity, ref MapInitEvent args)
     {
@@ -20,7 +21,7 @@ public sealed partial class PuddleSystem
             return;
         }
 
-        if (solution.GetTotalPrototypeQuantity(EvaporationReagents) > FixedPoint2.Zero)
+        if (solution.Volume > FixedPoint2.Zero)
         {
             var evaporation = AddComp<EvaporationComponent>(uid);
             evaporation.NextTick = _timing.CurTime + EvaporationCooldown;
@@ -33,7 +34,6 @@ public sealed partial class PuddleSystem
     private void TickEvaporation()
     {
         var query = EntityQueryEnumerator<EvaporationComponent, PuddleComponent>();
-        var xformQuery = GetEntityQuery<TransformComponent>();
         var curTime = _timing.CurTime;
         while (query.MoveNext(out var uid, out var evaporation, out var puddle))
         {
@@ -46,15 +46,11 @@ public sealed partial class PuddleSystem
                 continue;
 
             var reagentTick = evaporation.EvaporationAmount * EvaporationCooldown.TotalSeconds;
-            puddleSolution.SplitSolutionWithOnly(reagentTick, EvaporationReagents);
+            puddleSolution.SplitSolution(reagentTick);
 
             // Despawn if we're done
             if (puddleSolution.Volume == FixedPoint2.Zero)
-            {
-                // Spawn a *sparkle*
-                Spawn("PuddleSparkle", xformQuery.GetComponent(uid).Coordinates);
-                QueueDel(uid);
-            }
+                QueueDel(uid); // ERRORGATE: no sparkle
         }
     }
 }

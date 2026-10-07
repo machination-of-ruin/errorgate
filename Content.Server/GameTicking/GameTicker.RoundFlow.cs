@@ -437,7 +437,6 @@ namespace Content.Server.GameTicking
             SendStatusToAll();
             ReqWindowAttentionAll();
             UpdateLateJoinStatus();
-            AnnounceRound();
             UpdateInfoText();
             SendRoundStartedDiscordMessage();
             RaiseLocalEvent(new RoundStartedEvent(RoundId));
@@ -780,20 +779,6 @@ namespace Content.Server.GameTicking
             {
                 LoadMaps();
             }
-        }
-
-        private void AnnounceRound()
-        {
-            if (CurrentPreset == null) return;
-
-            var options = _prototypeManager.EnumeratePrototypes<RoundAnnouncementPrototype>().ToList();
-
-            if (options.Count == 0)
-                return;
-
-            var proto = _robustRandom.Pick(options);
-
-            _announcer.SendAnnouncement(_announcer.GetAnnouncementId(proto.ID), proto.Message ?? "game-ticker-welcome-to-the-station");
         }
 
         private async void SendRoundStartedDiscordMessage()

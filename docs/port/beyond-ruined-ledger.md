@@ -82,16 +82,16 @@ Hints below come from commit messages, file lists and quick greps. **They are le
 | PR | Name | What it is | Upstream overlap / lead | Plan |
 |---|---|---|---|---|
 | 33, 34, 35 | mobspawner, mob-loot-system(2) | `SmartMobSpawner`, `MobLoot`, `DespawnDeadBody` | none | MILESTONE world systems |
-| 36 | blood-evaporate | Blood, insect blood, vomit and copper blood evaporate in puddles, 10 s tick, no sparkle | none in master (`EvaporationReagents = [Water]`). #65 later widens it to every reagent | TODO, small. Decide scope with #65 |
+| 36 | blood-evaporate | Blood, insect blood, vomit and copper blood evaporate in puddles, 10 s tick, no sparkle | none in master | DONE (small-PR batch). Owner chose scope (b): **every puddle evaporates**, which also covers the evaporation part of #65. Mops still use `EvaporationReagents` (water) |
 | 37 | melee-tweak | RMB disarm instead of heavy attack, no heavy damage examine, thrust wide animation, human punch effect, melee prototype tweaks | Partly overlaps WWDP #264 melee visuals, #623 aiming and hitting. Heavy attack still present in master | MILESTONE melee (with #46, #52, #61, #69, #72, #84) |
 | 38 | character-creation | Remove job/antag/traits/loadout tabs, spawn priority, disclaimer; default to HUMANERROR | WWDP #334 touched departments only. UI part not upstream | TODO. Note jobs are already hidden (#15) |
 | 39 | item-pickup-sounds | Equip rustle for guns and backpacks, gun interact sounds, rifle sound fix | The Gunnening added equip sound collections; WWDP #591 belt gear sounds | Likely COVERED, verify sounds |
-| 40 | no-pointing | Pointing disabled (client and server) | none | TODO, tiny |
-| 41 | body-fixes | Gib does not spawn organs | Master `GibBehavior` uses Shitmed gib args | TODO, check Shitmed `GibContents` first |
+| 40 | no-pointing | Pointing disabled (client and server) | none | DONE (small-PR batch) |
+| 41 | body-fixes | Gib does not spawn organs | Shitmed gib options | DONE (small-PR batch): default `GibContentsOption.Skip` in `GibBody` and `GibBehavior` (tested, no organs left) |
 | 42 | weapons-resize | Smaller guns, bat tweaks, sniper fixes | WWDP #284 Weapons Resize (same author) | COVERED, check leftovers |
 | 43 | character-inspect | Character examine rework, only 2 genders | WWDP #269 Better Character Examine | COVERED (system). Gender menu trim is humans-only housekeeping |
 | 44 | no-id-card-verb | Health/bleeding/damage text pushed inline into examine, ID card verb removed, radiation inspect | WWDP keeps health examine as a verb (`SharedHealthExaminableSystem`) | TODO. Pairs with #50 |
-| 45 | embed-fix | Embedded items can be pulled out | WWDP #278 #308 #235 touch embedding, `Embedded` flag not in master | TODO, small |
+| 45 | embed-fix | Embedded items can be pulled out | Tested: embedded items are reachable under WWDP interactions | SKIP (not needed) |
 | 46, 52 | shove-2, mag-inspect-logs | Separate shove (`ShoveAttackEvent`, flip animation `FlipCharacter`, `FlipAnimationEffect`) | WWDP shove (#280 #295 #304 #315 #347 #565 #582 #978) tunes the disarm-as-shove; no `ShoveAttackEvent` in master | MILESTONE melee. Big decision: keep WWDP shove or replace |
 | 47 | mag-inspect-fix | Ballistic fill delay 0.5 to 1 s, magazine examine tweak | Gunnening shows magazine/chamber | Mostly COVERED, fill delay only |
 | 48 | gun-calibers | "The gunnening" of the old fork: real-world calibers (9x19, 5.56x45, 7.62x39, .357/.44, lapua, 6mm caseless), ammo and gun roster cut, station maps deleted (about 184 files), loot-entry names by caliber | Master uses fictional calibers (`.35 auto`, `.30 rifle`, `.50`); the roster is intact | MILESTONE guns. Very large; decide caliber model first |
@@ -99,9 +99,9 @@ Hints below come from commit messages, file lists and quick greps. **They are le
 | 50 | no-examine | Damage examine for melee/ranged/thrown pushed inline, magazine examine | WWDP #549 #574 #925 fix damage examine | TODO. Pairs with #44 |
 | 51 | clothes-innteraction | Patch of old must-be-in-hand | n/a | SKIP |
 | 54 | stamina-fix2 | Stamina crit buffer 0, reset to 10%, shove stamina only on dynamic targets | none | TODO, stamina; combine with #82 |
-| 55 | announce | No roundstart announcement | none | TODO, tiny |
+| 55 | announce | No roundstart announcement | none | DONE (small-PR batch): `AnnounceRound` removed |
 | 56 | revert-engine | Engine revert | n/a | SKIP |
-| 57 | lobby-fixes | Lobby server name ">>> ERRORGATE <<<" | none | TODO, tiny, in the `>>> STYLE <<<` |
+| 57 | lobby-fixes | Lobby server name ">>> ERRORGATE <<<" | none | DONE (small-PR batch): `ui-lobby-title` locale string |
 | 58 | loot-tables | 36 loot spawner and table files, starter kits, smaller satchel, no breaking floor | none | MILESTONE world (loot + starter gear) |
 | 59 | playtest-preparation | Main map `EdgeOfEntropy.yml` (94k lines), no flashlight/gas tank actions, identity "Unknown" grammar, butchering allowed, no dreams | Map not in master | MILESTONE world map; the code bits TODO individually |
 | 60, 62, 63, 64 | mob-fixes, loot-spawners, branchchchc x2 | Loot/mob/despawn tweaks, `DespawnItem`, map update | none | MILESTONE world systems |
