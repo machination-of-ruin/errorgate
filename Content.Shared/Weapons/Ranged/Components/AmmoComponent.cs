@@ -15,6 +15,13 @@ public partial class AmmoComponent : Component, IShootable
 
     [ViewVariables(VVAccess.ReadWrite), DataField("muzzleFlash", customTypeSerializer:typeof(PrototypeIdSerializer<EntityPrototype>))]
     public string? MuzzleFlash = "MuzzleFlashEffect";
+
+    /// <summary>
+    /// ERRORGATE: radius of the light a shot with this ammo casts, was always 2 in the base game.
+    /// Louder, brighter shots give the shooter away.
+    /// </summary>
+    [ViewVariables(VVAccess.ReadWrite), DataField]
+    public float MuzzleEffectRadius = 5f;
 }
 
 /// <summary>

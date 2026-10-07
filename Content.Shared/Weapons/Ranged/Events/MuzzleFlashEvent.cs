@@ -13,10 +13,16 @@ public sealed class MuzzleFlashEvent : EntityEventArgs
 
     public Angle Angle;
 
-    public MuzzleFlashEvent(NetEntity uid, string prototype, Angle angle)
+    /// <summary>
+    /// ERRORGATE: radius of the light the shot casts, was always 2 in the base game.
+    /// </summary>
+    public float MuzzleEffectRadius;
+
+    public MuzzleFlashEvent(NetEntity uid, string prototype, Angle angle, float muzzleEffectRadius = 2f)
     {
         Uid = uid;
         Prototype = prototype;
         Angle = angle;
+        MuzzleEffectRadius = muzzleEffectRadius;
     }
 }

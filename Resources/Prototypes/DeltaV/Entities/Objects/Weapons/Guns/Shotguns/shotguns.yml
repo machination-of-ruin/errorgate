@@ -22,7 +22,7 @@
     shape: # WWDP guns resize
     - 0,0,7,1
   - type: Gun
-    fireRate: 1.5
+    fireRate: 1 # ERRORGATE slower
     selectedMode: SemiAuto
     availableModes:
     - SemiAuto

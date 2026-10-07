@@ -624,7 +624,7 @@ public abstract partial class SharedGunSystem : EntitySystem
         if (sprite == null)
             return;
 
-        var ev = new MuzzleFlashEvent(GetNetEntity(gun), sprite, worldAngle);
+        var ev = new MuzzleFlashEvent(GetNetEntity(gun), sprite, worldAngle, component.MuzzleEffectRadius); // ERRORGATE
         CreateEffect(gun, ev, gun);
     }
 

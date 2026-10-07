@@ -409,7 +409,7 @@ public sealed partial class GunSystem : SharedGunSystem
         }
 
         Lights.SetEnabled(gunUid, true, light);
-        Lights.SetRadius(gunUid, 2f, light);
+        Lights.SetRadius(gunUid, message.MuzzleEffectRadius, light); // ERRORGATE
         Lights.SetColor(gunUid, Color.FromHex("#cc8e2b"), light);
         Lights.SetEnergy(gunUid, 5f, light);
 
