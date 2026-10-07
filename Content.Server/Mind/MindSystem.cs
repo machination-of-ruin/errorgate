@@ -1,4 +1,5 @@
 using Content.Server.Administration.Logs;
+using Content.Server._ERRORGATE.DeathVoid;
 using Content.Server.GameTicking;
 using Content.Server.Ghost;
 using Content.Server.Mind.Commands;
@@ -70,6 +71,12 @@ public sealed class MindSystem : SharedMindSystem
         DebugTools.AssertNull(mind.OwnedEntity);
 
         if (!component.GhostOnShutdown || mind.Session == null || _gameTicker.RunLevel == GameRunLevel.PreRoundLobby)
+            return;
+
+        // ERRORGATE: no ghosts, something else may claim the player (death void)
+        var deleted = new MindBodyDeletedEvent(mindId, mind);
+        RaiseLocalEvent(ref deleted);
+        if (deleted.Handled)
             return;
 
         var ghost = _ghosts.SpawnGhost((mindId, mind), uid);
@@ -194,7 +201,13 @@ public sealed class MindSystem : SharedMindSystem
             component = EnsureComp<MindContainerComponent>(entity.Value);
 
             if (component.HasMind)
-                _ghosts.OnGhostAttempt(component.Mind.Value, false);
+            {
+                // ERRORGATE: no ghosts, the mind that is pushed out of this body goes somewhere else (death void)
+                var evicted = new MindEvictedEvent(component.Mind.Value);
+                RaiseLocalEvent(ref evicted);
+                if (!evicted.Handled)
+                    _ghosts.OnGhostAttempt(component.Mind.Value, false);
+            }
 
             if (TryComp<ActorComponent>(entity.Value, out var actor))
             {

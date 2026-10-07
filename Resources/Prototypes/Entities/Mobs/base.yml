@@ -104,6 +104,7 @@
       - ActionCritFakeDeath
       - ActionCritLastWords
   - type: Deathgasp
+    needsCritical: false # ERRORGATE: always
   - type: HealthExaminable
     examinableTypes:
     - Blunt

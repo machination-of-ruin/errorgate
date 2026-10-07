@@ -1,3 +1,4 @@
+using Content.Client.Administration.Managers;
 using Content.Client.Audio;
 using Content.Client.GameTicking.Managers;
 using Content.Client.LateJoin;
@@ -21,6 +22,7 @@ namespace Content.Client.Lobby
     public sealed class LobbyState : Robust.Client.State.State
     {
         [Dependency] private readonly IBaseClient _baseClient = default!;
+        [Dependency] private readonly IClientAdminManager _adminManager = default!; // ERRORGATE
         [Dependency] private readonly IConfigurationManager _cfg = default!;
         [Dependency] private readonly IClientConsoleHost _consoleHost = default!;
         [Dependency] private readonly IEntityManager _entityManager = default!;
@@ -48,6 +50,7 @@ namespace Content.Client.Lobby
             _gameTicker = _entityManager.System<ClientGameTicker>();
             _contentAudioSystem = _entityManager.System<ContentAudioSystem>();
             _contentAudioSystem.LobbySoundtrackChanged += UpdateLobbySoundtrackInfo;
+            _adminManager.AdminStatusUpdated += UpdateLobbyUi; // ERRORGATE
             _sawmill = Logger.GetSawmill("lobby");
             _readyManifest = _entityManager.EntitySysManager.GetEntitySystem<ReadyManifestSystem>();
 
@@ -88,6 +91,7 @@ namespace Content.Client.Lobby
             _gameTicker.LobbyStatusUpdated -= LobbyStatusUpdated;
             _gameTicker.LobbyLateJoinStatusUpdated -= LobbyLateJoinStatusUpdated;
             _contentAudioSystem.LobbySoundtrackChanged -= UpdateLobbySoundtrackInfo;
+            _adminManager.AdminStatusUpdated -= UpdateLobbyUi; // ERRORGATE
 
             _voteManager.ClearPopupContainer();
 
@@ -208,6 +212,9 @@ namespace Content.Client.Lobby
                 Lobby!.ManifestButton.Disabled = false;
                 Lobby!.ObserveButton.Disabled = true;
             }
+
+            // ERRORGATE: only admins may observe
+            Lobby!.ObserveButton.Visible = _adminManager.CanCommand("observe");
 
             if (_gameTicker.ServerInfoBlob != null)
                 Lobby!.ServerInfo.SetInfoBlob(_gameTicker.ServerInfoBlob);

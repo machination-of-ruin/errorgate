@@ -73,6 +73,7 @@ public sealed partial class MindTests
 
     // this is a variant of TestGhostOnDelete that just deletes the whole map.
     [Test]
+    [Ignore("ERRORGATE: ghosts are disabled, players go to the death void instead")]
     public async Task TestGhostOnDeleteMap()
     {
         await using var pair = await SetupPair(dirty: true);
@@ -127,6 +128,7 @@ public sealed partial class MindTests
     /// 2. Assert is ghost
     /// </summary>
     [Test]
+    [Ignore("ERRORGATE: ghosts are disabled, players go to the death void instead")]
     public async Task TestGhostOnDelete()
     {
         // Client is needed to spawn session
@@ -261,6 +263,7 @@ public sealed partial class MindTests
     /// 3. new ghost is spawned
     /// </summary>
     [Test]
+    [Ignore("ERRORGATE: ghosts are disabled, players go to the death void instead")]
     public async Task TestGhostDeletedSpawnsNewGhost()
     {
         // Client is needed to spawn session

@@ -40,7 +40,7 @@ public sealed class DeathVoidTest
 
     private static async Task<(TestPair Pair, EntityUid Body, EntityUid MindId, ICommonSession Session)> Setup()
     {
-        var pair = await PoolManager.GetServerClient(new PoolSettings { Connected = true, Dirty = true });
+        var pair = await PoolManager.GetServerClient(new PoolSettings { DummyTicker = false, Connected = true, Dirty = true });
         var server = pair.Server;
         var entMan = server.EntMan;
         var mindSystem = entMan.System<SharedMindSystem>();
@@ -121,6 +121,55 @@ public sealed class DeathVoidTest
     }
 
     [Test]
+    public async Task DeletedBodyLeadsToTheVoidNotAGhost()
+    {
+        var (pair, body, mindId, session) = await Setup();
+        var server = pair.Server;
+        var entMan = server.EntMan;
+
+        await server.WaitPost(() => entMan.DeleteEntity(body));
+        await pair.RunTicksSync(5);
+
+        await server.WaitAssertion(() =>
+        {
+            Assert.That(session.AttachedEntity, Is.Not.Null);
+            var attached = session.AttachedEntity!.Value;
+            Assert.That(entMan.HasComponent<DeathVoidComponent>(attached));
+            Assert.That(entMan.HasComponent<Content.Shared.Ghost.GhostComponent>(attached), Is.False);
+            Assert.That(entMan.GetComponent<MindComponent>(mindId).OwnedEntity, Is.EqualTo(attached));
+        });
+
+        await pair.CleanReturnAsync();
+    }
+
+    [Test]
+    public async Task PlayerPushedOutOfTheirBodyGoesToTheVoid()
+    {
+        var (pair, body, mindId, session) = await Setup();
+        var server = pair.Server;
+        var entMan = server.EntMan;
+
+        EntityUid otherMind = default;
+        await server.WaitPost(() =>
+        {
+            var mind = entMan.System<SharedMindSystem>();
+            otherMind = mind.CreateMind(null);
+            mind.TransferTo(otherMind, body);
+        });
+        await pair.RunTicksSync(5);
+
+        await server.WaitAssertion(() =>
+        {
+            var attached = session.AttachedEntity!.Value;
+            Assert.That(entMan.HasComponent<DeathVoidComponent>(attached));
+            Assert.That(entMan.GetComponent<MindComponent>(otherMind).OwnedEntity, Is.EqualTo(body));
+            Assert.That(entMan.GetComponent<MindComponent>(mindId).OwnedEntity, Is.Not.EqualTo(body));
+        });
+
+        await pair.CleanReturnAsync();
+    }
+
+    [Test]
     public async Task DeadPlayerCanRespawn()
     {
         var (pair, body, mindId, session) = await Setup();
@@ -129,7 +178,7 @@ public sealed class DeathVoidTest
         var console = server.ResolveDependency<IServerConsoleHost>();
 
         await SetDamage(pair, body, 200);
-        await server.WaitPost(() => console.ExecuteCommand(session, "respawn"));
+        await server.WaitPost(() => console.ExecuteCommand(session, "rise"));
         await pair.RunTicksSync(5);
         await server.WaitAssertion(() =>
         {

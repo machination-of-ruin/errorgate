@@ -61,7 +61,5 @@
       - type: StationNameSetup
         mapNameTemplate: "EDGE OF ENTROPY"
       - type: StationJobs
-        overflowJobs:
-        - Passenger
         availableJobs:
           Passenger: [ -1, -1 ]

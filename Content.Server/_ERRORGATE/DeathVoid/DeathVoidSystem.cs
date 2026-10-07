@@ -43,6 +43,8 @@ public sealed class DeathVoidSystem : EntitySystem
 
         SubscribeLocalEvent<MindContainerComponent, MobStateChangedEvent>(OnMobStateChanged);
         SubscribeLocalEvent<GhostAttemptHandleEvent>(OnGhostAttempt);
+        SubscribeLocalEvent<MindBodyDeletedEvent>(OnMindBodyDeleted);
+        SubscribeLocalEvent<MindEvictedEvent>(OnMindEvicted);
         SubscribeLocalEvent<RoundRestartCleanupEvent>(_ => _voidMap = null);
 
         SubscribeLocalEvent<DeathVoidComponent, DeadRespawnEvent>(OnRespawn);
@@ -70,6 +72,38 @@ public sealed class DeathVoidSystem : EntitySystem
             SendToVoid(body);
     }
 
+    /// <summary>
+    ///     The body of a player was deleted (chasm, gibbing, admin delete, ...). They end up in the void, not on a ghost.
+    ///     The mind has no body left at this point, so the void becomes its entity.
+    /// </summary>
+    private void OnMindBodyDeleted(ref MindBodyDeletedEvent args)
+    {
+        var voidEnt = SpawnVoid(args.MindId, args.Mind);
+        _mind.TransferTo(args.MindId, voidEnt, mind: args.Mind);
+        args.Handled = true;
+    }
+
+    /// <summary>
+    ///     Another mind takes over a body (mind swap, admin control, ...). The previous player ends up in the void,
+    ///     minds without a player are simply detached.
+    /// </summary>
+    private void OnMindEvicted(ref MindEvictedEvent args)
+    {
+        args.Handled = true;
+
+        if (!TryComp<MindComponent>(args.MindId, out var mind))
+            return;
+
+        if (mind.UserId == null)
+        {
+            _mind.TransferTo(args.MindId, null, createGhost: false, mind: mind);
+            return;
+        }
+
+        var voidEnt = SpawnVoid(args.MindId, mind);
+        _mind.TransferTo(args.MindId, voidEnt, mind: mind);
+    }
+
     private void SendToVoid(EntityUid body)
     {
         if (!_mind.TryGetMind(body, out var mindId, out var mind) || mind.UserId == null)
@@ -78,9 +112,14 @@ public sealed class DeathVoidSystem : EntitySystem
         if (mind.VisitingEntity != null)
             return;
 
+        var voidEnt = SpawnVoid(mindId, mind);
+        _mind.Visit(mindId, voidEnt, mind);
+    }
+
+    private EntityUid SpawnVoid(EntityUid mindId, MindComponent mind)
+    {
         var voidEnt = Spawn(VoidPrototype, new MapCoordinates(Vector2.Zero, EnsureVoidMap()));
         _actions.AddAction(voidEnt, RespawnAction);
-        _mind.Visit(mindId, voidEnt, mind);
 
         if (mind.Session is { } session)
         {
@@ -93,6 +132,8 @@ public sealed class DeathVoidSystem : EntitySystem
                 session.Channel,
                 Color.Red);
         }
+
+        return voidEnt;
     }
 
     private void ReturnFromVoid(EntityUid body)
