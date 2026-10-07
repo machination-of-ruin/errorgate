@@ -202,7 +202,7 @@ namespace Content.Client.Administration.UI.Bwoink
                 }
 
                 if (_currentPlayer is not null)
-                    _console.ExecuteCommand($"respawn \"{_currentPlayer.Username}\"");
+                    _console.ExecuteCommand($"forcerespawn \"{_currentPlayer.Username}\"");
             };
 
             PopOut.OnPressed += _ =>
@@ -251,7 +251,7 @@ namespace Content.Client.Administration.UI.Bwoink
             Kick.Visible = _adminManager.CanCommand("kick");
             Kick.Disabled = !Kick.Visible || disabled;
 
-            Respawn.Visible = _adminManager.CanCommand("respawn");
+            Respawn.Visible = _adminManager.CanCommand("forcerespawn");
             Respawn.Disabled = !Respawn.Visible || disabled;
 
             Follow.Visible = _adminManager.CanCommand("follow");

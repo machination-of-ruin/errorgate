@@ -1,0 +1,29 @@
+# What a dead player is attached to instead of a ghost.
+# It spawns on an empty map, so the player cannot see, hear or read anything.
+- type: entity
+  id: ErrorgateDeathVoid
+  name: the void
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: DeathVoid
+  - type: Transform
+  - type: MetaData
+  - type: Eye
+    drawFov: false
+  - type: Input
+    context: "human"
+  - type: Actions
+
+- type: entity
+  id: ActionDeadRespawn
+  name: Respawn
+  description: Rise.
+  components:
+  - type: InstantAction
+    itemIconStyle: NoItem
+    checkCanInteract: false
+    checkConsciousness: false
+    icon:
+      sprite: Structures/Storage/Crates/wooden_grave.rsi
+      state: open
+    event: !type:DeadRespawnEvent

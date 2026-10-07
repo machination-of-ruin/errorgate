@@ -15,7 +15,7 @@ namespace Content.Server.GameTicking.Commands
         [Dependency] private readonly GameTicker _gameTicker = default!;
         [Dependency] private readonly MindSystem _mind = default!;
 
-        public override string Command => "respawn";
+        public override string Command => "forcerespawn"; // ERRORGATE: "respawn" is the player-facing command
 
         public override async void Execute(IConsoleShell shell, string argStr, string[] args)
         {

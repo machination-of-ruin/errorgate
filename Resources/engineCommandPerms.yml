@@ -115,7 +115,7 @@
 - Flags: MODERATOR
   Commands:
   - kick
-  - respawn
+  - forcerespawn
 
 - Flags: HOST
   Commands:

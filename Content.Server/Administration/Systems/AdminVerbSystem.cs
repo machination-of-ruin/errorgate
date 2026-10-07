@@ -223,7 +223,7 @@ namespace Content.Server.Administration.Systems
                         Category = VerbCategory.Admin,
                         Act = () =>
                         {
-                            _console.ExecuteCommand(player, $"respawn \"{mind.UserId}\"");
+                            _console.ExecuteCommand(player, $"forcerespawn \"{mind.UserId}\"");
                         },
                         ConfirmationPopup = true,
                         // No logimpact as the command does it internally.
