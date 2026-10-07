@@ -34,6 +34,7 @@ Branch: `port/beyond`. Shared history base: `8068dda469` (Sep 2024). PR list: `g
 | Lobby music | Owner chose to ship the 16-track playlist as is. Attributions state honestly that most are commercial. |
 | Tips | Off by default; real tips come with #91. |
 | LOOC | Off by default; plain OOC stays. |
+| WWDP "[Port]" features the old fork reverted (#68) | Keep all as upstream has them. |
 | Loot / mobs / despawn / day cycle | Port the **final** versions as one "world systems" milestone, not PR by PR. |
 
 ## Ledger
@@ -108,7 +109,7 @@ Hints below come from commit messages, file lists and quick greps. **They are le
 | 65 | fixes | Executions return (x20 damage), every reagent evaporates, no ghosts (death void covers), no evac shuttle CVars, carps move on water, cold damage examinable, cigarettes in loot | partly covered by #13 | TODO, split |
 | 66 | loot-manager | Loot Manager 1.0 (global loot tables, LootEntries per category) | none | MILESTONE world systems (core) |
 | 67 | deaf-component | `DeafComponent` in `_ERRORGATE/Hearing` | WWDP deafness #265 #270 #384 #390 #395 and `HearingSystem` | COVERED |
-| 68 | no-dmca-revert | **Nine reverts of WWDP "[Port]" PRs + "no-dmca-fixes"** (hobo, maid, e-sword, betrayal knife, aspects, telescope, lying down, blink, uplink discounts, advanced prying, melee block) | All nine exist in master | TODO. Needs one decision per feature, probably for licensing/DMCA reasons. Ask the owner why |
+| 68 | no-dmca-revert | **Nine reverts of WWDP "[Port]" PRs + "no-dmca-fixes"** (hobo, maid, e-sword, betrayal knife, aspects, telescope, lying down, blink, uplink discounts, advanced prying, melee block) | All nine exist in master | **SKIP, decided: leave all nine as in upstream.** The loot-related part of `no-dmca-fixes` (armor entries, global loot table) is handled with the world systems milestone |
 | 69 | tweaks | Combined melee attack on LMB, extract cartridge action, silenced guns no muzzle flash, stacking | Extract round is in the Gunnening | MILESTONE melee/guns; check |
 | 70 | clothes-rebalance | Inventory rework: item sizes, belts, outer clothing storage | Owner has inventory-size commits in master (belts, waist bags, March 2025) | TODO, verify what is left |
 | 71 | Guns-resprite | Drozd resprite to MP5 | none | TODO, sprites only |
@@ -147,7 +148,7 @@ Decision first: keep WWDP shove (disarm based) or the old `ShoveAttackEvent` rew
 Inline examine text instead of verbs. Check WWDP #549/#574/#919/#925 first.
 
 ### Reverts (#68)
-Nine WWDP "[Port]" features: telescope, lying down (an upstream better version exists, #815), blink, uplink discounts, aspects, advanced prying, energy sword (WD), melee block, hobo and maid. Ask the owner what to remove and why.
+Decided: **keep** the nine WWDP "[Port]" features as upstream has them (telescope, lying down, blink, uplink discounts, aspects, advanced prying, energy sword, melee block, hobo and maid). Nothing to do.
 
 ## WWDP PRs by the owner already in master (overlap lookup)
 
