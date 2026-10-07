@@ -4,7 +4,7 @@
   description: job-description-boxer
   playTimeTracker: JobBoxer
   startingGear: BoxerGear
-  setPreference: false # WWDP disabled
+  setPreference: false # ERRORGATE: only HumanError is selectable
   icon: "JobIconBoxer"
   supervisors: job-supervisors-hop
   access:

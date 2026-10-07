@@ -62,4 +62,4 @@
         mapNameTemplate: "EDGE OF ENTROPY"
       - type: StationJobs
         availableJobs:
-          Passenger: [ -1, -1 ]
+          HumanError: [ -1, -1 ]

@@ -1,5 +1,6 @@
 - type: job
   id: Clown
+  setPreference: false # ERRORGATE: only HumanError is selectable
   name: job-name-clown
   description: job-description-clown
   playTimeTracker: JobClown

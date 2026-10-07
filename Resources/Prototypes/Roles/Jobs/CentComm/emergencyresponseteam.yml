@@ -4,7 +4,7 @@
   name: job-name-ertleader
   description: job-description-ertleader
   playTimeTracker: JobERTLeader
-  setPreference: false
+  setPreference: false # ERRORGATE: only HumanError is selectable
   startingGear: ERTLeaderGearEVA
   icon: "JobIconNanotrasen"
   supervisors: job-supervisors-centcom
@@ -105,7 +105,7 @@
   name: job-name-ertchaplain
   description: job-description-ertchaplain
   playTimeTracker: JobERTChaplain
-  setPreference: false
+  setPreference: false # ERRORGATE: only HumanError is selectable
   startingGear: ERTChaplainGear
   icon: "JobIconNanotrasen"
   supervisors: job-supervisors-centcom
@@ -194,7 +194,7 @@
   name: job-name-ertengineer
   description: job-description-ertengineer
   playTimeTracker: JobERTEngineer
-  setPreference: false
+  setPreference: false # ERRORGATE: only HumanError is selectable
   startingGear: ERTEngineerGearEVA
   icon: "JobIconNanotrasen"
   supervisors: job-supervisors-centcom
@@ -273,7 +273,7 @@
   name: job-name-ertsecurity
   description: job-description-ertsecurity
   playTimeTracker: JobERTSecurity
-  setPreference: false
+  setPreference: false # ERRORGATE: only HumanError is selectable
   startingGear: ERTEngineerGearEVA
   icon: "JobIconNanotrasen"
   supervisors: job-supervisors-centcom
@@ -374,7 +374,7 @@
   name: job-name-ertmedic
   description: job-description-ertmedic
   playTimeTracker: JobERTMedical
-  setPreference: false
+  setPreference: false # ERRORGATE: only HumanError is selectable
   startingGear: ERTMedicalGearEVA
   icon: "JobIconNanotrasen"
   supervisors: job-supervisors-centcom
@@ -443,7 +443,7 @@
   name: job-name-ertjanitor
   description: job-description-ertjanitor
   playTimeTracker: JobERTJanitor
-  setPreference: false
+  setPreference: false # ERRORGATE: only HumanError is selectable
   startingGear: ERTJanitorGearEVA
   icon: "JobIconNanotrasen"
   supervisors: job-supervisors-centcom

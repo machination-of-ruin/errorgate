@@ -1,5 +1,6 @@
 - type: job
   id: ForensicMantis
+  setPreference: false # ERRORGATE: only HumanError is selectable
   name: job-name-mantis
   description: job-description-mantis
   playTimeTracker: JobForensicMantis

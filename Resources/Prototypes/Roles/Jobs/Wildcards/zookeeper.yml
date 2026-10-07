@@ -4,7 +4,7 @@
   description: job-description-zookeeper
   playTimeTracker: JobZookeeper
   startingGear: ZookeeperGear
-  setPreference: false # WWDP disabled
+  setPreference: false # ERRORGATE: only HumanError is selectable
   icon: "JobIconZookeeper"
   supervisors: job-supervisors-hop
   access:

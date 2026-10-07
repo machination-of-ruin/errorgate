@@ -1,6 +1,7 @@
 # Combat maid, a trained secret Centcom asset for protecting heads and enforcing Centcom orders.
 - type: job
   id: Maid
+  setPreference: false # ERRORGATE: only HumanError is selectable
   name: job-name-maid
   description: job-description-maid
   playTimeTracker: JobMaid

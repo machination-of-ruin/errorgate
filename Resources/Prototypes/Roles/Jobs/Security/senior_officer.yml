@@ -3,7 +3,7 @@
   name: job-name-senior-officer
   description: job-description-senior-officer
   playTimeTracker: JobSeniorOfficer
-  setPreference: false # WWDP disabled role, not mapped
+  setPreference: false # ERRORGATE: only HumanError is selectable
   requirements:
     # WD EDIT START
     # - !type:CharacterPlaytimeRequirement

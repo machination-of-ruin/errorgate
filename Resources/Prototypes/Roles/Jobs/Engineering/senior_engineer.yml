@@ -3,7 +3,7 @@
   name: job-name-senior-engineer
   description: job-description-senior-engineer
   playTimeTracker: JobSeniorEngineer
-  setPreference: false # WWDP disabled role, not mapped
+  setPreference: false # ERRORGATE: only HumanError is selectable
   requirements:
     # - !type:CharacterPlaytimeRequirement # WWDP
     #   tracker: JobAtmosphericTechnician

@@ -8,7 +8,7 @@
       employers:
       - NanoTrasen
   startingGear: ProsecutorGear
-  setPreference: false # WWDP disabled
+  setPreference: false # ERRORGATE: only HumanError is selectable
   icon: "JobIconProsecutor"
   supervisors: job-supervisors-cj
   access:

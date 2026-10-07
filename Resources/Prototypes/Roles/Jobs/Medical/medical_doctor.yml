@@ -1,5 +1,6 @@
 - type: job
   id: MedicalDoctor
+  setPreference: false # ERRORGATE: only HumanError is selectable
   name: job-name-doctor
   description: job-description-doctor
   playTimeTracker: JobMedicalDoctor

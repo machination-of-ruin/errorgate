@@ -1,5 +1,6 @@
 - type: job
   id: Psychologist
+  setPreference: false # ERRORGATE: only HumanError is selectable
   name: job-name-psychologist
   description: job-description-psychologist
   playTimeTracker: JobPsychologist

@@ -3,7 +3,7 @@
   name: job-name-deathsquad
   description: job-description-deathsquad
   playTimeTracker: JobDeathSquad
-  setPreference: false
+  setPreference: false # ERRORGATE: only HumanError is selectable
   startingGear: DeathSquadGear
   icon: "JobIconNanotrasen"
   supervisors: job-supervisors-centcom

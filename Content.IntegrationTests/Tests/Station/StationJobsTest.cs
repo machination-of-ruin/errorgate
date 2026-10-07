@@ -229,6 +229,10 @@ public sealed class StationJobsTest
             {
                 foreach (var gameMap in prototypeManager.EnumeratePrototypes<GameMapPrototype>())
                 {
+                    // ERRORGATE: the leftover station maps use jobs that are hidden from character setup on purpose
+                    if (!gameMap.ID.StartsWith("EdgeOfEntropy"))
+                        continue;
+
                     foreach (var (stationId, station) in gameMap.Stations)
                     {
                         if (!station.StationComponentOverrides.TryGetComponent(name, out var comp))

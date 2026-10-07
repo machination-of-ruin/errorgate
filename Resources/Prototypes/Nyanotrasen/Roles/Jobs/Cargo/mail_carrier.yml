@@ -1,5 +1,6 @@
 - type: job
   id: MailCarrier
+  setPreference: false # ERRORGATE: only HumanError is selectable
   name: job-name-mail-carrier
   description: job-description-mail-carrier
   startingGear: CourierGear

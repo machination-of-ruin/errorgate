@@ -1,5 +1,6 @@
 - type: job
   id: Janitor
+  setPreference: false # ERRORGATE: only HumanError is selectable
   name: job-name-janitor
   description: job-description-janitor
   playTimeTracker: JobJanitor

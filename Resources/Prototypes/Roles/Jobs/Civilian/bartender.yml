@@ -1,5 +1,6 @@
 - type: job
   id: Bartender
+  setPreference: false # ERRORGATE: only HumanError is selectable
   name: job-name-bartender
   description: job-description-bartender
   playTimeTracker: JobBartender

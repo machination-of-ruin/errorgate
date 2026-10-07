@@ -3,7 +3,7 @@
   name: job-name-brigmedic
   description: job-description-brigmedic
   playTimeTracker: JobBrigmedic
-  setPreference: false # WWDP disabled role, not mapped
+  setPreference: false # ERRORGATE: only HumanError is selectable
   requirements:
     # WD EDIT START
     # - !type:CharacterDepartmentTimeRequirement

@@ -3,7 +3,7 @@
   name: job-name-senior-researcher
   description: job-description-senior-researcher
   playTimeTracker: JobSeniorResearcher
-  setPreference: false # WWDP disabled role, not mapped
+  setPreference: false # ERRORGATE: only HumanError is selectable
   requirements:
     # WD EDIT START
     # - !type:CharacterDepartmentTimeRequirement

@@ -6,7 +6,7 @@
   startingGear: MartialArtistGear
   icon: "JobIconMartialArtist"
   supervisors: job-supervisors-hop
-  setPreference: false # WWDP disabled
+  setPreference: false # ERRORGATE: only HumanError is selectable
 #  whitelistRequired: true
   access:
   - Maintenance

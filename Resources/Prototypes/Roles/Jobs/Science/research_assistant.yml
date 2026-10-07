@@ -1,5 +1,6 @@
 - type: job
   id: ResearchAssistant
+  setPreference: false # ERRORGATE: only HumanError is selectable
   name: job-name-research-assistant
   description: job-description-research-assistant
   playTimeTracker: JobResearchAssistant

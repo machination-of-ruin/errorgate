@@ -1,5 +1,6 @@
 - type: job
   id: HeadOfSecurity
+  setPreference: false # ERRORGATE: only HumanError is selectable
   name: job-name-hos
   description: job-description-hos
   playTimeTracker: JobHeadOfSecurity

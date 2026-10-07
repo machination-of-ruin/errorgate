@@ -1,0 +1,36 @@
+- type: job
+  id: HumanError
+  name: HUMAN ERROR
+  description: RISE ON THE EDGE OF ENTROPY
+  playTimeTracker: HumanErrorPlaytracker
+  startingGear: HumanErrorGear
+  icon: "JobIconPassenger"
+
+- type: startingGear
+  id: HumanErrorGear
+  equipment:
+    jumpsuit: ClothingUniformJumpsuitColorGrey
+    shoes: ClothingShoesColorBlack
+
+- type: playTimeTracker
+  id: HumanErrorPlaytracker
+
+- type: department
+  id: HumanErrorDepartment # HELLO?
+  name: department-HumanErrorDepartment
+  description: department-HumanErrorDepartment-description
+  color: "#FF0000"
+  roles:
+  - HumanError
+
+- type: entity
+  id: SpawnPointHumanError
+  parent: SpawnPointJobBase
+  name: human error
+  components:
+  - type: SpawnPoint
+    job_id: HumanError
+  - type: Sprite
+    layers:
+      - state: green
+      - state: passenger

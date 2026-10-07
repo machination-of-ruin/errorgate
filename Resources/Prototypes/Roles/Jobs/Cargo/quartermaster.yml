@@ -1,5 +1,6 @@
 - type: job
   id: Quartermaster
+  setPreference: false # ERRORGATE: only HumanError is selectable
   name: job-name-qm
   description: job-description-qm
   playTimeTracker: JobQuartermaster

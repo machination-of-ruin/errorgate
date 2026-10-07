@@ -225,7 +225,7 @@ entities:
     - type: Transform
       pos: 3.5,-14.5
       parent: 1
-- proto: SpawnPointPassenger
+- proto: SpawnPointHumanError
   entities:
   - uid: 91
     components:

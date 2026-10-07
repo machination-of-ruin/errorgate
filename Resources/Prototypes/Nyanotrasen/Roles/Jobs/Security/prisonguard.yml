@@ -8,7 +8,7 @@
   canBeAntag: false
   icon: "JobIconPrisonGuard"
   supervisors: job-supervisors-warden
-  setPreference: false # WWDP disabled role, not mapped
+  setPreference: false # ERRORGATE: only HumanError is selectable
 #  whitelistRequired: true
   access:
   - Security

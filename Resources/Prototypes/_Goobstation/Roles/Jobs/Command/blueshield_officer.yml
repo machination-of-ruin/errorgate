@@ -3,7 +3,7 @@
   name: Blueshield Officer
   description: "Act as a bodyguard and advisor for Command and CentCom VIPs."
   playTimeTracker: JobBlueshieldOfficer
-  setPreference: false # WWDP disabled
+  setPreference: false # ERRORGATE: only HumanError is selectable
   requirements:
     - !type:CharacterDepartmentTimeRequirement
       department: Command

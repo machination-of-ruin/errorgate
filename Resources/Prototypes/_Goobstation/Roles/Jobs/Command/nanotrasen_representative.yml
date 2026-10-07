@@ -3,7 +3,7 @@
   name: Corporate Liaison
   description: "Represent your employer, send reports back to them on the station's situation, inform the heads of anything CentCom orders them to do."
   playTimeTracker: JobNanotrasenRepresentative
-  setPreference: false # WWDP disabled
+  setPreference: false # ERRORGATE: only HumanError is selectable
   requirements:
     - !type:CharacterDepartmentTimeRequirement
       department: Command

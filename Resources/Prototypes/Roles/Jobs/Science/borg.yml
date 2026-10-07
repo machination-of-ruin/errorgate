@@ -1,6 +1,7 @@
 # No idea why it's in sci but we ball.
 - type: job
   id: StationAi
+  setPreference: false # ERRORGATE: only HumanError is selectable
   name: job-name-station-ai
   description: job-description-station-ai
   playTimeTracker: JobStationAi
@@ -31,6 +32,7 @@
 
 - type: job
   id: Borg
+  setPreference: false # ERRORGATE: only HumanError is selectable
   name: job-name-borg
   description: job-description-borg
   playTimeTracker: JobBorg

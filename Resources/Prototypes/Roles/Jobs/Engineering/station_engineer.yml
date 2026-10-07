@@ -1,5 +1,6 @@
 - type: job
   id: StationEngineer
+  setPreference: false # ERRORGATE: only HumanError is selectable
   name: job-name-engineer
   description: job-description-engineer
   playTimeTracker: JobStationEngineer

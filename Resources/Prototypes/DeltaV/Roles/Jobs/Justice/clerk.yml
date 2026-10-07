@@ -3,7 +3,7 @@
   name: job-name-clerk
   description: job-description-clerk
   playTimeTracker: JobClerk
-  setPreference: false # WWDP disabled
+  setPreference: false # ERRORGATE: only HumanError is selectable
   requirements:
     - !type:CharacterDepartmentTimeRequirement
       department: Security

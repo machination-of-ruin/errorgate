@@ -3,7 +3,7 @@
   name: job-name-cburn
   description: job-description-cburn
   playTimeTracker: JobCBURN
-  setPreference: false
+  setPreference: false # ERRORGATE: only HumanError is selectable
   startingGear: CBURNGear
   icon: "JobIconNanotrasen"
   supervisors: job-supervisors-centcom

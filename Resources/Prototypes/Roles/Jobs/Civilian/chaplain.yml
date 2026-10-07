@@ -1,5 +1,6 @@
 - type: job
   id: Chaplain
+  setPreference: false # ERRORGATE: only HumanError is selectable
   name: job-name-chaplain
   description: job-description-chaplain
   playTimeTracker: JobChaplain
