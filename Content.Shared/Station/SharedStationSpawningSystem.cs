@@ -102,6 +102,21 @@ public abstract class SharedStationSpawningSystem : EntitySystem
                 var equipmentEntity = EntityManager.SpawnEntity(equipmentStr, xform.Coordinates);
                 InventorySystem.TryEquip(entity, equipmentEntity, slot.Name, true, force: true);
             }
+
+            // ERRORGATE: humans have no pocket slots, their pocket gear goes into the jumpsuit storage instead
+            foreach (var pocket in new[] { "pocket1", "pocket2" })
+            {
+                var pocketProto = startingGear.GetGear(pocket);
+                if (string.IsNullOrEmpty(pocketProto) || slotDefinitions.Any(s => s.Name == pocket))
+                    continue;
+
+                var pocketEntity = EntityManager.SpawnEntity(pocketProto, xform.Coordinates);
+                if (InventorySystem.TryGetSlotEntity(entity, "jumpsuit", out var suit)
+                    && _storageQuery.TryComp(suit, out var suitStorage))
+                {
+                    _storage.Insert(suit.Value, pocketEntity, out _, storageComp: suitStorage, playSound: false);
+                }
+            }
         }
 
         if (_handsQuery.TryComp(entity, out var handsComponent))

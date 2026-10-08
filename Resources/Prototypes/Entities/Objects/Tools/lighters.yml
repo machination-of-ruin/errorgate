@@ -71,6 +71,10 @@
       right:
       - state: inhand-right-flame
         shader: unshaded
+  - type: Clothing
+    quickEquip: false
+    slots:
+    - idcard # ERRORGATE: light slot
   - type: Item
     size: Tiny
     sprite: Objects/Tools/lighters.rsi
@@ -201,6 +205,10 @@
   - type: ItemToggleSize
     activatedSize: Small
   - type: ItemToggleHot
+  - type: Clothing
+    quickEquip: false
+    slots:
+    - idcard # ERRORGATE: light slot
   - type: Item
     size: Tiny
     sprite: Objects/Tools/lighters.rsi

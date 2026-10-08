@@ -85,6 +85,7 @@
     quickEquip: false
     slots:
       - Belt
+      - idcard # ERRORGATE: light slot
   - type: AttachmentFlashlight # Lavaland Change
   # WD EDIT START
   - type: RotatePointLight
@@ -146,6 +147,7 @@
     quickEquip: false
     slots:
       - Belt
+      - idcard # ERRORGATE: light slot
 
 - type: entity
   parent: FlashlightLantern

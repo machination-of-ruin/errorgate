@@ -48,8 +48,8 @@
         friction: 0.2
   - type: HeldSpeedModifier # WWDP slow down with bags in hand
     mirrorClothingModifier: false
-    sprintModifier: 0.85
-    walkModifier: 0.85
+    sprintModifier: 0.8 # ERRORGATE: was 0.85
+    walkModifier: 0.8
 
 - type: entity
   parent: ClothingBackpack
@@ -228,6 +228,12 @@
   components:
   - type: Sprite
     sprite: Clothing/Back/Backpacks/merc.rsi
+  - type: Storage # ERRORGATE: bigger grid
+    grid:
+    - 0,0,7,3
+    - 0,5,1,7
+    - 3,5,4,7
+    - 6,5,7,7
 
 #ERT
 - type: entity

@@ -15,6 +15,10 @@
     equipSound: /Audio/_White/Equip/clothingrustle4.ogg
   - type: Item # WWDP
     canBeUsedWhileWorn: true
+  - type: HeldSpeedModifier # ERRORGATE: slow down with a satchel in hand
+    mirrorClothingModifier: false
+    sprintModifier: 0.8
+    walkModifier: 0.8
 
 - type: entity
   parent: ClothingBackpackSatchel

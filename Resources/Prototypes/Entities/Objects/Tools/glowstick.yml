@@ -4,6 +4,10 @@
   id: GlowstickBase
   description: Useful for raves and emergencies.
   components:
+    - type: Clothing
+      quickEquip: false
+      slots:
+      - idcard # ERRORGATE: light slot
     - type: SpaceGarbage
     - type: ExpendableLight
       spentName: expendable-light-spent-green-glowstick-name

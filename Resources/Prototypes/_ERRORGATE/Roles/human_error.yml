@@ -11,6 +11,7 @@
   equipment:
     jumpsuit: ClothingUniformJumpsuitColorGrey
     shoes: ClothingShoesColorBlack
+    id: CheapLighter # ERRORGATE: the id slot is the light slot
 
 - type: playTimeTracker
   id: HumanErrorPlaytracker
