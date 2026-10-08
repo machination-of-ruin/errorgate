@@ -340,7 +340,7 @@ public sealed partial class CCVars
     ///     Whether to allow characters to select traits.
     /// </summary>
     public static readonly CVarDef<bool> GameTraitsEnabled =
-        CVarDef.Create("game.traits_enabled", true, CVar.REPLICATED);
+        CVarDef.Create("game.traits_enabled", false, CVar.REPLICATED); // ERRORGATE: bare start, no traits
 
     /// <summary>
     ///     How many traits a character can have at most.
@@ -366,7 +366,7 @@ public sealed partial class CCVars
     ///     Whether to allow characters to select loadout items.
     /// </summary>
     public static readonly CVarDef<bool> GameLoadoutsEnabled =
-        CVarDef.Create("game.loadouts_enabled", true, CVar.REPLICATED);
+        CVarDef.Create("game.loadouts_enabled", false, CVar.REPLICATED); // ERRORGATE: bare start, no loadouts
 
     /// <summary>
     ///     How many points to give to each player for loadouts.

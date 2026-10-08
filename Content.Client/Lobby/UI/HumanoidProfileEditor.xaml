@@ -164,7 +164,7 @@
                                     <!-- WD EDIT END -->
                                 </BoxContainer>
                                 <!-- Spawn Priority -->
-                                <BoxContainer HorizontalExpand="True">
+                                <BoxContainer HorizontalExpand="True" Visible="False"> <!-- ERRORGATE: one spawn, no priority -->
                                     <Label Text="{Loc 'humanoid-profile-editor-spawn-priority-label'}" />
                                     <Control HorizontalExpand="True"/>
                                     <OptionButton Name="SpawnPriorityButton" HorizontalAlignment="Right" />

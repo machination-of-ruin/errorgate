@@ -111,6 +111,7 @@
     - Slash
     - Piercing
     - Heat
+    - Cold # ERRORGATE
     - Shock
   - type: DamageOnHighSpeedImpact
     damage:

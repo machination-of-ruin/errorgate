@@ -1,7 +1,7 @@
 - type: job
   id: HumanError
-  name: HUMAN ERROR
-  description: RISE ON THE EDGE OF ENTROPY
+  name: job-name-humanerror
+  description: job-description-humanerror
   playTimeTracker: HumanErrorPlaytracker
   startingGear: HumanErrorGear
   icon: "JobIconPassenger"

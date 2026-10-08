@@ -112,6 +112,7 @@
     soundHit:
       path: /Audio/Weapons/bladeslice.ogg
     animationRotation: -135 # WD EDIT
+  - type: Sharp # ERRORGATE: bayonet
   - type: IncreaseDamageOnWield
     damage:
       types:

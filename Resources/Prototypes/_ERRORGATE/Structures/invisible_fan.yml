@@ -1,0 +1,10 @@
+# A tiny fan nobody can see. Placed in the world to wall off areas with toxic gas, so gas stays where it is
+# without a visible object in the way.
+- type: entity
+  parent: AtmosDeviceFanTiny
+  id: AtmosDeviceFanTinyInvisible
+  name: tiny fan
+  suffix: Invisible
+  components:
+  - type: Sprite
+    visible: false

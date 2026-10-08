@@ -49,7 +49,12 @@ public sealed partial class StaminaSystem : EntitySystem
     /// <summary>
     /// How much of a buffer is there between the stun duration and when stuns can be re-applied.
     /// </summary>
-    private static readonly TimeSpan StamCritBufferTime = TimeSpan.FromSeconds(3f);
+    private static readonly TimeSpan StamCritBufferTime = TimeSpan.FromSeconds(0f); // ERRORGATE: was 3
+
+    /// <summary>
+    /// ERRORGATE: how much stamina is left after coming out of stamina crit.
+    /// </summary>
+    private const float StaminaFractionAfterCrit = 0.1f;
 
     public override void Initialize()
     {
@@ -426,7 +431,7 @@ public sealed partial class StaminaSystem : EntitySystem
             // We were in crit so come out of it and continue.
             if (comp.Critical)
             {
-                ExitStamCrit(uid, comp);
+                ExitStamCrit(uid, comp, true);
                 continue;
             }
 
@@ -471,7 +476,7 @@ public sealed partial class StaminaSystem : EntitySystem
         _adminLogger.Add(LogType.Stamina, LogImpact.Medium, $"{ToPrettyString(uid):user} entered stamina crit");
     }
 
-    private void ExitStamCrit(EntityUid uid, StaminaComponent? component = null)
+    private void ExitStamCrit(EntityUid uid, StaminaComponent? component = null, bool exhausted = false)
     {
         if (!Resolve(uid, ref component) ||
             !component.Critical)
@@ -480,10 +485,14 @@ public sealed partial class StaminaSystem : EntitySystem
         }
 
         component.Critical = false;
-        component.StaminaDamage = 0f;
+        // ERRORGATE: waking up from stamina crit leaves you exhausted, not fully recovered
+        component.StaminaDamage = exhausted ? component.CritThreshold * (1f - StaminaFractionAfterCrit) : 0f;
         component.NextUpdate = _timing.CurTime;
         SetStaminaAlert(uid, component);
-        RemComp<ActiveStaminaComponent>(uid);
+        if (component.StaminaDamage > 0f)
+            EnsureComp<ActiveStaminaComponent>(uid);
+        else
+            RemComp<ActiveStaminaComponent>(uid);
         Dirty(uid, component);
         _adminLogger.Add(LogType.Stamina, LogImpact.Low, $"{ToPrettyString(uid):user} recovered from stamina crit");
     }

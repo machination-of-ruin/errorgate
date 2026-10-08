@@ -33,11 +33,8 @@ language-NovuNederic-description =
     Spoken in the New-Netherlands, this direct and pragmatic trade language carries the sharp consonants and clipped vowels of its old-world roots.
     Built on centuries of seafaring, land reclamation, and commerce, it thrives among those who shape entire worlds — just as their ancestors shaped the land from the sea.
 
-language-TauCetiBasic-name = Tau-Ceti Basic
-language-TauCetiBasic-description =
-    A spiritual successor of Esperanto, established in 2404 in Tau Ceti by Ceti intellectuals.
-    Its unique, fully customized alphabet and structure allow it to be spoken even by most alien species.
-    It's the official language of Tau Ceti and has growing traction in diplomatic circles and Universalists across human space.
+language-TauCetiBasic-name = Common
+language-TauCetiBasic-description = The standard language.
 
 language-Tradeband-name = Tradeband
 language-Tradeband-description =

@@ -11,6 +11,7 @@ using Content.Shared.Verbs;
 using Content.Shared.Weapons.Melee;
 using Content.Shared.Weapons.Melee.Events;
 using Content.Shared.Interaction.Events;
+using Content.Shared.Weapons.Ranged.Components;
 using Robust.Shared.Player;
 using Robust.Shared.Audio.Systems;
 
@@ -45,6 +46,10 @@ public sealed class SharedExecutionSystem : EntitySystem
     private void OnGetInteractionsVerbs(EntityUid uid, ExecutionComponent comp, GetVerbsEvent<UtilityVerb> args)
     {
         if (args.Hands == null || args.Using == null || !args.CanAccess || !args.CanInteract)
+            return;
+
+        // ERRORGATE: guns have their own execution, they fire a round
+        if (HasComp<GunComponent>(uid))
             return;
 
         var attacker = args.User;
@@ -111,9 +116,7 @@ public sealed class SharedExecutionSystem : EntitySystem
         if (!_actionBlocker.CanAttack(attacker, victim))
             return false;
 
-        // The victim must be incapacitated to be executed
-        if (victim != attacker && _actionBlocker.CanInteract(victim, null))
-            return false;
+        // ERRORGATE: the victim does not have to be incapacitated, anyone can be executed
 
         // All checks passed
         return true;
@@ -183,6 +186,10 @@ public sealed class SharedExecutionSystem : EntitySystem
     private void OnExecutionDoAfter(Entity<ExecutionComponent> entity, ref ExecutionDoAfterEvent args)
     {
         if (args.Handled || args.Cancelled || args.Used == null || args.Target == null)
+            return;
+
+        // ERRORGATE: guns have their own execution, they fire a round
+        if (HasComp<GunComponent>(entity))
             return;
 
         if (!TryComp<MeleeWeaponComponent>(entity, out var meleeWeaponComp))

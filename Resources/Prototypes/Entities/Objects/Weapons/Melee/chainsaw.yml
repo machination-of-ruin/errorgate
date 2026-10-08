@@ -19,8 +19,7 @@
     attackRate: 0.3
     damage:
       types:
-        Slash: 2
-        Blunt: 2
+        Slash: 3
         Structural: 4
     clickPartDamageMultiplier: 3
     heavyPartDamageMultiplier: 2.5
@@ -28,7 +27,11 @@
     heavyDamageBaseModifier: 3.0
     heavyStaminaCost: 2.5
     maxTargets: 20
-    angle: 160
+    angle: 30
+    soundSwing:
+      path: /Audio/Weapons/chainsaw.ogg
+      params:
+        volume: -3
     soundHit:
       path: /Audio/Weapons/chainsaw.ogg
       params:
@@ -36,7 +39,7 @@
   - type: IncreaseDamageOnWield
     damage:
       types:
-        Slash: 4
+        Slash: 7
         Structural: 4
   - type: Item
     size: Normal

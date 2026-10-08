@@ -361,7 +361,9 @@
     heavyDamageBaseModifier: 2.0
     heavyStaminaCost: 20
     maxTargets: 8
-    angle: 20
+    angle: 60
+    wideAnimationRotation: 90
+    swingLeft: true
     soundHit:
       path: /Audio/Weapons/bladeslice.ogg
   - type: DamageOtherOnHit
@@ -422,7 +424,9 @@
     sprite: _Shitmed/Objects/Specific/Medical/Surgery/circular-saw.rsi
     storedRotation: 90
   - type: MeleeWeapon
-    attackRate: .8
+    attackRate: 4 # ERRORGATE
+    autoAttack: true
+    wideAnimationRotation: 90
     range: 1.4
     bluntStaminaDamageFactor: 3.0
     damage:
@@ -434,7 +438,7 @@
     heavyDamageBaseModifier: 1
     heavyStaminaCost: 10
     maxTargets: 8
-    angle: 360
+    angle: 10
     soundHit:
       path: /Audio/Items/drill_hit.ogg
   - type: DamageOtherOnHit
@@ -468,7 +472,9 @@
     sprite: Objects/Specific/Medical/Surgery/saw.rsi
     heldPrefix: advanced
   - type: MeleeWeapon
-    attackRate: .8
+    attackRate: 4 # ERRORGATE
+    autoAttack: true
+    wideAnimationRotation: 90
     range: 1.4
     bluntStaminaDamageFactor: 5.0
     damage:
@@ -480,7 +486,7 @@
     heavyDamageBaseModifier: 1
     heavyStaminaCost: 10
     maxTargets: 8
-    angle: 360
+    angle: 10
     soundHit:
       path: /Audio/Items/drill_hit.ogg
   - type: DamageOtherOnHit

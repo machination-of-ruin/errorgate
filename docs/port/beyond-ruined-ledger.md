@@ -84,7 +84,7 @@ Hints below come from commit messages, file lists and quick greps. **They are le
 | 33, 34, 35 | mobspawner, mob-loot-system(2) | `SmartMobSpawner`, `MobLoot`, `DespawnDeadBody` | none | MILESTONE world systems |
 | 36 | blood-evaporate | Blood, insect blood, vomit and copper blood evaporate in puddles, 10 s tick, no sparkle | none in master | DONE (small-PR batch). Owner chose scope (b): **every puddle evaporates**, which also covers the evaporation part of #65. Mops still use `EvaporationReagents` (water) |
 | 37 | melee-tweak | RMB disarm instead of heavy attack, no heavy damage examine, thrust wide animation, human punch effect, melee prototype tweaks | Partly overlaps WWDP #264 melee visuals, #623 aiming and hitting. Heavy attack still present in master | MILESTONE melee (with #46, #52, #61, #69, #72, #84) |
-| 38 | character-creation | Remove job/antag/traits/loadout tabs, spawn priority, disclaimer; default to HUMANERROR | WWDP #334 touched departments only. UI part not upstream | TODO. Note jobs are already hidden (#15) |
+| 38 | character-creation | Remove job/antag/traits/loadout tabs, spawn priority, disclaimer; default to HUMANERROR | WWDP #334 touched departments only | DONE (batch 2): Jobs and Antags tabs hidden, spawn priority hidden, traits and loadouts off through `game.traits_enabled` / `game.loadouts_enabled` (default false), two genders (old genders normalised), `FallbackOverflowJob = HumanError`, new wait-in-lobby text |
 | 39 | item-pickup-sounds | Equip rustle for guns and backpacks, gun interact sounds, rifle sound fix | The Gunnening added equip sound collections; WWDP #591 belt gear sounds | COVERED by the Gunnening (`equip.yml` collections, `EmitSoundOnPickup/Drop` on guns) |
 | 40 | no-pointing | Pointing disabled (client and server) | none | DONE (small-PR batch) |
 | 41 | body-fixes | Gib does not spawn organs | Shitmed gib options | DONE (small-PR batch): default `GibContentsOption.Skip` in `GibBody` and `GibBehavior` (tested, no organs left) |
@@ -98,7 +98,7 @@ Hints below come from commit messages, file lists and quick greps. **They are le
 | 49 | 357 | The gunnening part 2 (.357/.44 rename, speed loaders) | same | MILESTONE guns |
 | 50 | no-examine | Damage examine for melee/ranged/thrown pushed inline, magazine examine | WWDP #549 #574 #925 fix damage examine | TODO. Pairs with #44 |
 | 51 | clothes-innteraction | Patch of old must-be-in-hand | n/a | SKIP |
-| 54 | stamina-fix2 | Stamina crit buffer 3 s to 0, recover from crit at 10% (not 100%), no slowdown at half stamina, shove stamina cost only for dynamic/kinematic targets and uses the target's stamina | none | TODO, stamina; combine with the stamina part of #82 |
+| 54 | stamina-fix2 | Stamina crit buffer 3 s to 0, recover from crit at 10% | master stamina already has no slowdown and no `OnShoved` | DONE (batch 2): no crit buffer, coming out of crit leaves 10% stamina. Shove stamina part not applicable |
 | 55 | announce | No roundstart announcement | none | DONE (small-PR batch): `AnnounceRound` removed |
 | 56 | revert-engine | Engine revert | n/a | SKIP |
 | 57 | lobby-fixes | Lobby server name ">>> ERRORGATE <<<" | none | DONE (small-PR batch): `ui-lobby-title` locale string |
@@ -106,18 +106,18 @@ Hints below come from commit messages, file lists and quick greps. **They are le
 | 59 | playtest-preparation | Main map `EdgeOfEntropy.yml` (94k lines), no flashlight/gas tank actions, identity "Unknown" grammar, butchering allowed, no dreams | Map not in master | MILESTONE world map; the code bits TODO individually |
 | 60, 62, 63, 64 | mob-fixes, loot-spawners, branchchchc x2 | Loot/mob/despawn tweaks, `DespawnItem`, map update | none | MILESTONE world systems |
 | 61 | better-melee | Combined melee attack, 36 melee prototype tweaks | none | MILESTONE melee |
-| 65 | fixes | Executions return (x20 damage), every reagent evaporates, no ghosts (death void covers), no evac shuttle CVars, carps move on water, cold damage examinable, cigarettes in loot | partly covered by #13 | TODO, split |
+| 65 | fixes | Executions return (x20 damage), every reagent evaporates, no ghosts (death void covers), no evac shuttle CVars, carps move on water, cold damage examinable, cigarettes in loot | partly covered by #13 | DONE (batch 2): executions (below), cold burn examine, no evacuation CVars. Evaporation was done in the small batch. `baseTurf` edits deferred to world, cigarettes with loot |
 | 66 | loot-manager | Loot Manager 1.0 (global loot tables, LootEntries per category) | none | MILESTONE world systems (core) |
 | 67 | deaf-component | `DeafComponent` in `_ERRORGATE/Hearing` | WWDP deafness #265 #270 #384 #390 #395 and `HearingSystem` | COVERED |
 | 68 | no-dmca-revert | **Nine reverts of WWDP "[Port]" PRs + "no-dmca-fixes"** (hobo, maid, e-sword, betrayal knife, aspects, telescope, lying down, blink, uplink discounts, advanced prying, melee block) | All nine exist in master | **SKIP, decided: leave all nine as in upstream.** The loot-related part of `no-dmca-fixes` (armor entries, global loot table) is handled with the world systems milestone |
 | 69 | tweaks | Combined melee attack on LMB, extract cartridge action, silenced guns no muzzle flash, stacking | Extract round is in the Gunnening | MILESTONE melee/guns; check |
 | 70 | clothes-rebalance | Inventory rework: human template slots moved (pockets removed from the hotbar group, UI positions), "sling" and "light" examine strings, held-bag slowdown, equip delays, storage grids on clothing | Owner has inventory-size commits in master (belts, waist bags, March 2025). Held bag slowdown + delays came with #288 | TODO. Needs a real diff against master before presenting |
 | 71 | Guns-resprite | Drozd resprite to MP5 | none | TODO, sprites only |
-| 72 | fixes-333 | Revolver spin, outer clothes butcherable, hoodie storage, shove back, chug jug crash | #613 More Butcherable Clothes upstream | TODO, mostly small |
+| 72 | fixes-333 | Revolver spin, outer clothes butcherable, hoodie storage, shove back, chug jug crash | #613 butcherable clothes, hoodie storage (`ClothingOuterStorageBase` with WWDP larger grid) already upstream | DONE/COVERED: nothing left to port. Revolver spin skipped by the owner, chug jug skipped |
 | 73 | bad-water | Contaminated water reagents/tiles | none | MILESTONE world |
 | 74 | mobs | Walker mobs, mob loot uses the global manager, mob spawner prototypes | none | MILESTONE world systems |
 | 75, 80 | weather, doors | Weather off on concrete, doors and keys, tough airlocks | none | MILESTONE world |
-| 76 | tweaks | Second map prototype Kuznetsk, mask popup fix, circular saw buff, disable pulling items, invisible tiny fan | WWDP #975 pull attempt cooldown | TODO, split |
+| 76 | tweaks | Second map prototype Kuznetsk, mask popup fix, circular saw buff, disable pulling items, invisible tiny fan | WWDP #975 pull attempt cooldown | DONE (batch 2): saws buffed (`Saw`, `SawElectric`, `SawAdvanced`), items cannot be pulled (`Pullable` removed from `BaseItem`), invisible tiny fan prototype `AtmosDeviceFanTinyInvisible`. Mask popup left upstream. Kuznetsk map with world milestone |
 | 77 | crafting-cannibalism | Human butchering, bone crafts, campfires despawn, cooking, crafting cull | WWDP #578 Diegetic Crafting, #619 Construction | TODO. Check overlap first |
 | 78 | lootpool | Kuznetsk loot table | none | MILESTONE world |
 | 79 | lights | `DayCycle` (client and server), traps, starvation, all masks hide identity, wield uses identity | WWDP #917 masks hide identity; #305 booby traps exist | MILESTONE world systems (day cycle); the rest TODO |
@@ -126,12 +126,18 @@ Hints below come from commit messages, file lists and quick greps. **They are le
 | 83 | fixes | Butcher delay 8 to 5 s, faster gauze, cloth buff, gaiter ingestion block, sturdier trees, campfire craft, body despawn 5 to 10 min | none | Butchering/despawn with world systems; the rest TODO small |
 | 84 | brutal-melee | Fire axe, melee balance | WWDP #926 Fix Fireaxe | MILESTONE melee |
 | 85 | bugfix | Cherry-picks (#935, #933, #815, #889) plus "look far", shotgun fix | #935 #933 #815 #889 are all in master | COVERED. "look far" TODO |
-| 86 | tweaks | "Galactic Common" renamed "Common", `SolCommon` removed from humans, power cells and chainsaw tweaks, sprite `unshaded` commented out on many cells, fence/crate tweaks, loot table edits | language system exists upstream | TODO. Split: language rename (humans-only), rest cosmetic |
+| 86 | tweaks | "Galactic Common" renamed "Common", `SolCommon` removed from humans, power cells and chainsaw tweaks, sprite `unshaded` commented out on many cells, fence/crate tweaks, loot table edits | language system exists upstream | DONE (batch 2): language rename (`TauCetiBasic` is shown as "Common"), humans no longer know `SolCommon`, chainsaw, fences cut faster, power cell and crate glow off, sniper bayonet (`Sharp`). Loot table edits with world systems |
 | 87 | upstream | Footprints port, e-sword fix | Footprints are in master (#1867, #1439 ...) | COVERED |
 | 88 | upstream-chatstack | Chat stacking | `Add Chatstack (#1422)` in master | COVERED |
 | 89 | port-nvg | Night vision overlays | Master has `Content.Shared/Overlays/Switchable/NightVision*` | COVERED, check leftovers |
 | 90 | port-k | Religious headgear | In master (`religious.yml`, `headGroup.yml`) | COVERED |
 | 91 | rules-tips | Rules and tips text | none | TODO. Keep the `>>> STYLE <<<`; replaces tips (#23) |
+
+### Execution rules (decided, part of #65)
+Anyone can be executed, not only incapacitated victims. The damage multiplier is 20 (`ExecutionComponent.DamageMultiplier`). WWDP's execution system only knows melee, so a gun with `Execution` used to pistol whip: guns now have their own verb and a server handler that fires one round point blank (`SharedGunExecutionSystem`, server `GunExecutionSystem`, tests in `ExecutionTest`). A gun that is not racked or has no round says why instead of firing.
+
+### Invisible tiny fan
+`AtmosDeviceFanTinyInvisible` is for walling off toxic gas areas invisibly. The final `EdgeOfEntropy.yml` has one normal `AtmosDeviceFanTiny` (the dev map has none): swap them when the map is ported.
 
 ## Milestones
 

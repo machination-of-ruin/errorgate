@@ -261,8 +261,7 @@ namespace Content.Client.Lobby.UI
 
             PronounsButton.AddItem(Loc.GetString("humanoid-profile-editor-pronouns-male-text"), (int) Gender.Male);
             PronounsButton.AddItem(Loc.GetString("humanoid-profile-editor-pronouns-female-text"), (int) Gender.Female);
-            PronounsButton.AddItem(Loc.GetString("humanoid-profile-editor-pronouns-epicene-text"), (int) Gender.Epicene);
-            PronounsButton.AddItem(Loc.GetString("humanoid-profile-editor-pronouns-neuter-text"), (int) Gender.Neuter);
+            // ERRORGATE: two genders
 
             PronounsButton.OnItemSelected += args =>
             {
@@ -549,7 +548,9 @@ namespace Content.Client.Lobby.UI
             #region Jobs
 
             Jobs.Orphan();
-            CTabContainer.AddTab(Jobs, Loc.GetString("humanoid-profile-editor-jobs-tab"));
+            // ERRORGATE: there is a single role, no job or antag selection
+            var jobsTab = CTabContainer.AddTab(Jobs, Loc.GetString("humanoid-profile-editor-jobs-tab"));
+            CTabContainer.SetTabVisible(jobsTab, false);
 
             PreferenceUnavailableButton.AddItem(
                 Loc.GetString(
@@ -575,7 +576,8 @@ namespace Content.Client.Lobby.UI
             #region Antags
 
             Antags.Orphan();
-            CTabContainer.AddTab(Antags, Loc.GetString("humanoid-profile-editor-antags-tab"));
+            var antagsTab = CTabContainer.AddTab(Antags, Loc.GetString("humanoid-profile-editor-antags-tab"));
+            CTabContainer.SetTabVisible(antagsTab, false);
 
             #endregion Antags
 
@@ -1709,6 +1711,10 @@ namespace Content.Client.Lobby.UI
         {
             if (Profile == null)
                 return;
+
+            // ERRORGATE: only two genders are offered, older profiles may still have another one
+            if (Profile.Gender is Gender.Epicene or Gender.Neuter)
+                Profile = Profile.WithGender(Profile.Sex == Sex.Female ? Gender.Female : Gender.Male);
 
             PronounsButton.SelectId((int) Profile.Gender);
         }

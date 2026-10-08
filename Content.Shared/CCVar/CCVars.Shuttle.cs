@@ -185,7 +185,7 @@ public sealed partial class CCVars
     ///     Whether the emergency shuttle is enabled or should the round just end.
     /// </summary>
     public static readonly CVarDef<bool> EmergencyShuttleEnabled =
-        CVarDef.Create("shuttle.emergency", true, CVar.SERVERONLY);
+        CVarDef.Create("shuttle.emergency", false, CVar.SERVERONLY); // ERRORGATE: no evacuation
 
     /// <summary>
     ///     The percentage of time passed from the initial call to when the shuttle can no longer be recalled.
@@ -198,14 +198,14 @@ public sealed partial class CCVars
     ///     Time in minutes after round start to auto-call the shuttle. Set to zero to disable.
     /// </summary>
     public static readonly CVarDef<int> EmergencyShuttleAutoCallTime =
-        CVarDef.Create("shuttle.auto_call_time", 0, CVar.SERVERONLY); // WD EDIT: 180 -> 0
+        CVarDef.Create("shuttle.auto_call_time", 120000, CVar.SERVERONLY); // ERRORGATE: effectively never // WD EDIT: 180 -> 0
 
     /// <summary>
     ///     Time in minutes after the round was extended (by recalling the shuttle) to call
     ///     the shuttle again.
     /// </summary>
     public static readonly CVarDef<int> EmergencyShuttleAutoCallExtensionTime =
-        CVarDef.Create("shuttle.auto_call_extension_time", 45, CVar.SERVERONLY);
+        CVarDef.Create("shuttle.auto_call_extension_time", 300000, CVar.SERVERONLY); // ERRORGATE
 
     /// <summary>
     ///     Impulse multiplier for player interactions that move grids (other than shuttle thrusters, gyroscopes and grid collisons).

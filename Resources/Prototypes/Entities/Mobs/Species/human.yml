@@ -24,10 +24,8 @@
   - type: LanguageKnowledge
     speaks:
     - TauCetiBasic
-    - SolCommon
     understands:
     - TauCetiBasic
-    - SolCommon
   - type: FootPrints
   - type: Inventory
     femaleDisplacements:
