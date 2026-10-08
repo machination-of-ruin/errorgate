@@ -345,6 +345,23 @@ public sealed partial class StaminaSystem : EntitySystem
             _stutter.DoStutter(uid, TimeSpan.FromSeconds(10f), true);
         }
 
+        // ERRORGATE: past 80% stamina damage you are warned once and slowed a little
+        var tiredThreshold = component.CritThreshold * 0.8f;
+        if (allowsSlowdown != false && component.StaminaDamage > tiredThreshold && value > 0)
+        {
+            if (!component.TiredWarned)
+            {
+                _popup.PopupClient(Loc.GetString("stamina-too-tired"), uid, uid, PopupType.MediumCaution);
+                component.TiredWarned = true;
+            }
+
+            _stunSystem.TrySlowdown(uid, TimeSpan.FromSeconds(4.5), true, 0.9f, 0.9f);
+        }
+        else if (component.StaminaDamage < tiredThreshold)
+        {
+            component.TiredWarned = false;
+        }
+
         SetStaminaAlert(uid, component);
 
         if (!component.Critical && component.StaminaDamage >= component.CritThreshold && value > 0)

@@ -27,7 +27,12 @@ public sealed partial class StaminaComponent : Component
     /// How much time after receiving damage until stamina starts decreasing.
     /// </summary>
     [ViewVariables(VVAccess.ReadWrite), DataField, AutoNetworkedField]
-    public float Cooldown = 3f;
+    public float Cooldown = 1f; // ERRORGATE: was 3
+
+    /// <summary>
+    /// ERRORGATE: whether the "too tired" warning was already shown for this stretch of exhaustion.
+    /// </summary>
+    public bool TiredWarned;
 
     /// <summary>
     /// How much stamina damage this entity has taken.
