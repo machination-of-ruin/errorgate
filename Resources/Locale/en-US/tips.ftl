@@ -1,12 +1,10 @@
-tips-dataset-1 = DEAD IS DEAD. NO GHOST, NO SIGHT, NO SOUND OF THE LIVING. THE VOID KEEPS ONLY OOC. TYPE /RESPAWN OR /RISE WHEN YOU ARE READY TO COME BACK.
-tips-dataset-2 = NO SHUTTLE IS COMING. NO ONE IS COMING.
-tips-dataset-3 = EVERY SHOT LIGHTS YOU UP. THE MUZZLE FLASH SHOWS WHERE YOU STAND. SILENCED WEAPONS DO NOT FLASH.
-tips-dataset-4 = AMMUNITION FITS BY CALIBER. 9x19, .45 ACP, .357 MAGNUM, 5.56x45, 7.62x39, 6MM CASELESS, .338 LAPUA. WHAT DOES NOT FIT DOES NOT LOAD.
-tips-dataset-5 = A GUN PRESSED TO A HEAD ENDS IT. EXECUTE FROM THE VERB MENU. THE CHAMBER MUST HOLD A ROUND.
-tips-dataset-6 = RUNNING COSTS STAMINA. EMPTY IT AND YOU WILL BE LEFT EXHAUSTED. SPEND IT WITH CARE.
-tips-dataset-7 = EXAMINE EVERYTHING. ARMOR AND WOUNDS ARE WRITTEN IN THE TEXT. WEAPON DAMAGE IS ONE CLICK AWAY.
-tips-dataset-8 = BLOOD DRIES. PUDDLES DO NOT STAY. THE TRAIL YOU LEAVE IS ONLY AS OLD AS THE WOUND.
-tips-dataset-9 = LOADING A MAGAZINE BY HAND TAKES TIME. DO IT BEFORE YOU NEED IT.
-tips-dataset-10 = HUNGER WILL KILL YOU. EAT, COOK ON A CAMPFIRE, AND DO NOT WASTE WHAT YOU FIND.
-tips-dataset-11 = THE AI GOD IS WATCHING. IT DOES NOT TELL YOU WHAT IT WANTS.
-tips-dataset-12 = IF YOU CAN SEE THEM, THEY CAN SEE YOU. ASSUME THE OTHER PLAYER IS ARMED.
+tips-dataset-1 = Use your lighter in the separate light slot for seeing in the dark.
+tips-dataset-2 = You can respawn after dying with an action on the bar. If it's not there use /respawn or /rise.
+tips-dataset-3 = [color=#ff0000]YOU WILL DIE OF HUNGER.[/color] Scavenge or cook raw meat on craftable campfires.
+tips-dataset-4 = Butchering humans is a good source of food and equipment too.
+tips-dataset-5 = Running takes stamina, configure your controls in the settings and manage it carefully.
+tips-dataset-6 = You have to take off backpacks and dufflebags to open them, but not to put items in.
+tips-dataset-7 = You can wear most weapons in your back (suit) slot.
+tips-dataset-8 = Melee attacks are combined on LMB, with physical shove on RMB.
+tips-dataset-9 = You can look/aim in the distance by pressing Space.
+tips-dataset-10 = Wide crosshair with guns = bad accuracy. Stay still to hit well.

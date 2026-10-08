@@ -49,9 +49,11 @@ Found while playing the `port/beyond` build. One line each, newest last.
 - [x] Bone spear is a craft again: wooden shaft plus 2 bones, no web silk.
 - [x] Combat logs: orange to red for hits, bleeding lines small and red.
 - [x] "Say last words" and "succumb" now kill (they ran the disabled ghost command).
-- [ ] Mob loot feels rarer than the old build. Measured: a fresh pool gives the 70% rate, tables are identical to the old fork, and the floor spawners take 30-40% of the pool at map load. No cause found yet; needs numbers from play (kills and drops).
-- [ ] Crafts that do not fit (AI core, clown suit and more): list presented to the owner, waiting for the decision.
+- [x] (left as is by the owner) Mob loot feels rarer than the old build. Measured: a fresh pool gives the 70% rate, tables are identical to the old fork, and the floor spawners take 30-40% of the pool at map load. No cause found yet; needs numbers from play (kills and drops).
+- [x] Crafts that do not fit: clown, mime and joke recipes plus AI core and all bot recipes removed. Cult, station machinery, furniture and HUD glasses recipes stay for now.
 - ("Cannot keep up" is a local-hosting artifact, ignore.)
 
 
-- Notes on round 2: the bark list lost Meow, Tem and Gav (Undertale-character voices stay). The names, verbs and adjectives datasets are English again (taken from the errorgate repo). Running drains 10 stamina per second until 80%, then you are tired and slowed. Floors FloorTechMaint2, FloorSteelLime (Edge) and FloorBlue (Kuznetsk) were deprecated placeholders and were replaced in the maps. Walk by default is a client setting, an old saved value may override it. Lighter ranges are the old ones (3 and 4). The EmergencyLight wall lamp was 10 in the old build and is 3 now, left alone.
+- Notes on round 2: the bark list lost Meow, Tem and Gav (Undertale-character voices stay). The names, verbs and adjectives datasets are English again (taken from the errorgate repo). Running drains 10 stamina per second until 80%, then you are tired and slowed. Floors FloorTechMaint2, FloorSteelLime (Edge) and FloorBlue (Kuznetsk) were deprecated placeholders and were replaced in the maps. Walk by default is a client setting, an old saved value may override it. Lighter ranges are the old ones (3 and 4). 
+
+- Round 3: EmergencyLight radius is 10 again, battery starts full (3 000 000) and an unpowered lamp lights red at round start even without a station (`EmergencyLightSystem.UpdateState`, test `EmergencyLightTest`). Loading screen tips are the ten playtest tips verbatim from `ErrorgateRules.xml`.

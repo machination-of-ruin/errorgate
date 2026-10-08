@@ -447,16 +447,16 @@
   components:
   - type: PointLight
     enabled: false
-    radius: 3 # White Dream
+    radius: 10 # ERRORGATE
     energy: 2 # White Dream
     offset: "0, 0.4"
     color: "#7CFC00"
     mask: /Textures/Effects/LightMasks/double_cone.png
   - type: ApcPowerReceiver
   - type: ExtensionCableReceiver
-  - type: Battery
-    maxCharge: 30000
-    startingCharge: 0
+  - type: Battery # ERRORGATE: full charge, burns for ages without power
+    maxCharge: 3000000
+    startingCharge: 3000000
   - type: EmergencyLight
   - type: RotatingLight
     speed: 120 # White Dream

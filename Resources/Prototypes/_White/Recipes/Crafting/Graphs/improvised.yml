@@ -139,19 +139,6 @@
   - node: gunpowder
     entity: MaterialGunpowder
 
-- type: construction
-  name: snap pop
-  id: snappop
-  graph: PaperGraph
-  startNode: startsnappop
-  targetNode: snappop
-  category: construction-category-weapons
-  objectType: Item
-  description: Throw it at the floor and listen to it POP!
-  icon:
-    sprite: Objects/Fun/toys.rsi
-    state: snappop
-
 - type: constructionGraph
   id: MakeshiftLaserGraph
   start: start

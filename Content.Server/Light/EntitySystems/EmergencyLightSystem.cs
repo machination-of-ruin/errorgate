@@ -192,8 +192,16 @@ public sealed class EmergencyLightSystem : SharedEmergencyLightSystem
         if (!TryComp<ApcPowerReceiverComponent>(entity.Owner, out var receiver))
             return;
 
+        // ERRORGATE: no station (wasteland maps), an unpowered lamp still lights up red
         if (!TryComp<AlertLevelComponent>(_station.GetOwningStation(entity.Owner), out var alerts))
+        {
+            if (!receiver.Powered && !entity.Comp.ForciblyEnabled)
+            {
+                TurnOn(entity, Color.Red);
+                SetState(entity.Owner, entity.Comp, EmergencyLightState.On);
+            }
             return;
+        }
 
         if (alerts.AlertLevels == null || !alerts.AlertLevels.Levels.TryGetValue(alerts.CurrentLevel, out var details))
         {
