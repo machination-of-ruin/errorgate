@@ -35,12 +35,12 @@
   # These are roundstart but not replenishable for salvage
 
   # WWDP Civilian/lowtier guns
-  - MagazineLightRifleLowCapacityEmpty
-  - MagazineLightRifleLowCapacity
+  - Magazine762x39LowCapacityEmpty
+  - Magazine762x39LowCapacity
   - SpeedLoaderRifleHeavy
   - SpeedLoaderRifleHeavyEmpty
-  - MagazineMagnumLeverRifle # Goobstation
-  - MagazineMagnumLeverRifleEmpty # Goobstation
+  - Magazine357MagnumLeverRifle # Goobstation
+  - Magazine357MagnumLeverRifleEmpty # Goobstation
   - MagazineNovaliteC1Empty
   - MagazineNovaliteC1
   - WeaponRifleNovaliteC1
@@ -60,22 +60,22 @@
   cost: 10000
   recipeUnlocks:
   - BoxShotgunIncendiary
-  - MagazineRifleIncendiary
-  - MagazinePistolIncendiary
-  - MagazinePistolSubMachineGunIncendiary
-  - MagazineMagnumIncendiary
-  - MagazineLightRifleIncendiary
-  - MagazineCaselessRifleIncendiary
-  - SpeedLoaderMagnumIncendiary
+  - Magazine556x45Incendiary
+  - Magazine9x19Incendiary
+  - Magazine9x19SubMachineGunIncendiary
+  - Magazine45ACPIncendiary
+  - Magazine762x39Incendiary
+  - Magazine6mmCaselessIncendiary
+  - SpeedLoader357MagnumIncendiary
   - SpeedLoaderRifleHeavyIncendiary
   - MagazineShotgunIncendiary
-  - MagazineBoxPistolIncendiary
-  - MagazineBoxMagnumIncendiary
-  - MagazineBoxLightRifleIncendiary
-  - MagazineBoxRifleIncendiary
-  - MagazineBoxCaselessRifleIncendiary
+  - AmmoBox9x19Incendiary
+  - AmmoBox357MagnumIncendiary
+  - AmmoBox762x39Incendiary
+  - AmmoBox556x45Incendiary
+  - AmmoBoxCaselessRifleIncendiary
   - MagazineBoxSpecialIncendiary
-  - MagazineUniversalMagnumIncendiary
+  - MagazineUSP45ACPIncendiary
 
 - type: technology
   id: UraniumMunitions
@@ -87,22 +87,22 @@
   tier: 1
   cost: 7500
   recipeUnlocks:
-  - MagazineRifleUranium
-  - MagazinePistolUranium
-  - MagazinePistolSubMachineGunUranium
-  - MagazineMagnumUranium
-  - MagazineLightRifleUranium
-  - MagazineCaselessRifleUranium
-  - SpeedLoaderMagnumUranium
+  - Magazine556x45Uranium
+  - Magazine9x19Uranium
+  - Magazine9x19SubMachineGunUranium
+  - Magazine45ACPUranium
+  - Magazine762x39Uranium
+  - Magazine6mmCaselessUranium
+  - SpeedLoader357MagnumUranium
   - SpeedLoaderRifleHeavyUranium # Frontier
-  - MagazineBoxPistolUranium
-  - MagazineBoxMagnumUranium
-  - MagazineBoxLightRifleUranium
-  - MagazineBoxRifleUranium
-  - MagazineBoxCaselessRifleUranium
+  - AmmoBox9x19Uranium
+  - AmmoBox357MagnumUranium
+  - AmmoBox762x39Uranium
+  - AmmoBox556x45Uranium
+  - AmmoBoxCaselessRifleUranium
   - BoxShotgunUranium
   - MagazineBoxSpecialUranium
-  - MagazineUniversalMagnumUranium
+  - MagazineUSP45ACPUranium
 
 - type: technology
   id: ExplosiveTechnology
@@ -164,18 +164,18 @@
   tier: 2
   cost: 7500
   recipeUnlocks:
-  - MagazineRifleShrapnel
-  - MagazinePistolShrapnel
-  - MagazinePistolSubMachineGunShrapnel
-  - MagazineMagnumShrapnel
-  - MagazineLightRifleShrapnel
-  - MagazineCaselessRifleShrapnel
-  - MagazineBoxPistolShrapnel
-  - MagazineBoxMagnumShrapnel
-  - MagazineBoxLightRifleShrapnel
-  - MagazineBoxRifleShrapnel
-  - MagazineBoxCaselessRifleShrapnel
-  - MagazineUniversalMagnumShrapnel
+  - Magazine556x45Shrapnel
+  - Magazine9x19Shrapnel
+  - Magazine9x19SubMachineGunShrapnel
+  - Magazine45ACPShrapnel
+  - Magazine762x39Shrapnel
+  - Magazine6mmCaselessShrapnel
+  - AmmoBox9x19Shrapnel
+  - AmmoBox357MagnumShrapnel
+  - AmmoBox762x39Shrapnel
+  - AmmoBox556x45Shrapnel
+  - AmmoBoxCaselessRifleShrapnel
+  - MagazineUSP45ACPShrapnel
 
 - type: technology
   id: AdvancedWeapons
@@ -273,7 +273,7 @@
   # - EnergySwordDouble
   #  - EnergyCutlass
   # WWDP moved caseless ammo here
-  # - MagazineCaselessRiflePractice # EE - WD EDIT
-  # - MagazineCaselessRifle # EE - WD EDIT
+  # - Magazine6mmCaselessPractice # EE - WD EDIT
+  # - Magazine6mmCaseless # EE - WD EDIT
   - WeaponSubMachineGunBRDIR25
   softCapContribution: 1.5

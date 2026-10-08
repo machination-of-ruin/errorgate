@@ -17,7 +17,7 @@
     contents:
     - id: WeaponPistolDualetta
       amount: 2
-    - id: MagazinePistolHighCapacity
+    - id: Magazine9x19HighCapacity
       amount: 2
 
 - type: entity
@@ -35,7 +35,7 @@
   - type: StorageFill
     contents:
     - id: WeaponRifleM90
-    - id: MagazineRifle
+    - id: Magazine556x45
       amount: 2
 
 - type: entity
@@ -53,7 +53,7 @@
   - type: StorageFill
     contents:
     - id: WeaponSubMachineGunFPA90
-    - id: MagazineCaselessRifle
+    - id: Magazine6mmCaseless
       amount: 2
 
 - type: entity
@@ -64,7 +64,7 @@
   - type: StorageFill
     contents:
     - id: WeaponSubMachineGunC20r
-    - id: MagazinePistolSubMachineGun
+    - id: Magazine9x19SubMachineGun
       amount: 2
 
 - type: entity # WWDP weapon resprite
@@ -75,7 +75,7 @@
   - type: StorageFill
     contents:
     - id: WeaponSubMachineGunCR12Moros
-    - id: MagazinePistolSubMachineGun
+    - id: Magazine9x19SubMachineGun
       amount: 2
 
 - type: entity
@@ -93,7 +93,7 @@
   - type: StorageFill
     contents:
     - id: WeaponLightRifleAR31Hydra
-    - id: MagazineLightRifleAR31Hydra
+    - id: Magazine762x39AR31Hydra
       amount: 2
 
 - type: entity
@@ -111,7 +111,7 @@
   - type: StorageFill
     contents:
     - id: WeaponRifleWSPR
-    - id: MagazineLightRifleSubsonic
+    - id: Magazine762x39Subsonic
       amount: 2
 
 - type: entity
@@ -191,7 +191,7 @@
   - type: StorageFill
     contents:
     - id: WeaponLightMachineGunL6
-    - id: MagazineLightRifleBox
+    - id: Magazine762x39Box
       amount: 2
 
 - type: entity # WWDP weapon resprite
@@ -209,7 +209,7 @@
   - type: StorageFill
     contents:
     - id: WeaponLightMachineGunL9Centaur
-    - id: MagazineLightRifleBox
+    - id: Magazine762x39Box
       amount: 2
 
 - type: entity
@@ -228,7 +228,7 @@
   - type: StorageFill
     contents:
     - id: WeaponPistolViper
-    - id: MagazinePistol
+    - id: Magazine9x19
       amount: 2
 
 - type: entity # WWDP weapon resprite
@@ -247,7 +247,7 @@
   - type: StorageFill
     contents:
     - id: WeaponPistolMPR10Xyphos
-    - id: MagazinePistol
+    - id: Magazine9x19
       amount: 2
 
 - type: entity
@@ -266,6 +266,6 @@
   - type: StorageFill
     contents:
     - id: WeaponPistolCobra
-    - id: MagazinePistolCaselessRifle
+    - id: MagazinePistol6mmCaseless
       amount: 2
 

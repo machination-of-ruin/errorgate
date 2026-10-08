@@ -351,7 +351,15 @@ public abstract partial class SharedGunSystem
         // Alternatively, just track spawned count, instead of unspawned count.
         if (component.Proto != null)
         {
-            component.UnspawnedCount = Math.Max(0, component.Capacity - component.Container.ContainedEntities.Count);
+            // ERRORGATE: random-load prototypes spawn partly filled
+            var total = component.Capacity;
+            if (component.RandomizeAmmo)
+            {
+                var roll = Math.Max(Random.NextDouble() * component.RandomizeAmmoBias, 0.0001);
+                total = Random.Next(0, Math.Clamp((int) (component.Capacity / roll), 0, component.Capacity) + 1);
+            }
+
+            component.UnspawnedCount = Math.Max(0, total - component.Container.ContainedEntities.Count);
             UpdateBallisticAppearance(uid, component);
             Dirty(uid, component);
         }

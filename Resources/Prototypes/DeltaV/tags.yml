@@ -39,7 +39,7 @@
   id: HidesHarpyWings
 
 - type: Tag
-  id: MagazinePistolSpecial # For the .38 special ammo and pistol
+  id: Magazine9x19Special # For the .38 special ammo and pistol
 
 - type: Tag
   id: ModularBreech #Craftable Musket

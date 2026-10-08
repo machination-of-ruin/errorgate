@@ -226,7 +226,7 @@
     soundGunshot:
       path: /Audio/Weapons/Guns/Gunshots/shotgun.ogg
   - type: ProjectileBatteryAmmoProvider
-    proto: CartridgeLightRifle
+    proto: Cartridge762x39
     fireCost: 15
   - type: Appearance
   - type: AmmoCounter

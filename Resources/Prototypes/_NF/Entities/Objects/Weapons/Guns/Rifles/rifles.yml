@@ -3,7 +3,7 @@
   name: Gestio
   parent: BaseWeaponRifle
   id: WeaponRifleGestio
-  description: An old prototype burst-fire NanoTrasen marksman rifle. Manufactured by Silver Industries. It never left the trials. Given its antiquity it is considered a civilian grade weapon.  Uses .30 rifle ammo.
+  description: An old prototype burst-fire NanoTrasen marksman rifle. Manufactured by Silver Industries. It never left the trials. Given its antiquity it is considered a civilian grade weapon.  Uses 7.62x39mm ammo.
   components:
   - type: Sprite
     sprite: _NF/Objects/Weapons/Guns/Rifles/gestio.rsi
@@ -38,20 +38,20 @@
     slots:
       gun_magazine:
         name: Magazine
-        startingItem: MagazineLightRifleLowCapacity
+        startingItem: Magazine762x39LowCapacity
         insertSound: /Audio/Weapons/Guns/MagIn/ltrifle_magin.ogg
         ejectSound: /Audio/Weapons/Guns/MagOut/ltrifle_magout.ogg
         priority: 2
         whitelist:
           tags:
-            - MagazineLightRifle
+            - Magazine762x39
       gun_chamber:
         name: Chamber
-        startingItem: CartridgeLightRifle
+        startingItem: Cartridge762x39
         priority: 1
         whitelist:
           tags:
-            - CartridgeLightRifle
+            - Cartridge762x39
   - type: ContainerContainer
     containers:
       gun_magazine: !type:ContainerSlot
@@ -77,14 +77,14 @@
         priority: 2
         whitelist:
           tags:
-            - MagazineLightRifle
+            - Magazine762x39
       gun_chamber:
         name: Chamber
         startingItem: null
         priority: 1
         whitelist:
           tags:
-            - CartridgeLightRifle
+            - Cartridge762x39
   - type: ExtendDescription
     descriptionList:
       - description: "gun-legality-salvage"
@@ -96,7 +96,7 @@
   parent: BaseWeaponRifle
   id: WeaponRifleNovaliteC1
   name: Novalite C1
-  description: A modification to the Lecter from SW LLC, a civilian grade semi-automatic rifle with an internal magazine. Nanotrasen Representatives can not stress how compliant this rifle is. Uses .20 rifle ammo.
+  description: A modification to the Lecter from SW LLC, a civilian grade semi-automatic rifle with an internal magazine. Nanotrasen Representatives can not stress how compliant this rifle is. Uses 5.56x45mm ammo.
   components:
   - type: Sprite
     sprite: _NF/Objects/Weapons/Guns/Rifles/novalitec1.rsi
@@ -129,11 +129,11 @@
             - MagazineNovaliteC1
       gun_chamber:
         name: Chamber
-        startingItem: CartridgeRifle
+        startingItem: Cartridge556x45
         priority: 1
         whitelist:
           tags:
-            - CartridgeRifle
+            - Cartridge556x45
   - type: ContainerContainer
     containers:
       gun_magazine: !type:ContainerSlot
@@ -166,7 +166,7 @@
         priority: 1
         whitelist:
           tags:
-            - CartridgeRifle
+            - Cartridge556x45
   - type: ExtendDescription
     descriptionList:
       - description: "gun-legality-salvage"
@@ -208,20 +208,20 @@
     slots:
       gun_magazine:
         name: Magazine
-        startingItem: MagazineLightRifleLowCapacity
+        startingItem: Magazine762x39LowCapacity
         insertSound: /Audio/Weapons/Guns/MagIn/ltrifle_magin.ogg
         ejectSound: /Audio/Weapons/Guns/MagOut/ltrifle_magout.ogg
         priority: 2
         whitelist:
           tags:
-            - MagazineLightRifle
+            - Magazine762x39
       gun_chamber:
         name: Chamber
-        startingItem: CartridgeLightRifle
+        startingItem: Cartridge762x39
         priority: 1
         whitelist:
           tags:
-            - CartridgeLightRifle
+            - Cartridge762x39
   - type: ContainerContainer
     containers:
       gun_magazine: !type:ContainerSlot
@@ -252,14 +252,14 @@
         priority: 2
         whitelist:
           tags:
-            - MagazineLightRifle
+            - Magazine762x39
       gun_chamber:
         name: Chamber
         startingItem: null
         priority: 1
         whitelist:
           tags:
-            - CartridgeLightRifle
+            - Cartridge762x39
   - type: ExtendDescription
     descriptionList:
       - description: "gun-legality-salvage"

@@ -624,7 +624,14 @@ public abstract partial class SharedGunSystem : EntitySystem
         if (sprite == null)
             return;
 
-        var ev = new MuzzleFlashEvent(GetNetEntity(gun), sprite, worldAngle, component.MuzzleEffectRadius); // ERRORGATE
+        // ERRORGATE: a gun can override the ammo radius, silenced guns use 0 and flash nothing
+        var radius = TryComp<GunComponent>(gun, out var gunComp) && gunComp.MuzzleEffectRadius is { } gunRadius
+            ? gunRadius
+            : component.MuzzleEffectRadius;
+        if (radius <= 0f)
+            return;
+
+        var ev = new MuzzleFlashEvent(GetNetEntity(gun), sprite, worldAngle, radius); // ERRORGATE
         CreateEffect(gun, ev, gun);
     }
 

@@ -13,16 +13,16 @@
     Steel: 245 # 20 [Steel per empty mag] + 15 [bullets] * 15 [Steel per bullet]
 
 - type: latheRecipe # gestio mag empty
-  id: MagazineLightRifleLowCapacityEmpty
+  id: Magazine762x39LowCapacityEmpty
   parent: BaseEmptyAmmoRecipe
-  result: MagazineLightRifleLowCapacityEmpty
+  result: Magazine762x39LowCapacityEmpty
   materials:
     Steel: 20
 
 - type: latheRecipe # gestio mag
-  id: MagazineLightRifleLowCapacity
+  id: Magazine762x39LowCapacity
   parent: BaseAmmoRecipe
-  result: MagazineLightRifleLowCapacity
+  result: Magazine762x39LowCapacity
   materials:
     Steel: 245 # 20 [Steel per empty mag] + 15 [bullets] * 15 [Steel per bullet]
 

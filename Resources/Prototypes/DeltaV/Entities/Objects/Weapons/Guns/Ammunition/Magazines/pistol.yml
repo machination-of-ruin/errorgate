@@ -6,7 +6,7 @@
   components:
   - type: Tag
     tags:
-      - MagazinePistolSpecial
+      - Magazine9x19Special
   - type: BallisticAmmoProvider
     mayTransfer: true
     whitelist:
@@ -32,7 +32,7 @@
   - type: Appearance
 
 - type: entity
-  id: MagazinePistolSpecial
+  id: Magazine9x19Special
   name: pistol magazine (.38 special)
   parent: BaseMagazinePistolSpecial
   components:
@@ -46,7 +46,7 @@
       map: ["enum.GunVisualLayers.Mag"]
 
 - type: entity
-  id: MagazinePistolSpecialPractice
+  id: Magazine9x19SpecialPractice
   name: pistol magazine (.38 special practice)
   parent: BaseMagazinePistolSpecial
   components:
@@ -60,7 +60,7 @@
       map: ["enum.GunVisualLayers.Mag"]
 
 - type: entity
-  id: MagazinePistolSpecialMindbreaker
+  id: Magazine9x19SpecialMindbreaker
   name: pistol magazine (.38 special mindbreaker)
   parent: BaseMagazinePistolSpecial
   components:

@@ -38,7 +38,7 @@ public sealed partial class RevolverAmmoProviderComponent : AmmoProviderComponen
     public bool?[] Chambers = Array.Empty<bool?>();
 
     [DataField("proto", customTypeSerializer:typeof(PrototypeIdSerializer<EntityPrototype>))]
-    public string? FillPrototype = "CartridgeMagnum";
+    public string? FillPrototype = "Cartridge357Magnum"; // ERRORGATE: real-world calibers
 
     [DataField("soundEject")]
     public SoundSpecifier? SoundEject = new SoundPathSpecifier("/Audio/Weapons/Guns/MagOut/revolver_magout.ogg");

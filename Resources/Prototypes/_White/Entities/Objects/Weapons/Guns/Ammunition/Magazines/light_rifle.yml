@@ -1,10 +1,10 @@
-﻿- type: entity
-  id: MagazineLightRifleAR31Hydra
+- type: entity
+  id: Magazine762x39AR31Hydra
   name: increased magazine .30
-  parent: MagazineLightRifle
+  parent: Magazine762x39
   components:
   - type: BallisticAmmoProvider
-    proto: CartridgeLightRifle
+    proto: Cartridge762x39
     capacity: 40
   - type: Sprite
     sprite: _White/Objects/Weapons/Guns/Ammunition/Magazine/magazineAK220.rsi

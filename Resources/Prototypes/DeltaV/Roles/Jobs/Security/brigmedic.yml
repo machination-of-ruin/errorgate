@@ -83,7 +83,7 @@
     - BruteAutoInjector
     - BurnAutoInjector
     - BurnAutoInjector
-    - MagazinePistol
+    - Magazine9x19
 
 - type: startingGear
   id: CorpsmanPlasmamanGear

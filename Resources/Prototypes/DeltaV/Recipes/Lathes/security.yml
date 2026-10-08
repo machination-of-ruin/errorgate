@@ -8,8 +8,8 @@
     Steel: 200
 
 - type: latheRecipe
-  id: MagazinePistolSpecial
-  result: MagazinePistolSpecial
+  id: Magazine9x19Special
+  result: Magazine9x19Special
   categories:
   - Ammo
   completetime: 5

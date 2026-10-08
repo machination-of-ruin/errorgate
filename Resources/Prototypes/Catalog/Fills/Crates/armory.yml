@@ -8,7 +8,7 @@
     contents:
       - id: WeaponSubMachineGunWt550
         amount: 2
-      - id: MagazinePistolSubMachineGunTopMounted
+      - id: Magazine9x19SubMachineGunTopMounted
         amount: 4
 
 - type: entity
@@ -67,7 +67,7 @@
     contents:
     - id: WeaponPistolMk58
       amount: 2
-    - id: MagazinePistol
+    - id: Magazine9x19
       amount: 4
 
 - type: entity
@@ -99,5 +99,5 @@
     contents:
     - id: WeaponSubMachineGunBRDIR25
       amount: 2
-    - id: MagazineCaselessRifle
+    - id: Magazine6mmCaseless
       amount: 4

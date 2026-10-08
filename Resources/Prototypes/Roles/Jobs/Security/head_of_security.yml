@@ -68,7 +68,7 @@
     back:
     # WD EDIT START
     # - Flash
-    # - MagazinePistol
+    # - Magazine9x19
     - TelescopicBaton
     - WeaponEnergyGunMultiphase
     # WD EDIT END

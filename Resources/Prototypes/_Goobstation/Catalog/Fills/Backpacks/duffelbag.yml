@@ -34,8 +34,8 @@
   - type: StorageFill
     contents:
       - id: WeaponRifleM90
-      - id: MagazineRifle
-      - id: MagazineRifle
+      - id: Magazine556x45
+      - id: Magazine556x45
 
 - type: entity
   parent: ClothingBackpackDuffelSyndicateBundle
@@ -46,5 +46,5 @@
   - type: StorageFill
     contents:
       - id: WeaponRifleWSPR
-      - id: MagazineLightRifleSubsonic
+      - id: Magazine762x39Subsonic
         amount: 2

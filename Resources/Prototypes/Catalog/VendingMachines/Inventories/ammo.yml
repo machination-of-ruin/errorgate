@@ -1,20 +1,20 @@
 - type: vendingMachineInventory
   id: AmmoVendInventory
   startingInventory:
-    MagazineBoxCaselessRifle: 6
-    MagazineBoxCaselessRiflePractice: 3
+    AmmoBoxCaselessRifle: 6
+    AmmoBoxCaselessRiflePractice: 3
 
-    MagazineBoxLightRifleBig: 6
-    MagazineBoxLightRiflePractice: 3
+    AmmoBox762x39Big: 6
+    AmmoBox762x39Practice: 3
 
-    MagazineBoxMagnum: 6
-    MagazineBoxMagnumPractice: 3
+    AmmoBox357Magnum: 6
+    AmmoBox357MagnumPractice: 3
 
     MagazineBoxSpecial: 6
     MagazineBoxSpecialPractice: 3
 
-    MagazineBoxPistol: 6
-    MagazineBoxPistolPractice: 3
+    AmmoBox9x19: 6
+    AmmoBox9x19Practice: 3
 
-    MagazineBoxRifle: 6
-    MagazineBoxRiflePractice: 3
+    AmmoBox556x45: 6
+    AmmoBox556x45Practice: 3

@@ -1,0 +1,80 @@
+- type: entity
+  id: Bullet45ACP
+  name: bullet (.45 ACP)
+  parent: BaseBullet
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: Projectile
+    damage:
+      types:
+        Piercing: 35 #WWDP edit upstream cancer bruh
+
+- type: entity
+  id: Bullet45ACPPractice
+  name: bullet (.45 ACP practice)
+  parent: BaseBulletPractice
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: Projectile
+    damage:
+      types:
+        Blunt: 1
+
+- type: entity
+  id: Bullet45ACPIncendiary
+  parent: BaseBulletIncendiary
+  name: bullet (.45 ACP incendiary)
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: Projectile
+    damage:
+      types:
+        Blunt: 3 #WWDP edit
+        Heat: 32 #WWDP edit
+
+- type: entity
+  id: Bullet45ACPAP
+  name: bullet (.45 ACP armor-piercing)
+  parent: BaseBulletAP
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: Projectile
+    damage:
+      types:
+        Piercing: 35 #WWDP edit
+    ignoreResistances: true
+
+- type: entity
+  id: Bullet45ACPUranium
+  name: bullet (.45 ACP uranium)
+  parent: BaseBulletUranium
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: Projectile
+    damage:
+      types:
+        Radiation: 15 #WWDP edit
+        Piercing: 20 #WWDP edit
+
+- type: entity
+  id: Bullet45ACPShrapnel
+  name: bullet (.45 ACP shrapnel)
+  categories: [ HideSpawnMenu ]
+  parent: BaseBullet
+  components:
+  - type: Projectile
+    damage:
+      types:
+        Piercing: 4.7916
+  - type: Sprite
+    scale: 0.5, 0.5
+
+- type: entity
+  id: Bullet45ACPShrapnelSpread
+  categories: [ HideSpawnMenu ]
+  parent: Bullet45ACPShrapnel
+  components:
+  - type: ProjectileSpread
+    proto: Bullet45ACPShrapnel
+    count: 6
+    spread: 15

@@ -1,0 +1,161 @@
+# Random-load magazines. Separate prototypes on purpose: the normal ones always spawn full.
+
+- type: entity
+  id: Magazine45ACPRandom
+  suffix: Random
+  parent: Magazine45ACP
+  components:
+  - type: BallisticAmmoProvider
+    randomizeAmmo: true
+
+- type: entity
+  id: Magazine45ACPSubMachineGunRandom
+  suffix: Random
+  parent: Magazine45ACPSubMachineGun
+  components:
+  - type: BallisticAmmoProvider
+    randomizeAmmo: true
+
+- type: entity
+  id: MagazineUSP45ACPRandom
+  suffix: Random
+  parent: MagazineUSP45ACP
+  components:
+  - type: BallisticAmmoProvider
+    randomizeAmmo: true
+
+- type: entity
+  id: Magazine556x45Random
+  suffix: Random
+  parent: Magazine556x45
+  components:
+  - type: BallisticAmmoProvider
+    randomizeAmmo: true
+
+- type: entity
+  id: Magazine556x45BoxRandom
+  suffix: Random
+  parent: Magazine556x45Box
+  components:
+  - type: BallisticAmmoProvider
+    randomizeAmmo: true
+
+- type: entity
+  id: MagazinePistol6mmCaselessRandom
+  suffix: Random
+  parent: MagazinePistol6mmCaseless
+  components:
+  - type: BallisticAmmoProvider
+    randomizeAmmo: true
+
+- type: entity
+  id: Magazine6mmCaselessRandom
+  suffix: Random
+  parent: Magazine6mmCaseless
+  components:
+  - type: BallisticAmmoProvider
+    randomizeAmmo: true
+
+- type: entity
+  id: Magazine6mmCaselessShortRandom
+  suffix: Random
+  parent: Magazine6mmCaselessShort
+  components:
+  - type: BallisticAmmoProvider
+    randomizeAmmo: true
+
+- type: entity
+  id: Magazine762x39Random
+  suffix: Random
+  parent: Magazine762x39
+  components:
+  - type: BallisticAmmoProvider
+    randomizeAmmo: true
+
+- type: entity
+  id: Magazine762x39ShortRandom
+  suffix: Random
+  parent: Magazine762x39Short
+  components:
+  - type: BallisticAmmoProvider
+    randomizeAmmo: true
+
+- type: entity
+  id: Magazine762x39MaximRandom
+  suffix: Random
+  parent: Magazine762x39Maxim
+  components:
+  - type: BallisticAmmoProvider
+    randomizeAmmo: true
+
+- type: entity
+  id: Magazine762x39PkBoxRandom
+  suffix: Random
+  parent: Magazine762x39PkBox
+  components:
+  - type: BallisticAmmoProvider
+    randomizeAmmo: true
+
+- type: entity
+  id: Magazine9x19SubMachineGunTopMountedRandom
+  suffix: Random
+  parent: Magazine9x19SubMachineGunTopMounted
+  components:
+  - type: BallisticAmmoProvider
+    randomizeAmmo: true
+
+- type: entity
+  id: Magazine9x19Random
+  suffix: Random
+  parent: Magazine9x19
+  components:
+  - type: BallisticAmmoProvider
+    randomizeAmmo: true
+
+- type: entity
+  id: Magazine9x19HighCapacityRandom
+  suffix: Random
+  parent: Magazine9x19HighCapacity
+  components:
+  - type: BallisticAmmoProvider
+    randomizeAmmo: true
+
+- type: entity
+  id: Magazine9x19SubMachineGunRandom
+  suffix: Random
+  parent: Magazine9x19SubMachineGun
+  components:
+  - type: BallisticAmmoProvider
+    randomizeAmmo: true
+
+- type: entity
+  id: Magazine9x19UltraHighCapacityRandom
+  suffix: Random
+  parent: Magazine9x19UltraHighCapacity
+  components:
+  - type: BallisticAmmoProvider
+    randomizeAmmo: true
+
+- type: entity
+  id: SpeedLoader357MagnumRandom
+  suffix: Random
+  parent: SpeedLoader357Magnum
+  components:
+  - type: BallisticAmmoProvider
+    randomizeAmmo: true
+
+- type: entity
+  id: SpeedLoaderPistolRandom
+  suffix: Random
+  parent: SpeedLoaderPistol
+  components:
+  - type: BallisticAmmoProvider
+    randomizeAmmo: true
+
+- type: entity
+  id: SpeedLoader762x39Random
+  suffix: Random
+  parent: SpeedLoader762x39
+  components:
+  - type: BallisticAmmoProvider
+    randomizeAmmo: true

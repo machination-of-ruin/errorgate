@@ -33,7 +33,7 @@
       minAngle: 25 # Not guaranteed to hit their shots anymore.
       maxAngle: 45 # Continuous fire makes their accuracy unreliable.
     - type: BallisticAmmoProvider
-      proto: CartridgeCaselessRifle
+      proto: Cartridge6mmCaseless
       capacity: 200
 
 - type: entity

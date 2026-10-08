@@ -1,0 +1,52 @@
+- type: entity
+  categories: [ HideSpawnMenu ]
+  parent: BaseBullet
+  id: BulletLapuaMagnum
+  name: bullet (.338 Lapua Magnum)
+  components:
+  - type: Projectile
+    damage:
+      types:
+        Piercing: 120 # WD EDIT: 75 -> 120
+        Structural: 150 # WD EDIT: 226 -> 150
+    penetrationThreshold: 360
+    penetrationDamageTypeRequirement:
+    - Structural
+  - type: StaminaDamageOnCollide
+    damage: 60
+
+- type: entity
+  id: BulletLapuaMagnumShrapnel
+  name: bullet (.60 anti-personnel shrapnel)
+  categories: [ HideSpawnMenu ]
+  parent: BaseBullet
+  components:
+  - type: Projectile
+    damage:
+      types:
+        Piercing: 3
+  - type: Sprite
+    scale: 0.5, 0.5
+
+- type: entity
+  id: BulletLapuaMagnumShrapnelSpread
+  categories: [ HideSpawnMenu ]
+  parent: BulletLapuaMagnumShrapnel
+  components:
+  - type: ProjectileSpread
+    proto: BulletLapuaMagnumShrapnel
+    count: 30
+    spread: 15
+
+- type: entity
+  id: BulletLapuaMagnumAP
+  name: bullet (.338 Lapua Magnum AP)
+  parent: BaseBulletAP
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: Projectile
+    damage:
+      types:
+        Piercing: 60
+        Structural: 30
+    ignoreResistances: true

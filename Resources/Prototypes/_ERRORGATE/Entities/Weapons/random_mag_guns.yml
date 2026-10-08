@@ -1,0 +1,181 @@
+# Guns that start with a randomly loaded magazine. The normal guns always spawn with a full one.
+
+- type: entity
+  id: WeaponPistolMakarovRandomMag
+  parent: WeaponPistolMakarov
+  suffix: Random magazine
+  components:
+  - type: ItemSlots
+    slots:
+      gun_magazine:
+        startingItem: Magazine9x19Random
+
+- type: entity
+  id: WeaponPistolBerettaRandomMag
+  parent: WeaponPistolBeretta
+  suffix: Random magazine
+  components:
+  - type: ItemSlots
+    slots:
+      gun_magazine:
+        startingItem: Magazine9x19Random
+
+- type: entity
+  id: WeaponPistolM1911RandomMag
+  parent: WeaponPistolM1911
+  suffix: Random magazine
+  components:
+  - type: ItemSlots
+    slots:
+      gun_magazine:
+        startingItem: Magazine45ACPRandom
+
+- type: entity
+  id: WeaponPistolStechkinRandomMag
+  parent: WeaponPistolStechkin
+  suffix: Random magazine
+  components:
+  - type: ItemSlots
+    slots:
+      gun_magazine:
+        startingItem: Magazine9x19HighCapacityRandom
+
+- type: entity
+  id: WeaponPistolGlockRandomMag
+  parent: WeaponPistolGlock
+  suffix: Random magazine
+  components:
+  - type: ItemSlots
+    slots:
+      gun_magazine:
+        startingItem: Magazine9x19Random
+
+- type: entity
+  id: WeaponPistolUSPRandomMag
+  parent: WeaponPistolUSP
+  suffix: Random magazine
+  components:
+  - type: ItemSlots
+    slots:
+      gun_magazine:
+        startingItem: MagazineUSP45ACPRandom
+
+- type: entity
+  id: WeaponRifleAkRandomMag
+  parent: WeaponRifleAk
+  suffix: Random magazine
+  components:
+  - type: ItemSlots
+    slots:
+      gun_magazine:
+        startingItem: Magazine762x39Random
+
+- type: entity
+  id: WeaponRifleM90GrenadeLauncherRandomMag
+  parent: WeaponRifleM90GrenadeLauncher
+  suffix: Random magazine
+  components:
+  - type: ItemSlots
+    slots:
+      gun_magazine:
+        startingItem: Magazine556x45Random
+
+- type: entity
+  id: WeaponRifleLecterRandomMag
+  parent: WeaponRifleLecter
+  suffix: Random magazine
+  components:
+  - type: ItemSlots
+    slots:
+      gun_magazine:
+        startingItem: Magazine556x45Random
+
+- type: entity
+  id: WeaponRifleL1A1RandomMag
+  parent: WeaponRifleL1A1
+  suffix: Random magazine
+  components:
+  - type: ItemSlots
+    slots:
+      gun_magazine:
+        startingItem: Magazine762x39ShortRandom
+
+- type: entity
+  id: WeaponRifleJackdawRandomMag
+  parent: WeaponRifleJackdaw
+  suffix: Random magazine
+  components:
+  - type: ItemSlots
+    slots:
+      gun_magazine:
+        startingItem: Magazine6mmCaselessRandom
+
+- type: entity
+  id: WeaponRifleTenebraRandomMag
+  parent: WeaponRifleTenebra
+  suffix: Random magazine
+  components:
+  - type: ItemSlots
+    slots:
+      gun_magazine:
+        startingItem: Magazine556x45Random
+
+- type: entity
+  id: WeaponRifleASValRandomMag
+  parent: WeaponRifleASVal
+  suffix: Random magazine
+  components:
+  - type: ItemSlots
+    slots:
+      gun_magazine:
+        startingItem: Magazine762x39Random
+
+- type: entity
+  id: WeaponSubMachineGunMP5RandomMag
+  parent: WeaponSubMachineGunMP5
+  suffix: Random magazine
+  components:
+  - type: ItemSlots
+    slots:
+      gun_magazine:
+        startingItem: Magazine9x19SubMachineGunRandom
+
+- type: entity
+  id: WeaponSubMachineGunVector45ACPRandomMag
+  parent: WeaponSubMachineGunVector45ACP
+  suffix: Random magazine
+  components:
+  - type: ItemSlots
+    slots:
+      gun_magazine:
+        startingItem: Magazine45ACPSubMachineGunRandom
+
+- type: entity
+  id: WeaponSubMachineGunVector9x19mmRandomMag
+  parent: WeaponSubMachineGunVector9x19mm
+  suffix: Random magazine
+  components:
+  - type: ItemSlots
+    slots:
+      gun_magazine:
+        startingItem: Magazine9x19UltraHighCapacityRandom
+
+- type: entity
+  id: WeaponSubMachineGunWt550RandomMag
+  parent: WeaponSubMachineGunWt550
+  suffix: Random magazine
+  components:
+  - type: ItemSlots
+    slots:
+      gun_magazine:
+        startingItem: Magazine9x19SubMachineGunTopMountedRandom
+
+- type: entity
+  id: WeaponSubMachineGunThompsonRandomMag
+  parent: WeaponSubMachineGunThompson
+  suffix: Random magazine
+  components:
+  - type: ItemSlots
+    slots:
+      gun_magazine:
+        startingItem: Magazine45ACPSubMachineGunRandom

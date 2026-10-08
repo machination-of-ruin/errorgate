@@ -9,15 +9,15 @@
 # Ammo
 - type: latheRecipe
   parent: BaseAmmoRecipe
-  id: MagazineMagnumLeverRifleEmpty
-  result: MagazineMagnumLeverRifleEmpty
+  id: Magazine357MagnumLeverRifleEmpty
+  result: Magazine357MagnumLeverRifleEmpty
   materials:
     Steel: 25
 
 - type: latheRecipe
   parent: BaseAmmoRecipe
-  id: MagazineMagnumLeverRifle
-  result: MagazineMagnumLeverRifle
+  id: Magazine357MagnumLeverRifle
+  result: Magazine357MagnumLeverRifle
   materials:
     Steel: 185
 

@@ -1,0 +1,102 @@
+- type: entity
+  id: BaseCartridge357Magnum
+  name: cartridge (.357 Magnum)
+  parent: [ BaseCartridge, BaseSecurityContraband ]
+  abstract: true
+  components:
+  - type: Tag
+    tags:
+      - Cartridge
+      - Cartridge357Magnum
+  - type: CartridgeAmmo
+    proto: Bullet357Magnum
+  - type: Sprite
+    sprite: Objects/Weapons/Guns/Ammunition/Casings/ammo_casing.rsi
+    layers:
+    - state: base
+      map: ["enum.AmmoVisualLayers.Base"]
+  - type: Appearance
+  - type: SpentAmmoVisuals
+
+- type: entity
+  id: Cartridge357Magnum
+  name: cartridge (.357 Magnum)
+  parent: BaseCartridge357Magnum
+  components:
+  - type: CartridgeAmmo
+    proto: Bullet357Magnum
+
+- type: entity
+  id: Cartridge357MagnumPractice
+  name: cartridge (.357 Magnum practice)
+  parent: BaseCartridge357Magnum
+  components:
+  - type: CartridgeAmmo
+    proto: Bullet357MagnumPractice
+  - type: Sprite
+    layers:
+      - state: base
+        map: [ "enum.AmmoVisualLayers.Base" ]
+      - state: tip
+        map: [ "enum.AmmoVisualLayers.Tip" ]
+        color: "#dbdbdb"
+
+- type: entity
+  id: Cartridge357MagnumIncendiary
+  name: cartridge (.357 Magnum incendiary)
+  parent: BaseCartridge357Magnum
+  components:
+  - type: CartridgeAmmo
+    proto: Bullet357MagnumIncendiary
+  - type: Sprite
+    layers:
+      - state: base
+        map: [ "enum.AmmoVisualLayers.Base" ]
+      - state: tip
+        map: [ "enum.AmmoVisualLayers.Tip" ]
+        color: "#ff6e52"
+
+- type: entity
+  id: Cartridge357MagnumAP
+  name: cartridge (.357 Magnum armor-piercing)
+  parent: BaseCartridge357Magnum
+  components:
+  - type: CartridgeAmmo
+    proto: Bullet357MagnumAP
+  - type: Sprite
+    layers:
+      - state: base
+        map: [ "enum.AmmoVisualLayers.Base" ]
+      - state: tip
+        map: [ "enum.AmmoVisualLayers.Tip" ]
+        color: "#0a0a0a"
+
+- type: entity
+  id: Cartridge357MagnumUranium
+  name: cartridge (.357 Magnum uranium)
+  parent: BaseCartridge357Magnum
+  components:
+  - type: CartridgeAmmo
+    proto: Bullet357MagnumUranium
+  - type: Sprite
+    layers:
+      - state: base
+        map: [ "enum.AmmoVisualLayers.Base" ]
+      - state: tip
+        map: [ "enum.AmmoVisualLayers.Tip" ]
+        color: "#65fe08"
+
+- type: entity
+  id: Cartridge357MagnumShrapnel
+  name: cartridge (.357 Magnum shrapnel)
+  parent: BaseCartridge357Magnum
+  components:
+  - type: CartridgeAmmo
+    proto: Bullet357MagnumShrapnelSpread
+  - type: Sprite
+    layers:
+      - state: base
+        map: [ "enum.AmmoVisualLayers.Base" ]
+      - state: tip
+        map: [ "enum.AmmoVisualLayers.Tip" ]
+        color: "#FF00FF"

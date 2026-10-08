@@ -1,8 +1,8 @@
 # Empty mags
 - type: entity
-  parent: BaseMagazineRifle
+  parent: BaseMagazine556x45
   id: MagazineNovaliteC1Empty
-  name: "clip (.20 rifle any)"
+  name: "clip (5.56x45mm any)"
   suffix: empty
   components:
   - type: Tag
@@ -14,7 +14,7 @@
     mayTransfer: true
     whitelist:
       tags:
-        - CartridgeRifle
+        - Cartridge556x45
     capacity: 15
   - type: ContainerContainer
     containers:
@@ -35,11 +35,11 @@
 - type: entity
   parent: MagazineNovaliteC1Empty
   id: MagazineNovaliteC1
-  name: "clip (.20 rifle)"
+  name: "clip (5.56x45mm)"
   suffix: full
   components:
   - type: BallisticAmmoProvider
-    proto: CartridgeRifle
+    proto: Cartridge556x45
   - type: Sprite
     layers:
     - state: base

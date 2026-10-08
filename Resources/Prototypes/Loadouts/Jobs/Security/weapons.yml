@@ -80,7 +80,7 @@
 #   - !type:CharacterAgeRequirement
 #     min: 21
 #   items:
-#   - MagazinePistol
+#   - Magazine9x19
 
 # - type: loadout
 #   id: LoadoutMagazinePistolSpare
@@ -107,7 +107,7 @@
 #   - !type:CharacterAgeRequirement
 #     min: 21
 #   items:
-#   - MagazinePistol
+#   - Magazine9x19
 
 # - type: loadout
 #   id: LoadoutSpeedLoaderMagnum
@@ -135,7 +135,7 @@
 #   - !type:CharacterAgeRequirement
 #     min: 21
 #   items:
-#   - SpeedLoaderMagnum
+#   - SpeedLoader357Magnum
 
 # - type: loadout
 #   id: LoadoutSpeedLoaderMagnumSpare
@@ -163,7 +163,7 @@
 #   - !type:CharacterAgeRequirement
 #     min: 21
 #   items:
-#   - SpeedLoaderMagnum
+#   - SpeedLoader357Magnum
 
 # - type: loadout
 #   id: LoadoutMagazineMagnum
@@ -191,7 +191,7 @@
 #   - !type:CharacterAgeRequirement
 #     min: 21
 #   items:
-#   - MagazineMagnum
+#   - Magazine45ACP
 
 # - type: loadout
 #   id: LoadoutMagazineMagnumSpare
@@ -219,7 +219,7 @@
 #   - !type:CharacterAgeRequirement
 #     min: 21
 #   items:
-#   - MagazineMagnum
+#   - Magazine45ACP
 
 # - type: loadout
 #   id: LoadoutSpeedLoaderRifleHeavy

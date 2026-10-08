@@ -153,7 +153,7 @@
     eyes: ClothingEyesGlassesSecurity
     outerClothing: ClothingOuterCoatHoSTrench
     pocket1: WeaponDisabler
-    pocket2: MagazinePistolSubMachineGunTopMounted
+    pocket2: Magazine9x19SubMachineGunTopMounted
   inhand:
   - WeaponSubMachineGunWt550
 
@@ -173,7 +173,7 @@
     ears: ClothingHeadsetAltSecurity
     eyes: ClothingEyesGlassesSecurity
     pocket1: WeaponDisabler
-    pocket2: MagazinePistolSubMachineGunTopMounted
+    pocket2: Magazine9x19SubMachineGunTopMounted
   inhand:
   - WeaponSubMachineGunWt550
 
@@ -258,7 +258,7 @@
     eyes: ClothingEyesGlassesSecurity
     outerClothing: ClothingOuterArmorBasic
     pocket1: WeaponPistolMk58
-    pocket2: MagazinePistol
+    pocket2: Magazine9x19
   inhand:
   - FlashlightSeclite
 
@@ -278,7 +278,7 @@
     eyes: ClothingEyesGlassesSecurity
     outerClothing: ClothingOuterArmorBasicSlim
     pocket1: WeaponPistolMk58
-    pocket2: MagazinePistol
+    pocket2: Magazine9x19
   inhand:
   - FlashlightSeclite
 
@@ -297,7 +297,7 @@
     eyes: ClothingEyesGlassesSecurity
     outerClothing: ClothingOuterArmorBasic
     pocket1: WeaponPistolMk58
-    pocket2: MagazinePistol
+    pocket2: Magazine9x19
   inhand:
   - FlashlightSeclite
 
@@ -317,7 +317,7 @@
     eyes: ClothingEyesGlassesSecurity
     outerClothing: ClothingOuterArmorBasicSlim
     pocket1: WeaponPistolMk58
-    pocket2: MagazinePistol
+    pocket2: Magazine9x19
   inhand:
   - FlashlightSeclite
 

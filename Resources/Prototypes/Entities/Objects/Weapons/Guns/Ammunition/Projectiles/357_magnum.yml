@@ -1,0 +1,80 @@
+- type: entity
+  id: Bullet357Magnum
+  name: bullet (.357 Magnum)
+  parent: BaseBullet
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: Projectile
+    damage:
+      types:
+        Piercing: 35 #WWDP edit upstream cancer bruh
+
+- type: entity
+  id: Bullet357MagnumPractice
+  name: bullet (.357 Magnum practice)
+  parent: BaseBulletPractice
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: Projectile
+    damage:
+      types:
+        Blunt: 1
+
+- type: entity
+  id: Bullet357MagnumIncendiary
+  parent: BaseBulletIncendiary
+  name: bullet (.357 Magnum incendiary)
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: Projectile
+    damage:
+      types:
+        Blunt: 3 #WWDP edit
+        Heat: 32 #WWDP edit
+
+- type: entity
+  id: Bullet357MagnumAP
+  name: bullet (.357 Magnum armor-piercing)
+  parent: BaseBulletAP
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: Projectile
+    damage:
+      types:
+        Piercing: 35 #WWDP edit
+    ignoreResistances: true
+
+- type: entity
+  id: Bullet357MagnumUranium
+  name: bullet (.357 Magnum uranium)
+  parent: BaseBulletUranium
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: Projectile
+    damage:
+      types:
+        Radiation: 15 #WWDP edit
+        Piercing: 20 #WWDP edit
+
+- type: entity
+  id: Bullet357MagnumShrapnel
+  name: bullet (.357 Magnum shrapnel)
+  categories: [ HideSpawnMenu ]
+  parent: BaseBullet
+  components:
+  - type: Projectile
+    damage:
+      types:
+        Piercing: 4.7916
+  - type: Sprite
+    scale: 0.5, 0.5
+
+- type: entity
+  id: Bullet357MagnumShrapnelSpread
+  categories: [ HideSpawnMenu ]
+  parent: Bullet357MagnumShrapnel
+  components:
+  - type: ProjectileSpread
+    proto: Bullet357MagnumShrapnel
+    count: 6
+    spread: 15

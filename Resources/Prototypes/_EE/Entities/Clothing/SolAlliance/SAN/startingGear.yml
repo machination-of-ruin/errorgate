@@ -9,7 +9,7 @@
     shoes: ClothingShoesBootsCombatFilled
     id: SANIdCard
     pocket1: WeaponPistolViperWood
-    pocket2: MagazinePistol
+    pocket2: Magazine9x19
     belt: ClothingBeltMilitaryWebbing
     outerClothing: ClothingOuterVestWebSAN
 
@@ -24,5 +24,5 @@
     shoes: ClothingShoesBootsCombatFilled
     id: SANIdCard
     pocket1: WeaponPistolViperWood
-    pocket2: MagazinePistol
+    pocket2: Magazine9x19
     belt: ClothingBeltSheathSANMarineFilled

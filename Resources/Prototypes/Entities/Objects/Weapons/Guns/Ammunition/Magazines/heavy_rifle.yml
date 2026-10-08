@@ -1,6 +1,6 @@
 - type: entity
   id: BaseMagazineHeavyRifle
-  name: "magazine (.20 rifle)"
+  name: "magazine (5.56x45mm)"
   parent: [ BaseItem, BaseSecurityContraband ]
   abstract: true
   components:
@@ -28,13 +28,13 @@
   - type: Appearance
 
 - type: entity
-  id: MagazineBoxRifleMinigun
+  id: AmmoBox556x45Minigun
   name: "Minigun Ammo Box (.10 rifle)"
   parent: BaseMagazineHeavyRifle
   components:
   - type: Tag
     tags:
-      - MagazineBoxRifleMinigun
+      - AmmoBox556x45Minigun
   - type: BallisticAmmoProvider
     proto: CartridgeMinigun
     capacity: 500

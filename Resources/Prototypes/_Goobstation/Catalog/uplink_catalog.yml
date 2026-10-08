@@ -274,7 +274,7 @@
   name: uplink-rifle-subsonic-mag-name
   description: uplink-rifle-subsonic-mag-desc
   icon: { sprite: /Textures/Objects/Weapons/Guns/Ammunition/Magazine/LightRifle/light_rifle_mag.rsi, state: practice }
-  productEntity: MagazineLightRifleSubsonic
+  productEntity: Magazine762x39Subsonic
   # WD EDIT START
   cost:
     Telecrystal: 1
@@ -292,7 +292,7 @@
   name: uplink-rifle-mag-name
   description: uplink-rifle-mag-desc
   icon: { sprite: /Textures/Objects/Weapons/Guns/Ammunition/Magazine/Rifle/rifle_mag.rsi, state: red }
-  productEntity: MagazineRifle
+  productEntity: Magazine556x45
   # WD EDIT START
   cost:
     Telecrystal: 1
@@ -333,7 +333,7 @@
   name: uplink-l6-box-name
   description: uplink-l6-box-desc
   icon: { sprite: /Textures/Objects/Weapons/Guns/Ammunition/Magazine/LightRifle/light_rifle_box.rsi, state: base }
-  productEntity: MagazineLightRifleBox
+  productEntity: Magazine762x39Box
   # WD EDIT START
   discountDownTo:
     Telecrystal: 1
@@ -348,7 +348,7 @@
   name: uplink-highcap-pistol-mag-name
   description: uplink-highcap-pistol-mag-desc
   icon: { sprite: /Textures/Objects/Weapons/Guns/Ammunition/Magazine/Pistol/pistol_high_capacity_mag.rsi, state: red }
-  productEntity: MagazinePistolHighCapacity
+  productEntity: Magazine9x19HighCapacity
   # WD EDIT START
   cost:
     Telecrystal: 1

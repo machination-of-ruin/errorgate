@@ -36,8 +36,8 @@
     back:
     # - WeaponPulsePistol - WD EDIT
     - WeaponRevolverMatebaAP
-    - SpeedLoaderMagnumAP
-    - SpeedLoaderMagnumAP
+    - SpeedLoader357MagnumAP
+    - SpeedLoader357MagnumAP
     # - BoxFlashbang - WD EDIT
     - ToolDebug # spanish army knife
     - WelderExperimental

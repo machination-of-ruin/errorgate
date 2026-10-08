@@ -1,0 +1,103 @@
+- type: entity
+  abstract: true
+  parent: BaseAmmoBox
+  id: BaseAmmoBoxCaselessRifle
+  name: ammunition box (6mm caseless)
+  components:
+  - type: BallisticAmmoProvider
+    mayTransfer: true
+    whitelist:
+      tags:
+      - Cartridge6mmCaseless
+    proto: Cartridge6mmCaseless
+    capacity: 60
+  - type: Item
+    size: Small
+  - type: ContainerContainer
+    containers:
+      ballistic-ammo: !type:Container
+  - type: Sprite
+    sprite: Objects/Weapons/Guns/Ammunition/Boxes/caseless_rifle.rsi
+  - type: MagazineVisuals
+    magState: mag
+    steps: 4
+    zeroVisible: false
+  - type: Appearance
+
+# Boxes
+- type: entity
+  parent: BaseAmmoBoxCaselessRifle
+  id: AmmoBoxCaselessRifle
+  name: ammunition box (6mm caseless)
+  components:
+  - type: BallisticAmmoProvider
+    proto: Cartridge6mmCaseless
+  - type: Sprite
+    layers:
+    - state: base
+      map: ["enum.GunVisualLayers.Base"]
+    - state: mag-1
+      map: ["enum.GunVisualLayers.Mag"]
+
+- type: entity
+  parent: BaseAmmoBoxCaselessRifle
+  id: AmmoBoxCaselessRiflePractice
+  name: ammunition box (6mm caseless practice)
+  components:
+  - type: BallisticAmmoProvider
+    proto: Cartridge6mmCaselessPractice
+  - type: Sprite
+    layers:
+    - state: base
+      map: ["enum.GunVisualLayers.Base"]
+    - state: mag-1
+      map: ["enum.GunVisualLayers.Mag"]
+    - state: practice
+
+- type: entity
+  parent: AmmoBoxCaselessRifle
+  id: AmmoBoxCaselessRifleIncendiary
+  name: ammunition box (6mm caseless incendiary)
+  components:
+  - type: BallisticAmmoProvider
+    proto: Cartridge6mmCaselessIncendiary
+
+- type: entity
+  parent: AmmoBoxCaselessRifle
+  id: AmmoBoxCaselessRifleUranium
+  name: ammunition box (6mm caseless uranium)
+  components:
+  - type: BallisticAmmoProvider
+    proto: Cartridge6mmCaselessUranium
+
+- type: entity
+  parent: AmmoBoxCaselessRifle
+  id: AmmoBoxCaselessRifleShrapnel
+  name: ammunition box (6mm caseless shrapnel)
+  components:
+  - type: BallisticAmmoProvider
+    proto: Cartridge6mmCaselessShrapnel
+
+- type: entity
+  parent: BaseAmmoBoxCaselessRifle
+  id: AmmoBoxCaselessRifleBig
+  name: ammunition crate (6mm caseless)
+  suffix: 60
+  components:
+  - type: BallisticAmmoProvider
+    capacity: 60
+    proto: Cartridge6mmCaseless
+  - type: Item
+    size: Normal
+
+  - type: Sprite
+    layers:
+    - state: base-b
+      map: ["enum.GunVisualLayers.Base"]
+    - state: magb-1
+      map: ["enum.GunVisualLayers.Mag"]
+  - type: MagazineVisuals
+    magState: magb
+    steps: 2
+    zeroVisible: false
+  - type: Appearance

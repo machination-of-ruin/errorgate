@@ -2,7 +2,7 @@
   id: CannotSuicideAny
 
 - type: Tag
-  id: CartridgeLightRifleSubsonic
+  id: Cartridge762x39Subsonic
 
 - type: Tag
   id: CartridgeHighCaliber
@@ -101,10 +101,10 @@
   id: MagazineHighCaliber
 
 - type: Tag
-  id: MagazineLightRifleSubsonic
+  id: Magazine762x39Subsonic
 
 - type: Tag
-  id: MagazineMagnumLeverRifle
+  id: Magazine357MagnumLeverRifle
 
 - type: Tag
   id: MechAirTank

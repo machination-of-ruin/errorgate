@@ -74,7 +74,7 @@
 #   - !type:CharacterAgeRequirement
 #     min: 21
 #   items:
-#   - MagazineUniversalMagnum
+#   - MagazineUSP45ACP
 
 # - type: loadout
 #   id: LoadoutMagazineUniversalMagnumSpare
@@ -93,7 +93,7 @@
 #   - !type:CharacterAgeRequirement
 #     min: 21
 #   items:
-#   - MagazineUniversalMagnum
+#   - MagazineUSP45ACP
 
 # Eyes
 

@@ -2,7 +2,7 @@
   name: viper
   parent: BaseWeaponPistol
   id: WeaponPistolViperWood
-  description: A small, low-power pistol with pleasant lacquered wooden grips. Uses .35 auto ammo.
+  description: A small, low-power pistol with pleasant lacquered wooden grips. Uses 9x19mm ammo.
   suffix: Wood
   components:
   - type: Sprite
@@ -13,21 +13,21 @@
     slots:
       gun_magazine:
         name: Magazine
-        startingItem: MagazinePistol
+        startingItem: Magazine9x19
         insertSound: /Audio/Weapons/Guns/MagIn/pistol_magin.ogg
         ejectSound: /Audio/Weapons/Guns/MagOut/pistol_magout.ogg
         priority: 2
         whitelist:
           tags:
-            - MagazinePistol
-            - MagazinePistolHighCapacity
+            - Magazine9x19
+            - Magazine9x19HighCapacity
       gun_chamber:
         name: Chamber
-        startingItem: CartridgePistol
+        startingItem: Cartridge9x19
         priority: 1
         whitelist:
           tags:
-            - CartridgePistol
+            - Cartridge9x19
   - type: ContainerContainer
     containers:
       gun_magazine: !type:ContainerSlot
@@ -37,7 +37,7 @@
   name: viper
   parent: WeaponPistolViperWood
   id: WeaponPistolViperWoodSecurity
-  description: A small, low-power pistol with pleasant lacquered wooden grips. Uses .35 auto ammo.
+  description: A small, low-power pistol with pleasant lacquered wooden grips. Uses 9x19mm ammo.
                The serial number on the handguard marks this gun as belonging to an NT Security Officer.
   components:
   - type: GuideHelp
@@ -47,7 +47,7 @@
   name: Pollock
   parent: BaseWeaponPistol
   id: WeaponPistolPollock
-  description: A compact and mass-produced combat pistol. Uses .35 auto ammo.
+  description: A compact and mass-produced combat pistol. Uses 9x19mm ammo.
   suffix: Mercenary
   components:
   - type: Sprite
@@ -62,21 +62,21 @@
     slots:
       gun_magazine:
         name: Magazine
-        startingItem: MagazinePistol
+        startingItem: Magazine9x19
         insertSound: /Audio/Weapons/Guns/MagIn/pistol_magin.ogg
         ejectSound: /Audio/Weapons/Guns/MagOut/pistol_magout.ogg
         priority: 2
         whitelist:
           tags:
-            - MagazinePistol
-            - MagazinePistolHighCapacity
+            - Magazine9x19
+            - Magazine9x19HighCapacity
       gun_chamber:
         name: Chamber
-        startingItem: CartridgePistol
+        startingItem: Cartridge9x19
         priority: 1
         whitelist:
           tags:
-            - CartridgePistol
+            - Cartridge9x19
   - type: ContainerContainer
     containers:
       gun_magazine: !type:ContainerSlot
@@ -86,7 +86,7 @@
   name: Pollock
   parent: WeaponPistolPollock
   id: WeaponPistolPollockSecurity
-  description: A compact and mass-produced combat pistol. Uses .35 auto ammo.
+  description: A compact and mass-produced combat pistol. Uses 9x19mm ammo.
                The serial number on the handguard marks this gun as belonging to an NT Security Officer.
   components:
   - type: GuideHelp
@@ -110,13 +110,13 @@
     slots:
       gun_magazine:
         name: Magazine
-        startingItem: MagazinePistolSpecialMindbreaker
+        startingItem: Magazine9x19SpecialMindbreaker
         insertSound: /Audio/Weapons/Guns/MagIn/pistol_magin.ogg
         ejectSound: /Audio/Weapons/Guns/MagOut/pistol_magout.ogg
         priority: 2
         whitelist:
           tags:
-            - MagazinePistolSpecial
+            - Magazine9x19Special
       gun_chamber:
         name: Chamber
         startingItem: CartridgeSpecialMindbreaker

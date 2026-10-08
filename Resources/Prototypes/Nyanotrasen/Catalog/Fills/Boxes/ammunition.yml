@@ -19,34 +19,34 @@
 
 
 - type: entity
-  name: box of .45 magnum Universal magazines
+  name: box of .357 Magnum Universal magazines
   parent: BoxMagazine
   id: BoxMagazineUniversalMagnum
-  description: A box full of .45 magnum magazines.
+  description: A box full of .357 Magnum magazines.
   components:
   - type: StorageFill
     contents:
-      - id: MagazineUniversalMagnum
+      - id: MagazineUSP45ACP
         amount: 6
 
 - type: entity
-  name: box of .45 magnum Universal (practice) magazines
+  name: box of .357 Magnum Universal (practice) magazines
   parent: BoxMagazine
   id: BoxMagazineUniversalMagnumPractice
-  description: A box full of .45 magnum practice magazines.
+  description: A box full of .357 Magnum practice magazines.
   components:
   - type: StorageFill
     contents:
-      - id: MagazineUniversalMagnumPractice
+      - id: MagazineUSP45ACPPractice
         amount: 6
 
 - type: entity
-  name: box of .30 rifle speed loaders
+  name: box of 7.62x39mm speed loaders
   parent: BoxMagazine
   id: BoxSpeedLoaderLightRifle
-  description: A box full of .30 rifle speed loaders.
+  description: A box full of 7.62x39mm speed loaders.
   components:
   - type: StorageFill
     contents:
-    - id: SpeedLoaderLightRifle
+    - id: SpeedLoader762x39
       amount: 6

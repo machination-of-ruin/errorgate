@@ -51,21 +51,21 @@
     slots:
       gun_magazine:
         name: Magazine
-        startingItem: MagazinePistol
+        startingItem: Magazine9x19
         insertSound: /Audio/Weapons/Guns/MagIn/pistol_magin.ogg
         ejectSound: /Audio/Weapons/Guns/MagOut/pistol_magout.ogg
         priority: 2
         whitelist:
           tags:
-            - MagazinePistol
+            - Magazine9x19
         whitelistFailPopup: gun-magazine-whitelist-fail
       gun_chamber:
         name: Chamber
-        startingItem: CartridgePistol
+        startingItem: Cartridge9x19
         priority: 1
         whitelist:
           tags:
-            - CartridgePistol
+            - Cartridge9x19
   - type: ContainerContainer
     containers:
       gun_magazine: !type:ContainerSlot
@@ -110,7 +110,7 @@
   name: viper
   parent: [BaseWeaponPistol, BaseSyndicateContraband]
   id: WeaponPistolViper
-  description: A small, easily concealable, but somewhat underpowered gun, produced by a bulk arms manufacturer now defunct for over a century. Uses .35 auto ammo.
+  description: A small, easily concealable, but somewhat underpowered gun, produced by a bulk arms manufacturer now defunct for over a century. Uses 9x19mm ammo.
   components:
   - type: Sprite
     sprite: Objects/Weapons/Guns/Pistols/viper.rsi
@@ -118,22 +118,22 @@
     slots:
       gun_magazine:
         name: Magazine
-        startingItem: MagazinePistol
+        startingItem: Magazine9x19
         insertSound: /Audio/Weapons/Guns/MagIn/pistol_magin.ogg
         ejectSound: /Audio/Weapons/Guns/MagOut/pistol_magout.ogg
         priority: 2
         whitelist:
           tags:
-            - MagazinePistol
-            - MagazinePistolHighCapacity
+            - Magazine9x19
+            - Magazine9x19HighCapacity
         whitelistFailPopup: gun-magazine-whitelist-fail
       gun_chamber:
         name: Chamber
-        startingItem: CartridgePistol
+        startingItem: Cartridge9x19
         priority: 1
         whitelist:
           tags:
-            - CartridgePistol
+            - Cartridge9x19
   - type: ContainerContainer
     containers:
       gun_magazine: !type:ContainerSlot
@@ -164,22 +164,22 @@
         priority: 2
         whitelist:
           tags:
-          - MagazinePistol
-          - MagazinePistolHighCapacity
+          - Magazine9x19
+          - Magazine9x19HighCapacity
       gun_chamber:
         name: Chamber
         startingItem: null
         priority: 1
         whitelist:
           tags:
-          - CartridgePistol
+          - Cartridge9x19
 
 - type: entity
   name: viper
   parent: WeaponPistolViper
   id: WeaponPistolViperSecurity
   description: A small, easily concealable, but somewhat underpowered gun, produced by a bulk arms manufacturer now defunct for over a century.
-    Uses .35 auto ammo. The serial number on the handguard marks this gun as belonging to an NT Security Officer.
+    Uses 9x19mm ammo. The serial number on the handguard marks this gun as belonging to an NT Security Officer.
   suffix: Security Loadouts
   components:
   - type: GuideHelp
@@ -210,7 +210,7 @@
     containers:
       ballistic-ammo: !type:Container
   - type: ProjectileBatteryAmmoProvider
-    proto: BulletPistol
+    proto: Bullet9x19
     fireCost: 100
   - type: Battery
     maxCharge: 1000
@@ -224,7 +224,7 @@
   name: cobra
   parent: [ BaseWeaponPistol, BaseSyndicateContraband ]
   id: WeaponPistolCobra
-  description: A rugged, robust operator handgun with inbuilt silencer. Uses .25 caseless ammo.
+  description: A rugged, robust operator handgun with inbuilt silencer. Uses 6mm caseless ammo.
   components:
   - type: Sprite
     sprite: Objects/Weapons/Guns/Pistols/cobra.rsi
@@ -237,7 +237,8 @@
     sprite: Objects/Weapons/Guns/Pistols/cobra.rsi
   - type: ChamberMagazineAmmoProvider
     boltClosed: null
-  - type: Gun
+  - type: Gun
+    muzzleEffectRadius: 0 # ERRORGATE: silenced, no flash
     damageModifier: 1.25 # "Extra Robust" despite having an underpowered cartridge.
     fireRate: 4
     soundGunshot:
@@ -251,21 +252,21 @@
     slots:
       gun_magazine:
         name: Magazine
-        startingItem: MagazinePistolCaselessRifle
+        startingItem: MagazinePistol6mmCaseless
         insertSound: /Audio/Weapons/Guns/MagIn/pistol_magin.ogg
         ejectSound: /Audio/Weapons/Guns/MagOut/pistol_magout.ogg
         priority: 2
         whitelist:
           tags:
-            - MagazinePistolCaselessRifle
+            - MagazinePistol6mmCaseless
         whitelistFailPopup: gun-magazine-whitelist-fail
       gun_chamber:
         name: Chamber
-        startingItem: CartridgeCaselessRifle
+        startingItem: Cartridge6mmCaseless
         priority: 1
         whitelist:
           tags:
-            - CartridgeCaselessRifle
+            - Cartridge6mmCaseless
   - type: ContainerContainer
     containers:
       gun_magazine: !type:ContainerSlot
@@ -287,20 +288,20 @@
         priority: 2
         whitelist:
           tags:
-          - MagazinePistolCaselessRifle
+          - MagazinePistol6mmCaseless
       gun_chamber:
         name: Chamber
         startingItem: null
         priority: 1
         whitelist:
           tags:
-          - CartridgeCaselessRifle
+          - Cartridge6mmCaseless
 
 - type: entity
   name: mk 58
   parent: [BaseWeaponPistol, BaseSecurityContraband]
   id: WeaponPistolMk58
-  description: A cheap, ubiquitous sidearm, produced by a NanoTrasen subsidiary. Uses .35 auto ammo.
+  description: A cheap, ubiquitous sidearm, produced by a NanoTrasen subsidiary. Uses 9x19mm ammo.
   components:
   - type: Sprite
     sprite: Objects/Weapons/Guns/Pistols/mk58.rsi
@@ -335,20 +336,20 @@
         priority: 2
         whitelist:
           tags:
-          - MagazinePistol
+          - Magazine9x19
       gun_chamber:
         name: Chamber
         startingItem: null
         priority: 1
         whitelist:
           tags:
-          - CartridgePistol
+          - Cartridge9x19
 
 - type: entity
   name: mk 58
   parent: WeaponPistolMk58
   id: WeaponPistolMk58Security
-  description: A cheap, ubiquitous sidearm, produced by a NanoTrasen subsidiary. Uses .35 auto ammo.
+  description: A cheap, ubiquitous sidearm, produced by a NanoTrasen subsidiary. Uses 9x19mm ammo.
     The serial number on the handguard marks this gun as belonging to an NT Security Officer.
   suffix: Security Loadouts
   components:
@@ -359,7 +360,7 @@
   name: N1984
   parent: [BaseWeaponPistol, BaseSecurityContraband]
   id: WeaponPistolN1984 # the spaces in description are for formatting.
-  description: The sidearm of any self respecting officer.     Comes in .45 magnum, the lord's caliber.
+  description: The sidearm of any self respecting officer.     Comes in .45 ACP, the lord's caliber.
   components:
   - type: Sprite
     sprite: Objects/Weapons/Guns/Pistols/N1984.rsi
@@ -386,21 +387,21 @@
     slots:
       gun_magazine:
         name: Magazine
-        startingItem: MagazineMagnum
+        startingItem: Magazine45ACP
         insertSound: /Audio/Weapons/Guns/MagIn/pistol_magin.ogg
         ejectSound: /Audio/Weapons/Guns/MagOut/pistol_magout.ogg
         priority: 2
         whitelist:
           tags:
-            - MagazineMagnum
+            - Magazine45ACP
         whitelistFailPopup: gun-magazine-whitelist-fail
       gun_chamber:
         name: Chamber
-        startingItem: CartridgeMagnum
+        startingItem: Cartridge45ACP
         priority: 1
         whitelist:
           tags:
-            - CartridgeMagnum
+            - Cartridge45ACP
 
 - type: entity
   name: N1984
@@ -418,20 +419,20 @@
         priority: 2
         whitelist:
           tags:
-          - MagazineMagnum
+          - Magazine45ACP
       gun_chamber:
         name: Chamber
         startingItem: null
         priority: 1
         whitelist:
           tags:
-          - CartridgeMagnum
+          - Cartridge45ACP
 
 - type: entity
   name: N1984
   parent: WeaponPistolN1984
   id: WeaponPistolN1984Security # the spaces in description are for formatting.
-  description: The sidearm of any self respecting officer.     Comes in .45 magnum, the lord's caliber.
+  description: The sidearm of any self respecting officer.     Comes in .45 ACP, the lord's caliber.
     The serial number on the handguard marks this gun as belonging to an NT Security Officer.
   suffix: Security Loadouts
   components:

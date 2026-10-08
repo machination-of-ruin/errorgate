@@ -88,7 +88,7 @@
   - type: StorageFill
     contents:
       - id: WeaponRevolverPythonAP
-      - id: SpeedLoaderMagnumAP
+      - id: SpeedLoader357MagnumAP
         amount: 2
 
 - type: entity
@@ -100,7 +100,7 @@
   - type: StorageFill
     contents:
       - id: WeaponLightMachineGunL6
-      - id: MagazineLightRifleBox
+      - id: Magazine762x39Box
 
 - type: entity
   parent: ClothingBackpackDuffelSyndicateBundle
@@ -125,7 +125,7 @@
   - type: StorageFill
     contents:
       - id: WeaponRifleM90GrenadeLauncher
-      - id: MagazineRifle
+      - id: Magazine556x45
         amount: 2
       - id: GrenadeBlast
         amount: 2
@@ -142,13 +142,13 @@
   components:
   - type: StorageFill
     contents:
-      - id: MagazinePistolSubMachineGun
+      - id: Magazine9x19SubMachineGun
         amount: 4
-      - id: MagazineRifle
+      - id: Magazine556x45
         amount: 3
       - id: MagazineShotgun
         amount: 4
-      - id: MagazineLightRifleBox
+      - id: Magazine762x39Box
         amount: 2
       - id: MagazineHighCaliber
         amount: 1
@@ -162,11 +162,11 @@
   components:
   - type: StorageFill
     contents:
-    - id: MagazinePistolSubMachineGunIncendiary
+    - id: Magazine9x19SubMachineGunIncendiary
       amount: 4
     - id: MagazineShotgunIncendiary
       amount: 4
-    - id: MagazineLightRifleBoxIncendiary
+    - id: Magazine762x39BoxIncendiary
       amount: 2
 
 - type: entity
@@ -177,11 +177,11 @@
   components:
   - type: StorageFill
     contents:
-    - id: MagazinePistolSubMachineGunShrapnel
+    - id: Magazine9x19SubMachineGunShrapnel
       amount: 4
     - id: MagazineShotgunBirdshot
       amount: 4
-    - id: MagazineLightRifleBoxShrapnel
+    - id: Magazine762x39BoxShrapnel
       amount: 2
 
 - type: entity
@@ -350,7 +350,7 @@
     contents:
       - id: SyringeRomerol
       - id: WeaponRevolverPython
-      - id: MagazineBoxMagnumIncendiary
+      - id: AmmoBox357MagnumIncendiary
       - id: PillAmbuzolPlus
       - id: PillAmbuzol
         amount: 3

@@ -1,0 +1,80 @@
+- type: entity
+  id: Bullet9x19
+  name: bullet (9x19mm)
+  parent: BaseBullet
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: Projectile
+    damage:
+      types:
+        Piercing: 19 # ERRORGATE: old fork damage
+
+- type: entity
+  id: Bullet9x19Practice
+  name: bullet (9x19mm practice)
+  parent: BaseBulletPractice
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: Projectile
+    damage:
+      types:
+        Blunt: 2
+
+- type: entity
+  id: Bullet9x19Incendiary
+  parent: BaseBulletIncendiary
+  name: bullet (9x19mm incendiary)
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: Projectile
+    damage:
+      types:
+        Blunt: 2
+        Heat: 14
+
+- type: entity
+  id: Bullet9x19Uranium
+  parent: BaseBulletUranium
+  name: bullet (9x19mm uranium)
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: Projectile
+    damage:
+      types:
+        Radiation: 6
+        Piercing: 10
+
+- type: entity
+  id: Bullet9x19Shrapnel
+  name: bullet (9x19mm shrapnel)
+  categories: [ HideSpawnMenu ]
+  parent: BaseBullet
+  components:
+  - type: Projectile
+    damage:
+      types:
+        Piercing: 6.1333
+  - type: Sprite
+    scale: 0.5, 0.5
+
+- type: entity
+  id: Bullet9x19ShrapnelSpread
+  categories: [ HideSpawnMenu ]
+  parent: Bullet9x19Shrapnel
+  components:
+  - type: ProjectileSpread
+    proto: Bullet9x19Shrapnel
+    count: 3
+    spread: 15
+
+- type: entity
+  id: Bullet9x19AP
+  name: bullet (9x19mm AP)
+  parent: BaseBulletAP
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: Projectile
+    damage:
+      types:
+        Piercing: 16
+    ignoreResistances: true

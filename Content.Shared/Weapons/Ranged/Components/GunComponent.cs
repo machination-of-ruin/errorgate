@@ -11,6 +11,12 @@ namespace Content.Shared.Weapons.Ranged.Components;
 [RegisterComponent, NetworkedComponent, AutoGenerateComponentState, AutoGenerateComponentPause]
 public sealed partial class GunComponent : Component
 {
+    /// <summary>
+    /// ERRORGATE: overrides the ammo's muzzle light radius for this gun. 0 or less shows no muzzle flash at all (silenced guns).
+    /// </summary>
+    [DataField]
+    public float? MuzzleEffectRadius;
+
     #region Sound
 
     /// <summary>

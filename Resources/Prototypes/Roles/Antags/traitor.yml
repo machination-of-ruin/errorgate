@@ -49,8 +49,8 @@
   storage:
     back:
     - WeaponPistolViper
-    - MagazinePistol # WWDP
-    - MagazinePistol # WWDP
+    - Magazine9x19 # WWDP
+    - Magazine9x19 # WWDP
     - PinpointerSyndicateNuclear
     - DeathAcidifierImplanter
 

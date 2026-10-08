@@ -228,8 +228,8 @@
     - Maid
   items:
   - WeaponLeverChester
-  - MagazineMagnumLeverRifle
-  - MagazineMagnumLeverRifle
+  - Magazine357MagnumLeverRifle
+  - Magazine357MagnumLeverRifle
 
 - type: loadout
   id: LoadoutMaidMusket
@@ -304,7 +304,7 @@
     - Maid
   items:
   - WeaponSniperRepeater
-  - MagazineBoxMagnum
+  - AmmoBox357Magnum
 
 - type: loadout
   id: LoadoutMaidRifleSVT
@@ -319,8 +319,8 @@
     - Maid
   items:
   - WeaponRifleSVT
-  - MagazineLightRifleLowCapacity
-  - MagazineLightRifleLowCapacity
+  - Magazine762x39LowCapacity
+  - Magazine762x39LowCapacity
 
 - type: loadout
   id: LoadoutMaidSniperGrand
@@ -335,8 +335,8 @@
     - Maid
   items:
   - WeaponSniperGrand
-  - SpeedLoaderLightRifle
-  - SpeedLoaderLightRifle
+  - SpeedLoader762x39
+  - SpeedLoader762x39
 
 - type: loadout
   id: LoadoutPistolUniversal
@@ -351,8 +351,8 @@
     - Maid
   items:
   - WeaponPistolUniversal
-  - MagazineUniversalMagnum
-  - MagazineUniversalMagnum
+  - MagazineUSP45ACP
+  - MagazineUSP45ACP
 
 - type: loadout
   id: LoadoutMaidSniperMosin
@@ -367,8 +367,8 @@
     - Maid
   items:
   - WeaponSniperMosin
-  - SpeedLoaderLightRifle
-  - SpeedLoaderLightRifle
+  - SpeedLoader762x39
+  - SpeedLoader762x39
 
 - type: loadout
   id: LoadoutMaidRevolverSnub
@@ -383,8 +383,8 @@
     - Maid
   items:
   - WeaponRevolverSnub
-  - SpeedLoaderMagnum
-  - SpeedLoaderMagnum
+  - SpeedLoader357Magnum
+  - SpeedLoader357Magnum
 
 - type: loadout
   id: LoadoutMaidCQCManual

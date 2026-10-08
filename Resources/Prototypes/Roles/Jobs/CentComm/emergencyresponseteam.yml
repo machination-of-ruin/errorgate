@@ -39,7 +39,7 @@
     - RegenerativeMesh
     - BoxZiptie
     - CrowbarRed
-    - MagazineMagnum
+    - Magazine45ACP
 
 - type: startingGear
   id: ERTLeaderGearEVA
@@ -67,7 +67,7 @@
     - RegenerativeMesh
     - BoxZiptie
     - CrowbarRed
-    - MagazineMagnum
+    - Magazine45ACP
 
 - type: startingGear
   id: ERTLeaderGearEVALecter
@@ -86,8 +86,8 @@
     id: ERTLeaderPDA
     ears: ClothingHeadsetAltCentCom
     belt: ClothingBeltMilitaryWebbingERTLecterFilled # WD EDIT: ClothingBeltSecurityFilled -> ClothingBeltMilitaryWebbingERTLecterFilled
-    pocket1: WeaponPistolN1984 # WD EDIT: MagazineRifle -> WeaponPistolN1984
-    pocket2: FlashlightSeclite # WD EDIT: MagazineRifle -> FlashlightSeclite
+    pocket1: WeaponPistolN1984 # WD EDIT: Magazine556x45 -> WeaponPistolN1984
+    pocket2: FlashlightSeclite # WD EDIT: Magazine556x45 -> FlashlightSeclite
   inhand:
   - WeaponRifleLecter
   storage:
@@ -97,7 +97,7 @@
     - RegenerativeMesh
     - BoxZiptie
     - CrowbarRed
-    - MagazineMagnum
+    - Magazine45ACP
 
 # Chaplain
 - type: job
@@ -308,7 +308,7 @@
     - RegenerativeMesh
     - BoxZiptie
     - CrowbarRed
-    - MagazinePistol
+    - Magazine9x19
 
 - type: startingGear
   id: ERTSecurityGearEVA
@@ -336,7 +336,7 @@
     - RegenerativeMesh
     - BoxZiptie
     - CrowbarRed
-    - MagazinePistol
+    - Magazine9x19
 
 - type: startingGear
   id: ERTSecurityGearEVALecter
@@ -355,8 +355,8 @@
     id: ERTSecurityPDA
     ears: ClothingHeadsetAltCentCom
     belt: ClothingBeltSecurityFilled # WD EDIT: ClothingBeltSecurityFilled -> ClothingBeltMilitaryWebbingERTLecterFilled
-    pocket1: MagazineRifle # WD EDIT: MagazineRifle -> WeaponPistolMk58
-    pocket2: MagazineRifle # WD EDIT: MagazineRifle -> FlashlightSeclite
+    pocket1: Magazine556x45 # WD EDIT: Magazine556x45 -> WeaponPistolMk58
+    pocket2: Magazine556x45 # WD EDIT: Magazine556x45 -> FlashlightSeclite
   inhand:
   - WeaponRifleLecter
   storage:
@@ -366,7 +366,7 @@
     - RegenerativeMesh
     - BoxZiptie
     - CrowbarRed
-    - MagazinePistol
+    - Magazine9x19
 
 # Medical
 - type: job

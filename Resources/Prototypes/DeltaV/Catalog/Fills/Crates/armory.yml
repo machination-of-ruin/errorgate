@@ -7,7 +7,7 @@
 #     contents:
 #       - id: WeaponSniperGrand
 #         amount: 2
-#       - id: MagazineLightRifleMarkOne
+#       - id: Magazine762x39MarkOne
 #         amount: 4
 
 - type: entity
@@ -18,7 +18,7 @@
     contents:
       - id: WeaponPistolUniversal
         amount: 2
-      - id: MagazineUniversalMagnum
+      - id: MagazineUSP45ACP
         amount: 4
 
 - type: entity

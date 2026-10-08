@@ -2,7 +2,7 @@
   name: M-90
   parent: BaseWeaponRifle
   id: WeaponRifleM90
-  description: A revision of the M-90gl that removes the inbuilt grenade launcher. Uses .20 rifle ammo.
+  description: A revision of the M-90gl that removes the inbuilt grenade launcher. Uses 5.56x45mm ammo.
   components:
   - type: Sprite
     sprite: _Goobstation/Objects/Weapons/Guns/Rifles/m90.rsi
@@ -17,20 +17,20 @@
     slots:
       gun_magazine:
         name: Magazine
-        startingItem: MagazineRifle
+        startingItem: Magazine556x45
         insertSound: /Audio/Weapons/Guns/MagIn/batrifle_magin.ogg
         ejectSound: /Audio/Weapons/Guns/MagOut/batrifle_magout.ogg
         priority: 2
         whitelist:
           tags:
-            - MagazineRifle
+            - Magazine556x45
       gun_chamber:
         name: Chamber
-        startingItem: CartridgeRifle
+        startingItem: Cartridge556x45
         priority: 1
         whitelist:
           tags:
-            - CartridgeRifle
+            - Cartridge556x45
   - type: ContainerContainer
     containers:
       gun_magazine: !type:ContainerSlot
@@ -47,7 +47,7 @@
   name: Annie
   parent: BaseWeaponRifle
   id: WeaponRifleAnnie
-  description: A beast designed to shoulder the weight of impossible missions. Uses .30 rifle ammo.
+  description: A beast designed to shoulder the weight of impossible missions. Uses 7.62x39mm ammo.
   components:
   - type: Sprite
     sprite: _Goobstation/Objects/Weapons/Guns/Rifles/annie.rsi
@@ -76,20 +76,20 @@
     slots:
       gun_magazine:
         name: Magazine
-        startingItem: MagazineLightRifle
+        startingItem: Magazine762x39
         insertSound: /Audio/Weapons/Guns/MagIn/ltrifle_magin.ogg
         ejectSound: /Audio/Weapons/Guns/MagOut/ltrifle_magout.ogg
         priority: 2
         whitelist:
           tags:
-            - MagazineLightRifle
+            - Magazine762x39
       gun_chamber:
         name: Chamber
-        startingItem: CartridgeLightRifle
+        startingItem: Cartridge762x39
         priority: 1
         whitelist:
           tags:
-            - CartridgeLightRifle
+            - Cartridge762x39
   - type: ContainerContainer
     containers:
       gun_magazine: !type:ContainerSlot
@@ -133,20 +133,20 @@
     slots:
       gun_magazine:
         name: Magazine
-        startingItem: MagazineLightRifleSubsonic
+        startingItem: Magazine762x39Subsonic
         insertSound: /Audio/Weapons/Guns/MagIn/ltrifle_magin.ogg
         ejectSound: /Audio/Weapons/Guns/MagOut/ltrifle_magout.ogg
         priority: 2
         whitelist:
           tags:
-            - MagazineLightRifleSubsonic
+            - Magazine762x39Subsonic
       gun_chamber:
         name: Chamber
-        startingItem: CartridgeLightRifleSubsonic
+        startingItem: Cartridge762x39Subsonic
         priority: 1
         whitelist:
           tags:
-            - CartridgeLightRifleSubsonic
+            - Cartridge762x39Subsonic
   - type: MagazineVisuals
     magState: mag
     steps: 1

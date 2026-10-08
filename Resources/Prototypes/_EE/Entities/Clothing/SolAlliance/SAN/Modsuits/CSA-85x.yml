@@ -138,7 +138,7 @@
         - id: ClothingUniformJumpsuitSolFatigueGreen
         - id: ClothingBeltMercWebbing
         - id: WeaponPistolViperWood
-        - id: MagazinePistol
+        - id: Magazine9x19
         - id: ClothingMaskGasMerc
         - id: ClothingShoesBootsCombatFilled
         - id: SANIdCard
@@ -157,7 +157,7 @@
         - id: ClothingUniformJumpsuitSolArmyServiceOfficer
         - id: ClothingBeltSheathSANMarineFilled
         - id: WeaponPistolViperWood
-        - id: MagazinePistol
+        - id: Magazine9x19
         - id: ClothingMaskGasMerc
         - id: ClothingShoesBootsCombatFilled
         - id: SANIdCard

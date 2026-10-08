@@ -24,7 +24,7 @@
     soundGunshot:
       path: /Audio/Weapons/Guns/Gunshots/c-20r.ogg
   - type: BallisticAmmoProvider
-    proto: CartridgePistol
+    proto: Cartridge9x19
     capacity: 200
 
 - type: entity
@@ -43,7 +43,7 @@
     - FullAuto
     soundGunshot: /Audio/Weapons/Guns/Gunshots/gun_sentry.ogg
   - type: BallisticAmmoProvider
-    proto: CartridgePistol
+    proto: Cartridge9x19
     capacity: 50
   - type: Construction
     deconstructionTarget: null

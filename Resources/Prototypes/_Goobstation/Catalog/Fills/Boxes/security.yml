@@ -5,9 +5,9 @@
   components:
   - type: StorageFill
     contents:
-    - id: MagazineBoxMagnum
+    - id: AmmoBox357Magnum
       amount: 2
-    - id: MagazineBoxMagnumFlash
-    # - id: MagazineBoxMagnumEMP
-    - id: MagazineMagnumLeverRifleEmpty
+    - id: AmmoBox357MagnumFlash
+    # - id: AmmoBox357MagnumEMP
+    - id: Magazine357MagnumLeverRifleEmpty
       amount: 2

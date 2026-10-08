@@ -7,13 +7,13 @@
   components:
   - type: Tag
     tags:
-      - MagazineMagnumLeverRifle
+      - Magazine357MagnumLeverRifle
   - type: BallisticAmmoProvider
     mayTransfer: true
     whitelist:
       tags:
-        - CartridgeMagnum
-    proto: CartridgeMagnum
+        - Cartridge357Magnum
+    proto: Cartridge357Magnum
     capacity: 8
   - type: Item
     size: Small
@@ -34,19 +34,19 @@
   - type: Appearance
 
 - type: entity
-  id: MagazineMagnumLeverRifle
+  id: Magazine357MagnumLeverRifle
   name: "lever rifle magazine (.45)"
   parent: BaseMagazineMagnumLeverRifle
   components:
   - type: Tag
     tags:
-      - MagazineMagnumLeverRifle
+      - Magazine357MagnumLeverRifle
   - type: Sprite
     sprite: _Goobstation/Objects/Weapons/Guns/Ammunition/Magazine/lever_rifle_mags.rsi
 
 - type: entity
-  id: MagazineMagnumLeverRifleEmpty
-  parent: MagazineMagnumLeverRifle
+  id: Magazine357MagnumLeverRifleEmpty
+  parent: Magazine357MagnumLeverRifle
   suffix: Empty
   components:
   - type: BallisticAmmoProvider

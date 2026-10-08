@@ -88,7 +88,7 @@
   storage:
     back:
     - Flash
-    - MagazinePistol
+    - Magazine9x19
 
 - type: startingGear
   id: BoxingKangarooGear

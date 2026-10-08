@@ -70,7 +70,7 @@
     prototypes:
       - BoxMagazinePistolCaselessRiflePractice
       - BoxMagazineLightRiflePractice
-      - MagazineBoxMagnumPractice
+      - AmmoBox357MagnumPractice
       - BoxMagazineMagnumSubMachineGunPractice
       - BoxMagazinePistolPractice
       - BoxMagazinePistolHighCapacityPractice
@@ -91,7 +91,7 @@
     rarePrototypes:
       - BoxMagazinePistolCaselessRifle
       - BoxMagazineLightRifle
-      - MagazineBoxMagnum
+      - AmmoBox357Magnum
       - BoxMagazineMagnumSubMachineGun
       - BoxMagazinePistolSubMachineGunTopMounted
       - BoxMagazinePistol

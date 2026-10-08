@@ -1,0 +1,264 @@
+- type: entity
+  id: BaseMagazine6mmCaseless
+  name: "magazine (6mm caseless)"
+  parent: [ BaseItem, BaseSecurityContraband ]
+  abstract: true
+  components:
+  - type: Tag
+    tags:
+      - Magazine6mmCaseless
+  - type: BallisticAmmoProvider
+    mayTransfer: true
+    whitelist:
+      tags:
+        - Cartridge6mmCaseless
+    proto: Cartridge6mmCaseless
+    capacity: 30
+  - type: Item
+    size: Small
+  - type: ContainerContainer
+    containers:
+      ballistic-ammo: !type:Container
+  - type: Sprite
+    sprite: Objects/Weapons/Guns/Ammunition/Magazine/CaselessRifle/caseless_rifle_mag.rsi
+    layers:
+    - state: base
+      map: ["enum.GunVisualLayers.Base"]
+    - state: mag-1
+      map: ["enum.GunVisualLayers.Mag"]
+  - type: MagazineVisuals
+    magState: mag
+    steps: 2
+    zeroVisible: false
+  - type: Appearance
+
+- type: entity
+  id: BaseMagazine6mmCaselessShort
+  name: "caseless rifle short magazine (6mm caseless)"
+  parent: BaseMagazine6mmCaseless
+  abstract: true
+  components:
+  - type: BallisticAmmoProvider
+    proto: Cartridge6mmCaseless
+    capacity: 10
+  - type: Item
+    size: Tiny
+  - type: Sprite
+    sprite: Objects/Weapons/Guns/Ammunition/Magazine/CaselessRifle/caseless_rifle_mag_short.rsi
+    layers:
+    - state: base
+      map: ["enum.GunVisualLayers.Base"]
+    - state: mag-1
+      map: ["enum.GunVisualLayers.Mag"]
+
+- type: entity
+  id: BaseMagazinePistol6mmCaseless
+  name: "pistol magazine (6mm caseless)"
+  parent: BaseMagazine6mmCaseless
+  abstract: true
+  components:
+  - type: Tag
+    tags:
+      - MagazinePistol6mmCaseless
+  - type: BallisticAmmoProvider
+    whitelist:
+      tags:
+        - Cartridge6mmCaseless
+    proto: Cartridge6mmCaseless
+    capacity: 10
+  - type: Item
+    size: Small
+  - type: Sprite
+    sprite: Objects/Weapons/Guns/Ammunition/Magazine/CaselessRifle/caseless_pistol_mag.rsi
+    layers:
+    - state: base
+      map: ["enum.GunVisualLayers.Base"]
+    - state: mag-1
+      map: ["enum.GunVisualLayers.Mag"]
+  - type: MagazineVisuals
+    magState: mag
+    steps: 6
+    zeroVisible: false
+  - type: Appearance
+
+- type: entity
+  id: Magazine6mmCaseless10x24
+  name: "box magazine (6mm caseless)"
+  parent: BaseMagazine6mmCaseless
+  components:
+  - type: BallisticAmmoProvider
+    proto: Cartridge6mmCaseless
+    capacity: 99
+  - type: Sprite
+    sprite: Objects/Weapons/Guns/Ammunition/Magazine/CaselessRifle/10x24.rsi
+  - type: MagazineVisuals
+    magState: mag
+    steps: 8
+    zeroVisible: false
+
+- type: entity
+  id: MagazinePistol6mmCaseless
+  name: "pistol magazine (6mm caseless)"
+  parent: BaseMagazinePistol6mmCaseless
+  components:
+  - type: BallisticAmmoProvider
+    proto: Cartridge6mmCaseless
+  - type: Sprite
+    slayers:
+    - state: red
+      map: ["enum.GunVisualLayers.Base"]
+    - state: mag-1
+      map: ["enum.GunVisualLayers.Mag"]
+  - type: MagazineVisuals
+    magState: mag
+    steps: 6
+    zeroVisible: false
+  - type: Appearance
+
+- type: entity
+  id: MagazinePistol6mmCaselessPractice
+  name: "pistol magazine (6mm caseless practice)"
+  parent: BaseMagazinePistol6mmCaseless
+  components:
+  - type: BallisticAmmoProvider
+    proto: Cartridge6mmCaselessPractice
+  - type: Sprite
+    layers:
+    - state: practice
+      map: ["enum.GunVisualLayers.Base"]
+    - state: mag-1
+      map: ["enum.GunVisualLayers.Mag"]
+  - type: MagazineVisuals
+    magState: mag
+    steps: 6
+    zeroVisible: false
+  - type: Appearance
+
+- type: entity
+  id: MagazinePistol6mmCaselessIncendiary
+  name: "pistol magazine (6mm caseless incendiary)"
+  parent: BaseMagazinePistol6mmCaseless
+  components:
+  - type: BallisticAmmoProvider
+    proto: Cartridge6mmCaselessIncendiary
+
+- type: entity
+  id: MagazinePistol6mmCaselessUranium
+  name: "pistol magazine (6mm caseless uranium)"
+  parent: BaseMagazinePistol6mmCaseless
+  components:
+  - type: BallisticAmmoProvider
+    proto: Cartridge6mmCaselessUranium
+
+- type: entity
+  id: MagazinePistol6mmCaselessShrapnel
+  name: "pistol magazine (6mm caseless shrapnel)"
+  parent: BaseMagazinePistol6mmCaseless
+  components:
+  - type: BallisticAmmoProvider
+    proto: Cartridge6mmCaselessShrapnel
+
+- type: entity
+  id: Magazine6mmCaseless
+  name: "magazine (6mm caseless)"
+  parent: BaseMagazine6mmCaseless
+  components:
+  - type: BallisticAmmoProvider
+    proto: Cartridge6mmCaseless
+  - type: Sprite
+    layers:
+    - state: red
+      map: ["enum.GunVisualLayers.Base"]
+    - state: mag-1
+      map: ["enum.GunVisualLayers.Mag"]
+
+- type: entity
+  id: Magazine6mmCaselessPractice
+  name: "magazine (6mm caseless practice)"
+  parent: BaseMagazine6mmCaseless
+  components:
+  - type: BallisticAmmoProvider
+    proto: Cartridge6mmCaselessPractice
+  - type: Sprite
+    layers:
+    - state: practice
+      map: ["enum.GunVisualLayers.Base"]
+    - state: mag-1
+      map: ["enum.GunVisualLayers.Mag"]
+
+- type: entity
+  id: Magazine6mmCaselessIncendiary
+  name: "magazine (6mm caseless incendiary)"
+  parent: Magazine6mmCaseless
+  components:
+  - type: BallisticAmmoProvider
+    proto: Cartridge6mmCaselessIncendiary
+
+- type: entity
+  id: Magazine6mmCaselessUranium
+  name: "magazine (6mm caseless uranium)"
+  parent: Magazine6mmCaseless
+  components:
+  - type: BallisticAmmoProvider
+    proto: Cartridge6mmCaselessUranium
+
+- type: entity
+  id: Magazine6mmCaselessShrapnel
+  name: "magazine (6mm caseless shrapnel)"
+  parent: Magazine6mmCaseless
+  components:
+  - type: BallisticAmmoProvider
+    proto: Cartridge6mmCaselessShrapnel
+
+- type: entity
+  id: Magazine6mmCaselessShort
+  name: "short magazine (6mm caseless)"
+  parent: BaseMagazine6mmCaselessShort
+  components:
+  - type: BallisticAmmoProvider
+    proto: Cartridge6mmCaseless
+    capacity: 20
+  - type: Sprite
+    layers:
+    - state: red
+      map: ["enum.GunVisualLayers.Base"]
+    - state: mag-1
+      map: ["enum.GunVisualLayers.Mag"]
+
+- type: entity
+  id: Magazine6mmCaselessShortPractice
+  name: "short magazine (6mm caseless practice)"
+  parent: BaseMagazine6mmCaselessShort
+  components:
+  - type: BallisticAmmoProvider
+    proto: Cartridge6mmCaselessPractice
+  - type: Sprite
+    layers:
+    - state: practice
+      map: ["enum.GunVisualLayers.Base"]
+    - state: mag-1
+      map: ["enum.GunVisualLayers.Mag"]
+
+- type: entity
+  id: Magazine6mmCaselessShortIncendiary
+  name: "short magazine (6mm caseless incendiary)"
+  parent: BaseMagazine6mmCaselessShort
+  components:
+  - type: BallisticAmmoProvider
+    proto: Cartridge6mmCaselessIncendiary
+
+- type: entity
+  id: Magazine6mmCaselessShortUranium
+  name: "short magazine (6mm caseless uranium)"
+  parent: BaseMagazine6mmCaselessShort
+  components:
+  - type: BallisticAmmoProvider
+    proto: Cartridge6mmCaselessUranium
+
+- type: entity
+  id: Magazine6mmCaselessShortShrapnel
+  name: "short magazine (6mm caseless shrapnel)"
+  parent: BaseMagazine6mmCaselessShort
+  components:
+  - type: BallisticAmmoProvider
+    proto: Cartridge6mmCaselessShrapnel

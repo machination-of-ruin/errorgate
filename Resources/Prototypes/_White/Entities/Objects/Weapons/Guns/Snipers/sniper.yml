@@ -36,9 +36,9 @@
     soundInsert: /Audio/_White/Guns/insert.ogg
     whitelist:
       tags:
-      - CartridgeAntiMateriel
+      - CartridgeLapuaMagnum
     capacity: 5
-    proto: CartridgeAntiMateriel
+    proto: CartridgeLapuaMagnum
   - type: SpeedModifiedOnWield
     walkModifier: 0.25
     sprintModifier: 0.25

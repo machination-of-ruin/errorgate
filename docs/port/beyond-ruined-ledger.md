@@ -144,8 +144,12 @@ Anyone can be executed, not only incapacitated victims. The damage multiplier is
 ### World systems (decided: port the final version once)
 `SmartMobSpawner`, `MobLoot`, `Despawn` (dead bodies + items), `LootManager` (final form with `GlobalLootTable`, `LootEntries`, spawners), `DayCycle` (client `LightCycleSystem`, shared `LightCycleComponent`), contaminated water, doors/keys, traps, weather rules, maps (`EdgeOfEntropy`, Kuznetsk). Source of truth: final code under `Content.*/_ERRORGATE` and `Resources/Prototypes/_ERRORGATE` in `beyond/master`. Discuss one system at a time. Needs `docs/design/survival-loop.md` ("loot is finite per wipe").
 
-### Guns (#48, #49, #81, #82, #69 parts)
-Decision first: real-world caliber names and a trimmed roster, or keep WWDP's. This drives loot entries.
+### Guns (#48, #49, #81, #82, #69 parts) - DONE
+Decided with the owner: port all real-world calibers and the 21 real-world guns, keep every existing gun prototype, apply the old higher bullet damage, random-load magazines only in separate prototypes, skip #82 (upstream spread stays), MP5 is its own gun beside the Drozd.
+- Calibers: WWDP ids renamed in place (variants kept) to 9x19, 5.56x45, 7.62x39, 6mm caseless, .338 Lapua, .357 Magnum (revolvers, lever, repeater) and .45 ACP (magazine guns). References across all prototypes rewritten, `Resources/Migrations` extended so maps still load. Missing Big boxes, AP variants and magazines imported from the old fork. Old damage applied only where higher (5.56, 7.62x39, 6mm, 9x19); .357/.45/Lapua keep the WWDP values.
+- Guns: `Resources/Prototypes/_ERRORGATE/Entities/Weapons/real_world_guns.yml` (20 prototypes; the DeltaV cyborg M249 was not imported). Random loads: `random_magazines.yml` and `random_mag_guns.yml` (`<Gun>RandomMag`); the normal ones always spawn full. `BallisticAmmoProvider.RandomizeAmmo`.
+- #69 silenced: `GunComponent.MuzzleEffectRadius` override, 0 shows no flash (Beretta, AS Val, Cobra).
+- Tests: `RealWorldGunsTest`. Loot tables were not touched (they come with the world-systems milestone). Not run: full `PostMapInitTest` (a run used about 24 GB and was stopped, cause not found); `EdgeOfEntropyDev` passes.
 
 ### Melee and shove (#37, #46, #52, #61, #69, #72, #84)
 Decision first: keep WWDP shove (disarm based) or the old `ShoveAttackEvent` rework, and whether RMB is disarm/shove for all weapons. Keep upstream bash stats until then.

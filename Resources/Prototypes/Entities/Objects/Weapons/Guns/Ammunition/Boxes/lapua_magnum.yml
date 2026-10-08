@@ -1,0 +1,84 @@
+- type: entity
+  abstract: true
+  parent: BaseItem
+  id: BaseAmmoBoxSniper
+  name: ammunition box (.338 Lapua Magnum)
+  components:
+  - type: BallisticAmmoProvider
+    mayTransfer: true
+    whitelist:
+      tags:
+        - CartridgeLapuaMagnum
+    proto: CartridgeLapuaMagnum
+    capacity: 30 # WD EDIT: 10 -> 30
+  - type: Item
+    size: Small
+  - type: ContainerContainer
+    containers:
+      ballistic-ammo: !type:Container
+  - type: Sprite
+    sprite: Objects/Weapons/Guns/Ammunition/Boxes/anti_materiel.rsi
+  - type: MagazineVisuals
+    magState: mag
+    steps: 4
+    zeroVisible: false
+  - type: Appearance
+
+# Boxes
+- type: entity
+  parent: BaseAmmoBoxSniper
+  id: AmmoBoxSniper
+  name: ammunition box (.338 Lapua Magnum)
+  components:
+  - type: BallisticAmmoProvider
+    proto: CartridgeLapuaMagnum
+  - type: Sprite
+    layers:
+    - state: base
+      map: ["enum.GunVisualLayers.Base"]
+    - state: mag-1
+      map: ["enum.GunVisualLayers.Mag"]
+
+- type: entity
+  parent: AmmoBoxSniper
+  id: AmmoBoxSniperShrapnel
+  name: ammunition box (.60 anti-personnel shrapnel)
+  components:
+  - type: BallisticAmmoProvider
+    proto: CartridgeLapuaMagnumShrapnel
+
+- type: entity
+  parent: BaseAmmoBoxSniper
+  id: AmmoBoxSniperBig
+  name: ammunition crate (.338 Lapua Magnum)
+  suffix: 10
+  components:
+  - type: Item
+    size: Normal
+  - type: BallisticAmmoProvider
+    capacity: 10
+  - type: Sprite
+    sprite: Objects/Weapons/Guns/Ammunition/Boxes/anti_materiel.rsi
+    layers:
+    - state: base
+      map: [ "enum.GunVisualLayers.Base" ]
+    - state: mag-1
+      map: [ "enum.GunVisualLayers.Mag" ]
+  - type: MagazineVisuals
+    magState: mag
+
+- type: entity
+  parent: AmmoBoxSniper
+  name: ammunition box (.338 Lapua Magnum AP)
+  id: AmmoBoxSniperAP
+  components:
+  - type: BallisticAmmoProvider
+    proto: CartridgeLapuaMagnumAP
+
+- type: entity
+  parent: AmmoBoxSniperBig
+  name: ammunition crate (.338 Lapua Magnum AP)
+  id: AmmoBoxSniperBigAP
+  components:
+  - type: BallisticAmmoProvider
+    proto: CartridgeLapuaMagnumAP

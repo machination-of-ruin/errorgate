@@ -2,10 +2,10 @@ loadout-description-LoadoutSecurityUniformJumpskirtSenior = A skirt fit for the 
 loadout-description-LoadoutSecurityUniformJumpsuitSenior = A suit fit for the best of the best.
 loadout-description-LoadoutSecurityShoesJackboots = A really nice, heavy, pair of black boots.
 # Equipment
-loadout-name-LoadoutMagazinePistolSpare = pistol magazine (.35 auto, spare)
-loadout-name-LoadoutSpeedLoaderMagnumSpare = speed loader (.45 magnum, spare)
-loadout-name-LoadoutMagazineMagnumSpare = pistol magazine (.45 magnum, spare)
-loadout-name-LoadoutMagazineUniversalMagnumSpare = mk 32 'Universal' magazine (.45 magnum, spare)
+loadout-name-LoadoutMagazinePistolSpare = pistol magazine (9x19mm, spare)
+loadout-name-LoadoutSpeedLoaderMagnumSpare = speed loader (.357 Magnum, spare)
+loadout-name-LoadoutMagazineMagnumSpare = pistol magazine (.45 ACP, spare)
+loadout-name-LoadoutMagazineUniversalMagnumSpare = mk 32 'Universal' magazine (.45 ACP, spare)
 
 # Duty Weapons
 loadout-name-LoadoutSecurityMk58 = Mk58

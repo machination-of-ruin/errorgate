@@ -1,8 +1,8 @@
 - type: entity
-  id: MagazineLightRifleLowCapacityEmpty
-  name: "low cap magazine (.30 rifle any)"
+  id: Magazine762x39LowCapacityEmpty
+  name: "low cap magazine (7.62x39mm any)"
   suffix: empty
-  parent: MagazineLightRifle
+  parent: Magazine762x39
   components:
   - type: BallisticAmmoProvider
     proto: null
@@ -18,12 +18,12 @@
       map: ["enum.GunVisualLayers.Mag"]
 
 - type: entity
-  id: MagazineLightRifleLowCapacity
-  name: "low cap magazine (.30 rifle)"
-  parent: BaseMagazineLightRifle
+  id: Magazine762x39LowCapacity
+  name: "low cap magazine (7.62x39mm)"
+  parent: BaseMagazine762x39
   components:
   - type: BallisticAmmoProvider
-    proto: CartridgeLightRifle
+    proto: Cartridge762x39
     capacity: 15
   - type: Item
     size: Tiny
@@ -36,12 +36,12 @@
       map: ["enum.GunVisualLayers.Mag"]
 
 - type: entity
-  id: MagazineLightRifleLowCapacityPractice
-  name: "low cap magazine (.30 rifle practice)"
-  parent: MagazineLightRifleLowCapacity
+  id: Magazine762x39LowCapacityPractice
+  name: "low cap magazine (7.62x39mm practice)"
+  parent: Magazine762x39LowCapacity
   components:
   - type: BallisticAmmoProvider
-    proto: CartridgeLightRiflePractice
+    proto: Cartridge762x39Practice
     capacity: 15
   - type: Item
     size: Tiny
@@ -53,12 +53,12 @@
       map: ["enum.GunVisualLayers.Mag"]
 
 - type: entity
-  id: MagazineLightRifleLowCapacityUranium
-  name: "low cap magazine (.30 rifle uranium)"
-  parent: MagazineLightRifleLowCapacity
+  id: Magazine762x39LowCapacityUranium
+  name: "low cap magazine (7.62x39mm uranium)"
+  parent: Magazine762x39LowCapacity
   components:
   - type: BallisticAmmoProvider
-    proto: CartridgeLightRifleUranium
+    proto: Cartridge762x39Uranium
     capacity: 15
   - type: Item
     size: Tiny

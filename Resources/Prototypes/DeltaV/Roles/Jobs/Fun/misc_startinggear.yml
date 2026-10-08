@@ -86,7 +86,7 @@
     - DrinkWhiskeyBottleFullMobster # WD EDIT: BoxSurvival -> DrinkWhiskeyBottleFullMobster
     - WeaponSubMachineGunTypewriter
     - WeaponPistolViperWood
-    - MagazinePistol
+    - Magazine9x19
 
 - type: startingGear
   id: MobsterGearAlt
@@ -107,4 +107,4 @@
     - DrinkWhiskeyBottleFullMobster # WD EDIT: BoxSurvival -> DrinkWhiskeyBottleFullMobster
     - WeaponSubMachineGunTypewriter
     - WeaponPistolViperWood
-    - MagazinePistol
+    - Magazine9x19

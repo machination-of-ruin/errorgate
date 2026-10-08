@@ -1,0 +1,141 @@
+- type: entity
+  abstract: true
+  parent: BaseAmmoBox
+  id: BaseAmmoBox762x39
+  name: ammunition box (7.62x39mm)
+  components:
+  - type: BallisticAmmoProvider
+    mayTransfer: true
+    whitelist:
+      tags:
+      - Cartridge762x39
+    proto: Cartridge762x39
+    capacity: 60
+  - type: Item
+    size: Small
+  - type: ContainerContainer
+    containers:
+      ballistic-ammo: !type:Container
+  - type: Sprite
+    sprite: Objects/Weapons/Guns/Ammunition/Boxes/light_rifle.rsi
+  - type: MagazineVisuals
+    magState: mag
+    steps: 4
+    zeroVisible: false
+  - type: Appearance
+
+# Boxes
+- type: entity
+  parent: BaseAmmoBox762x39
+  id: AmmoBox762x39Big
+  name: ammunition box (7.62x39mm)
+  suffix: Big
+  components:
+  - type: BallisticAmmoProvider
+    capacity: 200
+    proto: Cartridge762x39
+  - type: Sprite
+    layers:
+    - state: base
+      map: ["enum.GunVisualLayers.Base"]
+    - state: mag-1
+      map: ["enum.GunVisualLayers.Mag"]
+
+- type: entity
+  parent: BaseAmmoBox762x39
+  id: AmmoBox762x39
+  name: ammunition box (7.62x39mm)
+  components:
+  - type: BallisticAmmoProvider
+    proto: Cartridge762x39
+  - type: Sprite
+    layers:
+    - state: base
+      map: ["enum.GunVisualLayers.Base"]
+    - state: mag-1
+      map: ["enum.GunVisualLayers.Mag"]
+
+- type: entity
+  parent: BaseAmmoBox762x39
+  id: AmmoBox762x39Practice
+  name: ammunition box (7.62x39mm practice)
+  components:
+  - type: BallisticAmmoProvider
+    proto: Cartridge762x39Practice
+  - type: Sprite
+    layers:
+    - state: base
+      map: ["enum.GunVisualLayers.Base"]
+    - state: mag-1
+      map: ["enum.GunVisualLayers.Mag"]
+    - state: practice
+
+- type: entity
+  id: AmmoBox762x39Incendiary
+  parent: BaseAmmoBox762x39
+  name: ammunition box (7.62x39mm incendiary)
+  components:
+  - type: BallisticAmmoProvider
+    proto: Cartridge762x39Incendiary
+  - type: Sprite
+    layers:
+    - state: base
+      map: ["enum.GunVisualLayers.Base"]
+    - state: mag-1
+      map: ["enum.GunVisualLayers.Mag"]
+    - state: incendiary
+
+- type: entity
+  parent: BaseAmmoBox762x39
+  id: AmmoBox762x39Uranium
+  name: ammunition box (7.62x39mm uranium)
+  components:
+  - type: BallisticAmmoProvider
+    proto: Cartridge762x39Uranium
+  - type: Sprite
+    layers:
+    - state: base
+      map: ["enum.GunVisualLayers.Base"]
+    - state: mag-1
+      map: ["enum.GunVisualLayers.Mag"]
+    - state: uranium
+
+- type: entity
+  parent: AmmoBox762x39
+  id: AmmoBox762x39Shrapnel
+  name: ammunition box (7.62x39mm shrapnel)
+  components:
+  - type: BallisticAmmoProvider
+    proto: Cartridge762x39Shrapnel
+
+- type: entity
+  parent: AmmoBox762x39Big
+  id: AmmoBox762x39BigPractice
+  name: bulk ammunition box (7.62x39mm practice)
+  components:
+  - type: BallisticAmmoProvider
+    proto: Cartridge762x39Practice
+
+- type: entity
+  parent: AmmoBox762x39Big
+  id: AmmoBox762x39BigIncendiary
+  name: bulk ammunition box (7.62x39mm incendiary)
+  components:
+  - type: BallisticAmmoProvider
+    proto: Cartridge762x39Incendiary
+
+- type: entity
+  parent: AmmoBox762x39Big
+  id: AmmoBox762x39BigUranium
+  name: bulk ammunition box (7.62x39mm uranium)
+  components:
+  - type: BallisticAmmoProvider
+    proto: Cartridge762x39Uranium
+
+- type: entity
+  parent: AmmoBox762x39Big
+  id: AmmoBox762x39BigShrapnel
+  name: bulk ammunition box (7.62x39mm shrapnel)
+  components:
+  - type: BallisticAmmoProvider
+    proto: Cartridge762x39Shrapnel

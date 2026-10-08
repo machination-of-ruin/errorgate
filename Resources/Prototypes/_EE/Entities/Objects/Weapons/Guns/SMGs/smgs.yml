@@ -2,7 +2,7 @@
   name: FPA-90 sub machine gun
   parent: BaseWeaponPistol
   id: WeaponSubMachineGunFPA90
-  description: It's a cheap piece of shit made by a company well known for cheap guns, but at least you don't need hearing protection while using it. It fires .25 caseless.
+  description: It's a cheap piece of shit made by a company well known for cheap guns, but at least you don't need hearing protection while using it. It fires 6mm caseless.
   components:
   - type: Sprite
     sprite: _EE/Objects/Weapons/Guns/SMGs/FPA90.rsi
@@ -36,20 +36,20 @@
     slots:
       gun_magazine:
         name: Magazine
-        startingItem: MagazineCaselessRifle
+        startingItem: Magazine6mmCaseless
         insertSound: /Audio/Weapons/Guns/MagIn/smg_magin.ogg
         ejectSound: /Audio/Weapons/Guns/MagOut/smg_magout.ogg
         priority: 2
         whitelist:
           tags:
-            - MagazineCaselessRifle
+            - Magazine6mmCaseless
       gun_chamber:
         name: Chamber
-        startingItem: CartridgeCaselessRifle
+        startingItem: Cartridge6mmCaseless
         priority: 1
         whitelist:
           tags:
-            - CartridgeCaselessRifle
+            - Cartridge6mmCaseless
   - type: Appearance
   - type: StaticPrice
     price: 200
@@ -67,7 +67,7 @@
   name: FPA-90 sub machine gun
   parent: WeaponSubMachineGunFPA90
   id: WeaponSubMachineGunFPA90Empty
-  description: It's a cheap piece of shit made by a company well known for cheap guns, but at least you don't need hearing protection while using it. It fires .25 caseless.
+  description: It's a cheap piece of shit made by a company well known for cheap guns, but at least you don't need hearing protection while using it. It fires 6mm caseless.
   components:
   - type: ItemSlots
     slots:
@@ -79,14 +79,14 @@
         priority: 2
         whitelist:
           tags:
-            - MagazineCaselessRifle
+            - Magazine6mmCaseless
       gun_chamber:
         name: Chamber
         startingItem: null
         priority: 1
         whitelist:
           tags:
-            - CartridgeCaselessRifle
+            - Cartridge6mmCaseless
 
 - type: entity
   name: BRDI R-25
@@ -139,20 +139,20 @@
     slots:
       gun_magazine:
         name: Magazine
-        startingItem: MagazineCaselessRifle
+        startingItem: Magazine6mmCaseless
         insertSound: /Audio/Weapons/Guns/MagIn/smg_magin.ogg
         ejectSound: /Audio/Weapons/Guns/MagOut/smg_magout.ogg
         priority: 2
         whitelist:
           tags:
-            - MagazineCaselessRifle
+            - Magazine6mmCaseless
       gun_chamber:
         name: Chamber
-        startingItem: CartridgeCaselessRifle
+        startingItem: Cartridge6mmCaseless
         priority: 1
         whitelist:
           tags:
-            - CartridgeCaselessRifle
+            - Cartridge6mmCaseless
   # - type: ExtendDescription # WWDP
   #   descriptionList:
   #     - description: "gun-suppressed"

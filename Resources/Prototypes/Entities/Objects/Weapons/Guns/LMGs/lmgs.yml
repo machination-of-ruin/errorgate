@@ -47,20 +47,20 @@
     slots:
       gun_magazine:
         name: Magazine
-        startingItem: MagazineLightRifleBox
+        startingItem: Magazine762x39Box
         insertSound: /Audio/Weapons/Guns/MagIn/batrifle_magin.ogg
         ejectSound: /Audio/Weapons/Guns/MagOut/batrifle_magout.ogg
         priority: 2
         whitelist:
           tags:
-            - MagazineLightRifleBox
+            - Magazine762x39Box
       gun_chamber:
         name: Chamber
-        startingItem: CartridgeLightRifle
+        startingItem: Cartridge762x39
         priority: 1
         whitelist:
           tags:
-            - CartridgeLightRifle
+            - Cartridge762x39
   - type: ContainerContainer
     containers:
       gun_magazine: !type:ContainerSlot
@@ -102,7 +102,7 @@
   name: L6 SAW
   id: WeaponLightMachineGunL6
   parent: [BaseWeaponLightMachineGun, BaseSyndicateContraband]
-  description: A rather traditionally made LMG with a pleasantly lacquered wooden pistol grip. Uses .30 rifle ammo.
+  description: A rather traditionally made LMG with a pleasantly lacquered wooden pistol grip. Uses 7.62x39mm ammo.
   components:
   - type: Sprite
     sprite: Objects/Weapons/Guns/LMGs/l6.rsi
@@ -124,7 +124,7 @@
   name: L6C ROW
   id: WeaponLightMachineGunL6C
   parent: BaseItem
-  description: A L6 SAW for use by cyborgs. Creates .30 rifle ammo on the fly from an internal ammo fabricator, which slowly self-charges.
+  description: A L6 SAW for use by cyborgs. Creates 7.62x39mm ammo on the fly from an internal ammo fabricator, which slowly self-charges.
   components:
     - type: Gun
       minAngle: 4
@@ -153,7 +153,7 @@
       containers:
         ballistic-ammo: !type:Container
     - type: ProjectileBatteryAmmoProvider
-      proto: CartridgeLightRifle
+      proto: Cartridge762x39
       fireCost: 100
     - type: Battery
       maxCharge: 10000

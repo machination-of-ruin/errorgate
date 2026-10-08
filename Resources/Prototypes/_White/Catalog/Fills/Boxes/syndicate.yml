@@ -1,4 +1,4 @@
-﻿- type: entity
+- type: entity
   name: suspicious cardboard box
   suffix: Empty
   parent: BoxPlastic # WWDP edit
@@ -110,7 +110,7 @@
     - id: ClothingOuterChameleon
     - id: ClothingMaskGasVoiceChameleon
     - id: WeaponRevolverPythonAP
-    - id: SpeedLoaderMagnumAP
+    - id: SpeedLoader357MagnumAP
     - id: CigPackSyndicate
     - id: MindShieldImplanter
 
@@ -122,10 +122,10 @@
   - type: StorageFill
     contents:
     - id: WeaponSubMachineGunTypewriter
-    - id: MagazinePistolSubMachineGun
+    - id: Magazine9x19SubMachineGun
       amount: 2
     - id: WeaponPistolViperWood
-    - id: MagazinePistol
+    - id: Magazine9x19
       amount: 2
     - id: DrinkWhiskeyBottleFull
     - id: SpaceCash20000
@@ -183,7 +183,7 @@
   - type: StorageFill
     contents:
     - id: WeaponPistolMPR10Xyphos
-    - id: MagazinePistol
+    - id: Magazine9x19
       amount: 6
     - id: ClothingHeadBandGreen
       amount: 3
@@ -205,7 +205,7 @@
   - type: StorageFill
     contents:
     - id: WeaponPistolMPR10Xyphos
-    - id: MagazinePistol
+    - id: Magazine9x19
       amount: 6
     - id: ClothingHeadBandRed
       amount: 3
@@ -249,7 +249,7 @@
     contents:
     - id: EncryptionKeySyndie
     - id: WeaponPistolCobra
-    - id: MagazinePistolCaselessRifle
+    - id: MagazinePistol6mmCaseless
       amount: 3
     - id: AgentIDCard
     - id: ClothingShoesChameleonNoSlips
@@ -307,7 +307,7 @@
     - id: ClothingHandsGlovesCombat
     - id: ClothingShoesBootsCombatFilled
     - id: WeaponPistolMPR10Xyphos 
-    - id: MagazinePistol
+    - id: Magazine9x19
     - id: EnergyShield
 
 - type: entity

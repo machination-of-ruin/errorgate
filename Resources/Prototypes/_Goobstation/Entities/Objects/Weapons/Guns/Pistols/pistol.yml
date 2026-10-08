@@ -28,21 +28,21 @@
     slots:
       gun_magazine:
         name: Magazine
-        startingItem: MagazinePistolHighCapacity
+        startingItem: Magazine9x19HighCapacity
         insertSound: /Audio/Weapons/Guns/MagIn/pistol_magin.ogg
         ejectSound: /Audio/Weapons/Guns/MagOut/pistol_magout.ogg
         priority: 2
         whitelist:
           tags:
-            - MagazinePistol
-            - MagazinePistolHighCapacity
+            - Magazine9x19
+            - Magazine9x19HighCapacity
       gun_chamber:
         name: Chamber
-        startingItem: CartridgePistol
+        startingItem: Cartridge9x19
         priority: 1
         whitelist:
           tags:
-            - CartridgePistol
+            - Cartridge9x19
   - type: Tag
     tags:
     - WeaponPistolDualetta

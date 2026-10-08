@@ -1,17 +1,17 @@
 - type: entity
   id: BaseMagazineUniversalMagnum
-  name: "mk 32 'Universal' magazine (.45 magnum)"
-  parent: BaseMagazinePistol
+  name: "mk 32 'Universal' magazine (.45 ACP)"
+  parent: BaseMagazine9x19
   abstract: true
   components:
   - type: Tag
     tags:
-    - MagazineUniversalMagnum
+    - MagazineUSP45ACP
   - type: BallisticAmmoProvider
     whitelist:
       tags:
-      - CartridgeMagnum
-    proto: CartridgeMagnum
+      - Cartridge45ACP
+    proto: Cartridge45ACP
     capacity: 12
   - type: Item
     size: Small
@@ -31,8 +31,8 @@
 # Magazines for the Universal Pistol
 
 - type: entity
-  id: MagazineUniversalMagnumEmpty
-  name: "mk 32 'Universal' magazine (.45 magnum any)"
+  id: MagazineUSP45ACPEmpty
+  name: "mk 32 'Universal' magazine (.45 ACP any)"
   suffix: empty
   parent: BaseMagazineUniversalMagnum
   components:
@@ -44,12 +44,12 @@
       map: ["enum.GunVisualLayers.Base"]
 
 - type: entity
-  id: MagazineUniversalMagnum
-  name: "mk 32 'Universal' magazine (.45 magnum)"
+  id: MagazineUSP45ACP
+  name: "mk 32 'Universal' magazine (.45 ACP)"
   parent: BaseMagazineUniversalMagnum
   components:
   - type: BallisticAmmoProvider
-    proto: CartridgeMagnum
+    proto: Cartridge45ACP
     capacity: 12
   - type: Sprite
     layers:
@@ -63,12 +63,12 @@
     zeroVisible: false
 
 - type: entity
-  id: MagazineUniversalMagnumPractice
-  name: "mk 32 'Universal' magazine (.45 magnum practice)"
+  id: MagazineUSP45ACPPractice
+  name: "mk 32 'Universal' magazine (.45 ACP practice)"
   parent: BaseMagazineUniversalMagnum
   components:
   - type: BallisticAmmoProvider
-    proto: CartridgeMagnumPractice
+    proto: Cartridge45ACPPractice
     capacity: 12
   - type: Sprite
     layers:
@@ -82,12 +82,12 @@
     zeroVisible: false
 
 - type: entity
-  id: MagazineUniversalMagnumIncendiary
-  name: "mk 32 'Universal' magazine (.45 magnum incendiary)"
+  id: MagazineUSP45ACPIncendiary
+  name: "mk 32 'Universal' magazine (.45 ACP incendiary)"
   parent: BaseMagazineUniversalMagnum
   components:
   - type: BallisticAmmoProvider
-    proto: CartridgeMagnumIncendiary
+    proto: Cartridge45ACPIncendiary
     capacity: 12
   - type: Sprite
     layers:
@@ -101,12 +101,12 @@
     zeroVisible: false
 
 - type: entity
-  id: MagazineUniversalMagnumUranium
-  name: "mk 32 'Universal' magazine (.45 magnum uranium)"
+  id: MagazineUSP45ACPUranium
+  name: "mk 32 'Universal' magazine (.45 ACP uranium)"
   parent: BaseMagazineUniversalMagnum
   components:
   - type: BallisticAmmoProvider
-    proto: CartridgeMagnumUranium
+    proto: Cartridge45ACPUranium
     capacity: 12
   - type: Sprite
     layers:
@@ -120,12 +120,12 @@
     zeroVisible: false
 
 - type: entity
-  id: MagazineUniversalMagnumShrapnel
-  name: "mk 32 'Universal' magazine (.45 magnum shrapnel)"
+  id: MagazineUSP45ACPShrapnel
+  name: "mk 32 'Universal' magazine (.45 ACP shrapnel)"
   parent: BaseMagazineUniversalMagnum
   components:
   - type: BallisticAmmoProvider
-    proto: CartridgeMagnumShrapnel
+    proto: Cartridge45ACPShrapnel
     capacity: 12
   - type: Sprite
     layers:

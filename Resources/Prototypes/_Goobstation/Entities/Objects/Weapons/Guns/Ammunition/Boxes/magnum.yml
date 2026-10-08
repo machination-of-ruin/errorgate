@@ -1,23 +1,23 @@
 - type: entity
   id: BaseMagazineBoxMagnumExtended
-  parent: BaseMagazineBoxMagnum
+  parent: BaseAmmoBox357Magnum
   abstract: true
   components:
   - type: BallisticAmmoProvider
     mayTransfer: true
     whitelist:
       tags:
-        - CartridgeMagnum
-    proto: CartridgeMagnum
+        - Cartridge357Magnum
+    proto: Cartridge357Magnum
     capacity: 16
 
 - type: entity
-  id: MagazineBoxMagnumEnsnaring
+  id: AmmoBox357MagnumEnsnaring
   parent: BaseMagazineBoxMagnumExtended
-  name: ammunition box (.45 magnum ensnaring)
+  name: ammunition box (.357 Magnum ensnaring)
   components:
   - type: BallisticAmmoProvider
-    proto: CartridgeMagnumEnsnaring
+    proto: Cartridge357MagnumEnsnaring
   - type: Sprite
     layers:
     - state: base
@@ -28,12 +28,12 @@
       color: "#cfff77"
 
 # - type: entity
-#   id: MagazineBoxMagnumEMP
+#   id: AmmoBox357MagnumEMP
 #   parent: BaseMagazineBoxMagnumExtended
-#   name: ammunition box (.45 magnum EMP)
+#   name: ammunition box (.357 Magnum EMP)
 #   components:
 #   - type: BallisticAmmoProvider
-#     proto: CartridgeMagnumEMP
+#     proto: Cartridge357MagnumEMP
 #   - type: Sprite
 #     layers:
 #     - state: base
@@ -44,12 +44,12 @@
 #       color: "#009eff"
 
 - type: entity
-  id: MagazineBoxMagnumFlash
+  id: AmmoBox357MagnumFlash
   parent: BaseMagazineBoxMagnumExtended
-  name: ammunition box (.45 magnum flash)
+  name: ammunition box (.357 Magnum flash)
   components:
   - type: BallisticAmmoProvider
-    proto: CartridgeMagnumFlash
+    proto: Cartridge357MagnumFlash
   - type: Sprite
     layers:
     - state: base

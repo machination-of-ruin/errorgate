@@ -44,21 +44,21 @@
     slots:
       gun_magazine:
         name: Magazine
-        startingItem: MagazinePistolSubMachineGun
+        startingItem: Magazine9x19SubMachineGun
         insertSound: /Audio/Weapons/Guns/MagIn/smg_magin.ogg
         ejectSound: /Audio/Weapons/Guns/MagOut/smg_magout.ogg
         priority: 2
         whitelist:
           tags:
-          - MagazinePistolSubMachineGun
+          - Magazine9x19SubMachineGun
         whitelistFailPopup: gun-magazine-whitelist-fail
       gun_chamber:
         name: Chamber
-        startingItem: CartridgePistol
+        startingItem: Cartridge9x19
         priority: 1
         whitelist:
           tags:
-          - CartridgePistol
+          - Cartridge9x19
   - type: ContainerContainer
     containers:
       gun_magazine: !type:ContainerSlot
@@ -105,7 +105,7 @@
   name: Atreides
   parent: [BaseWeaponSubMachineGun, BaseMajorContraband, BaseGunWieldable] # WD EDIT: BaseGunWieldable
   id: WeaponSubMachineGunAtreides
-  description: Pla-ket-ket-ket-ket! Uses .35 auto ammo.
+  description: Pla-ket-ket-ket-ket! Uses 9x19mm ammo.
   components:
   - type: Sprite
     sprite: Objects/Weapons/Guns/SMGs/atreides.rsi
@@ -134,7 +134,7 @@
   name: C-20r submachine gun
   parent: [BaseWeaponSubMachineGun, BaseSyndicateContraband, BaseGunWieldable] # WD EDIT: BaseGunWieldable
   id: WeaponSubMachineGunC20r
-  description: Manufactured by Cybersun-Armaments, the C-20r is one of the most popular personal small-arms in the Coalition of Colonies. Uses .35 auto ammo.
+  description: Manufactured by Cybersun-Armaments, the C-20r is one of the most popular personal small-arms in the Coalition of Colonies. Uses 9x19mm ammo.
   components:
   - type: Sprite
     sprite: Objects/Weapons/Guns/SMGs/c20r.rsi
@@ -182,7 +182,7 @@
   name: C-20r sub machine gun
   parent: [WeaponSubMachineGunC20r]
   id: WeaponSubMachineGunC20rEmpty
-  description: Manufactured by Cybersun-Armaments, the C-20r is one of the most popular personal small-arms in the Coalition of Colonies. Uses .35 auto ammo.
+  description: Manufactured by Cybersun-Armaments, the C-20r is one of the most popular personal small-arms in the Coalition of Colonies. Uses 9x19mm ammo.
   components:
   - type: ItemSlots
     slots:
@@ -194,7 +194,7 @@
         priority: 2
         whitelist:
           tags:
-          - MagazinePistolSubMachineGun
+          - Magazine9x19SubMachineGun
         whitelistFailPopup: gun-magazine-whitelist-fail
       gun_chamber:
         name: Chamber
@@ -202,7 +202,7 @@
         priority: 1
         whitelist:
           tags:
-          - CartridgePistol
+          - Cartridge9x19
 
 - type: entity
   name: antique C-20r submachine gun
@@ -249,21 +249,21 @@
     slots:
       gun_magazine:
         name: Magazine
-        startingItem: MagazinePistolSubMachineGun
+        startingItem: Magazine9x19SubMachineGun
         insertSound: /Audio/Weapons/Guns/MagIn/smg_magin.ogg
         ejectSound: /Audio/Weapons/Guns/MagOut/smg_magout.ogg
         priority: 2
         whitelist:
           tags:
-          - MagazinePistolSubMachineGun
+          - Magazine9x19SubMachineGun
         whitelistFailPopup: gun-magazine-whitelist-fail
       gun_chamber:
         name: Chamber
-        startingItem: CartridgePistol
+        startingItem: Cartridge9x19
         priority: 1
         whitelist:
           tags:
-          - CartridgePistol
+          - Cartridge9x19
   - type: MagazineVisuals
     magState: mag
     steps: 1
@@ -279,7 +279,7 @@
   name: WT550
   parent: [BaseWeaponSubMachineGun, BaseSecurityContraband, BaseGunWieldable] # WD EDIT: BaseGunWieldable
   id: WeaponSubMachineGunWt550
-  description: An excellent SMG, produced by NanoTrasen's Small Arms Division. Uses .35 auto ammo.
+  description: An excellent SMG, produced by NanoTrasen's Small Arms Division. Uses 9x19mm ammo.
   components:
   - type: Sprite
     sprite: Objects/Weapons/Guns/SMGs/wt550.rsi
@@ -319,21 +319,21 @@
     slots:
       gun_magazine:
         name: Magazine
-        startingItem: MagazinePistolSubMachineGunTopMounted
+        startingItem: Magazine9x19SubMachineGunTopMounted
         insertSound: /Audio/Weapons/Guns/MagIn/smg_magin.ogg
         ejectSound: /Audio/Weapons/Guns/MagOut/smg_magout.ogg
         priority: 2
         whitelist:
           tags:
-          - MagazinePistolSubMachineGunTopMounted
+          - Magazine9x19SubMachineGunTopMounted
         whitelistFailPopup: gun-magazine-whitelist-fail
       gun_chamber:
         name: Chamber
-        startingItem: CartridgePistol
+        startingItem: Cartridge9x19
         priority: 1
         whitelist:
           tags:
-          - CartridgePistol
+          - Cartridge9x19
   - type: MagazineVisuals
     magState: mag
     steps: 9 # WWDP edit

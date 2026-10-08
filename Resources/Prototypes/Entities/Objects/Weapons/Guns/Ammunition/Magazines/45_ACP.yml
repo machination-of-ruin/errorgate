@@ -1,0 +1,263 @@
+- type: entity
+  id: BaseMagazine45ACP
+  name: pistol magazine (.45 ACP)
+  parent: [ BaseMagazine9x19, BaseSecurityContraband ]
+  abstract: true
+  components:
+  - type: Tag
+    tags:
+      - Magazine45ACP
+  - type: BallisticAmmoProvider
+    mayTransfer: true
+    whitelist:
+      tags:
+        - Cartridge45ACP
+    capacity: 7
+
+- type: entity
+  id: BaseMagazine45ACPSubMachineGun
+  name: SMG magazine (.45 ACP)
+  parent: BaseItem
+  abstract: true
+  components:
+  - type: Tag
+    tags:
+      - Magazine45ACPSubMachineGun
+  - type: BallisticAmmoProvider
+    mayTransfer: true
+    whitelist:
+      tags:
+        - Cartridge45ACP
+    capacity: 25
+  - type: Item
+    size: Small
+  - type: ContainerContainer
+    containers:
+      ballistic-ammo: !type:Container
+  - type: Sprite
+    sprite: Objects/Weapons/Guns/Ammunition/Magazine/Magnum/magnum_smg_mag.rsi
+    layers:
+    - state: base
+      map: ["enum.GunVisualLayers.Base"]
+    - state: mag-1
+      map: ["enum.GunVisualLayers.Mag"]
+  - type: MagazineVisuals
+    magState: mag
+    steps: 2
+    zeroVisible: false
+  - type: Appearance
+
+- type: entity
+  id: Magazine45ACPEmpty
+  name: pistol magazine (.45 ACP any)
+  suffix: empty
+  parent: BaseMagazine45ACP
+  components:
+  - type: BallisticAmmoProvider
+    proto: null
+  - type: Sprite
+    layers:
+    - state: base
+      map: ["enum.GunVisualLayers.Base"]
+    - state: mag-1
+      map: ["enum.GunVisualLayers.Mag"]
+
+- type: entity
+  id: Magazine45ACP
+  name: pistol magazine (.45 ACP)
+  parent: BaseMagazine45ACP
+  components:
+  - type: BallisticAmmoProvider
+    proto: Cartridge45ACP
+  - type: Sprite
+    layers:
+    - state: red
+      map: ["enum.GunVisualLayers.Base"]
+    - state: mag-1
+      map: ["enum.GunVisualLayers.Mag"]
+
+- type: entity
+  id: Magazine45ACPPractice
+  name: pistol magazine (.45 ACP practice)
+  parent: BaseMagazine45ACP
+  components:
+  - type: BallisticAmmoProvider
+    proto: Cartridge45ACPPractice
+  - type: Sprite
+    layers:
+    - state: practice
+      map: ["enum.GunVisualLayers.Base"]
+    - state: mag-1
+      map: ["enum.GunVisualLayers.Mag"]
+
+- type: entity
+  id: Magazine45ACPIncendiary
+  name: pistol magazine (.45 ACP incendiary)
+  parent: BaseMagazine45ACP
+  components:
+  - type: BallisticAmmoProvider
+    proto: Cartridge45ACPIncendiary
+  - type: Sprite
+    layers:
+    - state: red
+      map: ["enum.GunVisualLayers.Base"]
+    - state: mag-1
+      map: ["enum.GunVisualLayers.Mag"]
+
+- type: entity
+  id: Magazine45ACPUranium
+  name: pistol magazine (.45 ACP uranium)
+  parent: BaseMagazine45ACP
+  components:
+  - type: BallisticAmmoProvider
+    proto: Cartridge45ACPUranium
+  - type: Sprite
+    layers:
+    - state: uranium
+      map: ["enum.GunVisualLayers.Base"]
+    - state: mag-1
+      map: ["enum.GunVisualLayers.Mag"]
+
+- type: entity
+  id: Magazine45ACPAP
+  name: pistol magazine (.45 ACP armor-piercing)
+  parent: BaseMagazine45ACP
+  components:
+  - type: BallisticAmmoProvider
+    proto: Cartridge45ACPAP
+  - type: Sprite
+    layers:
+    - state: piercing
+      map: ["enum.GunVisualLayers.Base"]
+    - state: mag-1
+      map: ["enum.GunVisualLayers.Mag"]
+
+
+- type: entity
+  id: Magazine45ACPShrapnel
+  name: pistol magazine (.45 ACP shrapnel)
+  parent: BaseMagazine45ACP
+  components:
+  - type: BallisticAmmoProvider
+    proto: Cartridge45ACPShrapnel
+  - type: Sprite
+    layers:
+    - state: red
+      map: ["enum.GunVisualLayers.Base"]
+    - state: mag-1
+      map: ["enum.GunVisualLayers.Mag"]
+
+- type: entity
+  id: Magazine45ACPSubMachineGunEmpty
+  name: SMG magazine (.45 ACP any)
+  suffix: empty
+  parent: BaseMagazine45ACPSubMachineGun
+  components:
+  - type: BallisticAmmoProvider
+    proto: null
+  - type: Sprite
+    layers:
+    - state: base
+      map: ["enum.GunVisualLayers.Base"]
+    - state: mag-1
+      map: ["enum.GunVisualLayers.Mag"]
+
+- type: entity
+  id: Magazine45ACPSubMachineGun
+  name: SMG magazine (.45 ACP)
+  parent: BaseMagazine45ACPSubMachineGun
+  components:
+  - type: BallisticAmmoProvider
+    proto: Cartridge45ACP
+  - type: Sprite
+    layers:
+    - state: red
+      map: ["enum.GunVisualLayers.Base"]
+    - state: mag-1
+      map: ["enum.GunVisualLayers.Mag"]
+
+- type: entity
+  id: Magazine45ACPSubMachineGunPractice
+  name: SMG magazine (.45 ACP practice)
+  parent: BaseMagazine45ACPSubMachineGun
+  components:
+  - type: BallisticAmmoProvider
+    proto: Cartridge45ACPPractice
+  - type: Sprite
+    layers:
+    - state: practice
+      map: ["enum.GunVisualLayers.Base"]
+    - state: mag-1
+      map: ["enum.GunVisualLayers.Mag"]
+
+- type: entity
+  id: Magazine45ACPSubMachineGunUranium
+  name: SMG magazine (.45 ACP uranium)
+  parent: BaseMagazine45ACPSubMachineGun
+  components:
+  - type: BallisticAmmoProvider
+    proto: Cartridge45ACPUranium
+  - type: Sprite
+    layers:
+    - state: uranium
+      map: ["enum.GunVisualLayers.Base"]
+    - state: mag-1
+      map: ["enum.GunVisualLayers.Mag"]
+
+- type: entity
+  id: Magazine45ACPSubMachineGunPiercing
+  name: SMG magazine (.45 ACP armour-piercing)
+  parent: BaseMagazine45ACPSubMachineGun
+  components:
+  - type: BallisticAmmoProvider
+    proto: Cartridge45ACPAP
+  - type: Sprite
+    layers:
+    - state: piercing
+      map: ["enum.GunVisualLayers.Base"]
+    - state: mag-1
+      map: ["enum.GunVisualLayers.Mag"]
+
+- type: entity
+  id: Magazine45ACPSubMachineGunAP
+  name: "SMG magazine (.45 ACP AP)"
+  parent: BaseMagazine45ACPSubMachineGun
+  components:
+  - type: BallisticAmmoProvider
+    proto: Cartridge45ACPAP
+  - type: Sprite
+    layers:
+    - state: piercing
+      map: ["enum.GunVisualLayers.Base"]
+    - state: mag-1
+      map: ["enum.GunVisualLayers.Mag"]
+
+- type: entity
+  id: BaseMagazineUSP45ACP
+  name: "USP magazine (.45 ACP)"
+  parent: BaseMagazine45ACP
+  abstract: true
+  components:
+  - type: Tag
+    tags:
+    - MagazineUSP45ACP
+  - type: BallisticAmmoProvider
+    whitelist:
+      tags:
+      - Cartridge45ACP
+    proto: Cartridge45ACP
+    capacity: 12
+  - type: Item
+    size: Small
+  - type: Sprite
+    sprite: Nyanotrasen/Objects/Weapons/Guns/Ammunition/Magazine/Magnum/universal_mag.rsi
+    layers:
+    - state: base
+      map: ["enum.GunVisualLayers.Base"]
+    - state: mag-1
+      map: ["enum.GunVisualLayers.Mag"]
+  - type: MagazineVisuals
+    magState: mag
+    steps: 12
+    zeroVisible: false
+  - type: Appearance

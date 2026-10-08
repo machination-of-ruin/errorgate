@@ -37,7 +37,7 @@
 #   - !type:CharacterAgeRequirement
 #     min: 21
 #   items:
-#   - MagazineBoxLightRifle
+#   - AmmoBox762x39
 
 # - type: loadout
 #   id: LoadoutServiceBartenderBoxRifle
@@ -53,7 +53,7 @@
 #   - !type:CharacterAgeRequirement
 #     min: 21
 #   items:
-#   - MagazineBoxRifle
+#   - AmmoBox556x45
 
 # - type: loadout
 #   id: LoadoutServiceBartenderShotgunDoubleBarreledRubber
@@ -101,7 +101,7 @@
 #   - !type:CharacterAgeRequirement
 #     min: 21
 #   items:
-#   - MagazineBoxMagnum
+#   - AmmoBox357Magnum
 
 # - type: loadout
 #   id: LoadoutServiceBartenderArgenti

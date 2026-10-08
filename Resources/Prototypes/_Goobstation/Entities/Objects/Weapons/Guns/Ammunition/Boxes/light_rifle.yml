@@ -1,15 +1,15 @@
 - type: entity
-  parent: BaseMagazineBoxLightRifle
-  id: MagazineBoxLightRifleSubsonic
-  name: ammunition box (.30 rifle subsonic)
+  parent: BaseAmmoBox762x39
+  id: AmmoBox762x39Subsonic
+  name: ammunition box (7.62x39mm subsonic)
   components:
   - type: BallisticAmmoProvider
     capacity: 70
-    proto: CartridgeLightRifleSubsonic
+    proto: Cartridge762x39Subsonic
     mayTransfer: true
     whitelist:
       tags:
-        - CartridgeLightRifleSubsonic
+        - Cartridge762x39Subsonic
   - type: Sprite
     layers:
     - state: base

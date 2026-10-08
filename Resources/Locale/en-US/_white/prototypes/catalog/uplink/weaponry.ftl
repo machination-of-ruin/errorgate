@@ -1,8 +1,8 @@
 uplink-gun-case-viper-name = Viper
-uplink-gun-case-viper-desc = An easily concealed pistol with a switchable automatic mode. Comes in a case with two magazines (.35 auto).
+uplink-gun-case-viper-desc = An easily concealed pistol with a switchable automatic mode. Comes in a case with two magazines (9x19mm).
 
 uplink-gun-case-cobra-name = Cobra
-uplink-gun-case-cobra-desc = A reliable pistol with an integrated suppressor. Comes in a case with two magazines (.25 caseless).
+uplink-gun-case-cobra-desc = A reliable pistol with an integrated suppressor. Comes in a case with two magazines (6mm caseless).
 
 uplink-gun-case-dualetta-name = Dualetta kit
 uplink-gun-case-dualetta-desc = Two dualettas for a cheap price.
@@ -47,7 +47,7 @@ uplink-gun-case-l6-saw-name = L6 Saw
 uplink-gun-case-l6-saw-desc = The iconic L6 light machine gun, bundled with two extra box magazines (.30).
 
 uplink-gun-case-mpr10xyphos-name = MPr-10 Xyphos
-uplink-gun-case-mpr10xyphos-desc = Modification of a submachine gun into a close-range weapon (.35 auto).
+uplink-gun-case-mpr10xyphos-desc = Modification of a submachine gun into a close-range weapon (9x19mm).
 
 uplink-gun-case-cr12moros-name = CR-12 Moros
 uplink-gun-case-cr12moros-desc = The primary firearm of any Syndicate operative (.35).

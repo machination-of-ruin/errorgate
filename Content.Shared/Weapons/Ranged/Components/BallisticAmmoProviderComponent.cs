@@ -24,6 +24,18 @@ public sealed partial class BallisticAmmoProviderComponent : Component
 
     public int Count => UnspawnedCount + Container.ContainedEntities.Count;
 
+    /// <summary>
+    ///     ERRORGATE: spawn with a random number of rounds instead of a full load. Only for dedicated random prototypes.
+    /// </summary>
+    [ViewVariables(VVAccess.ReadWrite), DataField]
+    public bool RandomizeAmmo;
+
+    /// <summary>
+    ///     ERRORGATE: higher values bias the random load towards nearly empty.
+    /// </summary>
+    [ViewVariables(VVAccess.ReadWrite), DataField]
+    public float RandomizeAmmoBias = 5f;
+
     [ViewVariables(VVAccess.ReadWrite), DataField, AutoNetworkedField]
     public int UnspawnedCount;
 

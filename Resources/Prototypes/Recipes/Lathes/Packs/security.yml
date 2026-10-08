@@ -21,19 +21,19 @@
   id: SecurityPracticeStatic
   recipes:
   - BoxShotgunPractice
-  - MagazineBoxLightRiflePractice
-  - MagazineBoxMagnumPractice
-  - MagazineBoxPistolPractice
-  - MagazineBoxRiflePractice
+  - AmmoBox762x39Practice
+  - AmmoBox357MagnumPractice
+  - AmmoBox9x19Practice
+  - AmmoBox556x45Practice
   - WeaponDisablerPractice
   - WeaponLaserCarbinePractice
   - WeaponFlareGunSecurity
   # EE EDIT START
-  # - MagazineBoxCaselessRiflePractice - WD EDIT
+  # - AmmoBoxCaselessRiflePractice - WD EDIT
   # - MagazineBoxSpecialPractice - WD EDIT
-  - MagazineCaselessRiflePractice
-  # - MagazineCaselessRifleShortPractice - WD EDIT
-  # - MagazinePistolCaselessRiflePractice - WD EDIT
+  - Magazine6mmCaselessPractice
+  # - Magazine6mmCaselessShortPractice - WD EDIT
+  # - MagazinePistol6mmCaselessPractice - WD EDIT
   # EE EDIT END
 
 # Shared between secfab and emagged autolathe
@@ -42,25 +42,25 @@
   recipes:
   - BoxLethalshot
   - BoxShotgunSlug
-  - MagazineBoxLightRifle
-  - MagazineBoxMagnum
-  - MagazineBoxPistol
-  - MagazineBoxRifle
-  - MagazineLightRifle
-  - MagazineLightRifleEmpty
-  - MagazinePistol
-  - MagazinePistolEmpty
-  - MagazinePistolSubMachineGun
-  - MagazinePistolSubMachineGunEmpty
-  - MagazinePistolSubMachineGunTopMounted
-  - MagazinePistolSubMachineGunTopMountedEmpty
-  - MagazineRifle
-  - MagazineRifleEmpty
+  - AmmoBox762x39
+  - AmmoBox357Magnum
+  - AmmoBox9x19
+  - AmmoBox556x45
+  - Magazine762x39
+  - Magazine762x39Empty
+  - Magazine9x19
+  - Magazine9x19Empty
+  - Magazine9x19SubMachineGun
+  - Magazine9x19SubMachineGunEmpty
+  - Magazine9x19SubMachineGunTopMounted
+  - Magazine9x19SubMachineGunTopMountedEmpty
+  - Magazine556x45
+  - Magazine556x45Empty
   - MagazineShotgun
   - MagazineShotgunEmpty
   - MagazineShotgunSlug
-  - SpeedLoaderMagnum
-  - SpeedLoaderMagnumEmpty
+  - SpeedLoader357Magnum
+  - SpeedLoader357MagnumEmpty
   # EE EDIT START
   - BoxBeanbag
   - BoxShellTranquilizer
@@ -68,25 +68,25 @@
   - BoxShotgun00Buckshot
   - BoxShotgun0000Buckshot
   - BoxShotgunLumen
-  # - MagazineBoxCaselessRifle - WD EDIT
+  # - AmmoBoxCaselessRifle - WD EDIT
   # - MagazineBoxSpecial - WD EDIT
-  - MagazineCaselessRifle
-  # - MagazineCaselessRifleShort - WD EDIT
-  # - MagazineLightRifleLowCapacity - WD EDIT
-  # - MagazineLightRifleLowCapacityEmpty - WD EDIT
-  - MagazineLightRifleMarkOne
-  - MagazineLightRifleMarkOneEmpty
-  - MagazineMagnum
-  - MagazineMagnumEmpty
-  # - MagazineMagnumLeverRifle - WD EDIT
-  # - MagazineMagnumLeverRifleEmpty - WD EDIT
+  - Magazine6mmCaseless
+  # - Magazine6mmCaselessShort - WD EDIT
+  # - Magazine762x39LowCapacity - WD EDIT
+  # - Magazine762x39LowCapacityEmpty - WD EDIT
+  - Magazine762x39MarkOne
+  - Magazine762x39MarkOneEmpty
+  - Magazine45ACP
+  - Magazine45ACPEmpty
+  # - Magazine357MagnumLeverRifle - WD EDIT
+  # - Magazine357MagnumLeverRifleEmpty - WD EDIT
   # - MagazineNovaliteC1 - WD EDIT
   # - MagazineNovaliteC1Empty - WD EDIT
-  # - MagazinePistolCaselessRifle - WD EDIT
-  # - MagazinePistolSpecial - WD EDIT
+  # - MagazinePistol6mmCaseless - WD EDIT
+  # - Magazine9x19Special - WD EDIT
   - MagazineShotgunBeanbag
-  - MagazineUniversalMagnum
-  - MagazineUniversalMagnumEmpty
+  - MagazineUSP45ACP
+  - MagazineUSP45ACPEmpty
   # - SpeedLoaderRifleHeavy - WD EDIT
   # - SpeedLoaderRifleHeavyEmpty - WD EDIT
   # - SpeedLoaderSpecial - WD EDIT
@@ -157,51 +157,51 @@
   - BoxShotgunIncendiary
   - BoxShotgunUranium
   # - BoxShellTranquilizer - EE EDIT: moved to static
-  - MagazineBoxLightRifleIncendiary
-  - MagazineBoxLightRifleUranium
-  - MagazineBoxMagnumIncendiary
-  - MagazineBoxMagnumUranium
-  - MagazineBoxPistolIncendiary
-  - MagazineBoxPistolUranium
-  - MagazineBoxRifleIncendiary
-  - MagazineBoxRifleUranium
-  - MagazineLightRifleIncendiary
-  - MagazineLightRifleUranium
-  - MagazinePistolIncendiary
-  - MagazinePistolUranium
-  - MagazinePistolSubMachineGunIncendiary
-  - MagazinePistolSubMachineGunUranium
-  - MagazineRifleIncendiary
-  - MagazineRifleUranium
+  - AmmoBox762x39Incendiary
+  - AmmoBox762x39Uranium
+  - AmmoBox357MagnumIncendiary
+  - AmmoBox357MagnumUranium
+  - AmmoBox9x19Incendiary
+  - AmmoBox9x19Uranium
+  - AmmoBox556x45Incendiary
+  - AmmoBox556x45Uranium
+  - Magazine762x39Incendiary
+  - Magazine762x39Uranium
+  - Magazine9x19Incendiary
+  - Magazine9x19Uranium
+  - Magazine9x19SubMachineGunIncendiary
+  - Magazine9x19SubMachineGunUranium
+  - Magazine556x45Incendiary
+  - Magazine556x45Uranium
   # - MagazineShotgunBeanbag - EE EDIT: moved to static
   - MagazineShotgunIncendiary
-  - SpeedLoaderMagnumIncendiary
-  - SpeedLoaderMagnumUranium
+  - SpeedLoader357MagnumIncendiary
+  - SpeedLoader357MagnumUranium
   # EE EDIT START
   - ShellSoulbreaker
-  - MagazineBoxCaselessRifleIncendiary
-  - MagazineBoxCaselessRifleShrapnel
-  - MagazineBoxCaselessRifleUranium
-  - MagazineBoxLightRifleShrapnel
-  - MagazineBoxMagnumShrapnel
-  - MagazineBoxPistolShrapnel
-  - MagazineBoxRifleShrapnel
+  - AmmoBoxCaselessRifleIncendiary
+  - AmmoBoxCaselessRifleShrapnel
+  - AmmoBoxCaselessRifleUranium
+  - AmmoBox762x39Shrapnel
+  - AmmoBox357MagnumShrapnel
+  - AmmoBox9x19Shrapnel
+  - AmmoBox556x45Shrapnel
   - MagazineBoxSpecialIncendiary
   - MagazineBoxSpecialUranium
   - MagazineBoxSpecialMindbreaker
-  - MagazineCaselessRifleShrapnel
-  - MagazineCaselessRifleIncendiary
-  - MagazineCaselessRifleUranium
-  - MagazineLightRifleShrapnel
-  - MagazineMagnumIncendiary
-  - MagazineMagnumShrapnel
-  - MagazineMagnumUranium
-  - MagazinePistolShrapnel
-  - MagazinePistolSubMachineGunShrapnel
-  - MagazineRifleShrapnel
-  - MagazineUniversalMagnumUranium
-  - MagazineUniversalMagnumIncendiary
-  - MagazineUniversalMagnumShrapnel
+  - Magazine6mmCaselessShrapnel
+  - Magazine6mmCaselessIncendiary
+  - Magazine6mmCaselessUranium
+  - Magazine762x39Shrapnel
+  - Magazine45ACPIncendiary
+  - Magazine45ACPShrapnel
+  - Magazine45ACPUranium
+  - Magazine9x19Shrapnel
+  - Magazine9x19SubMachineGunShrapnel
+  - Magazine556x45Shrapnel
+  - MagazineUSP45ACPUranium
+  - MagazineUSP45ACPIncendiary
+  - MagazineUSP45ACPShrapnel
   - SpeedLoaderRifleHeavyIncendiary
   - SpeedLoaderRifleHeavyUranium
   # EE EDIT END
@@ -209,12 +209,12 @@
   - BoxBreach
   - BoxFrag
   - BoxLaser
-  - MagazineLightRifleLowCapacity
-  - MagazineLightRifleLowCapacityEmpty
+  - Magazine762x39LowCapacity
+  - Magazine762x39LowCapacityEmpty
   - SpeedLoaderRifleHeavy
   - SpeedLoaderRifleHeavyEmpty
-  - MagazineMagnumLeverRifle
-  - MagazineMagnumLeverRifleEmpty
+  - Magazine357MagnumLeverRifle
+  - Magazine357MagnumLeverRifleEmpty
   - MagazineNovaliteC1
   - MagazineNovaliteC1Empty
   - MagazineShotgunBreach

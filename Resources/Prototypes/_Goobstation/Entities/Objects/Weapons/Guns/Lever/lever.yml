@@ -17,22 +17,22 @@
     slots:
       gun_magazine:
         name: Magazine
-        startingItem: MagazineMagnumLeverRifle
+        startingItem: Magazine357MagnumLeverRifle
         insertSound: /Audio/Weapons/Guns/MagIn/rifle_load.ogg
         ejectSound: /Audio/Weapons/Guns/MagOut/sfrifle_magout.ogg
         priority: 2
         whitelist:
           tags:
-          - MagazineMagnumLeverRifle
+          - Magazine357MagnumLeverRifle
       gun_chamber:
         name: Chamber
         priority: 1
         whitelist:
           tags:
-          - CartridgeMagnum
+          - Cartridge357Magnum
   - type: Gun
     fireRate: 0.8
-    damageModifier: 1.65 # BSO exclusive rifle shooting .45 magnum rounds
+    damageModifier: 1.65 # BSO exclusive rifle shooting .357 Magnum rounds
     soundGunshot:
       path: /Audio/Weapons/Guns/Gunshots/batrifle.ogg
   - type: ChamberMagazineAmmoProvider

@@ -1,10 +1,10 @@
 - type: entity
-  id: CartridgeMagnumEnsnaring
-  name: cartridge (.45 magnum ensnaring)
-  parent: BaseCartridgeMagnum
+  id: Cartridge357MagnumEnsnaring
+  name: cartridge (.357 Magnum ensnaring)
+  parent: BaseCartridge357Magnum
   components:
   - type: CartridgeAmmo
-    proto: BulletMagnumEnsnaring
+    proto: Bullet357MagnumEnsnaring
   - type: Sprite
     layers:
       - state: base
@@ -14,12 +14,12 @@
         color: "#cfff77"
 
 # - type: entity
-#   id: CartridgeMagnumEMP
-#   name: cartridge (.45 magnum EMP)
-#   parent: BaseCartridgeMagnum
+#   id: Cartridge357MagnumEMP
+#   name: cartridge (.357 Magnum EMP)
+#   parent: BaseCartridge357Magnum
 #   components:
 #   - type: CartridgeAmmo
-#     proto: BulletMagnumEMP
+#     proto: Bullet357MagnumEMP
 #   - type: Sprite
 #     layers:
 #       - state: base
@@ -29,12 +29,12 @@
 #         color: "#009eff"
 
 - type: entity
-  id: CartridgeMagnumFlash
-  name: cartridge (.45 magnum flash)
-  parent: BaseCartridgeMagnum
+  id: Cartridge357MagnumFlash
+  name: cartridge (.357 Magnum flash)
+  parent: BaseCartridge357Magnum
   components:
   - type: CartridgeAmmo
-    proto: BulletMagnumFlash
+    proto: Bullet357MagnumFlash
   - type: Sprite
     layers:
       - state: base

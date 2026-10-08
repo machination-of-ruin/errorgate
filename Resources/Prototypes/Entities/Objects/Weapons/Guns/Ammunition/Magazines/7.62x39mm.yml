@@ -1,0 +1,207 @@
+# Empty mags
+- type: entity
+  id: BaseMagazine762x39
+  name: "magazine (7.62x39mm)"
+  parent: [ BaseItem, BaseSecurityContraband ]
+  abstract: true
+  components:
+  - type: Tag
+    tags:
+      - Magazine762x39
+  - type: BallisticAmmoProvider
+    mayTransfer: true
+    whitelist:
+      tags:
+        - Cartridge762x39
+    proto: Cartridge762x39
+    capacity: 30
+  - type: Item
+    size: Small
+  - type: ContainerContainer
+    containers:
+      ballistic-ammo: !type:Container
+  - type: Sprite
+    sprite: Objects/Weapons/Guns/Ammunition/Magazine/LightRifle/light_rifle_mag.rsi
+    layers:
+    - state: base
+      map: ["enum.GunVisualLayers.Base"]
+    - state: mag-1
+      map: ["enum.GunVisualLayers.Mag"]
+  - type: MagazineVisuals
+    magState: mag
+    steps: 2
+    zeroVisible: false
+  - type: Appearance
+
+# Magazines
+- type: entity
+  id: Magazine762x39Box
+  name: "box magazine (7.62x39mm)"
+  parent: BaseMagazine762x39
+  components:
+  - type: Tag
+    tags:
+      - Magazine762x39Box
+  - type: BallisticAmmoProvider
+    proto: Cartridge762x39
+    capacity: 100
+  - type: Item
+  - type: Sprite
+    sprite: Objects/Weapons/Guns/Ammunition/Magazine/LightRifle/light_rifle_box.rsi
+  - type: MagazineVisuals
+    magState: mag
+    steps: 8
+    zeroVisible: false
+  - type: Appearance
+
+- type: entity
+  id: Magazine762x39BoxPractice
+  name: "box magazine (7.62x39mm practice)"
+  parent: Magazine762x39Box
+  components:
+  - type: BallisticAmmoProvider
+    proto: Cartridge762x39Practice
+
+- type: entity
+  id: Magazine762x39BoxIncendiary
+  name: "box magazine (7.62x39mm incendiary)"
+  parent: Magazine762x39Box
+  components:
+  - type: BallisticAmmoProvider
+    proto: Cartridge762x39Incendiary
+
+- type: entity
+  id: Magazine762x39BoxUranium
+  name: "box magazine (7.62x39mm uranium)"
+  parent: Magazine762x39Box
+  components:
+  - type: BallisticAmmoProvider
+    proto: Cartridge762x39Uranium
+
+- type: entity
+  id: Magazine762x39BoxShrapnel
+  name: "L6 SAW magazine box (7.62x39mm shrapnel)"
+  parent: Magazine762x39Box
+  components:
+  - type: BallisticAmmoProvider
+    proto: Cartridge762x39Shrapnel
+
+- type: entity
+  id: Magazine762x39
+  name: "magazine (7.62x39mm)"
+  parent: BaseMagazine762x39
+  components:
+  - type: BallisticAmmoProvider
+    proto: Cartridge762x39
+  - type: Sprite
+    layers:
+    - state: red
+      map: ["enum.GunVisualLayers.Base"]
+    - state: mag-1
+      map: ["enum.GunVisualLayers.Mag"]
+
+- type: entity
+  id: Magazine762x39Empty
+  name: "magazine (7.62x39mm any)"
+  suffix: empty
+  parent: Magazine762x39
+  components:
+  - type: BallisticAmmoProvider
+    proto: null
+  - type: Sprite
+    layers:
+    - state: base
+      map: ["enum.GunVisualLayers.Base"]
+    - state: mag-1
+      map: ["enum.GunVisualLayers.Mag"]
+
+- type: entity
+  id: Magazine762x39Practice
+  name: "magazine (7.62x39mm practice)"
+  parent: BaseMagazine762x39
+  components:
+  - type: BallisticAmmoProvider
+    proto: Cartridge762x39Practice
+  - type: Sprite
+    layers:
+    - state: practice
+      map: ["enum.GunVisualLayers.Base"]
+    - state: mag-1
+      map: ["enum.GunVisualLayers.Mag"]
+
+- type: entity
+  id: Magazine762x39Uranium
+  name: "magazine (7.62x39mm uranium)"
+  parent: BaseMagazine762x39
+  components:
+  - type: BallisticAmmoProvider
+    proto: Cartridge762x39Uranium
+  - type: Sprite
+    layers:
+    - state: uranium
+      map: ["enum.GunVisualLayers.Base"]
+    - state: mag-1
+      map: ["enum.GunVisualLayers.Mag"]
+
+- type: entity
+  id: Magazine762x39Incendiary
+  name: "magazine (7.62x39mm incendiary)"
+  parent: Magazine762x39
+  components:
+  - type: BallisticAmmoProvider
+    proto: Cartridge762x39Incendiary
+
+- type: entity
+  id: Magazine762x39Shrapnel
+  name: "magazine (7.62x39mm shrapnel)"
+  parent: BaseMagazine762x39
+  components:
+  - type: BallisticAmmoProvider
+    proto: Cartridge762x39Shrapnel
+
+- type: entity
+  id: Magazine762x39Maxim
+  name: "pan magazine (7.62x39mm)"
+  parent: BaseMagazine762x39
+  components:
+  - type: Tag
+    tags:
+      - Magazine762x39Pan
+  - type: BallisticAmmoProvider
+    proto: Cartridge762x39
+    capacity: 96
+  - type: Sprite
+    sprite: Objects/Weapons/Guns/Ammunition/Magazine/LightRifle/maxim.rsi
+
+- type: entity
+  id: Magazine762x39PkBox
+  name: "PK munitions box (7.62x39mm)"
+  parent: BaseMagazine762x39
+  components:
+  - type: Tag
+    tags:
+      - Magazine762x39Box
+  - type: BallisticAmmoProvider
+    proto: Cartridge762x39
+    capacity: 80
+  - type: Sprite
+    sprite: Objects/Weapons/Guns/Ammunition/Magazine/LightRifle/pk_box.rsi
+  - type: MagazineVisuals
+    magState: mag
+    steps: 8
+    zeroVisible: false
+  - type: Appearance
+
+- type: entity
+  id: Magazine762x39Short
+  name: "short magazine (7.62x39)"
+  parent: Magazine762x39
+  components:
+  - type: BallisticAmmoProvider
+    capacity: 20
+  - type: Sprite
+    layers:
+    - state: short
+      map: ["enum.GunVisualLayers.Base"]
+    - state: mag-1
+      map: ["enum.GunVisualLayers.Mag"]

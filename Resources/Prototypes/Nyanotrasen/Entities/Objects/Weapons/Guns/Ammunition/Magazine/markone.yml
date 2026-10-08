@@ -1,8 +1,8 @@
 - type: entity
-  id: MagazineLightRifleMarkOneEmpty
-  name: "mark 1 rifle en-bloc (.30 rifle any)"
+  id: Magazine762x39MarkOneEmpty
+  name: "mark 1 rifle en-bloc (7.62x39mm any)"
   suffix: empty
-  parent: MagazineLightRifle
+  parent: Magazine762x39
   components:
   - type: Tag
     tags:
@@ -25,15 +25,15 @@
     zeroVisible: false
 
 - type: entity
-  id: MagazineLightRifleMarkOne
-  name: "mark 1 rifle en-bloc (.30 rifle)"
-  parent: BaseMagazineLightRifle
+  id: Magazine762x39MarkOne
+  name: "mark 1 rifle en-bloc (7.62x39mm)"
+  parent: BaseMagazine762x39
   components:
   - type: Tag
     tags:
     - MagazineMarkOne
   - type: BallisticAmmoProvider
-    proto: CartridgeLightRifle
+    proto: Cartridge762x39
     capacity: 8
   - type: Item
     size: Tiny

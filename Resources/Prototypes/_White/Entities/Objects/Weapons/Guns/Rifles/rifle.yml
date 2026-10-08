@@ -1,4 +1,4 @@
-﻿- type: entity
+- type: entity
   parent: BaseWeaponRifle
   id: WeaponLightRifleAR31Hydra
   name: AR31 Hydra
@@ -31,20 +31,20 @@
     slots:
       gun_magazine:
         name: Magazine
-        startingItem: MagazineLightRifleAR31Hydra
+        startingItem: Magazine762x39AR31Hydra
         insertSound: /Audio/Weapons/Guns/MagIn/ltrifle_magin.ogg
         ejectSound: /Audio/Weapons/Guns/MagOut/ltrifle_magout.ogg
         priority: 2
         whitelist:
           tags:
-          - MagazineLightRifle
+          - Magazine762x39
       gun_chamber:
         name: Chamber
-        startingItem: CartridgeLightRifle
+        startingItem: Cartridge762x39
         priority: 1
         whitelist:
           tags:
-          - CartridgeLightRifle
+          - Cartridge762x39
   - type: ContainerContainer
     containers:
       gun_magazine: !type:ContainerSlot

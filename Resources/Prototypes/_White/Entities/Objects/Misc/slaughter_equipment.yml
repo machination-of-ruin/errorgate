@@ -161,7 +161,7 @@
     contents:
     - id: WeaponPistolDualetta
       amount: 2
-    - id: MagazinePistolHighCapacity
+    - id: Magazine9x19HighCapacity
       amount: 4
     - id: ClothingOuterVestWeb
     - id: ClothingHeadHelmetBasic
@@ -182,7 +182,7 @@
     contents:
     - id: WeaponRifleAk
     - id: ClothingHeadHelmetBasic
-    - id: MagazineLightRifle
+    - id: Magazine762x39
       amount: 4
     - id: ClothingOuterVestWeb
 
@@ -202,7 +202,7 @@
     contents:
     - id: WeaponSubMachineGunC20r
     - id: ClothingHeadHelmetBasic
-    - id: MagazinePistolSubMachineGun
+    - id: Magazine9x19SubMachineGun
       amount: 4
     - id: ClothingOuterVestWeb
 
@@ -222,7 +222,7 @@
     contents:
     - id: WeaponSubMachineGunWt550
     - id: ClothingHeadHelmetBasic
-    - id: MagazinePistolSubMachineGunTopMounted
+    - id: Magazine9x19SubMachineGunTopMounted
       amount: 4
     - id: ClothingOuterVestWeb
 
@@ -452,7 +452,7 @@
   - type: StorageFill
     contents:
     - id: ClothingOuterVestWeb
-    - id: MagazinePistol
+    - id: Magazine9x19
     - id: WeaponPistolMk58
     - id: ClothingHeadHatHoboCap
     - id: BallBatHomeRunSlaughterEquipment
