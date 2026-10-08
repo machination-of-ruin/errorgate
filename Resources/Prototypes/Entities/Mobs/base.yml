@@ -5,6 +5,7 @@
   id: BaseMob
   abstract: true
   components:
+  - type: DespawnDeadBody # ERRORGATE: corpses are gibbed after 10 minutes
   - type: Sprite
     noRot: true
     drawdepth: Mobs

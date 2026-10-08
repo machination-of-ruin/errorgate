@@ -1,0 +1,20 @@
+- type: reagent
+  id: ContaminatedWater
+  name: reagent-name-contaminated-water
+  group: Toxins
+  desc: reagent-desc-contaminated-water
+  physicalDesc: reagent-physical-desc-murky
+  flavor: bitter
+  color: "#6f8a5a"
+  boilingPoint: 100.0
+  meltingPoint: 0.0
+  metabolisms:
+    Poison:
+      effects:
+      - !type:HealthChange
+        ignoreResistances: true
+        damage:
+          types:
+            Poison: 5
+      - !type:ChemVomit
+        probability: 0.1

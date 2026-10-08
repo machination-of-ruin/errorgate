@@ -1,0 +1,82 @@
+- type: entity
+  id: SpikeTrap
+  parent: BaseStructure
+  name: spike trap
+  description: Watch your steps.
+  components:
+  - type: Sprite
+    noRot: true
+    sprite: Objects/Weapons/Traps/traps.rsi
+    layers:
+    - state: spikes
+  - type: Damageable
+    damageContainer: Inorganic
+    damageModifierSet: Wood
+  - type: Fixtures
+    fixtures:
+      slips:
+        shape:
+          !type:PhysShapeAabb
+          bounds: "-0.4,-0.4,0.4,0.4"
+        density: 60
+        hard: false
+        mask:
+        - MachineMask
+        layer:
+        - LowImpassable
+  - type: Construction
+    graph: SpikeTrapGraph
+    node: spikes
+  - type: Destructible
+    thresholds:
+    - trigger:
+        !type:DamageTrigger
+        damage: 20
+      behaviors:
+      - !type:DoActsBehavior
+        acts: [ "Destruction" ]
+  - type: Slippery
+    slipSound:
+      path: /Audio/Weapons/pierce.ogg
+    launchForwardsMultiplier: 0
+  - type: StepTrigger
+    intersectRatio: 0.2
+    requiredTriggeredSpeed: 3
+  - type: TriggerOnStepTrigger
+  - type: DamageUserOnTrigger
+    damage:
+      types:
+        Piercing: 25
+
+- type: construction
+  name: spike trap
+  id: SpikeTrap
+  graph: SpikeTrapGraph
+  startNode: start
+  targetNode: spikes
+  category: construction-category-furniture
+  description: Stabs anyone who is careless enough to step on it.
+  icon:
+    sprite: Objects/Weapons/Traps/traps.rsi
+    state: spikes
+  objectType: Structure
+  placementMode: SnapgridCenter
+  canBuildInImpassable: false
+  conditions:
+  - !type:TileNotBlocked
+
+- type: constructionGraph
+  id: SpikeTrapGraph
+  start: start
+  graph:
+  - node: start
+    edges:
+    - to: spikes
+      completed:
+      - !type:SnapToGrid { }
+      steps:
+      - material: WoodPlank
+        amount: 5
+        doAfter: 5
+  - node: spikes
+    entity: SpikeTrap

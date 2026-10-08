@@ -1,0 +1,184 @@
+# Unpowered, unwired, indestructible airlock for ERRORGATE.
+# Child prototypes cannot remove inherited components, so this derives from BaseStructure
+# and mirrors Airlock minus: Weldable, LayerChangeOnWeld, Wires, WiresPanel, WiresPanelSecurity,
+# WiresVisuals, Electrified (and its visuals), RCDDeconstructable, Destructible, Construction.
+- type: entity
+  id: AirlockTough
+  parent: BaseStructure
+  name: airlock
+  description: It opens, it closes, and maybe crushes you.
+  components:
+  - type: StationAiWhitelist
+  - type: MeleeSound
+    soundGroups:
+      Brute:
+        path:
+          "/Audio/Weapons/smash.ogg"
+  - type: InteractionOutline
+  - type: Sprite
+    sprite: Structures/Doors/Airlocks/Standard/basic.rsi
+    snapCardinals: true
+    noRot: true
+    layers:
+    - state: closed
+      map: ["enum.DoorVisualLayers.Base"]
+    - state: closed_unlit
+      shader: unshaded
+      map: ["enum.DoorVisualLayers.BaseUnlit"]
+      visible: false
+    - state: bolted_unlit
+      shader: unshaded
+      map: ["enum.DoorVisualLayers.BaseBolted"]
+    - state: emergency_unlit
+      map: ["enum.DoorVisualLayers.BaseEmergencyAccess"]
+      shader: unshaded
+  - type: AnimationPlayer
+  - type: Physics
+  - type: Fixtures
+    fixtures:
+      fix1:
+        shape:
+          !type:PhysShapeAabb
+          bounds: "-0.49,-0.49,0.49,0.49" # don't want this colliding with walls or they won't close
+        density: 100
+        mask:
+        - FullTileMask
+        layer:
+        - AirlockLayer
+  - type: ContainerFill
+    containers:
+      board: [ DoorElectronics ]
+  - type: AccessReader
+    containerAccessProvider: board
+  - type: Door
+    crushDamage:
+      types:
+        Blunt: 15
+    openSound:
+      path: /Audio/Machines/airlock_open.ogg
+    closeSound:
+      path: /Audio/Machines/airlock_close.ogg
+    denySound:
+      path: /Audio/Machines/airlock_deny.ogg
+  - type: ContainerContainer
+    containers:
+      board: !type:Container
+  - type: Airlock
+    animatePanel: false
+  - type: NavMapDoor
+  - type: DoorBolt
+  - type: Appearance
+  - type: ApcPowerReceiver
+    needsPower: false
+    powerLoad: 0
+  - type: DoorSignalControl
+  - type: DeviceNetwork
+    deviceNetId: Wireless
+    receiveFrequencyId: BasicDevice
+  - type: WirelessNetworkConnection
+    range: 200
+  - type: DeviceLinkSink
+    ports:
+    - Open
+    - Close
+    - Toggle
+    - AutoClose
+    - DoorBolt
+  - type: DeviceLinkSource
+    ports:
+    - DoorStatus
+    lastSignals:
+      DoorStatus: false
+  - type: SoundOnOverload
+  - type: SpawnOnOverload
+  - type: UserInterface
+    interfaces:
+      enum.AiUi.Key:
+        type: StationAiBoundUserInterface
+  - type: Airtight
+    noAirWhenFullyAirBlocked: false
+  - type: RadiationBlocker
+    resistance: 3
+  - type: Occluder
+  - type: Damageable
+    damageContainer: StructuralInorganic
+    damageModifierSet: StrongMetallic
+  - type: PlacementReplacement
+    key: walls
+  - type: PaintableAirlock
+    group: Standard
+    department: Civilian
+  - type: StaticPrice
+    price: 150
+  - type: LightningTarget
+    priority: 1
+  - type: Tag
+    tags:
+    - Airlock
+  - type: PryUnpowered
+  - type: BlockWeather
+  - type: InteractionVerbs
+    allowedVerbs:
+    - KnockOn
+  placement:
+    mode: SnapgridCenter
+
+- type: entity
+  parent: AirlockTough
+  name: Kuznetsk factory entrance
+  id: AirlockFactoryEntrance
+  suffix: ERRORGATE
+  components:
+  - type: Sprite
+    sprite: Structures/Doors/Airlocks/Standard/cargo.rsi
+  - type: PaintableAirlock
+    department: Logistics
+  - type: ContainerFill
+    containers:
+      board: [ DoorFactoryEntrance ]
+
+- type: entity
+  parent: DoorElectronics
+  id: DoorFactoryEntrance
+  suffix: Factory entrance
+  components:
+  - type: AccessReader
+    access: [["Factory"]]
+
+- type: entity
+  parent: BaseItem
+  id: AccessCardBase
+  name: access card
+  description: A card necessary to access secure areas.
+  abstract: true
+  components:
+  - type: Sprite
+    sprite: Objects/Misc/id_cards.rsi
+    scale: 0.7, 0.7
+  - type: Item
+    size: Small
+    heldPrefix: default
+    storedRotation: -90
+  - type: Access
+  - type: Tag
+    tags:
+    - DoorBumpOpener
+    - WhitelistChameleon
+
+- type: entity
+  parent: AccessCardBase
+  id: FactoryCard
+  description: "You can read the label: Kuznetsk factory worker"
+  suffix: ERRORGATE
+  components:
+  - type: Sprite
+    layers:
+    - state: default
+    - state: department
+      color: "#B18644"
+    - state: subdepartment
+      color: "#B18644"
+    - state: cargotechnician
+  - type: Access
+    tags:
+    - Factory

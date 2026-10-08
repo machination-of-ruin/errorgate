@@ -56,7 +56,6 @@
   id: ClothingOuterStorageBase
   components:
   - type: Storage
-    maxItemSize: Normal # ERRORGATE
     grid:
     - 0,0,3,2 # WWDP larger storage
   - type: ContainerContainer

@@ -4,7 +4,7 @@
   id: UnsensoredClothingUniformBase
   components:
   - type: Storage # ERRORGATE: the jumpsuit pockets, there are no pocket slots
-    maxItemSize: Normal
+    maxItemSize: Small # pocket sized, and small enough that a jumpsuit still fits in a toolbox
     grid:
     - 0,0,3,1
   - type: ContainerContainer

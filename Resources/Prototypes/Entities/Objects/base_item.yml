@@ -3,6 +3,7 @@
   id: BaseItem
   abstract: true
   components:
+  - type: DespawnItem # ERRORGATE: items left on the ground go away, their loot cap is freed
   - type: Item
     size: Small
   - type: Animateable

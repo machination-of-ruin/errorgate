@@ -32,8 +32,8 @@ public sealed class ImmersiveInteractionsTest
             flashlight = entMan.SpawnEntity("FlashlightLantern", coords);
 
             var inventory = entMan.System<InventorySystem>();
-            Assert.That(inventory.TryEquip(human, crowbar, "pocket1", force: true));
-            Assert.That(inventory.TryEquip(human, flashlight, "pocket2", force: true));
+            Assert.That(inventory.TryEquip(human, crowbar, "belt", force: true));
+            Assert.That(inventory.TryEquip(human, flashlight, "id", force: true));
         });
 
         await pair.RunTicksSync(5);

@@ -1,15 +1,4 @@
 - type: construction
-  name: cardboard box
-  id: BoxCardboard
-  graph: BoxCardboard
-  startNode: start
-  targetNode: boxcardboard
-  category: construction-category-storage
-  description: A small box for storing things.
-  icon: { sprite: _White/Objects/Storage/boxes.rsi, state: box_card_icon }
-  objectType: Item
-
-- type: construction
   name: box plastic
   id: BoxPlastic
   graph: BoxPlastic

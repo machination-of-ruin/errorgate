@@ -1,0 +1,52 @@
+# Rarity 1
+
+- type: lootEntry
+  id: WeaponShotgunDoubleBarreled
+  rarityTiers: [1]
+  locations: [Living, Church]
+
+- type: lootEntry
+  id: WeaponShotgunSawn
+  rarityTiers: [1, 2]
+  locations: [Prison, Industrial]
+
+- type: lootEntry
+  id: BoxShotgun00Buckshot
+  rarityTiers: [1, 2, 3]
+  locations: [Living, Church, Industrial, Security, Prison, Military]
+
+# Rarity 2
+
+- type: lootEntry
+  id: WeaponShotgunRemington
+  rarityTiers: [2]
+  locations: [Security, Military]
+
+- type: lootEntry
+  id: BoxShotgunSlug
+  rarityTiers: [2, 3]
+  locations: [Security, Military]
+
+# Rarity 3
+
+- type: lootEntry
+  id: WeaponShotgunBenelli
+  rarityTiers: [3]
+  locations: [Security, Military]
+
+- type: lootEntry
+  id: WeaponShotgunBulldog
+  rarityTiers: [3]
+  locations: [Military]
+  childEntries: [MagazineShotgun00Buckshot]
+
+- type: lootEntry
+  id: MagazineShotgun00Buckshot
+  rarityTiers: [3]
+  locations: [Military]
+
+- type: lootEntry
+  id: MagazineShotgunSlug
+  rarityTiers: [3]
+  locations: [Military]
+

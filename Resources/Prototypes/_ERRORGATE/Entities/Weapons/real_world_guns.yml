@@ -357,7 +357,7 @@
     sprite: Objects/Weapons/Guns/Revolvers/inspector.rsi
   - type: RevolverAmmoProvider
     capacity: 6
-    chambers: [ True, False, False, False, False, False ]
+    chambers: [ True, True, True, True, True, True ]
     ammoSlots: [ null, null, null, null, null, null ]
 
 - type: entity
