@@ -193,10 +193,11 @@
     heatDamage:
       types:
         Heat: 1 #per second, scales with temperature & other constants # WWDP less damage
-  - type: Barotrauma
-    damage:
-      types:
-        Blunt: 0.15 #per second, scales with pressure and other constants.
+  # ERRORGATE: no pressure damage out here
+  #- type: Barotrauma
+  #  damage:
+  #    types:
+  #      Blunt: 0.15 #per second, scales with pressure and other constants.
 
 # Used for mobs that can be set on fire
 - type: entity

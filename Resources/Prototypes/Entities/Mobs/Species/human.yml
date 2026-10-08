@@ -6,6 +6,10 @@
   abstract: true
   components:
   - type: Hunger
+    baseDecayRate: 0.1 # ERRORGATE: you will die of hunger, default is 0.0167
+    starvationDamage:
+      types:
+        Bloodloss: 1
   - type: EyeCursorOffset # ERRORGATE: look into the distance with Space (old fork "look far")
     maxOffset: 3
     pvsIncrease: 0.3
