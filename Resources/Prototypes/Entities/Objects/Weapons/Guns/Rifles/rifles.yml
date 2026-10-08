@@ -82,7 +82,7 @@
     staminaCost: 7.5
 
 - type: entity
-  name: AKMS
+  name: Kalashnikov # ERRORGATE
   parent: [BaseWeaponRifle, BaseSecurityContraband]
   id: WeaponRifleAk
   description: An iconic weapon of war. Uses 7.62x39mm ammo.

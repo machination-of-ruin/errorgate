@@ -148,7 +148,7 @@
     guides: [ SecurityWeapons ]
 
 - type: entity
-  name: Mateba
+  name: Mateba Model 6 Unica # ERRORGATE
   parent: [BaseWeaponRevolver, BaseMajorContraband]
   id: WeaponRevolverMateba
   description: A distinctive revolver of an ancient Sol' design that was once seen as a rare collectible. It is in common manufacture by many companies in the Biesel Republic. Uses .357 Magnum ammo.
@@ -171,7 +171,7 @@
     proto: Cartridge357MagnumAP
 
 - type: entity
-  name: Python
+  name: Colt Python # ERRORGATE
   parent: [BaseWeaponRevolver, BaseSyndicateContraband]
   id: WeaponRevolverPython
   description: An iconic large-framed revolver of ancient Sol' design. It is commonly manufactured by many companies all over the colonies. Uses .357 Magnum ammo.

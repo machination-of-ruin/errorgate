@@ -102,7 +102,7 @@
   # Don't parent to BaseWeaponShotgun because it differs significantly
   parent: [BaseItem, BaseGunWieldable, BaseSyndicateContraband]
   id: WeaponShotgunBulldog
-  description: An automatic magazine-fed shotgun for close-quarters combat. Kicks like a mule on steroids. Uses .50 shotgun shells.
+  description: An automatic magazine-fed shotgun for close-quarters combat. Kicks like a mule on steroids. Uses 12 gauge shells.
   components:
   - type: Sprite
     sprite: Objects/Weapons/Guns/Shotguns/bulldog.rsi
@@ -217,7 +217,7 @@
   name: Bulldog
   parent: [WeaponShotgunBulldog]
   id: WeaponShotgunBulldogEmpty
-  description: It's a magazine-fed shotgun designed for close quarters combat. Uses .50 shotgun shells.
+  description: It's a magazine-fed shotgun designed for close quarters combat. Uses 12 gauge shells.
   components:
   - type: ItemSlots
     slots:
@@ -289,7 +289,7 @@
   name: Enforcer
   parent: [BaseWeaponShotgun, BaseGunWieldable, BaseSecurityContraband]
   id: WeaponShotgunEnforcer
-  description: A premium semi-automatic shotgun, and the pride of all security forces. Uses .50 shotgun shells.
+  description: A premium semi-automatic shotgun, and the pride of all security forces. Uses 12 gauge shells.
   components: # intend for Enforcer to have wider choke for semi-auto function
   - type: Sprite
     sprite: Objects/Weapons/Guns/Shotguns/enforcer.rsi
@@ -327,7 +327,7 @@
   name: Kammerer
   parent: [BaseWeaponShotgun, BaseGunWieldable, BaseSecurityContraband]
   id: WeaponShotgunKammerer
-  description: An old yet faithful design, and a favorite among irregular forces of many worlds. Uses .50 shotgun shells.
+  description: An old yet faithful design, and a favorite among irregular forces of many worlds. Uses 12 gauge shells.
   components: # intend for Kammerer to have tighter choke for slower fire rate and/or manual cycling
   - type: Item
     # WD EDIT START: Guns resize
@@ -363,10 +363,11 @@
   # WD EDIT END
 
 - type: entity
-  name: sawn-off shotgun
+  name: sawn-off IZh-43 # ERRORGATE
+  suffix: 12 gauge # ERRORGATE
   parent: [ BaseWeaponShotgunSmall, BaseSecurityBartenderContraband ] # WD EDIT: BaseWeaponShotgun -> BaseWeaponShotgunSmall
   id: WeaponShotgunSawn
-  description: Groovy! Uses .50 shotgun shells.
+  description: Groovy! Uses 12 gauge shells.
   components: # needs to be super inaccurate because you don't need to wield it
   - type: Sprite
     sprite: DeltaV/Objects/Weapons/Guns/Shotguns/sawn.rsi # Delta-V
@@ -403,7 +404,7 @@
   parent: WeaponShotgunSawn
   id: WeaponShotgunSawnLumen
   suffix: Lumenblast
-  description: Groovy! Uses .50 shotgun shells.
+  description: Groovy! Uses 12 gauge shells.
   components:
   - type: BallisticAmmoProvider
     capacity: 2
@@ -413,7 +414,7 @@
   name: sawn-off shotgun
   parent: WeaponShotgunSawn
   id: WeaponShotgunSawnEmpty
-  description: Groovy! Uses .50 shotgun shells.
+  description: Groovy! Uses 12 gauge shells.
   suffix: Empty
   components:
   - type: BallisticAmmoProvider
@@ -424,10 +425,10 @@
     deconstructionTarget: null
 
 - type: entity
-  name: handmade pistol
+  name: handmade shotgun # ERRORGATE
   parent: [BaseWeaponShotgunSmall, BaseMinorContraband] # WD EDIT: BaseWeaponShotgun -> BaseWeaponShotgunSmall
   id: WeaponShotgunHandmade
-  description: Looks unreliable. Uses .50 shotgun shells.
+  description: Looks unreliable. Uses 12 gauge shells.
   components:
   - type: Item
     # WD EDIT START
@@ -492,7 +493,7 @@
   name: improvised shotgun
   parent: [BaseWeaponShotgun, BaseGunWieldable, BaseMinorContraband]
   id: WeaponShotgunImprovised
-  description: A shitty, hand-made shotgun that uses .50 shotgun shells. It can only hold one round in the chamber.
+  description: A shitty, hand-made shotgun that uses 12 gauge shells. It can only hold one round in the chamber.
   components:
   - type: Sprite
     sprite: DeltaV/Objects/Weapons/Guns/Shotguns/improvised_shotgun.rsi # Delta-V
