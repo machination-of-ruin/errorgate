@@ -62,7 +62,7 @@
     - BaseballBat
 
 - type: entity
-  name: incomplete baseball bat
+  name: wooden shaft # ERRORGATE
   parent: BaseItem
   id: IncompleteBaseBallBat
   description: A few planks of wood stuck together.

@@ -43,8 +43,8 @@
     range: 1.75
     damage:
       types:
-        Piercing: 7
-        Slash: 1
+        Piercing: 10 # ERRORGATE: was 7
+        Slash: 5 # ERRORGATE: was 1
     heavyRangeModifier: 1.35
     maxTargets: 3
     angle: 20
@@ -54,7 +54,7 @@
   - type: DamageOtherOnHit
     damage:
       types:
-        Piercing: 10
+        Piercing: 20 # ERRORGATE: was 10
     staminaCost: 6
   - type: Item
     size: Ginormous
@@ -85,8 +85,7 @@
   - type: IncreaseDamageOnWield
     damage:
       types:
-        Piercing: 3
-        Slash: 3
+        Piercing: 10 # ERRORGATE: was Piercing 3 Slash 3
   - type: Damageable
     damageContainer: Inorganic
   - type: Destructible
