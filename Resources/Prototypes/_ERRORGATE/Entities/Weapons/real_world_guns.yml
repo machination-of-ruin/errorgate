@@ -466,7 +466,7 @@
 - type: entity
   name: Benelli M4
   suffix: 12 gauge
-  parent: BaseWeaponShotgun
+  parent: [ BaseWeaponShotgun, BaseGunWieldable ] # ERRORGATE: two handed like the other guns of this class
   id: WeaponShotgunBenelli
   description: A reliable self-loading shotgun. Uses 12 gauge shells.
   components:
@@ -483,7 +483,7 @@
 - type: entity
   name: Remington Model 870
   suffix: 12 gauge
-  parent: BaseWeaponShotgun
+  parent: [ BaseWeaponShotgun, BaseGunWieldable ] # ERRORGATE: two handed like the other guns of this class
   id: WeaponShotgunRemington
   description: A favourite weapon of militia forces. Uses 12 gauge shells.
   components:
@@ -496,6 +496,8 @@
     sprite: Objects/Weapons/Guns/Shotguns/pump.rsi
   - type: BallisticAmmoProvider
     capacity: 6
+    soundRack:
+      path: /Audio/_White/Guns/shotgun_rack.ogg # the long pump sound of the old build
   - type: Tag
     tags:
     - WeaponShotgunRemington
@@ -540,7 +542,7 @@
 - type: entity
   name: H&K MP9
   suffix: 9x19mm
-  parent: BaseWeaponSubMachineGun
+  parent: [ BaseWeaponSubMachineGun, BaseGunWieldable ] # ERRORGATE: two handed like the other guns of this class
   id: WeaponSubMachineMP9
   description: Shreds through targets with its high firerate. Uses 9x19mm ammo.
   components:
@@ -568,7 +570,7 @@
 - type: entity
   name: H&K MP5
   suffix: 9x19mm
-  parent: BaseWeaponSubMachineGun
+  parent: [ BaseWeaponSubMachineGun, BaseGunWieldable ] # ERRORGATE: two handed like the other guns of this class
   id: WeaponSubMachineGunMP5
   description: An excellent fully automatic SMG. Uses 9x19mm ammo.
   components:
@@ -615,7 +617,7 @@
 - type: entity
   name: KRISS Vector
   suffix: .45 ACP
-  parent: BaseWeaponSubMachineGun
+  parent: [ BaseWeaponSubMachineGun, BaseGunWieldable ] # ERRORGATE: two handed like the other guns of this class
   id: WeaponSubMachineGunVector45ACP
   description: An excellent fully automatic heavy SMG. This version uses .45 ACP ammo.
   components:
@@ -712,7 +714,7 @@
 - type: entity
   name: Thompson
   suffix: .45 ACP
-  parent: BaseWeaponSubMachineGun
+  parent: [ BaseWeaponSubMachineGun, BaseGunWieldable ] # ERRORGATE: two handed like the other guns of this class
   id: WeaponSubMachineGunThompson
   description: A classic  used by mobsters throughout space and time. Uses .45 ACP ammo.
   components:

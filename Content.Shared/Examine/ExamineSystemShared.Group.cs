@@ -16,6 +16,12 @@ namespace Content.Shared.Examine
         /// </summary>
         private List<FormattedMessage>? _inlineDetails;
 
+        /// <summary>
+        ///     True while <see cref="GetInlineDetails"/> runs. Verbs that must stay a button (weapon damage) skip adding
+        ///     themselves then, so the text is not shown twice.
+        /// </summary>
+        public bool CollectingInlineDetails => _inlineDetails != null;
+
         public override void Initialize()
         {
             base.Initialize();

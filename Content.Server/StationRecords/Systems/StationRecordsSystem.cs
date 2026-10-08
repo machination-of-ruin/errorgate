@@ -93,6 +93,10 @@ public sealed class StationRecordsSystem : SharedStationRecordsSystem
         if (!_inventory.TryGetSlotEntity(player, "id", out var idUid))
             return;
 
+        // ERRORGATE: the id slot carries light sources, only a real ID card gets a record
+        if (!_idCard.TryFindIdCard(player, out _))
+            return;
+
         // WWDP edit
         string? fingerprint = null;
 

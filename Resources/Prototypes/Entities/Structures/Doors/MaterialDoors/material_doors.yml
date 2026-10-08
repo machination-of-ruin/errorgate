@@ -39,7 +39,8 @@
     closeSound:
       path: /Audio/Effects/stonedoor_openclose.ogg
   - type: Appearance
-  - type: Airtight
+  # ERRORGATE: material doors hold no air, an open doorway used to keep a pocket of vacuum that hurt players
+  #- type: Airtight
   - type: Damageable
     damageContainer: StructuralInorganic
     damageModifierSet: Metallic

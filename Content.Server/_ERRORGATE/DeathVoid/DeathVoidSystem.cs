@@ -140,7 +140,7 @@ public sealed class DeathVoidSystem : EntitySystem
             var message = Loc.GetString("errorgate-death-void-title");
             _chat.ChatMessageToOne(ChatChannel.Server,
                 message,
-                $"[font size=40][bold]{message}[/bold][/font]\n[bold]{Loc.GetString("errorgate-death-void-subtitle")}[/bold]",
+                $"\n\n[font size=40][bold]{message}[/bold][/font]\n[bold]{Loc.GetString("errorgate-death-void-subtitle")}[/bold]",
                 EntityUid.Invalid,
                 false,
                 session.Channel,

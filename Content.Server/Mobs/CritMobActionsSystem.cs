@@ -40,7 +40,8 @@ public sealed class CritMobActionsSystem : EntitySystem
         if (!TryComp<ActorComponent>(uid, out var actor) || !_mobState.IsCritical(uid))
             return;
 
-        _host.ExecuteCommand(actor.PlayerSession, "ghost");
+        // ERRORGATE: there are no ghosts, succumbing is dying
+        _mobState.ChangeMobState(uid, MobState.Dead);
         args.Handled = true;
     }
 
@@ -78,7 +79,8 @@ public sealed class CritMobActionsSystem : EntitySystem
                 lastWords += "...";
 
                 _chat.TrySendInGameICMessage(uid, lastWords, InGameICChatType.Whisper, ChatTransmitRange.Normal, checkRadioPrefix: false, ignoreActionBlocker: true);
-                _host.ExecuteCommand(actor.PlayerSession, "ghost");
+                // ERRORGATE: there are no ghosts, the last words end in death
+                _mobState.ChangeMobState(uid, MobState.Dead);
             });
 
         args.Handled = true;

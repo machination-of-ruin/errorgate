@@ -203,7 +203,8 @@
   - type: Sprite
     sprite: Objects/Weapons/Melee/bone_spear.rsi
   - type: Construction
-    graph: SpearBone
+    graph: WoodenBat # ERRORGATE
+    node: spear
 
 - type: entity
   name: salvage harpoon

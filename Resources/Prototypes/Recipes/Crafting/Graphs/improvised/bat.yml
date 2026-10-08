@@ -26,6 +26,15 @@
           steps:
             - tool: Slicing
               doAfter: 4
+        # ERRORGATE: the wooden shaft and two bones make a bone spear
+        - to: spear
+          steps:
+            - material: Bones
+              amount: 2
+              doAfter: 4
         
     - node: bat
       entity: BaseBallBat
+
+    - node: spear
+      entity: SpearBone

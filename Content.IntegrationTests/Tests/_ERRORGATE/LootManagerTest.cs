@@ -118,3 +118,39 @@ public sealed class EdgeOfEntropyLootTest
         await pair.CleanReturnAsync();
     }
 }
+
+[TestFixture]
+public sealed class MobLootRateTest
+{
+    [Test]
+    public async Task WalkersDropAtTheirDropChance()
+    {
+        await using var pair = await PoolManager.GetServerClient(new PoolSettings { Dirty = true });
+        var server = pair.Server;
+        var entMan = server.EntMan;
+        var testMap = await pair.CreateTestMap();
+        var lootManager = entMan.System<LootManagerSystem>();
+
+        await server.WaitPost(() =>
+        {
+            var manager = entMan.SpawnEntity(null, testMap.MapCoords);
+            entMan.AddComponent(manager, new LootManagerComponent { GlobalLootTablePrototype = "LootTableGlobal" });
+        });
+        await pair.RunTicksSync(2);
+
+        const int mobs = 200;
+        await server.WaitPost(() =>
+        {
+            for (var i = 0; i < mobs; i++)
+            {
+                var mob = entMan.SpawnEntity("MobWalker", testMap.GridCoords);
+                entMan.System<MobStateSystem>().ChangeMobState(mob, MobState.Dead);
+            }
+        });
+        await pair.RunTicksSync(5);
+
+        var drops = lootManager.LootManager.Values.Sum(e => e.Count);
+        Assert.That(drops, Is.InRange(100, 180), $"MobWalker has a 0.7 drop chance, 200 deaths gave {drops} drops.");
+        await pair.CleanReturnAsync();
+    }
+}

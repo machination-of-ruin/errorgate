@@ -23,6 +23,10 @@ public sealed class DamageExamineSystem : EntitySystem
 
     private void OnGetExamineVerbs(EntityUid uid, DamageExaminableComponent component, GetVerbsEvent<ExamineVerb> args)
     {
+        // ERRORGATE: the damage button stays a button, the examine text does not repeat it
+        if (_examine.CollectingInlineDetails)
+            return;
+
         if (!args.CanInteract || !args.CanAccess)
             return;
 

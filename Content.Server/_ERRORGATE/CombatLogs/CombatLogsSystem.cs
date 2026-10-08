@@ -271,13 +271,14 @@ public sealed class CombatLogsSystem : EntitySystem
         return Math.Clamp(damage / (dead * 0.25f), 0f, 1f);
     }
 
-    private void Send(EntityUid victim, string message, float intensity)
+    private void Send(EntityUid victim, string message, float intensity, Color? fixedColor = null)
     {
         if (!TryComp<ActorComponent>(victim, out var actor))
             return;
 
         var size = (int) float.Lerp(14, 30, intensity);
-        var color = Color.InterpolateBetween(Color.Yellow, Color.Red, intensity);
+        // hits go from orange to red with their size, bleeding is always red
+        var color = fixedColor ?? Color.InterpolateBetween(Color.Orange, Color.Red, intensity);
 
         _chat.ChatMessageToOne(ChatChannel.Local,
             message,
@@ -300,9 +301,9 @@ public sealed class CombatLogsSystem : EntitySystem
             var bleeding = blood.BleedAmount > 0 && !dead;
 
             if (bleeding && _bleeding.Add(uid))
-                Send(uid, Loc.GetString("errorgate-combat-log-bleeding-start"), 0.6f);
+                Send(uid, Loc.GetString("errorgate-combat-log-bleeding-start"), 0.15f, Color.Red);
             else if (!bleeding && _bleeding.Remove(uid) && !dead)
-                Send(uid, Loc.GetString("errorgate-combat-log-bleeding-stop"), 0.1f);
+                Send(uid, Loc.GetString("errorgate-combat-log-bleeding-stop"), 0.1f, Color.Red);
         }
     }
 

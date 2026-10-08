@@ -37,7 +37,7 @@ public sealed class InlineExamineTest
             Assert.That(Examine(entMan, armor, viewer), Does.Contain(Loc.GetString("armor-examine")), "Armor stats should be inline.");
 
             var knife = entMan.SpawnEntity("CombatKnife", pos);
-            Assert.That(Examine(entMan, knife, viewer), Does.Contain("does the following"), "Weapon damage should be inline.");
+            Assert.That(Examine(entMan, knife, viewer), Does.Not.Contain("does the following"), "Weapon damage stays a button, it must not repeat in the text.");
 
             Assert.That(Examine(entMan, other, viewer), Does.Contain(Loc.GetString("health-examinable-carbon-none")),
                 "An unhurt person should read as healthy.");
