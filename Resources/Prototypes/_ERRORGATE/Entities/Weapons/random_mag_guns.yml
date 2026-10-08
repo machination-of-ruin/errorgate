@@ -208,7 +208,7 @@
   - type: ItemSlots
     slots:
       gun_magazine:
-        startingItem: Magazine762x39BoxRandom
+        startingItem: Magazine556x45BoxRandom
 
 - type: entity
   id: WeaponShotgunBulldogRandomMag

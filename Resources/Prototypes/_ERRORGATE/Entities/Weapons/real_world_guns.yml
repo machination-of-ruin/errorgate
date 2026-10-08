@@ -17,6 +17,18 @@
     steps: 4
     zeroVisible: true
   - type: Appearance
+  - type: ItemSlots # ERRORGATE: the base LMG is 7.62x39, the M249 takes 5.56x45
+    slots:
+      gun_magazine:
+        startingItem: Magazine556x45Box
+        whitelist:
+          tags:
+          - Magazine556x45Box
+      gun_chamber:
+        startingItem: Cartridge556x45
+        whitelist:
+          tags:
+          - Cartridge556x45
 
 - type: entity
   name: L6C ROW
