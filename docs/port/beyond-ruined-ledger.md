@@ -151,8 +151,8 @@ Decided with the owner: port all real-world calibers and the 21 real-world guns,
 - #69 silenced: `GunComponent.MuzzleEffectRadius` override, 0 shows no flash (Beretta, AS Val, Cobra).
 - Tests: `RealWorldGunsTest`. Loot tables were not touched (they come with the world-systems milestone). Not run: full `PostMapInitTest` (a run used about 24 GB and was stopped, cause not found); `EdgeOfEntropyDev` passes.
 
-### Melee and shove (#37, #46, #52, #61, #69, #72, #84)
-Decision first: keep WWDP shove (disarm based) or the old `ShoveAttackEvent` rework, and whether RMB is disarm/shove for all weapons. Keep upstream bash stats until then.
+### Melee and shove (#37, #46, #52, #61, #69, #72, #84) - DECIDED: keep master
+Owner decision: keep master's melee attacks (light and heavy) and WWDP shove. Skip #46, #52, #37 (RMB disarm), #61 and the combined attack of #69. #84 is covered by WWDP #926; any leftover balance numbers can come up later if wanted.
 
 ### Examine (#44, #50)
 Inline examine text instead of verbs. Check WWDP #549/#574/#919/#925 first.
