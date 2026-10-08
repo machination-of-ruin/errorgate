@@ -13,7 +13,8 @@ namespace Content.Server.DetailExaminable
         {
             base.Initialize();
 
-            SubscribeLocalEvent<DetailExaminableComponent, GetVerbsEvent<ExamineVerb>>(OnGetExamineVerbs);
+            // ERRORGATE: no flavor text button, no roleplay obligation
+            // SubscribeLocalEvent<DetailExaminableComponent, GetVerbsEvent<ExamineVerb>>(OnGetExamineVerbs);
         }
 
         private void OnGetExamineVerbs(EntityUid uid, DetailExaminableComponent component, GetVerbsEvent<ExamineVerb> args)

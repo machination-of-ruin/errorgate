@@ -20,31 +20,16 @@ public abstract class SharedHealthExaminableSystem : EntitySystem
     {
         base.Initialize();
 
-        SubscribeLocalEvent<HealthExaminableComponent, GetVerbsEvent<ExamineVerb>>(OnGetExamineVerbs);
+        // ERRORGATE: health shows inline in the examine window instead of behind a button
+        SubscribeLocalEvent<HealthExaminableComponent, ExaminedEvent>(OnExamined);
     }
 
-    private void OnGetExamineVerbs(EntityUid uid, HealthExaminableComponent component, GetVerbsEvent<ExamineVerb> args)
+    private void OnExamined(EntityUid uid, HealthExaminableComponent component, ExaminedEvent args)
     {
-        if (!TryComp<DamageableComponent>(uid, out var damage))
+        if (!args.IsInDetailsRange || !TryComp<DamageableComponent>(uid, out var damage))
             return;
 
-        var detailsRange = _examineSystem.IsInDetailsRange(args.User, uid);
-
-        var verb = new ExamineVerb
-        {
-            Act = () =>
-            {
-                var markup = GetMarkup(args.User, (uid, component), damage);
-                _examineSystem.SendExamineTooltip(args.User, uid, markup, false, false);
-            },
-            Text = Loc.GetString("health-examinable-verb-text"),
-            Category = VerbCategory.Examine,
-            Disabled = !detailsRange,
-            Message = detailsRange ? null : Loc.GetString("health-examinable-verb-disabled"),
-            Icon = new SpriteSpecifier.Texture(new ResPath("/Textures/Interface/VerbIcons/rejuvenate.svg.192dpi.png"))
-        };
-
-        args.Verbs.Add(verb);
+        args.PushMessage(GetMarkup(args.Examiner, (uid, component), damage), -5);
     }
 
     public FormattedMessage GetMarkup(

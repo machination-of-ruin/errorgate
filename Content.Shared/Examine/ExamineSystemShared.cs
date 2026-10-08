@@ -289,6 +289,19 @@ namespace Content.Shared.Examine
             // pop color tag
             newMessage.Pop();
 
+            // ERRORGATE: armor, damage, clothing speed... print inline instead of behind buttons
+            if (isInDetailsRange)
+            {
+                foreach (var details in GetInlineDetails(examiner.Value, entity))
+                {
+                    if (details.IsEmpty)
+                        continue;
+
+                    newMessage.PushNewline();
+                    newMessage.AddMessage(details);
+                }
+            }
+
             return newMessage;
         }
     }

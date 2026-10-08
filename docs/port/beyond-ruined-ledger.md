@@ -90,13 +90,13 @@ Hints below come from commit messages, file lists and quick greps. **They are le
 | 41 | body-fixes | Gib does not spawn organs | Shitmed gib options | DONE (small-PR batch): default `GibContentsOption.Skip` in `GibBody` and `GibBehavior` (tested, no organs left) |
 | 42 | weapons-resize | Smaller guns, bat tweaks, sniper fixes | WWDP #284 Weapons Resize (same author) | COVERED, check leftovers |
 | 43 | character-inspect | Character examine rework, only 2 genders | WWDP #269 Better Character Examine | COVERED (system). Gender menu trim is humans-only housekeeping |
-| 44 | no-id-card-verb | Health/bleeding/damage text pushed inline into examine, ID card verb removed, radiation inspect | WWDP keeps health examine as a verb (`SharedHealthExaminableSystem`) | TODO. Pairs with #50 |
+| 44 | no-id-card-verb | Health/bleeding/damage text pushed inline into examine, ID card verb removed, radiation inspect | WWDP keeps health examine as a verb (`SharedHealthExaminableSystem`) | DONE with #50 (see below) |
 | 45 | embed-fix | Embedded items can be pulled out | Tested: embedded items are reachable under WWDP interactions | SKIP (not needed) |
 | 46, 52 | shove-2, mag-inspect-logs | Separate shove (`ShoveAttackEvent`, flip animation `FlipCharacter`, `FlipAnimationEffect`) | WWDP shove (#280 #295 #304 #315 #347 #565 #582 #978) tunes the disarm-as-shove; no `ShoveAttackEvent` in master | MILESTONE melee. Big decision: keep WWDP shove or replace |
 | 47 | mag-inspect-fix | Ballistic fill delay 0.5 to 1 s, magazine examine tweak | Gunnening shows magazine/chamber | DONE: fill delay 0.75 s (owner choice), rest COVERED |
 | 48 | gun-calibers | "The gunnening" of the old fork: real-world calibers (9x19, 5.56x45, 7.62x39, .357/.44, lapua, 6mm caseless), ammo and gun roster cut, station maps deleted (about 184 files), loot-entry names by caliber | Master uses fictional calibers (`.35 auto`, `.30 rifle`, `.50`); the roster is intact | MILESTONE guns. Very large; decide caliber model first |
 | 49 | 357 | The gunnening part 2 (.357/.44 rename, speed loaders) | same | MILESTONE guns |
-| 50 | no-examine | Damage examine for melee/ranged/thrown pushed inline, magazine examine | WWDP #549 #574 #925 fix damage examine | TODO. Pairs with #44 |
+| 50 | no-examine | Damage examine for melee/ranged/thrown pushed inline, magazine examine | WWDP #549 #574 #925 fix damage examine | DONE with #44 (see below) |
 | 51 | clothes-innteraction | Patch of old must-be-in-hand | n/a | SKIP |
 | 54 | stamina-fix2 | Stamina crit buffer 3 s to 0, recover from crit at 10% | master stamina already has no slowdown and no `OnShoved` | DONE (batch 2): no crit buffer, coming out of crit leaves 10% stamina. Shove stamina part not applicable |
 | 55 | announce | No roundstart announcement | none | DONE (small-PR batch): `AnnounceRound` removed |
@@ -143,6 +143,9 @@ Anyone can be executed, not only incapacitated victims. The damage multiplier is
 
 ### World systems (decided: port the final version once)
 `SmartMobSpawner`, `MobLoot`, `Despawn` (dead bodies + items), `LootManager` (final form with `GlobalLootTable`, `LootEntries`, spawners), `DayCycle` (client `LightCycleSystem`, shared `LightCycleComponent`), contaminated water, doors/keys, traps, weather rules, maps (`EdgeOfEntropy`, Kuznetsk). Source of truth: final code under `Content.*/_ERRORGATE` and `Resources/Prototypes/_ERRORGATE` in `beyond/master`. Discuss one system at a time. Needs `docs/design/survival-loop.md` ("loot is finite per wipe").
+
+### Examine (#44, #50) - DONE
+Owner rule: everything is in the examine window, no extra buttons. `ExamineSystemShared.GetInlineDetails` runs the normal examine-verb event and prints what armor, clothing speed, temperature protection, shield blocking, surgery tools and weapon damage would have shown, only in detail range. Health prints inline (unhurt people read as healthy, self-aware text when examining yourself). Removed: contraband, ID card, character flavor text and guidebook buttons. Kept on purpose: the reagent "examine solution" button. Test: `InlineExamineTest`.
 
 ### Guns (#48, #49, #81, #82, #69 parts) - DONE
 Decided with the owner: port all real-world calibers and the 21 real-world guns, keep every existing gun prototype, apply the old higher bullet damage, random-load magazines only in separate prototypes, skip #82 (upstream spread stays), MP5 is its own gun beside the Drozd.

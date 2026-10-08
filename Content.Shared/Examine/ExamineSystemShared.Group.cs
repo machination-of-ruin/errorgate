@@ -10,6 +10,12 @@ namespace Content.Shared.Examine
 
         public const string DefaultIconTexture = "/Textures/Interface/examine-star.png";
 
+        /// <summary>
+        ///     ERRORGATE: while set, detailed examine verbs write their text here instead of becoming buttons,
+        ///     see <see cref="GetInlineDetails"/>.
+        /// </summary>
+        private List<FormattedMessage>? _inlineDetails;
+
         public override void Initialize()
         {
             base.Initialize();
@@ -46,6 +52,50 @@ namespace Content.Shared.Examine
 
                 args.Verbs.Add(examineVerb);
             }
+        }
+
+        /// <summary>
+        ///     ERRORGATE: collects everything that would be a "details" button (armor, damage, clothing speed...)
+        ///     as plain messages so the examine window can print it directly. Runs the normal verb event and
+        ///     reads the text instead of the buttons.
+        /// </summary>
+        public List<FormattedMessage> GetInlineDetails(EntityUid examiner, EntityUid target)
+        {
+            var result = new List<FormattedMessage>();
+            if (_inlineDetails != null)
+                return result; // already collecting, do not nest
+
+            _inlineDetails = result;
+            try
+            {
+                var verbsEvent = new GetVerbsEvent<ExamineVerb>(examiner, target, null, null, true, true, true, new List<VerbCategory>());
+                RaiseLocalEvent(target, verbsEvent);
+
+                if (TryComp<GroupExamineComponent>(target, out var groupExamine))
+                {
+                    foreach (var group in groupExamine.Group)
+                    {
+                        if (group.Entries.Count == 0 || !EntityHasComponent(target, group.Components))
+                            continue;
+
+                        var message = new FormattedMessage();
+                        if (group.Title != null)
+                        {
+                            message.AddMarkupOrThrow(Loc.GetString(group.Title));
+                            message.PushNewline();
+                        }
+                        message.AddMessage(GetFormattedMessageFromExamineEntries(group.Entries));
+                        result.Add(message);
+                        group.Entries.Clear();
+                    }
+                }
+            }
+            finally
+            {
+                _inlineDetails = null;
+            }
+
+            return result;
         }
 
         /// <summary>
@@ -142,6 +192,13 @@ namespace Content.Shared.Examine
             }
 
             var formattedMessage = GetFormattedMessageFromExamineEntries(entries);
+
+            // ERRORGATE: inline examine, no button
+            if (_inlineDetails != null)
+            {
+                _inlineDetails.Add(formattedMessage);
+                return;
+            }
 
             var examineVerb = new ExamineVerb()
             {
