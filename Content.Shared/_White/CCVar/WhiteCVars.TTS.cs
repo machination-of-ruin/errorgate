@@ -46,5 +46,5 @@ public sealed partial class WhiteCVars
     /// Voice type for characters in-game
     /// </summary>
     public static readonly CVarDef<CharacterVoiceType> VoiceType =
-        CVarDef.Create("voice.type", CharacterVoiceType.TTS, CVar.CLIENTONLY | CVar.ARCHIVE);
+        CVarDef.Create("voice.type", CharacterVoiceType.Bark, CVar.CLIENTONLY | CVar.ARCHIVE);
 }

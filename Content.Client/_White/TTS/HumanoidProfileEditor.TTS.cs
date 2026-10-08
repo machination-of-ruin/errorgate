@@ -1,5 +1,6 @@
 using System.Linq;
 using Content.Client._White.TTS;
+using Content.Shared._White.Silicons.Borgs;
 using Content.Shared._White.TTS;
 using Content.Shared.Preferences;
 
@@ -9,6 +10,7 @@ namespace Content.Client.Lobby.UI;
 
 public sealed partial class HumanoidProfileEditor
 {
+    /*
     private List<TTSVoicePrototype> _voiceList = new();
 
     private void InitializeVoice()
@@ -64,4 +66,5 @@ public sealed partial class HumanoidProfileEditor
 
         _entManager.System<TTSSystem>().RequestGlobalTTS(VoiceRequestType.Preview,Profile.Voice);
     }
+    */
 }

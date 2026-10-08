@@ -229,7 +229,7 @@ namespace Content.Client.Lobby.UI
             // WD EDIT START
             #region Voice
 
-            InitializeVoice();
+            //InitializeVoice();
             InitializeBark();
 
             #endregion
@@ -982,7 +982,7 @@ namespace Content.Client.Lobby.UI
             UpdateNameEdit();
             UpdateFlavorTextEdit();
             UpdateSexControls();
-            UpdateTTSVoicesControls(); // WD EDIT
+            //UpdateTTSVoicesControls(); // WD EDIT
             UpdateBarksControl(); // WD EDIT
             UpdateBodyTypes(); // WD EDIT
             UpdateGenderControls();
@@ -1351,7 +1351,7 @@ namespace Content.Client.Lobby.UI
 
             UpdateGenderControls();
             Markings.SetSex(newSex);
-            UpdateTTSVoicesControls(); // WD EDIT
+            //UpdateTTSVoicesControls(); // WD EDIT
             UpdateBodyTypes(); // WD EDIT
             UpdateBarksControl(); // WD EDIT
             ReloadProfilePreview();
