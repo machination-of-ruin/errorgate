@@ -79,46 +79,14 @@ namespace Content.IntegrationTests.Tests
             "/Maps/_White/Kettle.yml", // WD EDIT
         };
 
+        // ERRORGATE: the station maps are gone, these are what is left
         private static readonly string[] GameMaps =
         {
             "Dev",
             "EdgeOfEntropyDev",
             "TestTeg",
-            // "CentCommMain",
-            // "CentCommHarmony",
-            "MeteorArena",
-            "Core", // No current maintainer. In need of a rework...
-            "Pebble", // Maintained by Plyushune
-            // "Edge", // De-rotated, no current maintainer.
-            "Saltern", // Maintained by the Sin Mapping Team, ODJ, and TCJ.
-            "Shoukou", // Maintained by Violet
-            // "Tortuga", // De-rotated, no current maintainer.
-            "Arena", // Maintained by astriloqua.
-            "Asterisk", // Maintained by mrs.
-            "Glacier", // Maintained by Violet
-            "TheHive", // Maintained by dootythefrooty
-            // "Hammurabi", // De-rotated, maintained by Ichai.
-            "Lighthouse", // Maintained by Violet
-            // "Submarine", // De-rotated, no current maintainer.
-            "Gax", // Maintained by Ichaai
             "Lavatest", // Lavaland Change
-            "Rad", // Maintained by Ichai
-            // "Europa", // De-rotated, has significant issues.
-            "Meta", // Maintained by Ichai
-            "Cyberiad", // Maintained by Ichai
-            "Lambda", // Maintained by Ichai
-            "Bagel", // Maintained by Ichai
-            "Northway", // Maintained by Violet
-            "Anchor", // Maintained by the SiN Mapping Team.
-            "DryDock", //WWDP
-            "Moose", //WWDP
-            //"WhiteBox", //WWDP
-            "WhiteMeta", //WWDP
-            "WonderBox", //WWDP
-            "Kettle", //WWDP
-            "Molecule", //WWDP
             "CentCommHub", //WWDP
-            "Almagest", //WWDP
         };
 
         /// <summary>
