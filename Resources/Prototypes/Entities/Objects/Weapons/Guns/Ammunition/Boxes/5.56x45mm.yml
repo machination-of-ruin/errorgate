@@ -19,7 +19,7 @@
     sprite: Objects/Weapons/Guns/Ammunition/Boxes/rifle.rsi
   - type: MagazineVisuals
     magState: mag
-    steps: 4
+    steps: 2 # ERRORGATE: old box art has one fill state
     zeroVisible: false
   - type: Appearance
 
@@ -35,13 +35,13 @@
     proto: Cartridge556x45
   - type: Sprite
     layers:
-    - state: base-big
+    - state: base-b
       map: ["enum.GunVisualLayers.Base"]
-    - state: mag-big-1
+    - state: magb-1
       map: ["enum.GunVisualLayers.Mag"]
   - type: MagazineVisuals
-    magState: mag-big
-    steps: 4
+    magState: magb
+    steps: 2
     zeroVisible: false
   - type: Appearance
 

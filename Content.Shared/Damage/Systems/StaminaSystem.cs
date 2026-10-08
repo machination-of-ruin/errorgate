@@ -311,7 +311,9 @@ public sealed partial class StaminaSystem : EntitySystem
                 component.TiredWarned = true;
             }
 
-            _stunSystem.TrySlowdown(uid, TimeSpan.FromSeconds(4.5), true, 0.9f, 0.9f);
+            // ERRORGATE: apply once; TrySlowdown multiplies into the existing modifier, so refreshing every tick stacked to a standstill
+            if (!_statusEffect.HasStatusEffect(uid, "SlowedDown"))
+                _stunSystem.TrySlowdown(uid, TimeSpan.FromSeconds(4.5), true, 0.6f, 0.6f);
         }
         else
         {

@@ -159,3 +159,19 @@
   components:
   - type: BallisticAmmoProvider
     randomizeAmmo: true
+
+- type: entity
+  id: Magazine762x39BoxRandom
+  suffix: Random
+  parent: Magazine762x39Box
+  components:
+  - type: BallisticAmmoProvider
+    randomizeAmmo: true
+
+- type: entity
+  id: MagazineShotgunRandom
+  suffix: Random
+  parent: MagazineShotgun
+  components:
+  - type: BallisticAmmoProvider
+    randomizeAmmo: true

@@ -1,4 +1,4 @@
-ui-lobby-title = >>> ERRORGATE <<<
+ui-lobby-title = [font="Bedstead" size=20]>>> ERRORGATE <<<[/font]
 ui-lobby-ahelp-button = Admin Help
 ui-lobby-changelog-button = Changelog
 ui-lobby-options-button = Options

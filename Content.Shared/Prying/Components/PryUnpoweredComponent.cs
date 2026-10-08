@@ -9,5 +9,6 @@ namespace Content.Shared.Prying.Components;
 public sealed partial class PryUnpoweredComponent : Component
 {
     [DataField]
-    public float PryModifier = 0.1f;
+    // ERRORGATE: hand-prying time = door PryTime (1.5s) / PryModifier, so 1.5 gives about 1 second (was 0.1, 15 seconds)
+    public float PryModifier = 1.5f;
 }

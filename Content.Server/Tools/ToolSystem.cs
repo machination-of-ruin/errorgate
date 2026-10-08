@@ -48,7 +48,7 @@ public sealed class ToolSystem : SharedToolSystem
             if (!SolutionContainerSystem.TryGetSolution((uid, solutionContainer), welder.FuelSolutionName, out var solutionComp, out var solution))
                 continue;
 
-            SolutionContainerSystem.RemoveReagent(solutionComp.Value, welder.FuelReagent, welder.FuelConsumption * welder.WelderTimer);
+            SolutionContainerSystem.RemoveReagent(solutionComp.Value, welder.FuelReagent, FixedPoint2.New(welder.FuelConsumption * welder.WelderTimer)); // ERRORGATE: float consumption
 
             if (solution.GetTotalPrototypeQuantity(welder.FuelReagent) <= FixedPoint2.Zero)
             {

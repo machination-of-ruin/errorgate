@@ -18,6 +18,7 @@
     VerticalExpand="False"
     VerticalAlignment="Bottom"
     HorizontalAlignment="Center">
+    <!-- ERRORGATE: chat panel does not expand, so the split starts at its minimum width (narrowest chat) -->
     <SplitContainer Name="ScreenContainer" HorizontalExpand="True" VerticalExpand="True" SplitWidth="0" StretchDirection="TopLeft">
         <LayoutContainer Name="ViewportContainer" HorizontalExpand="True" VerticalExpand="True">
             <controls:MainViewport Name="MainViewport"/>
@@ -38,7 +39,7 @@
             </BoxContainer>
             <alerts:AlertsUI Name="Alerts" Access="Protected" />
         </LayoutContainer>
-        <PanelContainer Name="SeparatedChatPanel" HorizontalExpand="True" MinWidth="300" StyleClasses="ChatMainPanel">
+        <PanelContainer Name="SeparatedChatPanel" HorizontalExpand="False" MinWidth="300" StyleClasses="ChatMainPanel">
             <BoxContainer Orientation="Vertical" HorizontalExpand="True" SeparationOverride="10" Margin="10">
                 <PanelContainer StyleClasses="TopButtonChat">
                     <menuBar:GameTopMenuBar Name="TopBar" HorizontalExpand="True" Access="Protected" />

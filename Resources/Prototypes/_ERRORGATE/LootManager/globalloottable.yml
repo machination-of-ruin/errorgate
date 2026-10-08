@@ -5,15 +5,15 @@
 
     # Guns
     ## 9x19
-    WeaponPistolMakarov: 4
-    WeaponPistolP226: 3
-    WeaponPistolGlock: 2
-    WeaponPistolStechkin: 2
-    WeaponPistolBeretta: 1
+    WeaponPistolMakarovRandomMag: 4
+    WeaponPistolP226RandomMag: 3
+    WeaponPistolGlockRandomMag: 2
+    WeaponPistolStechkinRandomMag: 2
+    WeaponPistolBerettaRandomMag: 1
 
-    WeaponSubMachineGunMP5: 3
-    WeaponSubMachineGunVector9x19mm: 1
-    WeaponSubMachineMP9: 1
+    WeaponSubMachineGunMP5RandomMag: 3
+    WeaponSubMachineGunVector9x19mmRandomMag: 1
+    WeaponSubMachineMP9RandomMag: 1
 
     Magazine9x19Random: 18
     Magazine9x19HighCapacityRandom: 6
@@ -24,11 +24,11 @@
 
     Magazine9x19UltraHighCapacityRandom: 3
     ## 45 ACP
-    WeaponPistolM1911: 2
-    WeaponPistolUSP: 1
+    WeaponPistolM1911RandomMag: 2
+    WeaponPistolUSPRandomMag: 1
 
-    WeaponSubMachineGunThompson: 1
-    WeaponSubMachineGunVector45ACP: 1
+    WeaponSubMachineGunThompsonRandomMag: 1
+    WeaponSubMachineGunVector45ACPRandomMag: 1
 
     Magazine45ACPRandom: 4
     MagazineUSP45ACPRandom: 3
@@ -38,17 +38,17 @@
     AmmoBox45ACP: 4
     AmmoBox45ACPBig: 2
     ## 357 Magnum
-    WeaponRevolverSmithAndWesson: 3
-    WeaponRevolverPython: 2
-    WeaponRevolverLucky: 1
-    WeaponRevolverMateba: 1
+    WeaponRevolverSmithAndWessonRandomMag: 3
+    WeaponRevolverPythonRandomMag: 2
+    WeaponRevolverLuckyRandomMag: 1
+    WeaponRevolverMatebaRandomMag: 1
 
     AmmoBox357Magnum: 5
     SpeedLoader357MagnumRandom: 3
     ## 5.56x45
-    WeaponRifleTenebra: 2
-    WeaponRifleLecter: 1
-    WeaponLightMachineM249: 1
+    WeaponRifleTenebraRandomMag: 2
+    WeaponRifleLecterRandomMag: 1
+    WeaponLightMachineM249RandomMag: 1
 
     Magazine556x45Random: 6
     Magazine556x45BoxRandom: 2
@@ -56,24 +56,24 @@
     AmmoBox556x45: 4
     AmmoBox556x45Big: 2
     ## 7.62x39
-    WeaponSniperSKS: 2
+    WeaponSniperSKSRandomMag: 2
     SpeedLoader762x39Random: 3
 
-    WeaponRifleL1A1: 2
+    WeaponRifleL1A1RandomMag: 2
     Magazine762x39ShortRandom: 4
 
-    WeaponRifleAk: 2
-    WeaponRifleASVal: 1
+    WeaponRifleAkRandomMag: 2
+    WeaponRifleASValRandomMag: 1
     Magazine762x39Random: 6
 
     AmmoBox762x39: 5
     AmmoBox762x39Big: 2
     ## Shotguns
-    WeaponShotgunDoubleBarreled: 3
-    WeaponShotgunSawn: 2
-    WeaponShotgunRemington: 2
-    WeaponShotgunBenelli: 1
-    WeaponShotgunBulldog: 1
+    WeaponShotgunDoubleBarreledRandomMag: 3
+    WeaponShotgunSawnRandomMag: 2
+    WeaponShotgunRemingtonRandomMag: 2
+    WeaponShotgunBenelliRandomMag: 1
+    WeaponShotgunBulldogRandomMag: 1
 
     MagazineShotgun00Buckshot: 2
     MagazineShotgunSlug: 1
@@ -81,7 +81,7 @@
     BoxShotgun00Buckshot: 8
     BoxShotgunSlug: 3
     ## Lapua Magnum
-    WeaponSniperHristov: 1
+    WeaponSniperHristovRandomMag: 1
     AmmoBoxSniper: 1
     AmmoBoxSniperBig: 1
 

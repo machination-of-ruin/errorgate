@@ -1,7 +1,7 @@
 # Rarity 3
 
 - type: lootEntry
-  id: WeaponSniperHristov
+  id: WeaponSniperHristovRandomMag
   rarityTiers: [3]
   locations: [Military]
 

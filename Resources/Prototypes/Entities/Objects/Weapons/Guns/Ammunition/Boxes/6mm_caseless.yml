@@ -20,7 +20,7 @@
     sprite: Objects/Weapons/Guns/Ammunition/Boxes/caseless_rifle.rsi
   - type: MagazineVisuals
     magState: mag
-    steps: 4
+    steps: 2 # ERRORGATE: old box art has one fill state
     zeroVisible: false
   - type: Appearance
 

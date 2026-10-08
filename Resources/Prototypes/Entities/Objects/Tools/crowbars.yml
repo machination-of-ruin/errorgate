@@ -50,6 +50,7 @@
   - type: Clothing
     quickEquip: false
     slots:
+    - suitStorage # ERRORGATE: all crowbar variants fit the sling
     - Belt
   - type: Item
     size: Normal

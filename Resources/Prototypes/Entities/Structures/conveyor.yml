@@ -13,7 +13,7 @@
     anchored: true
   - type: Sprite
     sprite: Structures/conveyor.rsi
-    state: conveyor_started_cw
+    state: conveyor_stopped_cw # ERRORGATE: stopped until powered, appearance data is only set on power or signal changes
     drawdepth: HighFloorObjects
   - type: ApcPowerReceiver
   - type: ExtensionCableReceiver

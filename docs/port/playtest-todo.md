@@ -57,3 +57,33 @@ Found while playing the `port/beyond` build. One line each, newest last.
 - Notes on round 2: the bark list lost Meow, Tem and Gav (Undertale-character voices stay). The names, verbs and adjectives datasets are English again (taken from the errorgate repo). Running drains 10 stamina per second until 80%, then you are tired and slowed. Floors FloorTechMaint2, FloorSteelLime (Edge) and FloorBlue (Kuznetsk) were deprecated placeholders and were replaced in the maps. Walk by default is a client setting, an old saved value may override it. Lighter ranges are the old ones (3 and 4). 
 
 - Round 3: EmergencyLight radius is 10 again, battery starts full (3 000 000) and an unpowered lamp lights red at round start even without a station (`EmergencyLightSystem.UpdateState`, test `EmergencyLightTest`). Loading screen tips are the ten playtest tips verbatim from `ErrorgateRules.xml`.
+
+## Round 3 (playtest reports)
+
+- [x] Lobby "Welcome to ..." text red like ERRORGATE.
+- [x] Remove the WDpass button and option from the lobby.
+- [x] Character setup: remove clown, mime, cyborg and AI nickname fields; remove the backgrounds option.
+- [x] Loading tip about combined LMB attacks is still in the rules; replace it.
+- [x] Remove the tutorial tab from the rules.
+- [x] Lobby text over the join button says "white dream": replace with >>> ERRORGATE <<<.
+- [x] Lobby backgrounds are the animated WWDP ones: use the ERRORGATE ones (errorgate-station branch of the old repo).
+- [x] In-game chat width starts as narrow as possible.
+- [x] Being tired from sprinting locks the player in place; it should slow down / force walking (see the old build).
+- [x] "No obvious wounds" examine text green.
+- [x] "Holding an item" examine text red.
+- [x] Damage text on yourself is self-aware.
+- [x] Crowbar (and similar items) fit on the sling.
+- [x] Allow putting items into equipped backpacks and duffelbags without having them in hand.
+- [x] Simonov inventory grid size: copy from the Mosin.
+- [x] Unique sawn-off shotgun fires twice without reload like the double barrel.
+- [x] Modern-day double barrel: the old fork has only the IZh-43 (`WeaponShotgunDoubleBarreled`), already ported. No newer model exists; waiting for a name if another gun was meant.
+- [x] Loading tips color too bright on the white background; custom font?
+- [x] Loading screen "white dream" becomes ERRORGATE.
+- [x] Unpowered airlocks open faster by hand (about 1 second).
+- [x] Lighters spend fuel much slower, as in the old build.
+- [x] "ERROR: YOU ARE DEAD" does not offset from the bottom: new chat messages overlap it when the chat is shrunk and large letters take two lines.
+- [x] Runner living 2 should be normal size, runner 1 (school) the smaller model: swap them.
+- [x] Unpowered conveyor belts look like they move.
+- [x] Port the ammo box textures from the old build.
+- [x] Guns in loot tables spawn with randomly filled magazines (new prototypes parented to each gun).
+- [x] Server crashed once: kill tracking KeyNotFound when a mob kills a mob (fixed).

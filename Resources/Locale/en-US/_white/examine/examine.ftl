@@ -43,7 +43,7 @@ shoes-examine-selfaware = - [bold]{$item}[/bold] on your feet.
 # Selfaware examine
 
 comp-hands-examine-empty-selfaware = You are not holding anything.
-comp-hands-examine-selfaware = You are holding { $items }.
+comp-hands-examine-selfaware = You are holding [color=red]{ $items }[/color].
 
 humanoid-appearance-component-examine-selfaware = You are { INDEFINITE($age) } { $age } { $species }.
 

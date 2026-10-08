@@ -33,7 +33,7 @@ public sealed partial class WelderComponent : Component
     ///     Fuel consumption per second while the welder is active.
     /// </summary>
     [DataField, AutoNetworkedField]
-    public FixedPoint2 FuelConsumption = FixedPoint2.New(1.0f);
+    public float FuelConsumption = 1.0f; // ERRORGATE: float so sub 0.01 per second rates work (FixedPoint2 only has 0.01 precision)
 
     /// <summary>
     ///     A fuel amount to be consumed when the welder goes from being unlit to being lit.

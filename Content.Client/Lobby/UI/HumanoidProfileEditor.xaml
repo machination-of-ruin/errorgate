@@ -117,26 +117,26 @@
                                     <LineEdit Name="NameEdit" MinSize="270 0" HorizontalAlignment="Right" />
                                 </BoxContainer>
                                 <!-- Station AI name -->
-                                <BoxContainer Name="StationAiNameContainer" HorizontalExpand="True">
+                                <BoxContainer Name="StationAiNameContainer" HorizontalExpand="True" Visible="False"> <!-- ERRORGATE -->
                                     <Label Text="{Loc 'humanoid-profile-editor-station-ai-name-label'}" />
                                     <Control HorizontalExpand="True"/>
                                     <LineEdit Name="StationAINameEdit" MinSize="270 0" HorizontalAlignment="Right" />
                                 </BoxContainer>
                                 <!-- Cyborg name -->
-                                <BoxContainer Name="CyborgNameContainer" HorizontalExpand="True">
+                                <BoxContainer Name="CyborgNameContainer" HorizontalExpand="True" Visible="False"> <!-- ERRORGATE -->
                                     <Label Text="{Loc 'humanoid-profile-editor-cyborg-name-label'}" />
                                     <Control HorizontalExpand="True"/>
                                     <LineEdit Name="CyborgNameEdit" MinSize="270 0" HorizontalAlignment="Right" />
                                 </BoxContainer>
                                 <!-- WD EDIT START -->
                                 <!-- Clown name -->
-                                <BoxContainer Name="ClownNameContainer" HorizontalExpand="True">
+                                <BoxContainer Name="ClownNameContainer" HorizontalExpand="True" Visible="False"> <!-- ERRORGATE -->
                                     <Label Text="{Loc 'humanoid-profile-editor-clown-name-label'}" />
                                     <Control HorizontalExpand="True"/>
                                     <LineEdit Name="ClownNameEdit" MinSize="270 0" HorizontalAlignment="Right" />
                                 </BoxContainer>
                                 <!-- Mime name -->
-                                <BoxContainer Name="MimeNameContainer" HorizontalExpand="True">
+                                <BoxContainer Name="MimeNameContainer" HorizontalExpand="True" Visible="False"> <!-- ERRORGATE -->
                                     <Label Text="{Loc 'humanoid-profile-editor-mime-name-label'}" />
                                     <Control HorizontalExpand="True"/>
                                     <LineEdit Name="MimeNameEdit" MinSize="270 0" HorizontalAlignment="Right" />

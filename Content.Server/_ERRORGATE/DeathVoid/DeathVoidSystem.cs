@@ -137,10 +137,13 @@ public sealed class DeathVoidSystem : EntitySystem
 
         if (mind.Session is { } session)
         {
+            // Large text is broken into short lines by hand: a wrapped large font line overlaps the following
+            // messages in a narrow chat panel. Trailing newlines keep later messages offset from it.
             var message = Loc.GetString("errorgate-death-void-title");
+            var lines = message.Replace(": ", ":\n");
             _chat.ChatMessageToOne(ChatChannel.Server,
                 message,
-                $"\n\n[font size=40][bold]{message}[/bold][/font]\n[bold]{Loc.GetString("errorgate-death-void-subtitle")}[/bold]",
+                $"\n\n[font size=32][bold]{lines}[/bold][/font]\n[bold]{Loc.GetString("errorgate-death-void-subtitle")}[/bold]\n\n\n",
                 EntityUid.Invalid,
                 false,
                 session.Channel,

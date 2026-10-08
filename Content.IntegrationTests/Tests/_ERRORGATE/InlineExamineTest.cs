@@ -39,12 +39,12 @@ public sealed class InlineExamineTest
             var knife = entMan.SpawnEntity("CombatKnife", pos);
             Assert.That(Examine(entMan, knife, viewer), Does.Not.Contain("does the following"), "Weapon damage stays a button, it must not repeat in the text.");
 
-            Assert.That(Examine(entMan, other, viewer), Does.Contain(Loc.GetString("health-examinable-carbon-none")),
+            Assert.That(Examine(entMan, other, viewer), Does.Contain("no obvious wounds"),
                 "An unhurt person should read as healthy.");
 
             var burn = new DamageSpecifier(server.ProtoMan.Index<DamageTypePrototype>("Blunt"), FixedPoint2.New(60));
             entMan.System<DamageableSystem>().TryChangeDamage(other, burn);
-            Assert.That(Examine(entMan, other, viewer), Does.Not.Contain(Loc.GetString("health-examinable-carbon-none")),
+            Assert.That(Examine(entMan, other, viewer), Does.Not.Contain("no obvious wounds"),
                 "A wounded person should show wounds, not the healthy line.");
         });
 

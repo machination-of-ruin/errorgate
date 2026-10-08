@@ -1,7 +1,7 @@
 # Rarity 1
 
 - type: lootEntry
-  id: WeaponRevolverSmithAndWesson
+  id: WeaponRevolverSmithAndWessonRandomMag
   rarityTiers: [1]
   locations: [Church, Security, Living]
 
@@ -13,7 +13,7 @@
 # Rarity 2
 
 - type: lootEntry
-  id: WeaponRevolverPython
+  id: WeaponRevolverPythonRandomMag
   rarityTiers: [2]
   locations: [Prison]
 
@@ -25,11 +25,11 @@
 # Rarity 3
 
 - type: lootEntry
-  id: WeaponRevolverLucky
+  id: WeaponRevolverLuckyRandomMag
   rarityTiers: [3]
   locations: [Prison]
 
 - type: lootEntry
-  id: WeaponRevolverMateba
+  id: WeaponRevolverMatebaRandomMag
   rarityTiers: [3]
   locations: [Military, Security]

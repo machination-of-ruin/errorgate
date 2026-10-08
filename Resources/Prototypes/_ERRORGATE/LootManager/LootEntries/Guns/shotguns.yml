@@ -1,12 +1,12 @@
 # Rarity 1
 
 - type: lootEntry
-  id: WeaponShotgunDoubleBarreled
+  id: WeaponShotgunDoubleBarreledRandomMag
   rarityTiers: [1]
   locations: [Living, Church]
 
 - type: lootEntry
-  id: WeaponShotgunSawn
+  id: WeaponShotgunSawnRandomMag
   rarityTiers: [1, 2]
   locations: [Prison, Industrial]
 
@@ -18,7 +18,7 @@
 # Rarity 2
 
 - type: lootEntry
-  id: WeaponShotgunRemington
+  id: WeaponShotgunRemingtonRandomMag
   rarityTiers: [2]
   locations: [Security, Military]
 
@@ -30,12 +30,12 @@
 # Rarity 3
 
 - type: lootEntry
-  id: WeaponShotgunBenelli
+  id: WeaponShotgunBenelliRandomMag
   rarityTiers: [3]
   locations: [Security, Military]
 
 - type: lootEntry
-  id: WeaponShotgunBulldog
+  id: WeaponShotgunBulldogRandomMag
   rarityTiers: [3]
   locations: [Military]
   childEntries: [MagazineShotgun00Buckshot]

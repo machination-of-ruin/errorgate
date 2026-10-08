@@ -462,7 +462,8 @@ public partial class SharedGunSystem
                     continue;
                 }
 
-                component.Chambers[i] = true;
+                // ERRORGATE: random-load revolvers
+                component.Chambers[i] = component.RandomizeAmmo && Random.NextDouble() < 0.5 ? null : true;
             }
         }
 

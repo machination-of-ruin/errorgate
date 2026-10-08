@@ -12,6 +12,7 @@ using Robust.Shared.Timing;
 using Robust.Shared.Network;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Random;
+using Robust.Shared.Utility; // ERRORGATE
 
 namespace Content.Client.Launcher
 {
@@ -154,9 +155,12 @@ namespace Content.Client.Launcher
 
             var randomIndex = _random.Next(tipList.Count);
             var tip = tipList[randomIndex];
-            LoginTip.SetMessage(Loc.GetString(tip));
+            // ERRORGATE: the tip sits on a white paper panel, so it uses dark text and the Bedstead font
+            var tipMessage = FormattedMessage.FromMarkupPermissive($"[font=\"Bedstead\" size=14]{Loc.GetString(tip)}[/font]");
+            LoginTip.SetMessage(tipMessage, defaultColor: Color.FromHex("#1a1a1a"));
 
             LoginTipTitle.Text = Loc.GetString("connecting-window-tip", ("numberTip", randomIndex));
+            LoginTipTitle.FontColorOverride = Color.FromHex("#1a1a1a"); // ERRORGATE
         }
 
         protected override void FrameUpdate(FrameEventArgs args)

@@ -23,18 +23,10 @@ namespace Content.Client.Info
             {
                 Margin = new Thickness(10)
             };
-            var tutorialList = new Info
-            {
-                Margin = new Thickness(10)
-            };
-
+            // ERRORGATE: tutorial tab removed
             rootContainer.AddChild(rulesList);
-            rootContainer.AddChild(tutorialList);
 
             TabContainer.SetTabTitle(rulesList, Loc.GetString("ui-info-tab-rules"));
-            TabContainer.SetTabTitle(tutorialList, Loc.GetString("ui-info-tab-tutorial"));
-
-            PopulateTutorial(tutorialList);
 
             Contents.AddChild(rootContainer);
 

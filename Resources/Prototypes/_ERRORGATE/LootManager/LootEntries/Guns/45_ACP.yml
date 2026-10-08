@@ -1,7 +1,7 @@
 # rarity 1
 
 - type: lootEntry
-  id: WeaponPistolM1911
+  id: WeaponPistolM1911RandomMag
   rarityTiers: [1]
   locations: [Church, Security, Military, Living]
   childEntries: [Magazine45ACPRandom]
@@ -19,7 +19,7 @@
 # rarity 1
 
 - type: lootEntry
-  id: WeaponSubMachineGunThompson
+  id: WeaponSubMachineGunThompsonRandomMag
   rarityTiers: [2, 3]
   locations: [Security, Prison]
   childEntries: [Magazine45ACPSubMachineGunRandom]
@@ -37,13 +37,13 @@
 # rarity 3
 
 - type: lootEntry
-  id: WeaponSubMachineGunVector45ACP
+  id: WeaponSubMachineGunVector45ACPRandomMag
   rarityTiers: [3]
   locations: [Security, Military]
   childEntries: [Magazine45ACPSubMachineGunRandom]
 
 - type: lootEntry
-  id: WeaponPistolUSP
+  id: WeaponPistolUSPRandomMag
   rarityTiers: [3]
   locations: [Security, Military]
   childEntries: [MagazineUSP45ACPRandom]

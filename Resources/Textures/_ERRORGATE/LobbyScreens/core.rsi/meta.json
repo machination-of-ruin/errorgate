@@ -1,0 +1,19 @@
+{
+  "version": 1,
+  "license": "CC-BY-SA-4.0",
+  "copyright": "Made by Unknown",
+  "size": {
+    "x": 991,
+    "y": 686
+  },
+  "states": [
+    {
+      "name": "1",
+	  "delays": [
+        [
+          0.1
+        ]
+      ]
+    }
+  ]
+}

@@ -1,0 +1,23 @@
+- type: animatedLobbyScreen
+  id: Obelisk
+  path: /Textures/_ERRORGATE/LobbyScreens/obelisk.rsi
+  name: Obelisk
+  artist: Unknown
+
+- type: animatedLobbyScreen
+  id: ServerRoom
+  path: /Textures/_ERRORGATE/LobbyScreens/serverroom.rsi
+  name: Server Room
+  artist: Unknown
+
+- type: animatedLobbyScreen
+  id: Core
+  path: /Textures/_ERRORGATE/LobbyScreens/core.rsi
+  name: Core
+  artist: Unknown
+
+- type: animatedLobbyScreen
+  id: BunkerDoor
+  path: /Textures/_ERRORGATE/LobbyScreens/bunkerdoor.rsi
+  name: Bunker Door
+  artist: Unknown

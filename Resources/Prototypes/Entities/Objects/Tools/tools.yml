@@ -851,6 +851,10 @@
       path: /Audio/Nyanotrasen/Items/shovel_dig.ogg
   - type: EarthDigging
   - type: Shovel
+  - type: Clothing # ERRORGATE: wearable on the sling
+    quickEquip: false
+    slots:
+    - suitStorage
 
 - type: entity
   parent: BaseItem

@@ -39,9 +39,9 @@ public abstract class SharedHealthExaminableSystem : EntitySystem
         ) =>
         examiner == examinable.Owner && TryComp<SelfAwareComponent>(examinable, out var selfAware)
             ? CreateMarkupSelfAware(examinable, selfAware, examinable.Comp, damageable)
-            : CreateMarkup(examinable, examinable.Comp, damageable);
+            : CreateMarkup(examinable, examinable.Comp, damageable, examiner == examinable.Owner); // ERRORGATE: first person when examining yourself
 
-    private FormattedMessage CreateMarkup(EntityUid uid, HealthExaminableComponent component, DamageableComponent damage)
+    private FormattedMessage CreateMarkup(EntityUid uid, HealthExaminableComponent component, DamageableComponent damage, bool self = false)
     {
         var msg = new FormattedMessage();
 
@@ -65,6 +65,15 @@ public abstract class SharedHealthExaminableSystem : EntitySystem
                 var str = $"health-examinable-{component.LocPrefix}-{type}-{threshold}";
                 var tempLocStr = Loc.GetString($"health-examinable-{component.LocPrefix}-{type}-{threshold}", ("target", Identity.Entity(uid, EntityManager)));
 
+                // ERRORGATE: first person variant when examining yourself
+                if (self)
+                {
+                    var selfStr = $"health-examinable-selfaware-{component.LocPrefix}-{type}-{threshold}";
+                    var selfLocStr = Loc.GetString(selfStr);
+                    if (selfLocStr != selfStr)
+                        tempLocStr = selfLocStr;
+                }
+
                 // i.e., this string doesn't exist, because theres nothing for that threshold
                 if (tempLocStr == str)
                     continue;
@@ -87,10 +96,17 @@ public abstract class SharedHealthExaminableSystem : EntitySystem
         }
 
         if (msg.IsEmpty)
-            msg.AddMarkupOrThrow(Loc.GetString($"health-examinable-{component.LocPrefix}-none"));
+        {
+            // ERRORGATE: first person variant when examining yourself
+            var noneKey = self ? $"health-examinable-selfaware-{component.LocPrefix}-none" : $"health-examinable-{component.LocPrefix}-none";
+            var noneStr = Loc.GetString(noneKey);
+            if (noneStr == noneKey)
+                noneStr = Loc.GetString($"health-examinable-{component.LocPrefix}-none");
+            msg.AddMarkupOrThrow(noneStr);
+        }
 
         // Anything else want to add on to this?
-        RaiseLocalEvent(uid, new HealthBeingExaminedEvent(msg, false), true);
+        RaiseLocalEvent(uid, new HealthBeingExaminedEvent(msg, self), true);
 
         return msg;
     }

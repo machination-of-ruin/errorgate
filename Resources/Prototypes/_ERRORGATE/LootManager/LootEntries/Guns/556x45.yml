@@ -1,7 +1,7 @@
 #Rarity 2
 
 - type: lootEntry
-  id: WeaponRifleTenebra
+  id: WeaponRifleTenebraRandomMag
   rarityTiers: [2]
   locations: [Military]
   childEntries: [Magazine556x45Random]
@@ -24,13 +24,13 @@
 #Rarity 3
 
 - type: lootEntry
-  id: WeaponRifleLecter
+  id: WeaponRifleLecterRandomMag
   rarityTiers: [3]
   locations: [Security, Military]
   childEntries: [Magazine556x45Random]
 
 - type: lootEntry
-  id: WeaponLightMachineM249
+  id: WeaponLightMachineM249RandomMag
   rarityTiers: [3]
   locations: [Military]
   childEntries: [Magazine556x45BoxRandom]

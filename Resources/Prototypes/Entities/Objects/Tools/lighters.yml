@@ -97,8 +97,9 @@
         Blunt: 0
   - type: DamageOtherOnHit
   - type: Welder
-    fuelConsumption: 0.01
-    fuelLitCost: 0.1
+    fuelConsumption: 0.002 # ERRORGATE: 0.002 per second like the old build, 1 unit lasts about 8 minutes
+    welderUpdateTimer: 5 # consumes 0.01 every 5 seconds, the smallest amount a solution can lose
+    fuelLitCost: 0.01
     tankSafe: true
   - type: PointLight
     enabled: false
@@ -237,8 +238,9 @@
           Quantity: 12
         maxVol: 12 #uses less fuel than a welder, so this isnt as bad as it looks
   - type: Welder
-    fuelConsumption: 0.01
-    fuelLitCost: 0.1
+    fuelConsumption: 0.002 # ERRORGATE: 0.002 per second like the old build, 1 unit lasts about 8 minutes
+    welderUpdateTimer: 5 # consumes 0.01 every 5 seconds, the smallest amount a solution can lose
+    fuelLitCost: 0.01
     tankSafe: true
   - type: ToggleableLightVisuals
     spriteLayer: lighter_flame

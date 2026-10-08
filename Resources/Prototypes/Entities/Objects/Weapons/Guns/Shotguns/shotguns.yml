@@ -385,6 +385,7 @@
     damageModifier: 1.5
   - type: BallisticAmmoProvider
     capacity: 2
+    autoCycle: true # ERRORGATE: break action, both barrels without a pump
   - type: Construction
     graph: ShotgunSawn
     node: shotgunsawn

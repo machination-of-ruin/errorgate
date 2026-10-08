@@ -37,6 +37,10 @@ public sealed partial class RevolverAmmoProviderComponent : AmmoProviderComponen
     [DataField("chambers")]
     public bool?[] Chambers = Array.Empty<bool?>();
 
+    /// <summary>ERRORGATE: spawn with a random number of live rounds in the cylinder.</summary>
+    [DataField]
+    public bool RandomizeAmmo;
+
     [DataField("proto", customTypeSerializer:typeof(PrototypeIdSerializer<EntityPrototype>))]
     public string? FillPrototype = "Cartridge357Magnum"; // ERRORGATE: real-world calibers
 

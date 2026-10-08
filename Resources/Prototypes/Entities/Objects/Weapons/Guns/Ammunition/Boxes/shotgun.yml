@@ -59,13 +59,17 @@
   components:
   - type: BallisticAmmoProvider
     proto: ShellShotgun
-  - type: Sprite
+  - type: Sprite # ERRORGATE: old box art
+    sprite: Objects/Weapons/Guns/Ammunition/Boxes/anti_materiel.rsi
     layers:
-    - state: base
+    - state: base-b
       map: ["enum.GunVisualLayers.Base"]
-    - state: mag-1
+    - state: magb-1
       map: ["enum.GunVisualLayers.Mag"]
-    - state: lethal
+  - type: MagazineVisuals
+    magState: magb
+    steps: 2
+    zeroVisible: false
 
 - type: entity
   name: shell box (slug)
@@ -74,17 +78,17 @@
   components:
   - type: BallisticAmmoProvider
     proto: ShellShotgunSlug
-  - type: MagazineVisuals
-    magState: mag-slug
-    steps: 5
-    zeroVisible: false
-  - type: Sprite
+  - type: Sprite # ERRORGATE: old box art
+    sprite: Objects/Weapons/Guns/Ammunition/Boxes/anti_materiel.rsi
     layers:
-    - state: base
+    - state: base-b
       map: ["enum.GunVisualLayers.Base"]
-    - state: mag-slug-1
+    - state: magb-green-1
       map: ["enum.GunVisualLayers.Mag"]
-    - state: slug
+  - type: MagazineVisuals
+    magState: magb-green
+    steps: 2
+    zeroVisible: false
 
 - type: entity
   name: shell box (flare)
@@ -189,13 +193,17 @@
   components:
   - type: BallisticAmmoProvider
     proto: ShellShotgunBirdshot
-  - type: Sprite
+  - type: Sprite # ERRORGATE: old box art
+    sprite: Objects/Weapons/Guns/Ammunition/Boxes/anti_materiel.rsi
     layers:
-    - state: base
+    - state: base-b
       map: ["enum.GunVisualLayers.Base"]
-    - state: mag-1
+    - state: magb-1
       map: ["enum.GunVisualLayers.Mag"]
-    - state: lethal
+  - type: MagazineVisuals
+    magState: magb
+    steps: 2
+    zeroVisible: false
 
 - type: entity
   name: ".50 00-Buckshot Box"
@@ -205,13 +213,17 @@
   components:
   - type: BallisticAmmoProvider
     proto: ShellShotgun00Buckshot
-  - type: Sprite
+  - type: Sprite # ERRORGATE: old box art
+    sprite: Objects/Weapons/Guns/Ammunition/Boxes/anti_materiel.rsi
     layers:
-    - state: base
+    - state: base-b
       map: ["enum.GunVisualLayers.Base"]
-    - state: mag-1
+    - state: magb-1
       map: ["enum.GunVisualLayers.Mag"]
-    - state: lethal
+  - type: MagazineVisuals
+    magState: magb
+    steps: 2
+    zeroVisible: false
 
 - type: entity
   name: ".50 0000-Buckshot Box"
@@ -221,13 +233,17 @@
   components:
   - type: BallisticAmmoProvider
     proto: ShellShotgun0000Buckshot
-  - type: Sprite
+  - type: Sprite # ERRORGATE: old box art
+    sprite: Objects/Weapons/Guns/Ammunition/Boxes/anti_materiel.rsi
     layers:
-    - state: base
+    - state: base-b
       map: ["enum.GunVisualLayers.Base"]
-    - state: mag-1
+    - state: magb-1
       map: ["enum.GunVisualLayers.Mag"]
-    - state: lethal
+  - type: MagazineVisuals
+    magState: magb
+    steps: 2
+    zeroVisible: false
 
 - type: entity
   name: shotgun lumenblast cartridges dispenser

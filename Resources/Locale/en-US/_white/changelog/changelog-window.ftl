@@ -1,1 +1,1 @@
-changelog-tab-title-WhiteChangelog = White Dream
+changelog-tab-title-WhiteChangelog = ERRORGATE

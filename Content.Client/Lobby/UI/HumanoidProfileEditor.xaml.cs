@@ -293,10 +293,10 @@ namespace Content.Client.Lobby.UI
 
             #region Custom Names
 
-            _customizeStationAiName = _cfgManager.GetCVar(CCVars.AllowCustomStationAiName);
-            _customizeBorgName = _cfgManager.GetCVar(CCVars.AllowCustomCyborgName);
-            _customizeClownName = _cfgManager.GetCVar(WhiteCVars.AllowCustomClownName); // WD EDIT
-            _customizeMimeName = _cfgManager.GetCVar(WhiteCVars.AllowCustomMimeName); // WD EDIT
+            _customizeStationAiName = false; // ERRORGATE: custom role names removed
+            _customizeBorgName = false; // ERRORGATE: custom role names removed
+            _customizeClownName = false; // ERRORGATE: custom role names removed // WD EDIT
+            _customizeMimeName = false; // ERRORGATE: custom role names removed // WD EDIT
 
             _cfgManager.OnValueChanged(CCVars.AllowCustomStationAiName, OnChangedStationAiNameCustomizationValue);
             _cfgManager.OnValueChanged(CCVars.AllowCustomCyborgName, OnChangedCyborgNameCustomizationValue);
@@ -342,7 +342,7 @@ namespace Content.Client.Lobby.UI
 
             #region Contractors
 
-            if(_cfgManager.GetCVar(CCVars.ContractorsEnabled))
+            if (false && _cfgManager.GetCVar(CCVars.ContractorsEnabled)) // ERRORGATE: backgrounds tab removed
             {
                 Background.Orphan();
                 CTabContainer.AddTab(Background, Loc.GetString("humanoid-profile-editor-background-tab"));
@@ -676,26 +676,26 @@ namespace Content.Client.Lobby.UI
 
         private void OnChangedStationAiNameCustomizationValue(bool newValue)
         {
-            _customizeStationAiName = newValue;
-            StationAiNameContainer.Visible = newValue;
+            _customizeStationAiName = false; // ERRORGATE
+            StationAiNameContainer.Visible = false;
         }
 
         private void OnChangedCyborgNameCustomizationValue(bool newValue)
         {
-            _customizeBorgName = newValue;
-            CyborgNameContainer.Visible = newValue;
+            _customizeBorgName = false; // ERRORGATE
+            CyborgNameContainer.Visible = false;
         }
 
         // WD EDIT START
         private void OnChangedClownNameCustomizationValue(bool newValue)
         {
-            _customizeClownName = newValue;
+            _customizeClownName = false; // ERRORGATE
             UpdateClownControls();
         }
 
         private void OnChangedMimeNameCustomizationValue(bool newValue)
         {
-            _customizeMimeName = newValue;
+            _customizeMimeName = false; // ERRORGATE
             UpdateMimeControls();
         }
         // WD EDIT END

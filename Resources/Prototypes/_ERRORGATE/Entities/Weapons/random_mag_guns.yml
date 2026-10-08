@@ -179,3 +179,126 @@
     slots:
       gun_magazine:
         startingItem: Magazine45ACPSubMachineGunRandom
+
+- type: entity
+  id: WeaponPistolP226RandomMag
+  parent: WeaponPistolP226
+  suffix: Random magazine
+  components:
+  - type: ItemSlots
+    slots:
+      gun_magazine:
+        startingItem: Magazine9x19Random
+
+- type: entity
+  id: WeaponSubMachineMP9RandomMag
+  parent: WeaponSubMachineMP9
+  suffix: Random magazine
+  components:
+  - type: ItemSlots
+    slots:
+      gun_magazine:
+        startingItem: Magazine9x19SubMachineGunRandom
+
+- type: entity
+  id: WeaponLightMachineM249RandomMag
+  parent: WeaponLightMachineM249
+  suffix: Random magazine
+  components:
+  - type: ItemSlots
+    slots:
+      gun_magazine:
+        startingItem: Magazine762x39BoxRandom
+
+- type: entity
+  id: WeaponShotgunBulldogRandomMag
+  parent: WeaponShotgunBulldog
+  suffix: Random magazine
+  components:
+  - type: ItemSlots
+    slots:
+      gun_magazine:
+        startingItem: MagazineShotgunRandom
+
+# Guns with an internal magazine: the load itself is random.
+
+- type: entity
+  id: WeaponSniperSKSRandomMag
+  parent: WeaponSniperSKS
+  suffix: Random load
+  components:
+  - type: BallisticAmmoProvider
+    randomizeAmmo: true
+
+- type: entity
+  id: WeaponSniperHristovRandomMag
+  parent: WeaponSniperHristov
+  suffix: Random load
+  components:
+  - type: BallisticAmmoProvider
+    randomizeAmmo: true
+
+- type: entity
+  id: WeaponShotgunDoubleBarreledRandomMag
+  parent: WeaponShotgunDoubleBarreled
+  suffix: Random load
+  components:
+  - type: BallisticAmmoProvider
+    randomizeAmmo: true
+
+- type: entity
+  id: WeaponShotgunSawnRandomMag
+  parent: WeaponShotgunSawn
+  suffix: Random load
+  components:
+  - type: BallisticAmmoProvider
+    randomizeAmmo: true
+
+- type: entity
+  id: WeaponShotgunRemingtonRandomMag
+  parent: WeaponShotgunRemington
+  suffix: Random load
+  components:
+  - type: BallisticAmmoProvider
+    randomizeAmmo: true
+
+- type: entity
+  id: WeaponShotgunBenelliRandomMag
+  parent: WeaponShotgunBenelli
+  suffix: Random load
+  components:
+  - type: BallisticAmmoProvider
+    randomizeAmmo: true
+
+# Revolvers: a random number of live rounds in the cylinder.
+- type: entity
+  id: WeaponRevolverSmithAndWessonRandomMag
+  parent: WeaponRevolverSmithAndWesson
+  suffix: Random cylinder
+  components:
+  - type: RevolverAmmoProvider
+    randomizeAmmo: true
+
+- type: entity
+  id: WeaponRevolverPythonRandomMag
+  parent: WeaponRevolverPython
+  suffix: Random cylinder
+  components:
+  - type: RevolverAmmoProvider
+    randomizeAmmo: true
+
+- type: entity
+  id: WeaponRevolverLuckyRandomMag
+  parent: WeaponRevolverLucky
+  suffix: Random cylinder
+  components:
+  - type: RevolverAmmoProvider
+    randomizeAmmo: true
+
+- type: entity
+  id: WeaponRevolverMatebaRandomMag
+  parent: WeaponRevolverMateba
+  suffix: Random cylinder
+  components:
+  - type: RevolverAmmoProvider
+    randomizeAmmo: true

@@ -515,6 +515,9 @@
     - state: sks
       map: [ "enum.GunVisualLayers.Base" ]
   - type: Item
+    storedRotation: 45 # ERRORGATE: same inventory grid as the Mosin
+    shape:
+    - 0,0,7,0
     storedSprite:
       sprite: Objects/Weapons/Guns/Snipers/bolt_gun_wood.rsi
       state: sks

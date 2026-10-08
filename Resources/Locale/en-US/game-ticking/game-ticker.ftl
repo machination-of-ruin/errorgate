@@ -8,13 +8,13 @@ game-ticker-delay-start = Round start has been delayed for {$seconds} seconds.
 game-ticker-pause-start = Round start has been paused.
 game-ticker-pause-start-resumed = Round start countdown is now resumed.
 game-ticker-player-join-game-message = You slowly rise from the ground.
-game-ticker-get-info-text = WELCOME TO [color=red]ERRORGATE[/color]
+game-ticker-get-info-text = [color=red]WELCOME TO ERRORGATE[/color]
                             The current round is: [color=blue]#{$roundId}[/color]
                             The current player count is: [color=blue]{$playerCount}[/color]
                             The current map is: [color=blue]{$mapName}[/color]
                             The current game mode is: [color=blue]{$gmTitle}[/color]
                             >[color=blue]{$desc}[/color]
-game-ticker-get-info-preround-text = WELCOME TO [color=red]ERRORGATE[/color]
+game-ticker-get-info-preround-text = [color=red]WELCOME TO ERRORGATE[/color]
                             The current round is: [color=blue]#{$roundId}[/color]
                             The current player count is: [color=blue]{$playerCount}[/color] ([color=blue]{$readyCount}[/color] {$readyCount ->
                                 [one] is

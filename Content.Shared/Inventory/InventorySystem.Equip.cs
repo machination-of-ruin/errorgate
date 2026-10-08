@@ -10,6 +10,7 @@ using Content.Shared.Inventory.Events;
 using Content.Shared.Item;
 using Content.Shared.Movement.Systems;
 using Content.Shared.Popups;
+using Content.Shared.Lock;
 using Content.Shared.Storage;
 using Content.Shared.Strip;
 using Content.Shared.Strip.Components;
@@ -24,6 +25,7 @@ namespace Content.Shared.Inventory;
 public abstract partial class InventorySystem
 {
     [Dependency] private readonly SharedPopupSystem _popup = default!;
+    [Dependency] private readonly Content.Shared.ActionBlocker.ActionBlockerSystem _actionBlocker = default!; // ERRORGATE
     [Dependency] private readonly MovementSpeedModifierSystem _movementSpeed = default!;
     [Dependency] private readonly SharedInteractionSystem _interactionSystem = default!;
     [Dependency] private readonly SharedItemSystem _item = default!;
@@ -93,6 +95,17 @@ public abstract partial class InventorySystem
         // attempt to perform some interaction
         if (held != null && itemUid != null)
         {
+            // ERRORGATE: a worn bag can be filled by clicking its slot with an item in hand (insert only; opening it still needs it off).
+            if (TryComp<StorageComponent>(itemUid.Value, out var wornStorage)
+                && wornStorage.ClickInsert
+                && !(TryComp<LockComponent>(itemUid.Value, out var wornLock) && wornLock.Locked)
+                && _actionBlocker.CanInteract(actor, null)
+                && _actionBlocker.CanUseHeldEntity(actor, held.Value))
+            {
+                _storageSystem.PlayerInsertHeldEntity((itemUid.Value, wornStorage), (actor, hands));
+                return;
+            }
+
             _interactionSystem.InteractUsing(actor, held.Value, itemUid.Value,
                 Transform(itemUid.Value).Coordinates);
             return;

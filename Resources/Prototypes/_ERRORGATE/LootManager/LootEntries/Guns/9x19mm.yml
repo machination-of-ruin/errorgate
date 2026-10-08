@@ -1,13 +1,13 @@
 # rarityTiers 1
 
 - type: lootEntry
-  id: WeaponPistolMakarov
+  id: WeaponPistolMakarovRandomMag
   rarityTiers: [1]
   locations: [Living, Prison]
   childEntries: [Magazine9x19Random]
 
 - type: lootEntry
-  id: WeaponPistolP226
+  id: WeaponPistolP226RandomMag
   rarityTiers: [1]
   locations: [Security, Military]
   childEntries: [Magazine9x19Random]
@@ -25,19 +25,19 @@
 # rarityTiers 2
 
 - type: lootEntry
-  id: WeaponPistolGlock
+  id: WeaponPistolGlockRandomMag
   rarityTiers: [2]
   locations: [Living, Security, Military, Prison]
   childEntries: [Magazine9x19Random]
 
 - type: lootEntry
-  id: WeaponPistolStechkin
+  id: WeaponPistolStechkinRandomMag
   rarityTiers: [2]
   locations: [Military, Security]
   childEntries: [Magazine9x19HighCapacityRandom]
 
 - type: lootEntry
-  id: WeaponSubMachineGunMP5
+  id: WeaponSubMachineGunMP5RandomMag
   rarityTiers: [2]
   locations: [Security, Military]
   childEntries: [Magazine9x19SubMachineGunRandom]
@@ -60,19 +60,19 @@
 # rarityTiers 3
 
 - type: lootEntry
-  id: WeaponPistolBeretta
+  id: WeaponPistolBerettaRandomMag
   rarityTiers: [3]
   locations: [Prison, Military]
   childEntries: [Magazine9x19Random]
 
 - type: lootEntry
-  id: WeaponSubMachineGunVector9x19mm
+  id: WeaponSubMachineGunVector9x19mmRandomMag
   rarityTiers: [3]
   locations: [Security, Military]
   childEntries: [Magazine9x19UltraHighCapacityRandom]
 
 - type: lootEntry
-  id: WeaponSubMachineMP9
+  id: WeaponSubMachineMP9RandomMag
   rarityTiers: [3]
   locations: [Security, Military]
   childEntries: [Magazine9x19SubMachineGunRandom]

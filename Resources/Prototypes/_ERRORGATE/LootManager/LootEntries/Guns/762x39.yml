@@ -1,7 +1,7 @@
 #Rarity 1
 
 - type: lootEntry
-  id: WeaponSniperSKS
+  id: WeaponSniperSKSRandomMag
   rarityTiers: [1]
   locations: [Living, Industrial]
 
@@ -18,13 +18,13 @@
 #Rarity 2
 
 - type: lootEntry
-  id: WeaponRifleL1A1
+  id: WeaponRifleL1A1RandomMag
   rarityTiers: [2]
   locations: [Military]
   childEntries: [Magazine762x39ShortRandom]
 
 - type: lootEntry
-  id: WeaponRifleAk
+  id: WeaponRifleAkRandomMag
   rarityTiers: [2, 3]
   locations: [Military, Prison]
   childEntries: [Magazine762x39Random]
@@ -47,7 +47,7 @@
 #Rarity 3
 
 - type: lootEntry
-  id: WeaponRifleASVal
+  id: WeaponRifleASValRandomMag
   rarityTiers: [3]
   locations: [Military]
   childEntries: [Magazine762x39Random]

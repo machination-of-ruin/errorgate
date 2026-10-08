@@ -171,7 +171,7 @@
   - type: Sprite
     drawdepth: Mobs
     sprite: Mobs/Demons/abomination.rsi
-    scale: 0.6, 0.6
+    scale: 1, 1 # normal size; MobRunnerSmall (School 1) is the 0.8 model
     layers:
     - map: ["enum.DamageStateVisualLayers.Base"]
       state: rag

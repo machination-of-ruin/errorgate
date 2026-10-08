@@ -28,6 +28,10 @@
     heavyDamageBaseModifier: 1.75
     maxTargets: 5
     angle: 80
+  - type: Clothing # ERRORGATE: wearable on the sling
+    quickEquip: false
+    slots:
+    - suitStorage
   - type: DamageOtherOnHit
     staminaCost: 5
   - type: Wieldable
