@@ -1,0 +1,73 @@
+- type: entity
+  name: campfire
+  parent: Bonfire
+  id: CampfireCraftable
+  description: A source of light and heat. It will burn out.
+  components:
+  - type: TimedDespawn
+    lifetime: 300 # 5 minutes
+  - type: ApcPowerReceiver # the heater only runs while powered, a fire needs no power
+    needsPower: false
+    powerLoad: 0
+  - type: EntityHeater
+    setting: High
+    power: 2400
+  - type: ItemPlacer
+    maxEntities: 4
+    whitelist:
+      components:
+      - Temperature
+  - type: PlaceableSurface
+  - type: Physics
+    bodyType: Static
+  - type: Construction
+    graph: CampfireGraph
+    node: campfire
+  - type: Fixtures
+    fixtures:
+      fix1:
+        shape:
+          !type:PhysShapeAabb
+          bounds: "-0.5,-0.5,0.5,0.5"
+        mask:
+        - TabletopMachineMask
+        layer:
+        - Impassable
+        - MidImpassable
+        - LowImpassable
+        - SlipLayer
+        hard: false
+        density: 1000
+
+- type: construction
+  name: campfire
+  id: Campfire
+  graph: CampfireGraph
+  startNode: start
+  targetNode: campfire
+  category: construction-category-furniture
+  description: A source of light and heat. Burns out after a few minutes.
+  icon:
+    sprite: Structures/Decoration/bonfire.rsi
+    state: bonfire
+  objectType: Structure
+  placementMode: SnapgridCenter
+  canBuildInImpassable: false
+  conditions:
+  - !type:TileNotBlocked
+
+- type: constructionGraph
+  id: CampfireGraph
+  start: start
+  graph:
+  - node: start
+    edges:
+    - to: campfire
+      completed:
+      - !type:SnapToGrid { }
+      steps:
+      - material: WoodPlank
+        amount: 10
+        doAfter: 5
+  - node: campfire
+    entity: CampfireCraftable

@@ -67,7 +67,7 @@ Status: **DONE** = ported (commit), **SKIP** = will not port (reason), **COVERED
 | 21 | Gun-melee | COVERED | Right-click gun melee (WD #24) exists; keep upstream stats and bash cooldown. |
 | 22, 27 | backpack-fix, pocket-gun-fix | SKIP | Patches of the old #19. |
 | 23 | cvar | DONE `75418641b5` | Tips, LOOC, LOOC bubbles off. Screen shake 0.2 was already upstream. |
-| 24 | loot-spawners | MILESTONE | First draft of the loot system (see World systems). |
+| 24 | loot-spawners | First draft of the loot system | none | DONE (world systems batch 1) |
 | 25 | gunslotvisual | DONE `75418641b5` | Only the 11 missing worn-gun sprites. Prototype path edits dropped (Windows backslashes). |
 | 26 | suitslot-no-suit | DONE `75418641b5` | Human template only. |
 | 28, 29 | gun-cycle | DONE `96154c2a36` | Muzzle flash radius on ammo (default 5), slower shotguns. `AutoCycle` already upstream. |
@@ -118,7 +118,7 @@ Hints below come from commit messages, file lists and quick greps. **They are le
 | 74 | mobs | Walker mobs, mob loot uses the global manager, mob spawner prototypes | none | DONE (world systems batch 1) |
 | 75, 80 | weather, doors | Weather off on concrete, doors and keys, tough airlocks | none | DONE (weather tiles checked, tough airlock variant, factory door) |
 | 76 | tweaks | Second map prototype Kuznetsk, mask popup fix, circular saw buff, disable pulling items, invisible tiny fan | WWDP #975 pull attempt cooldown | DONE (batch 2): saws buffed (`Saw`, `SawElectric`, `SawAdvanced`), items cannot be pulled (`Pullable` removed from `BaseItem`), invisible tiny fan prototype `AtmosDeviceFanTinyInvisible`. Mask popup left upstream. Kuznetsk map with world milestone |
-| 77 | crafting-cannibalism | Human butchering, bone crafts, campfires despawn, cooking, crafting cull | WWDP #578 Diegetic Crafting, #619 Construction | DONE: 263 build/craft recipes removed from the menus (prototypes and graphs stay), meat not sliceable and rots in 15 min, human meat cooks into human steak, spear damage up, bat starts as a wooden shaft. Bone spear already upstream (needs web silk), skull helmet recipe and campfire craft still open |
+| 77 | crafting-cannibalism | Human butchering, bone crafts, campfires despawn, cooking, crafting cull | WWDP #578 Diegetic Crafting, #619 Construction | DONE: 263 build/craft recipes removed from the menus (prototypes and graphs stay), meat not sliceable and rots in 15 min, human meat cooks into human steak, spear damage up, bat starts as a wooden shaft. Bone spear already upstream (needs web silk), campfire craft DONE (`CampfireCraftable`, 10 planks, burns out in 5 min, cooks), skull helmet recipe still open |
 | 78 | lootpool | Kuznetsk loot table | none | PARTLY: Kuznetsk loot table ported, its map never existed |
 | 79 | lights | `DayCycle` (client and server), traps, starvation, all masks hide identity, wield uses identity | WWDP #917 masks hide identity; #305 booby traps exist | PARTLY DONE: wield identity and masks already upstream; hunger 0.1 with starvation bloodloss, head bandana covers face, dresser holds large items, barotrauma off. Day cycle, traps (and the Grenade tag), stone-door airtight come with world systems |
 | 81 | less-ammo | Guns start empty, randomised magazines, more damage | none | DONE (random-mag prototypes only) |

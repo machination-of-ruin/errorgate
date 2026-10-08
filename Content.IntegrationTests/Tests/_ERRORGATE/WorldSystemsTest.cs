@@ -25,7 +25,7 @@ public sealed class WorldSystemsTest
                      {
                          "FloorWaterEntityToxic", "SpikeTrap", "AirlockTough", "AirlockFactoryEntrance", "FactoryCard",
                          "MobSpawnerWalkerLiving", "MobSpawnerWalkerArmored", "MobSpawnerRunner", "MobSpawnerTarantula",
-                         "MobSpawnerCarp", "LootSpawnerSecurityTier2",
+                         "MobSpawnerCarp", "LootSpawnerSecurityTier2", "CampfireCraftable",
                      })
             {
                 entMan.SpawnEntity(proto, testMap.GridCoords);
