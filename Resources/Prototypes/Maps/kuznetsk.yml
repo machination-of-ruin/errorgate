@@ -1,0 +1,15 @@
+- type: gameMap
+  id: Kuznetsk
+  mapName: Kuznetsk
+  mapPath: /Maps/edge_of_entropy/Kuznetsk.yml
+  minPlayers: 0
+  randomRotation: false
+  stations:
+    Kuznetsk:
+      stationProto: TestStation
+      components:
+      - type: StationNameSetup
+        mapNameTemplate: "Kuznetsk"
+      - type: StationJobs
+        availableJobs:
+          HumanError: [ -1, -1 ]
