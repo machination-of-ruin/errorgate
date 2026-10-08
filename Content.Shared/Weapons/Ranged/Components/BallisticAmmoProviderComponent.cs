@@ -70,7 +70,7 @@ public sealed partial class BallisticAmmoProviderComponent : Component
     /// DoAfter delay for filling a bullet into another ballistic ammo provider.
     /// </summary>
     [DataField]
-    public TimeSpan FillDelay = TimeSpan.FromSeconds(0.5);
+    public TimeSpan FillDelay = TimeSpan.FromSeconds(0.75); // ERRORGATE: slower manual loading
 
     /// <summary>
     /// Is ammo ejected after each shot, or not.

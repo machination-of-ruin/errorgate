@@ -93,7 +93,7 @@ Hints below come from commit messages, file lists and quick greps. **They are le
 | 44 | no-id-card-verb | Health/bleeding/damage text pushed inline into examine, ID card verb removed, radiation inspect | WWDP keeps health examine as a verb (`SharedHealthExaminableSystem`) | TODO. Pairs with #50 |
 | 45 | embed-fix | Embedded items can be pulled out | Tested: embedded items are reachable under WWDP interactions | SKIP (not needed) |
 | 46, 52 | shove-2, mag-inspect-logs | Separate shove (`ShoveAttackEvent`, flip animation `FlipCharacter`, `FlipAnimationEffect`) | WWDP shove (#280 #295 #304 #315 #347 #565 #582 #978) tunes the disarm-as-shove; no `ShoveAttackEvent` in master | MILESTONE melee. Big decision: keep WWDP shove or replace |
-| 47 | mag-inspect-fix | Ballistic fill delay 0.5 to 1 s, magazine examine tweak | Gunnening shows magazine/chamber | Mostly COVERED, fill delay only |
+| 47 | mag-inspect-fix | Ballistic fill delay 0.5 to 1 s, magazine examine tweak | Gunnening shows magazine/chamber | DONE: fill delay 0.75 s (owner choice), rest COVERED |
 | 48 | gun-calibers | "The gunnening" of the old fork: real-world calibers (9x19, 5.56x45, 7.62x39, .357/.44, lapua, 6mm caseless), ammo and gun roster cut, station maps deleted (about 184 files), loot-entry names by caliber | Master uses fictional calibers (`.35 auto`, `.30 rifle`, `.50`); the roster is intact | MILESTONE guns. Very large; decide caliber model first |
 | 49 | 357 | The gunnening part 2 (.357/.44 rename, speed loaders) | same | MILESTONE guns |
 | 50 | no-examine | Damage examine for melee/ranged/thrown pushed inline, magazine examine | WWDP #549 #574 #925 fix damage examine | TODO. Pairs with #44 |
