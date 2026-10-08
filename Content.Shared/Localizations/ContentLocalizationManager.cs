@@ -78,7 +78,8 @@ namespace Content.Shared.Localizations
             */
             var cultureRu = new CultureInfo("ru-RU");
 
-            _loc.AddFunction(cultureRu, "RU-PLURAL", FormatRuPlural);
+            if (_culture == "ru-RU") // ERRORGATE: the ru-RU culture is only loaded on demand
+                _loc.AddFunction(cultureRu, "RU-PLURAL", FormatRuPlural);
             // WWDP EDIT END
         }
 

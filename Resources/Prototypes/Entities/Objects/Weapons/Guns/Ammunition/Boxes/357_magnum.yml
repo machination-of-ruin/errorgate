@@ -2,6 +2,7 @@
   abstract: true
   parent: BaseAmmoBox
   id: BaseAmmoBox357Magnum
+  suffix: 20 # ERRORGATE
   components:
   - type: BallisticAmmoProvider
     mayTransfer: true
@@ -9,7 +10,7 @@
       tags:
         - Cartridge357Magnum
     proto: Cartridge357Magnum
-    capacity: 30 # WWDP
+    capacity: 20 # ERRORGATE: old fork count
   - type: Item
     size: Small
   - type: ContainerContainer
@@ -86,7 +87,7 @@
 - type: entity
   id: AmmoBox357MagnumAP
   parent: BaseAmmoBox357Magnum
-  name: ammunition box (.357 Magnum armor-piercing)
+  name: ammunition box (.357 Magnum AP)
   components:
   - type: BallisticAmmoProvider
     proto: Cartridge357MagnumAP

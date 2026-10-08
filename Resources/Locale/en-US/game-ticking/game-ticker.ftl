@@ -9,21 +9,21 @@ game-ticker-pause-start = Round start has been paused.
 game-ticker-pause-start-resumed = Round start countdown is now resumed.
 game-ticker-player-join-game-message = You slowly rise from the ground.
 game-ticker-get-info-text = [color=red]WELCOME TO ERRORGATE[/color]
-                            The current round is: [color=blue]#{$roundId}[/color]
-                            The current player count is: [color=blue]{$playerCount}[/color]
-                            The current map is: [color=blue]{$mapName}[/color]
-                            The current game mode is: [color=blue]{$gmTitle}[/color]
-                            >[color=blue]{$desc}[/color]
+                            The current round is: [color=red]#{$roundId}[/color]
+                            The current player count is: [color=red]{$playerCount}[/color]
+                            The current map is: [color=red]{$mapName}[/color]
+                            The current game mode is: [color=red]{$gmTitle}[/color]
+                            >[color=red]{$desc}[/color]
 game-ticker-get-info-preround-text = [color=red]WELCOME TO ERRORGATE[/color]
-                            The current round is: [color=blue]#{$roundId}[/color]
-                            The current player count is: [color=blue]{$playerCount}[/color] ([color=blue]{$readyCount}[/color] {$readyCount ->
+                            The current round is: [color=red]#{$roundId}[/color]
+                            The current player count is: [color=red]{$playerCount}[/color] ([color=red]{$readyCount}[/color] {$readyCount ->
                                 [one] is
                                 *[other] are
                             } ready)
-                            The current map is: [color=blue]{$mapName}[/color]
-                            The current game mode is: [color=blue]{$gmTitle}[/color]
-                            >[color=blue]{$desc}[/color]
-game-ticker-no-map-selected = [color=blue]Map not yet selected![/color]
+                            The current map is: [color=red]{$mapName}[/color]
+                            The current game mode is: [color=red]{$gmTitle}[/color]
+                            >[color=red]{$desc}[/color]
+game-ticker-no-map-selected = [color=red]Map not yet selected![/color]
 game-ticker-player-no-jobs-available-when-joining = When attempting to join to the game, no jobs were available.
 game-ticker-welcome-to-the-station = Welcome to the station crew, enjoy your stay!
 

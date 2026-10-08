@@ -25,7 +25,7 @@
     whitelist:
       tags:
       - ShellShotgun
-    capacity: 16
+    capacity: 12 # ERRORGATE: old fork count
   - type: MagazineVisuals
     magState: mag
     steps: 5

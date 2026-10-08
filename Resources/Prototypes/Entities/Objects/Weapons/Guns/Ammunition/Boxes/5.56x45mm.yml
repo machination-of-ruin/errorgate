@@ -2,6 +2,7 @@
   abstract: true
   parent: BaseAmmoBox
   id: BaseAmmoBox556x45
+  suffix: 20 # ERRORGATE
   components:
   - type: BallisticAmmoProvider
     mayTransfer: true
@@ -9,7 +10,7 @@
       tags:
         - Cartridge556x45
     proto: Cartridge556x45
-    capacity: 50
+    capacity: 20 # ERRORGATE: old fork count
   - type: Item
     size: Small
   - type: ContainerContainer
@@ -27,11 +28,13 @@
 - type: entity
   parent: BaseAmmoBox556x45
   id: AmmoBox556x45Big
-  name: ammunition box (5.56x45mm)
-  suffix: Big
+  name: ammunition crate (5.56x45mm) # ERRORGATE
+  suffix: 60 # ERRORGATE
   components:
+  - type: Item # ERRORGATE
+    size: Normal
   - type: BallisticAmmoProvider
-    capacity: 200
+    capacity: 60 # ERRORGATE: old fork count
     proto: Cartridge556x45
   - type: Sprite
     layers:

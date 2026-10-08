@@ -2,6 +2,7 @@
   abstract: true
   parent: BaseAmmoBox
   id: BaseAmmoBox45ACP
+  suffix: 20 # ERRORGATE
   components:
   - type: BallisticAmmoProvider
     mayTransfer: true
@@ -9,7 +10,7 @@
       tags:
         - Cartridge45ACP
     proto: Cartridge45ACP
-    capacity: 30 # WWDP
+    capacity: 20 # ERRORGATE: old fork count
   - type: Item
     size: Small
   - type: ContainerContainer
@@ -86,7 +87,7 @@
 - type: entity
   id: AmmoBox45ACPAP
   parent: BaseAmmoBox45ACP
-  name: ammunition box (.45 ACP armor-piercing)
+  name: ammunition box (.45 ACP AP)
   components:
   - type: BallisticAmmoProvider
     proto: Cartridge45ACPAP

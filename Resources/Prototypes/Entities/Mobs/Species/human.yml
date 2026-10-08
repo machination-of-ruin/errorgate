@@ -18,11 +18,14 @@
     state: full
   - type: Thirst
   - type: Carriable # Carrying system from nyanotrasen.
-  - type: Butcherable
-    butcheringType: Spike
+  - type: Butcherable # ERRORGATE: cannibalism, butcher with a knife
+    butcheringType: Knife
     spawned:
     - id: FoodMeatHuman
-      amount: 5
+      amount: 3
+    - id: HeadSkeleton
+    - id: MaterialBones1
+      amount: 4
   - type: HumanoidAppearance
     species: Human
     hideLayersOnEquip:

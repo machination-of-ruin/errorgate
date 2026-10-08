@@ -3,6 +3,7 @@
   parent: BaseItem
   id: BaseAmmoBoxSniper
   name: ammunition box (.338 Lapua Magnum)
+  suffix: 5 # ERRORGATE
   components:
   - type: BallisticAmmoProvider
     mayTransfer: true
@@ -10,7 +11,7 @@
       tags:
         - CartridgeLapuaMagnum
     proto: CartridgeLapuaMagnum
-    capacity: 30 # WD EDIT: 10 -> 30
+    capacity: 5 # ERRORGATE: old fork count
   - type: Item
     size: Small
   - type: ContainerContainer

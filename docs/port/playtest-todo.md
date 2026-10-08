@@ -87,3 +87,14 @@ Found while playing the `port/beyond` build. One line each, newest last.
 - [x] Port the ammo box textures from the old build.
 - [x] Guns in loot tables spawn with randomly filled magazines (new prototypes parented to each gun).
 - [x] Server crashed once: kill tracking KeyNotFound when a mob kills a mob (fixed).
+
+## Round 5 (playtest reports)
+
+- [x] Lobby info text: all `[color=blue]` values are red now (`game-ticker.ftl`).
+- [x] Item examine: the whole "a <item>" is one muted red (`#b04848`), no inner paleturquoise.
+- [x] 7.62 and 5.56 200-round boxes use the big crate art; all ammo box round counts, sizes, names and suffixes match the old fork (Big = 60 rounds, Normal; base boxes 20, sniper 5, shotgun boxes 12).
+- [x] Walk/run speeds: base values (walk 3.5, sprint 5) and every mob speed in `_ERRORGATE/MobSpawners` are identical to the old fork.
+- [x] Human bodies butcher with a knife: 3 human meat, a skull and 4 bones (old commit 0c1e3c06e5, was marked done by mistake). Skull craft into a bone helmet (slice, 2 bones).
+- [x] `locale.culture` default was ru-RU, now en-US (ru-RU plural function registered only when that culture is chosen).
+- [x] Old `ERRORGATE/errorgate.toml` server preset ported (`Resources/ConfigPresets/ERRORGATE/errorgate.toml`, no rules_file: the rules are the guidebook page).
+- [ ] Still not ported from the old fork: starter backpack fills (`StarterGear`), night vision and thermal goggles cherry-pick (check upstream), old `errorgate_rules.txt`.

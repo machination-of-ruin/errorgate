@@ -3,6 +3,7 @@
   parent: BaseAmmoBox
   id: BaseAmmoBoxCaselessRifle
   name: ammunition box (6mm caseless)
+  suffix: 20 # ERRORGATE
   components:
   - type: BallisticAmmoProvider
     mayTransfer: true
@@ -10,7 +11,7 @@
       tags:
       - Cartridge6mmCaseless
     proto: Cartridge6mmCaseless
-    capacity: 60
+    capacity: 20 # ERRORGATE: old fork count
   - type: Item
     size: Small
   - type: ContainerContainer

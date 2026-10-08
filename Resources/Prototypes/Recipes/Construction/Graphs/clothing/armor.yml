@@ -23,5 +23,14 @@
       - material: Bones
         amount: 4
         doAfter: 1
+  - node: skull # ERRORGATE: a human skull becomes a helmet
+    edges:
+    - to: helmet
+      steps:
+      - tool: Slicing
+        doAfter: 4
+      - material: Bones
+        amount: 2
+        doAfter: 3
   - node: helmet
     entity: ClothingHeadHelmetBone

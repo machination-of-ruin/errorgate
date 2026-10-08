@@ -77,6 +77,9 @@
       state: "skull_icon"
     - type: BodyPart
       partType: Head
+    - type: Construction # ERRORGATE: skull helmet
+      graph: BoneHelmet
+      node: skull
     - type: Input
       context: "human"
     - type: Speech

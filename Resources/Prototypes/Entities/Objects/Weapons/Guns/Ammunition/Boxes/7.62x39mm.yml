@@ -3,6 +3,7 @@
   parent: BaseAmmoBox
   id: BaseAmmoBox762x39
   name: ammunition box (7.62x39mm)
+  suffix: 20 # ERRORGATE
   components:
   - type: BallisticAmmoProvider
     mayTransfer: true
@@ -10,7 +11,7 @@
       tags:
       - Cartridge762x39
     proto: Cartridge762x39
-    capacity: 60
+    capacity: 20 # ERRORGATE: old fork count
   - type: Item
     size: Small
   - type: ContainerContainer
@@ -28,18 +29,24 @@
 - type: entity
   parent: BaseAmmoBox762x39
   id: AmmoBox762x39Big
-  name: ammunition box (7.62x39mm)
-  suffix: Big
+  name: ammunition crate (7.62x39mm) # ERRORGATE
+  suffix: 60 # ERRORGATE
   components:
+  - type: Item # ERRORGATE
+    size: Normal
   - type: BallisticAmmoProvider
-    capacity: 200
+    capacity: 60 # ERRORGATE: old fork count
     proto: Cartridge762x39
   - type: Sprite
     layers:
-    - state: base
+    - state: base-b
       map: ["enum.GunVisualLayers.Base"]
-    - state: mag-1
+    - state: magb-1
       map: ["enum.GunVisualLayers.Mag"]
+  - type: MagazineVisuals
+    magState: magb
+    steps: 2
+    zeroVisible: false
 
 - type: entity
   parent: BaseAmmoBox762x39
