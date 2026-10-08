@@ -89,4 +89,44 @@ public sealed class SmallTweaksTest
 
         await pair.CleanReturnAsync();
     }
+
+    [Test]
+    public async Task SprintingDrainsStaminaUntilTired()
+    {
+        await using var pair = await PoolManager.GetServerClient(new PoolSettings { Dirty = true });
+        var server = pair.Server;
+        var entMan = server.EntMan;
+
+        EntityUid human = default;
+        await server.WaitAssertion(() =>
+        {
+            entMan.System<Robust.Server.GameObjects.MapSystem>().CreateMap(out var mapId);
+            human = entMan.SpawnEntity("MobHuman", new MapCoordinates(0, 0, mapId));
+            var stamina = entMan.GetComponent<Content.Shared.Damage.Components.StaminaComponent>(human);
+            Assert.That(stamina.SprintingStaminaDrainRate, Is.GreaterThan(0f));
+            // The mover toggles the drain of the entity itself every tick, so use another source to keep it going without input
+            var source = entMan.SpawnEntity(null, new MapCoordinates(0, 0, mapId));
+            entMan.System<Content.Shared.Damage.Systems.StaminaSystem>().ToggleStaminaDrain(human, stamina.SprintingStaminaDrainRate, true, false, source);
+        });
+
+        await pair.RunSeconds(2);
+
+        await server.WaitAssertion(() =>
+        {
+            var stamina = entMan.GetComponent<Content.Shared.Damage.Components.StaminaComponent>(human);
+            Assert.That(stamina.StaminaDamage, Is.GreaterThan(5f), $"Sprinting should cost stamina. drains={stamina.ActiveDrains.Count} active={entMan.HasComponent<Content.Shared.Damage.Components.ActiveStaminaComponent>(human)} crit={stamina.Critical} dmg={stamina.StaminaDamage}");
+        });
+
+        // Keep sprinting for a long time: it stops at 80%, it never reaches a crit
+        await pair.RunSeconds(25);
+
+        await server.WaitAssertion(() =>
+        {
+            var stamina = entMan.GetComponent<Content.Shared.Damage.Components.StaminaComponent>(human);
+            Assert.That(stamina.Critical, Is.False, "Sprinting alone must not cause a stamina crit.");
+            Assert.That(stamina.StaminaDamage, Is.LessThan(stamina.CritThreshold), "Sprinting stops at the tired mark.");
+        });
+
+        await pair.CleanReturnAsync();
+    }
 }

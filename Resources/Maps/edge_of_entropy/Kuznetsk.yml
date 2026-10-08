@@ -6,7 +6,7 @@ tilemap:
   1: FloorArcadeBlue
   4: FloorAsphalt
   7: FloorBasalt
-  18: FloorBlue
+  18: FloorWhite
   23: FloorBrokenWood
   26: FloorCave
   27: FloorCaveDrought

@@ -39,11 +39,8 @@ public sealed class TitleWindowManager
             return;
         }
 
-        if (_cfg.GetCVar(CCVars.GameHostnameInTitlebar))
-            // If you really dislike the dash I guess change it here
-            _clyde.SetWindowTitle(hostname + " - " + defaultWindowTitle);
-        else
-            _clyde.SetWindowTitle(defaultWindowTitle);
+        // ERRORGATE: the window is always called ERRORGATE, never the server's hostname
+        _clyde.SetWindowTitle(defaultWindowTitle);
     }
 
     // Clients by default assume game.hostname_in_titlebar is true

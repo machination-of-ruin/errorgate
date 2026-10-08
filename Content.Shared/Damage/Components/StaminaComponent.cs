@@ -54,6 +54,12 @@ public sealed partial class StaminaComponent : Component
     public Dictionary<EntityUid, (float DrainRate, bool ModifiesSpeed)> ActiveDrains = new();
 
     /// <summary>
+    /// ERRORGATE: how much stamina per second is drained while sprinting.
+    /// </summary>
+    [ViewVariables(VVAccess.ReadWrite), DataField, AutoNetworkedField]
+    public float SprintingStaminaDrainRate = 10f;
+
+    /// <summary>
     /// How long will this mob be stunned for?
     /// </summary>
     [ViewVariables(VVAccess.ReadWrite), DataField]

@@ -572,13 +572,12 @@ public sealed partial class HumanoidCharacterProfile : ICharacterProfile
 
         var age = Math.Clamp(Age, speciesPrototype.MinAge, speciesPrototype.MaxAge);
 
-        var gender = Gender switch
+        // ERRORGATE: no pronoun choice, the gender always follows the sex
+        var gender = sex switch
         {
-            Gender.Epicene => Gender.Epicene,
-            Gender.Female => Gender.Female,
-            Gender.Male => Gender.Male,
-            Gender.Neuter => Gender.Neuter,
-            _ => Gender.Epicene // Invalid enum values.
+            Sex.Male => Gender.Male,
+            Sex.Female => Gender.Female,
+            _ => Gender.Epicene,
         };
 
         var bodyType = speciesPrototype.BodyTypes.Contains(BodyType) ? BodyType : speciesPrototype.BodyTypes.First(); // WD EDIT
@@ -662,6 +661,7 @@ public sealed partial class HumanoidCharacterProfile : ICharacterProfile
                 _ => false
             }));
 
+        priorities.Clear(); // ERRORGATE
         var hasHighPrio = false;
         foreach (var (key, value) in priorities)
         {
@@ -673,23 +673,17 @@ public sealed partial class HumanoidCharacterProfile : ICharacterProfile
             hasHighPrio = true;
         }
 
-        var antags = AntagPreferences
-            .Where(id => prototypeManager.TryIndex(id, out var antag) && antag.SetPreference)
-            .Distinct()
-            .ToList();
+        var antags = new List<ProtoId<AntagPrototype>>();
 
-        var traits = TraitPreferences
-            .Where(prototypeManager.HasIndex)
-            .Distinct()
-            .ToList();
+        // ERRORGATE: no traits, loadouts, antags, job choices, flavor text or custom species name, whatever an imported profile says
+        var traits = new List<ProtoId<TraitPrototype>>();
 
-        var loadouts = LoadoutPreferences
-            .Where(l => prototypeManager.HasIndex<LoadoutPrototype>(l.Key))
-            .ToList();
+        var loadouts = new List<KeyValuePair<ProtoId<LoadoutPrototype>, Loadout>>();
 
         Name = name;
-        Customspeciename = customspeciename;
-        FlavorText = flavortext;
+        Customspeciename = string.Empty; // ERRORGATE
+        DisplayPronouns = null; // ERRORGATE
+        FlavorText = string.Empty; // ERRORGATE
         Age = age;
         Sex = sex;
         Gender = gender;

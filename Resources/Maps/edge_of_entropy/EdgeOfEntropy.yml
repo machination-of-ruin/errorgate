@@ -31,8 +31,8 @@ tilemap:
   93: FloorShuttleWhite
   14: FloorSteel
   10: FloorSteelDirty
-  11: FloorSteelLime
-  113: FloorTechMaint2
+  11: FloorSteel
+  113: FloorTechMaint3
   3: FloorTechMaint3
   121: FloorWhiteMono
   125: FloorWhitePlastic
@@ -56,11 +56,6 @@ entities:
     - type: Broadphase
     - type: OccluderTree
     - type: LoadedMap
-    - type: MapLight
-      ambientLightColor: '#D8B059FF'
-    - type: LightCycle
-      minLightLevel: 0.2
-      maxLightLevel: 1.25
   - uid: 2
     components:
     - type: MetaData

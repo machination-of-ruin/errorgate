@@ -263,6 +263,11 @@ namespace Content.Client.Lobby.UI
             PronounsButton.AddItem(Loc.GetString("humanoid-profile-editor-pronouns-female-text"), (int) Gender.Female);
             // ERRORGATE: two genders
 
+            // ERRORGATE: no pronoun choice, the gender follows the sex, no cosmetic pronouns or custom species name
+            PronounsButton.Parent!.Visible = false;
+            CosmeticPronousContainer.Visible = false;
+            CCustomSpecieName.Visible = false;
+
             PronounsButton.OnItemSelected += args =>
             {
                 PronounsButton.SelectId(args.Id);
@@ -585,14 +590,11 @@ namespace Content.Client.Lobby.UI
 
             // Set up the traits tab
             TraitsTab.Orphan();
-            CTabContainer.AddTab(TraitsTab, Loc.GetString("humanoid-profile-editor-traits-tab"));
+            var traitsTab = CTabContainer.AddTab(TraitsTab, Loc.GetString("humanoid-profile-editor-traits-tab"));
             _traitPreferences = new List<TraitPreferenceSelector>();
 
-            // Show/Hide the traits tab if they ever get enabled/disabled
-            var traitsEnabled = cfgManager.GetCVar(CCVars.GameTraitsEnabled);
-            CTabContainer.SetTabVisible(3, traitsEnabled);
-            cfgManager.OnValueChanged(CCVars.GameTraitsEnabled,
-                enabled => CTabContainer.SetTabVisible(3, enabled));
+            // ERRORGATE: no traits, the tab never shows
+            CTabContainer.SetTabVisible(traitsTab, false);
 
             TraitsShowUnusableButton.OnToggled += args => UpdateTraits(args.Pressed);
             TraitsRemoveUnusableButton.OnPressed += _ => TryRemoveUnusableTraits();
@@ -639,7 +641,8 @@ namespace Content.Client.Lobby.UI
         /// </summary>
         public void RefreshFlavorText()
         {
-            if (_cfgManager.GetCVar(CCVars.FlavorText))
+            // ERRORGATE: no custom flavor text, the tab never shows
+            if (false && _cfgManager.GetCVar(CCVars.FlavorText))
             {
                 if (_flavorText != null)
                     return;

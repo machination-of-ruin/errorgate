@@ -103,7 +103,7 @@
   - type: PointLight
     enabled: false
     netsync: false
-    radius: 1.1 #smallest possible
+    radius: 3 # ERRORGATE: the old build range, was 1.1
     color: orange
   - type: ItemTogglePointLight
   # Shitmed Change
@@ -260,7 +260,7 @@
   - type: PointLight
     enabled: false
     netsync: false
-    radius: 1.2 #slightly stronger than the other lighters
+    radius: 4 # ERRORGATE: the old build range, was 1.2
     color: orange
   - type: ItemTogglePointLight
   - type: UseDelay

@@ -14,7 +14,7 @@ namespace Content.Server.Audio;
 public sealed class ContentAudioSystem : SharedContentAudioSystem
 {
     [ValidatePrototypeId<SoundCollectionPrototype>]
-    private const string LobbyMusicCollection = "WhiteLobbyMusic"; // WD EDIT
+    private const string LobbyMusicCollection = "LobbyMusic"; // ERRORGATE: only the ERRORGATE tracks (was WhiteLobbyMusic)
 
     [Dependency] private readonly AudioSystem _serverAudio = default!;
     [Dependency] private readonly IRobustRandom _robustRandom = default!;

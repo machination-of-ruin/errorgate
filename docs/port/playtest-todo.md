@@ -2,36 +2,36 @@
 
 Found while playing the `port/beyond` build. One line each, newest last.
 
-- [ ] Loading screen tips (the station tips dataset, `Resources/Locale/en-US/tips.ftl`, `Datasets/tips.yml`) need to be rewritten in the ERRORGATE voice or removed.
-- [ ] Rules and playtesting tips lose their line breaks (`ServerInfo/Guidebook/ServerRules/ErrorgateRules.xml` is plain text inside `<Document>`, the guidebook parser needs `\n` or blank lines).
+- [x] Loading screen tips (the station tips dataset, `Resources/Locale/en-US/tips.ftl`, `Datasets/tips.yml`) need to be rewritten in the ERRORGATE voice or removed.
+- [x] Rules and playtesting tips lose their line breaks (`ServerInfo/Guidebook/ServerRules/ErrorgateRules.xml` is plain text inside `<Document>`, the guidebook parser needs `\n` or blank lines).
 
 ## Window, lobby, menus
 
-- [ ] OS window title adds "myserver". It must always read ERRORGATE.
-- [ ] Guidebook goes (button, hotkey, F1 help links).
-- [ ] Lobby text "Hi and welcome to Space Station 14" becomes "welcome to ERRORGATE".
-- [ ] Lobby music is vanilla, not ERRORGATE. Only ERRORGATE tracks should play (check the lobby sound collection and the `Audio/Lobby` tracks).
-- [ ] "Have a happy lesbian day": holiday greetings are on. Disable the server holiday cvar.
-- [ ] Crew manifest lobby button is not needed, remove it.
+- [x] OS window title adds "myserver". It must always read ERRORGATE.
+- [x] Guidebook goes (button, hotkey, F1 help links).
+- [x] Lobby text "Hi and welcome to Space Station 14" becomes "welcome to ERRORGATE".
+- [x] Lobby music is vanilla, not ERRORGATE. Only ERRORGATE tracks should play (check the lobby sound collection and the `Audio/Lobby` tracks).
+- [x] "Have a happy lesbian day": holiday greetings are on. Disable the server holiday cvar.
+- [x] Crew manifest lobby button is not needed, remove it.
 
 ## Character setup
 
-- [ ] Remove the animal voices (bark voice list: humans' voices only).
-- [ ] Remove traits (tab and any data).
-- [ ] Remove the custom fluff / flavor description.
-- [ ] Remove pronouns: default to the ones that go with the chosen sex.
-- [ ] Players must not be able to cheat by importing characters with traits, loadouts and so on. Sanitize imported and saved profiles on the server.
+- [x] Remove the animal voices (bark voice list: humans' voices only).
+- [x] Remove traits (tab and any data).
+- [x] Remove the custom fluff / flavor description.
+- [x] Remove pronouns: default to the ones that go with the chosen sex.
+- [x] Players must not be able to cheat by importing characters with traits, loadouts and so on. Sanitize imported and saved profiles on the server.
 
 ## In game
 
-- [ ] Not walking by default (check whether the old setting carried over; the cvar default is true and is archived client side).
-- [ ] Running does not cost stamina.
-- [ ] Lighter does not light the increased range it had in the old build.
-- [ ] World lighting on the dev map and EdgeOfEntropy must go, they are underground (no ambient day/night, `MapLight` and `LightCycle` on those maps).
-- [ ] Rat king has a localized Russian name.
-- [ ] Some maints floors are missing a texture.
-- [ ] Combat logs: the bleeding lines are too large ("hits you are fine"). SS14 chat cannot do larger fonts with a proper offset, so limit them to the size the hit lines use. Hit color orange, not yellow. Bleeding red.
-- [ ] "Say last words" does not kill me. Same with "succumb".
+- [x] Not walking by default (check whether the old setting carried over; the cvar default is true and is archived client side).
+- [x] Running does not cost stamina.
+- [x] Lighter does not light the increased range it had in the old build.
+- [x] World lighting on the dev map and EdgeOfEntropy must go, they are underground (no ambient day/night, `MapLight` and `LightCycle` on those maps).
+- [x] Rat king has a localized Russian name.
+- [x] Some maints floors are missing a texture.
+- [x] Combat logs: the bleeding lines are too large ("hits you are fine"). SS14 chat cannot do larger fonts with a proper offset, so limit them to the size the hit lines use. Hit color orange, not yellow. Bleeding red.
+- [x] "Say last words" does not kill me. Same with "succumb".
 
 ## Found in the server log (not reported by the player)
 
@@ -52,3 +52,6 @@ Found while playing the `port/beyond` build. One line each, newest last.
 - [ ] Mob loot feels rarer than the old build. Measured: a fresh pool gives the 70% rate, tables are identical to the old fork, and the floor spawners take 30-40% of the pool at map load. No cause found yet; needs numbers from play (kills and drops).
 - [ ] Crafts that do not fit (AI core, clown suit and more): list presented to the owner, waiting for the decision.
 - ("Cannot keep up" is a local-hosting artifact, ignore.)
+
+
+- Notes on round 2: the bark list lost Meow, Tem and Gav (Undertale-character voices stay). The names, verbs and adjectives datasets are English again (taken from the errorgate repo). Running drains 10 stamina per second until 80%, then you are tired and slowed. Floors FloorTechMaint2, FloorSteelLime (Edge) and FloorBlue (Kuznetsk) were deprecated placeholders and were replaced in the maps. Walk by default is a client setting, an old saved value may override it. Lighter ranges are the old ones (3 and 4). The EmergencyLight wall lamp was 10 in the old build and is 3 now, left alone.

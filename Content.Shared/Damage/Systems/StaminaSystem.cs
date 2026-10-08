@@ -297,6 +297,28 @@ public sealed partial class StaminaSystem : EntitySystem
         overtime!.Damage = hasComp ? overtime.Damage + value : value;
     }
 
+    /// <summary>
+    /// ERRORGATE: past 80% stamina damage you are warned once and slowed a little.
+    /// </summary>
+    private void CheckTired(EntityUid uid, StaminaComponent component)
+    {
+        var tiredThreshold = component.CritThreshold * 0.8f;
+        if (component.StaminaDamage > tiredThreshold)
+        {
+            if (!component.TiredWarned)
+            {
+                _popup.PopupClient(Loc.GetString("stamina-too-tired"), uid, uid, PopupType.MediumCaution);
+                component.TiredWarned = true;
+            }
+
+            _stunSystem.TrySlowdown(uid, TimeSpan.FromSeconds(4.5), true, 0.9f, 0.9f);
+        }
+        else
+        {
+            component.TiredWarned = false;
+        }
+    }
+
     // goob edit - stunmeta
     public void TakeStaminaDamage(EntityUid uid, float value, StaminaComponent? component = null,
         EntityUid? source = null, EntityUid? with = null, bool visual = true, SoundSpecifier? sound = null, bool? allowsSlowdown = true, bool immediate = true)
@@ -345,22 +367,8 @@ public sealed partial class StaminaSystem : EntitySystem
             _stutter.DoStutter(uid, TimeSpan.FromSeconds(10f), true);
         }
 
-        // ERRORGATE: past 80% stamina damage you are warned once and slowed a little
-        var tiredThreshold = component.CritThreshold * 0.8f;
-        if (allowsSlowdown != false && component.StaminaDamage > tiredThreshold && value > 0)
-        {
-            if (!component.TiredWarned)
-            {
-                _popup.PopupClient(Loc.GetString("stamina-too-tired"), uid, uid, PopupType.MediumCaution);
-                component.TiredWarned = true;
-            }
-
-            _stunSystem.TrySlowdown(uid, TimeSpan.FromSeconds(4.5), true, 0.9f, 0.9f);
-        }
-        else if (component.StaminaDamage < tiredThreshold)
-        {
-            component.TiredWarned = false;
-        }
+        if (value > 0)
+            CheckTired(uid, component);
 
         SetStaminaAlert(uid, component);
 
@@ -431,7 +439,8 @@ public sealed partial class StaminaSystem : EntitySystem
                 RemComp<ActiveStaminaComponent>(uid);
                 continue;
             }
-            if (comp.ActiveDrains.Count > 0)
+            // ERRORGATE: sprinting drains stamina only until you are tired, it never pushes you into a crit by itself
+            if (comp.ActiveDrains.Count > 0 && comp.StaminaDamage < comp.CritThreshold * 0.8f)
                 foreach (var (source, (drainRate, modifiesSpeed)) in comp.ActiveDrains)
                     TakeStaminaDamage(uid,
                     drainRate * frameTime,
@@ -439,6 +448,8 @@ public sealed partial class StaminaSystem : EntitySystem
                     source: source,
                     visual: false,
                     allowsSlowdown: modifiesSpeed);
+            CheckTired(uid, comp); // ERRORGATE
+
             // Shouldn't need to consider paused time as we're only iterating non-paused stamina components.
             var nextUpdate = comp.NextUpdate;
 

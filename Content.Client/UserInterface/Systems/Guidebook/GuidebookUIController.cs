@@ -52,7 +52,8 @@ public sealed class GuidebookUIController : UIController, IOnStateEntered<LobbyS
         _guideWindow.OnClose += OnWindowClosed;
         _guideWindow.OnOpen += OnWindowOpen;
 
-        if (state is LobbyState &&
+        // ERRORGATE: no guidebook, it never pops up for new players
+        if (false && state is LobbyState &&
             _jobRequirements.FetchOverallPlaytime() < TimeSpan.FromMinutes(PlaytimeOpenGuidebook))
         {
             OpenGuidebook();
@@ -61,10 +62,7 @@ public sealed class GuidebookUIController : UIController, IOnStateEntered<LobbyS
         }
 
         // setup keybinding
-        CommandBinds.Builder
-            .Bind(ContentKeyFunctions.OpenGuidebook,
-                InputCmdHandler.FromDelegate(_ => ToggleGuidebook()))
-            .Register<GuidebookUIController>();
+        // ERRORGATE: no guidebook hotkey
     }
 
     public void OnStateExited(LobbyState state)

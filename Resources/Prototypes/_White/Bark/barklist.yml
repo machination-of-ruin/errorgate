@@ -1,11 +1,10 @@
 - type: barkList
   id: default
   voiceList:
-    Meow: []
+    # ERRORGATE: no animal voices (Meow, Tem, Gav)
     Mtt:
     - !type:CharacterGenderRequirement
       gender: Male
-    Tem: []
     Tenna:
     - !type:CharacterGenderRequirement
       gender: Male
@@ -46,4 +45,3 @@
     - !type:CharacterGenderRequirement
       gender: Female
     TxtUnd: []
-    Gav: []

@@ -153,11 +153,6 @@ entities:
     - type: Broadphase
     - type: OccluderTree
     - type: LoadedMap
-    - type: MapLight
-      ambientLightColor: '#D8B059FF'
-    - type: LightCycle
-      minLightLevel: 0.2
-      maxLightLevel: 1.25
     - type: LootManager
       globalLootTablePrototype: LootTableGlobal
 - proto: AlwaysPoweredlightRed
