@@ -203,6 +203,11 @@
     shape:
     - 0,0,3,0
     sprite: Objects/Weapons/Melee/machete.rsi
+  - type: Clothing # ERRORGATE: wearable on the sling
+    quickEquip: false
+    slots:
+    - suitStorage
+    - Belt
 
 - type: entity
   name: claymore

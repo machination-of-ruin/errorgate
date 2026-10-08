@@ -15,6 +15,9 @@ namespace Content.Server.Psionics.Dreams
         [Dependency] private readonly IRobustRandom _random = default!;
         [Dependency] private readonly IChatManager _chatManager = default!;
         [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
+        // ERRORGATE NO DREAMS: sleepers get no telepathic dream messages
+        private const bool DreamsEnabled = false;
+
         private float _accumulator = 0f;
         private float _updateRate = 15f;
 
@@ -28,6 +31,9 @@ namespace Content.Server.Psionics.Dreams
         public override void Update(float frameTime)
         {
             base.Update(frameTime);
+            if (!DreamsEnabled)
+                return;
+
             _accumulator += frameTime;
             if (_accumulator < _updateRate)
                 return;

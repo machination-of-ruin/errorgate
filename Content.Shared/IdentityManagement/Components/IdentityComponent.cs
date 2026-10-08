@@ -63,9 +63,7 @@ public sealed class IdentityRepresentation
             Gender.Epicene or Gender.Neuter or _ => Loc.GetString("identity-gender-person")
         };
 
-        // i.e. 'young assistant man' or 'old cargo technician person' or 'middle-aged captain'
-        return PresumedJob is null
-            ? $"{AgeString} {genderString}"
-            : $"{AgeString} {PresumedJob} {genderString}";
+        // ERRORGATE: unknown man or woman, that is all anyone can tell
+        return $"Unknown {genderString}";
     }
 }

@@ -54,7 +54,8 @@ public sealed class UnpoweredFlashlightSystem : EntitySystem
 
     private void OnGetActions(EntityUid uid, UnpoweredFlashlightComponent component, GetItemActionsEvent args)
     {
-        args.AddAction(component.ToggleActionEntity);
+        // ERRORGATE NO ACTIONS: lights are toggled from their verb, not from the action bar
+        // args.AddAction(component.ToggleActionEntity);
     }
 
     private void AddToggleLightVerbs(EntityUid uid, UnpoweredFlashlightComponent component, GetVerbsEvent<ActivationVerb> args)

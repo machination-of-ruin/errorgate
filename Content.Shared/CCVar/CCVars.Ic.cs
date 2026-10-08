@@ -8,7 +8,7 @@ public sealed partial class CCVars
     ///     Restricts IC character names to alphanumeric chars.
     /// </summary>
     public static readonly CVarDef<bool> RestrictedNames =
-        CVarDef.Create("ic.restricted_names", true, CVar.SERVER | CVar.REPLICATED);
+        CVarDef.Create("ic.restricted_names", false, CVar.SERVER | CVar.REPLICATED);
 
     /// <summary>
     ///     Allows flavor text (character descriptions)
@@ -20,13 +20,13 @@ public sealed partial class CCVars
     ///     Adds a period at the end of a sentence if the sentence ends in a letter.
     /// </summary>
     public static readonly CVarDef<bool> ChatPunctuation =
-        CVarDef.Create("ic.punctuation", true, CVar.SERVER);
+        CVarDef.Create("ic.punctuation", false, CVar.SERVER);
 
     /// <summary>
     ///     Enables automatically forcing IC name rules. Uppercases the first letter of the first and last words of the name
     /// </summary>
     public static readonly CVarDef<bool> ICNameCase =
-        CVarDef.Create("ic.name_case", true, CVar.SERVER | CVar.REPLICATED);
+        CVarDef.Create("ic.name_case", false, CVar.SERVER | CVar.REPLICATED);
 
     /// <summary>
     ///     Whether or not players' characters are randomly generated rather than using their selected characters in the creator.

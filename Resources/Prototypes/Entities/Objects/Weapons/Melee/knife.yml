@@ -51,6 +51,11 @@
       path: /Audio/Medical/Surgery/scalpel2.ogg
   - type: EmitSoundOnPickup # White Dream
     sound: /Audio/Items/unsheath.ogg
+  - type: Clothing # ERRORGATE: wearable on the sling
+    quickEquip: false
+    slots:
+    - suitStorage
+    - Belt
 
 - type: entity
   name: kitchen knife

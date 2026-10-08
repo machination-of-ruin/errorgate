@@ -88,6 +88,12 @@
       state: storage
 
 # Emergency (red) Crowbar
+  - type: Clothing # ERRORGATE: wearable on the sling
+    quickEquip: false
+    slots:
+    - suitStorage
+    - Belt
+
 - type: entity
   name: emergency crowbar
   parent: BaseCrowbar

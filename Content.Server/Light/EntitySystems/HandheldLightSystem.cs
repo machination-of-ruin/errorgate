@@ -69,7 +69,8 @@ namespace Content.Server.Light.EntitySystems
 
         private void OnGetActions(EntityUid uid, HandheldLightComponent component, GetItemActionsEvent args)
         {
-            args.AddAction(ref component.ToggleActionEntity, component.ToggleAction);
+            // ERRORGATE NO ACTIONS: lights are toggled from their verb, not from the action bar
+            // args.AddAction(ref component.ToggleActionEntity, component.ToggleAction);
         }
 
         private void OnToggleAction(Entity<HandheldLightComponent> ent, ref ToggleActionEvent args)

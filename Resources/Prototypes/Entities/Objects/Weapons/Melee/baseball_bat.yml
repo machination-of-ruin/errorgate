@@ -49,6 +49,7 @@
     quickEquip: false
     slots:
     - back
+    - suitStorage # ERRORGATE: sling
   - type: Construction
     graph: WoodenBat
     node: bat

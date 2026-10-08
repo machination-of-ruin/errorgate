@@ -96,11 +96,7 @@ public sealed class SharpSystem : EntitySystem
 
         component.Butchering.Remove(args.Args.Target.Value);
 
-        if (_containerSystem.IsEntityInContainer(args.Args.Target.Value))
-        {
-            args.Handled = true;
-            return;
-        }
+        // ERRORGATE ALLOW BUTCHER: bodies in containers can be butchered
 
         var spawnEntities = EntitySpawnCollection.GetSpawns(butcher.SpawnedEntities, _robustRandom);
         var coords = _transform.GetMapCoordinates(args.Args.Target.Value);
@@ -147,12 +143,6 @@ public sealed class SharpSystem : EntitySystem
             disabled = true;
             message = Loc.GetString("butcherable-need-knife",
                 ("target", uid));
-        }
-        else if (_containerSystem.IsEntityInContainer(uid))
-        {
-            message = Loc.GetString("butcherable-not-in-container",
-                ("target", uid));
-            disabled = true;
         }
         else if (TryComp<MobStateComponent>(uid, out var state) && !_mobStateSystem.IsDead(uid, state))
         {

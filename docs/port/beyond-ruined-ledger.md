@@ -150,6 +150,9 @@ LootManager (global table, spawners, finite caps with refund), DespawnItem (20 m
 ### EdgeOfEntropy map - DONE
 Imported the old fork map (2.2 MB) as `Resources/Maps/edge_of_entropy/EdgeOfEntropy.yml` with gameMap `EdgeOfEntropy`, now the only entry in `DefaultMapPool` and the deathmatch pool. Changes to the map: `AtmosDeviceFanTiny` swapped for the invisible fan, `LootSpawnervTier3` fixed to `LootSpawnerMedicalTier3`, 21 `SpawnPointHumanError` points added at the latejoin positions, `MapLight` and upstream `LightCycle` on the map entity. The loot manager comes from the grid entity as before. Test: `EdgeOfEntropyLootTest` loads the map and checks the table and spawned loot. Kuznetsk stays unported (the old fork never had its map file).
 
+### #59 playtest tweaks - DONE
+No toggle actions for flashlights, lanterns and gas tanks (verbs only), butchering allowed inside containers, no dreams, strangers read as "Unknown man/woman" and keep the proper-noun grammar, CVars off: restricted names, punctuation fixing, name casing, restart ambience, restart votes. Tools, knives, machete and bat fit the Sling with the old worn sprites; ore box holds anything. Not ported: pickaxe wide animation (file moved), campfire craft, skull helmet recipe, starter backpack fills (backpack lighter fill already irrelevant: HumanError spawns with a lighter in the shoulder slot).
+
 ### World systems decisions (owner)
 Item despawn with loot refund (old fork), corpses gib after 10 min, upstream `LightCycle` on the map (min 0.2, max 1.25), toxic water as its own tile, spike trap only (WWDP grenade trap stays), separate tough-airlock variant. Research notes per system were collected by read-only agents; known old-fork bugs to fix while porting: `TryPickLoot` can loop forever, spawner `type: Timer` leftover, `MobRunner` uses `size:` instead of `scale:`, `LootSpawnervTier3` typo, spike trap `acts:` indentation.
 

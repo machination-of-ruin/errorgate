@@ -91,6 +91,11 @@
         - ItemMask
         restitution: 0.3
         friction: 0.2
+  - type: Clothing # ERRORGATE: wearable on the sling
+    quickEquip: false
+    slots:
+    - suitStorage
+    - Belt
 
 - type: entity
   name: screwdriver
@@ -181,6 +186,11 @@
         - ItemMask
         restitution: 0.3
         friction: 0.2
+  - type: Clothing # ERRORGATE: wearable on the sling
+    quickEquip: false
+    slots:
+    - suitStorage
+    - Belt
 
 - type: entity
   name: wrench
@@ -253,6 +263,11 @@
   - type: GuideHelp
     guides:
     - Construction
+  - type: Clothing # ERRORGATE: wearable on the sling
+    quickEquip: false
+    slots:
+    - suitStorage
+    - Belt
 
 - type: entity
   name: multitool

@@ -101,7 +101,8 @@ namespace Content.Server.Atmos.EntitySystems
 
         private void OnGetActions(EntityUid uid, GasTankComponent component, GetItemActionsEvent args)
         {
-            args.AddAction(ref component.ToggleActionEntity, component.ToggleAction);
+            // ERRORGATE NO ACTIONS: the tank is toggled from its verb, not from the action bar
+            // args.AddAction(ref component.ToggleActionEntity, component.ToggleAction);
         }
 
         private void OnExamined(EntityUid uid, GasTankComponent component, ExaminedEvent args)

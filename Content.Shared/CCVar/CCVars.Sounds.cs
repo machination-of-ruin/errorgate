@@ -14,7 +14,7 @@ public sealed partial class CCVars
     ///     Round end sound (APC Destroyed)
     /// </summary>
     public static readonly CVarDef<bool> RestartSoundsEnabled =
-        CVarDef.Create("ambience.restart_sounds_enabled", true, CVar.ARCHIVE | CVar.CLIENTONLY);
+        CVarDef.Create("ambience.restart_sounds_enabled", false, CVar.ARCHIVE | CVar.CLIENTONLY);
 
     public static readonly CVarDef<bool> AdminSoundsEnabled =
         CVarDef.Create("audio.admin_sounds_enabled", true, CVar.ARCHIVE | CVar.CLIENTONLY);
