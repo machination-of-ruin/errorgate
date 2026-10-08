@@ -81,9 +81,9 @@ Hints below come from commit messages, file lists and quick greps. **They are le
 
 | PR | Name | What it is | Upstream overlap / lead | Plan |
 |---|---|---|---|---|
-| 33, 34, 35 | mobspawner, mob-loot-system(2) | `SmartMobSpawner`, `MobLoot`, `DespawnDeadBody` | none | MILESTONE world systems |
+| 33, 34, 35 | mobspawner, mob-loot-system(2) | `SmartMobSpawner`, `MobLoot`, `DespawnDeadBody` | none | DONE (world systems batch 1) |
 | 36 | blood-evaporate | Blood, insect blood, vomit and copper blood evaporate in puddles, 10 s tick, no sparkle | none in master | DONE (small-PR batch). Owner chose scope (b): **every puddle evaporates**, which also covers the evaporation part of #65. Mops still use `EvaporationReagents` (water) |
-| 37 | melee-tweak | RMB disarm instead of heavy attack, no heavy damage examine, thrust wide animation, human punch effect, melee prototype tweaks | Partly overlaps WWDP #264 melee visuals, #623 aiming and hitting. Heavy attack still present in master | MILESTONE melee (with #46, #52, #61, #69, #72, #84) |
+| 37 | melee-tweak | RMB disarm instead of heavy attack, no heavy damage examine, thrust wide animation, human punch effect, melee prototype tweaks | Partly overlaps WWDP #264 melee visuals, #623 aiming and hitting. Heavy attack still present in master | SKIP (owner keeps master melee) |
 | 38 | character-creation | Remove job/antag/traits/loadout tabs, spawn priority, disclaimer; default to HUMANERROR | WWDP #334 touched departments only | DONE (batch 2): Jobs and Antags tabs hidden, spawn priority hidden, traits and loadouts off through `game.traits_enabled` / `game.loadouts_enabled` (default false), two genders (old genders normalised), `FallbackOverflowJob = HumanError`, new wait-in-lobby text |
 | 39 | item-pickup-sounds | Equip rustle for guns and backpacks, gun interact sounds, rifle sound fix | The Gunnening added equip sound collections; WWDP #591 belt gear sounds | COVERED by the Gunnening (`equip.yml` collections, `EmitSoundOnPickup/Drop` on guns) |
 | 40 | no-pointing | Pointing disabled (client and server) | none | DONE (small-PR batch) |
@@ -92,39 +92,39 @@ Hints below come from commit messages, file lists and quick greps. **They are le
 | 43 | character-inspect | Character examine rework, only 2 genders | WWDP #269 Better Character Examine | COVERED (system). Gender menu trim is humans-only housekeeping |
 | 44 | no-id-card-verb | Health/bleeding/damage text pushed inline into examine, ID card verb removed, radiation inspect | WWDP keeps health examine as a verb (`SharedHealthExaminableSystem`) | DONE with #50 (see below) |
 | 45 | embed-fix | Embedded items can be pulled out | Tested: embedded items are reachable under WWDP interactions | SKIP (not needed) |
-| 46, 52 | shove-2, mag-inspect-logs | Separate shove (`ShoveAttackEvent`, flip animation `FlipCharacter`, `FlipAnimationEffect`) | WWDP shove (#280 #295 #304 #315 #347 #565 #582 #978) tunes the disarm-as-shove; no `ShoveAttackEvent` in master | MILESTONE melee. Big decision: keep WWDP shove or replace |
+| 46, 52 | shove-2, mag-inspect-logs | Separate shove (`ShoveAttackEvent`, flip animation `FlipCharacter`, `FlipAnimationEffect`) | WWDP shove (#280 #295 #304 #315 #347 #565 #582 #978) tunes the disarm-as-shove; no `ShoveAttackEvent` in master | SKIP (owner keeps WWDP shove) |
 | 47 | mag-inspect-fix | Ballistic fill delay 0.5 to 1 s, magazine examine tweak | Gunnening shows magazine/chamber | DONE: fill delay 0.75 s (owner choice), rest COVERED |
-| 48 | gun-calibers | "The gunnening" of the old fork: real-world calibers (9x19, 5.56x45, 7.62x39, .357/.44, lapua, 6mm caseless), ammo and gun roster cut, station maps deleted (about 184 files), loot-entry names by caliber | Master uses fictional calibers (`.35 auto`, `.30 rifle`, `.50`); the roster is intact | MILESTONE guns. Very large; decide caliber model first |
-| 49 | 357 | The gunnening part 2 (.357/.44 rename, speed loaders) | same | MILESTONE guns |
+| 48 | gun-calibers | "The gunnening" of the old fork: real-world calibers (9x19, 5.56x45, 7.62x39, .357/.44, lapua, 6mm caseless), ammo and gun roster cut, station maps deleted (about 184 files), loot-entry names by caliber | Master uses fictional calibers (`.35 auto`, `.30 rifle`, `.50`); the roster is intact | DONE (guns milestone) |
+| 49 | 357 | The gunnening part 2 (.357/.44 rename, speed loaders) | same | DONE (guns milestone) |
 | 50 | no-examine | Damage examine for melee/ranged/thrown pushed inline, magazine examine | WWDP #549 #574 #925 fix damage examine | DONE with #44 (see below) |
 | 51 | clothes-innteraction | Patch of old must-be-in-hand | n/a | SKIP |
 | 54 | stamina-fix2 | Stamina crit buffer 3 s to 0, recover from crit at 10% | master stamina already has no slowdown and no `OnShoved` | DONE (batch 2): no crit buffer, coming out of crit leaves 10% stamina. Shove stamina part not applicable |
 | 55 | announce | No roundstart announcement | none | DONE (small-PR batch): `AnnounceRound` removed |
 | 56 | revert-engine | Engine revert | n/a | SKIP |
 | 57 | lobby-fixes | Lobby server name ">>> ERRORGATE <<<" | none | DONE (small-PR batch): `ui-lobby-title` locale string |
-| 58 | loot-tables | 36 loot spawner and table files, starter kits, smaller satchel, no breaking floor | none | MILESTONE world (loot + starter gear) |
-| 59 | playtest-preparation | Main map `EdgeOfEntropy.yml` (94k lines), no flashlight/gas tank actions, identity "Unknown" grammar, butchering allowed, no dreams | Map not in master | MILESTONE world map; the code bits TODO individually |
-| 60, 62, 63, 64 | mob-fixes, loot-spawners, branchchchc x2 | Loot/mob/despawn tweaks, `DespawnItem`, map update | none | MILESTONE world systems |
-| 61 | better-melee | Combined melee attack, 36 melee prototype tweaks | none | MILESTONE melee |
+| 58 | loot-tables | 36 loot spawner and table files, starter kits, smaller satchel, no breaking floor | none | DONE (loot tables, entries and spawners); starter fills not ported |
+| 59 | playtest-preparation | Main map `EdgeOfEntropy.yml` (94k lines), no flashlight/gas tank actions, identity "Unknown" grammar, butchering allowed, no dreams | Map not in master | DONE (map and tweaks) |
+| 60, 62, 63, 64 | mob-fixes, loot-spawners, branchchchc x2 | Loot/mob/despawn tweaks, `DespawnItem`, map update | none | DONE (world systems batch 1) |
+| 61 | better-melee | Combined melee attack, 36 melee prototype tweaks | none | SKIP (owner keeps master melee) |
 | 65 | fixes | Executions return (x20 damage), every reagent evaporates, no ghosts (death void covers), no evac shuttle CVars, carps move on water, cold damage examinable, cigarettes in loot | partly covered by #13 | DONE (batch 2): executions (below), cold burn examine, no evacuation CVars. Evaporation was done in the small batch. `baseTurf` edits deferred to world, cigarettes with loot |
-| 66 | loot-manager | Loot Manager 1.0 (global loot tables, LootEntries per category) | none | MILESTONE world systems (core) |
+| 66 | loot-manager | Loot Manager 1.0 (global loot tables, LootEntries per category) | none | DONE (world systems batch 1) |
 | 67 | deaf-component | `DeafComponent` in `_ERRORGATE/Hearing` | WWDP deafness #265 #270 #384 #390 #395 and `HearingSystem` | COVERED |
 | 68 | no-dmca-revert | **Nine reverts of WWDP "[Port]" PRs + "no-dmca-fixes"** (hobo, maid, e-sword, betrayal knife, aspects, telescope, lying down, blink, uplink discounts, advanced prying, melee block) | All nine exist in master | **SKIP, decided: leave all nine as in upstream.** The loot-related part of `no-dmca-fixes` (armor entries, global loot table) is handled with the world systems milestone |
-| 69 | tweaks | Combined melee attack on LMB, extract cartridge action, silenced guns no muzzle flash, stacking | Extract round is in the Gunnening | MILESTONE melee/guns; check |
+| 69 | tweaks | Combined melee attack on LMB, extract cartridge action, silenced guns no muzzle flash, stacking | Extract round is in the Gunnening | DONE (silenced guns); combined melee SKIP |
 | 70 | clothes-rebalance | Inventory rework: human template slots moved (pockets removed from the hotbar group, UI positions), "sling" and "light" examine strings, held-bag slowdown, equip delays, storage grids on clothing | Owner has inventory-size commits in master (belts, waist bags, March 2025). Held bag slowdown + delays came with #288 | DONE (owner chose all): no pocket slots, jumpsuit storage 4x2 (starting-gear pocket items go there), ID slot is the shoulder light slot (lights fit it), suit storage is the Sling, held-bag slowdown 0.8 on backpack and satchel, merc backpack grid, outer storage size limit. Equip-while-moving and duffel delay were already in master. Smart-equip pocket hotkeys left alone |
-| 71 | Guns-resprite | Drozd resprite to MP5 | none | TODO, sprites only |
+| 71 | Guns-resprite | Drozd resprite to MP5 | none | DONE (MP5 imported as its own gun with mp5.rsi) |
 | 72 | fixes-333 | Revolver spin, outer clothes butcherable, hoodie storage, shove back, chug jug crash | #613 butcherable clothes, hoodie storage (`ClothingOuterStorageBase` with WWDP larger grid) already upstream | DONE/COVERED: nothing left to port. Revolver spin skipped by the owner, chug jug skipped |
-| 73 | bad-water | Contaminated water reagents/tiles | none | MILESTONE world |
-| 74 | mobs | Walker mobs, mob loot uses the global manager, mob spawner prototypes | none | MILESTONE world systems |
-| 75, 80 | weather, doors | Weather off on concrete, doors and keys, tough airlocks | none | MILESTONE world |
+| 73 | bad-water | Contaminated water reagents/tiles | none | DONE (own reagent and tile) |
+| 74 | mobs | Walker mobs, mob loot uses the global manager, mob spawner prototypes | none | DONE (world systems batch 1) |
+| 75, 80 | weather, doors | Weather off on concrete, doors and keys, tough airlocks | none | DONE (weather tiles checked, tough airlock variant, factory door) |
 | 76 | tweaks | Second map prototype Kuznetsk, mask popup fix, circular saw buff, disable pulling items, invisible tiny fan | WWDP #975 pull attempt cooldown | DONE (batch 2): saws buffed (`Saw`, `SawElectric`, `SawAdvanced`), items cannot be pulled (`Pullable` removed from `BaseItem`), invisible tiny fan prototype `AtmosDeviceFanTinyInvisible`. Mask popup left upstream. Kuznetsk map with world milestone |
 | 77 | crafting-cannibalism | Human butchering, bone crafts, campfires despawn, cooking, crafting cull | WWDP #578 Diegetic Crafting, #619 Construction | DONE: 263 build/craft recipes removed from the menus (prototypes and graphs stay), meat not sliceable and rots in 15 min, human meat cooks into human steak, spear damage up, bat starts as a wooden shaft. Bone spear already upstream (needs web silk), skull helmet recipe and campfire craft still open |
-| 78 | lootpool | Kuznetsk loot table | none | MILESTONE world |
+| 78 | lootpool | Kuznetsk loot table | none | PARTLY: Kuznetsk loot table ported, its map never existed |
 | 79 | lights | `DayCycle` (client and server), traps, starvation, all masks hide identity, wield uses identity | WWDP #917 masks hide identity; #305 booby traps exist | PARTLY DONE: wield identity and masks already upstream; hunger 0.1 with starvation bloodloss, head bandana covers face, dresser holds large items, barotrauma off. Day cycle, traps (and the Grenade tag), stone-door airtight come with world systems |
-| 81 | less-ammo | Guns start empty, randomised magazines, more damage | none | MILESTONE guns / loot |
+| 81 | less-ammo | Guns start empty, randomised magazines, more damage | none | DONE (random-mag prototypes only) |
 | 82 | sprinting-release | **Movement-based gun accuracy rework**: new `GunComponent.Ergonomics`, spread grows with speed and decays over time (`GunSystem.Update`), crosshair size shows spread, no examine block in combat mode; plus Tired popup and stamina | `Ergonomics` is NOT in master. WWDP #623 (aiming and hitting) and #630 (gunplay) are different tweaks. #889 sprinting is in master | Accuracy rework SKIPPED (owner). Stamina part DONE: sprint drain already in master; added "Too tired!" popup and slowdown at 80%, recovery cooldown 1 s, base walk speed 3.5 |
 | 83 | fixes | Butcher delay 8 to 5 s, faster gauze, cloth buff, gaiter ingestion block, sturdier trees, campfire craft, body despawn 5 to 10 min | none | DONE: butcher 5 s, gauze 2 s, cloth healing, tree 100, wood modifiers; gaiter already blocks. Despawn 10 min and campfire craft come with world systems |
-| 84 | brutal-melee | Fire axe, melee balance | WWDP #926 Fix Fireaxe | MILESTONE melee |
+| 84 | brutal-melee | Fire axe, melee balance | WWDP #926 Fix Fireaxe | SKIP (WWDP fireaxe fix, owner keeps master melee) |
 | 85 | bugfix | Cherry-picks (#935, #933, #815, #889) plus "look far", shotgun fix | #935 #933 #815 #889 are all in master | COVERED. "Look far" DONE: humans get `EyeCursorOffset` (master replaced the old `Telescope`), Space toggles it |
 | 86 | tweaks | "Galactic Common" renamed "Common", `SolCommon` removed from humans, power cells and chainsaw tweaks, sprite `unshaded` commented out on many cells, fence/crate tweaks, loot table edits | language system exists upstream | DONE (batch 2): language rename (`TauCetiBasic` is shown as "Common"), humans no longer know `SolCommon`, chainsaw, fences cut faster, power cell and crate glow off, sniper bayonet (`Sharp`). Loot table edits with world systems |
 | 87 | upstream | Footprints port, e-sword fix | Footprints are in master (#1867, #1439 ...) | COVERED |
