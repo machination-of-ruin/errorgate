@@ -131,7 +131,7 @@ Hints below come from commit messages, file lists and quick greps. **They are le
 | 88 | upstream-chatstack | Chat stacking | `Add Chatstack (#1422)` in master | COVERED |
 | 89 | port-nvg | Night vision overlays | Master has `Content.Shared/Overlays/Switchable/NightVision*` | COVERED, check leftovers |
 | 90 | port-k | Religious headgear | In master (`religious.yml`, `headGroup.yml`) | COVERED |
-| 91 | rules-tips | Rules and tips text | none | TODO. Keep the `>>> STYLE <<<`; replaces tips (#23) |
+| 91 | rules-tips | Rules and tips text | none | DONE for now: the old fork rules and playtesting tips verbatim as guide entry `ErrorgateRuleset` (default rules). Tips dataset still the station one; rewrite later in `>>> STYLE <<<` |
 
 ### Execution rules (decided, part of #65)
 Anyone can be executed, not only incapacitated victims. The damage multiplier is 20 (`ExecutionComponent.DamageMultiplier`). WWDP's execution system only knows melee, so a gun with `Execution` used to pistol whip: guns now have their own verb and a server handler that fires one round point blank (`SharedGunExecutionSystem`, server `GunExecutionSystem`, tests in `ExecutionTest`). A gun that is not racked or has no round says why instead of firing.

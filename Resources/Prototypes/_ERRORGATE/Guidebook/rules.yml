@@ -1,0 +1,5 @@
+- type: guideEntry
+  id: ErrorgateRuleset
+  name: guide-entry-rules-errorgate
+  ruleEntry: true
+  text: "/ServerInfo/Guidebook/ServerRules/ErrorgateRules.xml"

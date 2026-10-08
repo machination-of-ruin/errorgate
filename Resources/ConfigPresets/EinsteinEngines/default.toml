@@ -37,7 +37,7 @@ limit = 10.0
 fork_id = "EinsteinEngines"
 
 [server]
-rules_file   = "DefaultRuleset"
+rules_file   = "ErrorgateRuleset"
 
 [ooc]
 enable_during_round = true
