@@ -1,4 +1,4 @@
 - type: gameMapPool
   id: DeathMatchMapPool
   maps:
-  - EdgeOfEntropyDev # ERRORGATE: the meteor arena is gone
+  - EdgeOfEntropy # ERRORGATE: the meteor arena is gone

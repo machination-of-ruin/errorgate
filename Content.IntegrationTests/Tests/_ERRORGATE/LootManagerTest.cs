@@ -92,3 +92,29 @@ public sealed class LootManagerTest
         await pair.CleanReturnAsync();
     }
 }
+
+[TestFixture]
+public sealed class EdgeOfEntropyLootTest
+{
+    [Test]
+    public async Task TheMapFillsWithLoot()
+    {
+        await using var pair = await PoolManager.GetServerClient(new PoolSettings { Dirty = true });
+        var server = pair.Server;
+        var entMan = server.EntMan;
+        var lootManager = entMan.System<LootManagerSystem>();
+
+        await server.WaitPost(() =>
+        {
+            var ticker = entMan.System<Content.Server.GameTicking.GameTicker>();
+            var opts = Robust.Shared.EntitySerialization.DeserializationOptions.Default with { InitializeMaps = true };
+            ticker.LoadGameMap(server.ProtoMan.Index<Content.Server.Maps.GameMapPrototype>("EdgeOfEntropy"), out _, opts);
+        });
+        await pair.RunTicksSync(10);
+
+        Assert.That(lootManager.LootManager.Count, Is.GreaterThan(50), "The map should load the global loot table.");
+        Assert.That(lootManager.LootManager.Values.Sum(e => e.Count), Is.GreaterThan(20), "The map's spawners should have placed loot.");
+        Assert.That(entMan.EntityQuery<LootSpawnerComponent>().Count(), Is.GreaterThan(50), "The map should carry loot spawners.");
+        await pair.CleanReturnAsync();
+    }
+}

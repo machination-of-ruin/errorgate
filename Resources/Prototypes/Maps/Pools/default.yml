@@ -1,4 +1,4 @@
 - type: gameMapPool
   id: DefaultMapPool
   maps:
-  - EdgeOfEntropyDev # ERRORGATE: the only playable map until EdgeOfEntropy is ported
+  - EdgeOfEntropy

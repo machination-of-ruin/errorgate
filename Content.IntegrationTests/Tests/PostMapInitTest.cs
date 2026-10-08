@@ -84,6 +84,7 @@ namespace Content.IntegrationTests.Tests
         {
             "Dev",
             "EdgeOfEntropyDev",
+            "EdgeOfEntropy",
             "TestTeg",
             "Lavatest", // Lavaland Change
             "CentCommHub", //WWDP
