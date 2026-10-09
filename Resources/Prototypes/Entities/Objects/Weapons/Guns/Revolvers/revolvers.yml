@@ -22,7 +22,7 @@
     slots:
     - suitStorage
     - Belt
-  # - type: AmmoCounter # ERRORGATE
+  - type: AmmoCounter
   - type: Gun
     bonusAngleIncreaseTurn: 0.2   # wwdp
     bonusAngleDecay: 50           # wwdp
