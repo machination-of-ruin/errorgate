@@ -545,6 +545,7 @@
     capacity: 10
     autoCycle: true
   - type: MeleeWeapon
+    animationRotation: 270 # ERRORGATE: the stab (light attack) sprite is rotated like the old swing, bayonet first
     wideAnimationRotation: 270
     damage:
       types:
