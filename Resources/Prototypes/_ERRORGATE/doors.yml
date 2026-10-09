@@ -133,6 +133,7 @@
     sprite: Structures/Doors/Airlocks/Standard/cargo.rsi
   - type: PaintableAirlock
     department: Logistics
+  - type: ShockOnHit # unbreakable while powered, hitting it hurts
   - type: ContainerFill
     containers:
       board: [ DoorFactoryEntrance ]

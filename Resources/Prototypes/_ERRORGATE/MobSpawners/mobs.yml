@@ -20,6 +20,11 @@
         Base: rag
       Dead:
         Base: dead
+  # The dead sprite is a standing figure, so lie it down on death (MobBase defaults to horizontalRotation 0).
+  # Inherited by every runner and walker below.
+  - type: RotationVisuals
+    defaultRotation: 90
+    horizontalRotation: 90
   - type: MobState
     allowedStates:
     - Alive

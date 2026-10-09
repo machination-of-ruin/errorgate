@@ -97,6 +97,31 @@
   locations: [Industrial, Security, Military]
 
 - type: lootEntry
+  id: GlowstickBase
+  rarityTiers: [1]
+  locations: [Industrial, Security, Military]
+
+- type: lootEntry
+  id: GlowstickRed
+  rarityTiers: [1]
+  locations: [Industrial, Security, Military]
+
+- type: lootEntry
+  id: GlowstickBlue
+  rarityTiers: [1]
+  locations: [Industrial, Security, Military]
+
+- type: lootEntry
+  id: GlowstickYellow
+  rarityTiers: [1]
+  locations: [Industrial, Security, Military]
+
+- type: lootEntry
+  id: GlowstickPurple
+  rarityTiers: [1]
+  locations: [Industrial, Security, Military]
+
+- type: lootEntry
   id: CheapLighter
   rarityTiers: [1]
   locations: [Living, Prison, School]

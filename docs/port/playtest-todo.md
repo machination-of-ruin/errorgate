@@ -157,3 +157,14 @@ Found while playing the `port/beyond` build. One line each, newest last.
 
 - [x] "Люди" was the species window's info text (`ServerInfo/Guidebook/Mobs/Human.xml`), now English in the ERRORGATE voice.
 - [x] Ammonia did not make anyone vomit: `ChemVomit` cancelled itself on any partial metabolism scale, the old build had that check commented out. `AmmoniaInTheAirPoisonsPlayers` now also checks for vomit and fails without the fix.
+
+## Features batch 1
+
+- [x] Kuznetsk's locked factory doors (`AirlockFactoryEntrance`) shock whoever hits them while powered (5 Shock, `ShockOnHit`, `DoorShockTest`).
+- [x] Loading screen line is "RISE ON THE EDGE OF ENTROPY."
+- [x] Pill canisters only take pills (they took steaks: no whitelist; `PillCanisterTest` fails without the fix).
+- [x] The floodlight is not an item any more: it can be dragged and toggled, not picked up (assumed to be the "spotlight"; `FloodlightBroken` stays an item).
+- [x] Pointing is back: the keybind and the right-click "Point at" verb share one path (the old `PointingEnabled = false` guards were removed).
+- [x] Combat log and bleeding text size 16 (was 19).
+- [x] Dead walkers and runners lie down (`RotationVisuals` 90 on `MobWalker` and its children).
+- [x] Glowsticks replace part of the flares in the loot tables (global table Flare 10 -> 5 plus five glowsticks; Kuznetsk Flare 5 -> 3 plus two).

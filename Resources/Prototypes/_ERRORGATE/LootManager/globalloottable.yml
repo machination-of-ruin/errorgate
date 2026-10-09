@@ -152,7 +152,12 @@
     FlashlightLantern: 10
     Lantern: 5
     FlashlightSeclite: 3
-    Flare: 10
+    Flare: 5
+    GlowstickBase: 1
+    GlowstickRed: 1
+    GlowstickBlue: 1
+    GlowstickYellow: 1
+    GlowstickPurple: 1
     CheapLighter: 10
     Lighter: 10
     GeigerCounter: 5

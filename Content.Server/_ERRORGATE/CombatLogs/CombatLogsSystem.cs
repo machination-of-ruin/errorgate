@@ -276,7 +276,7 @@ public sealed class CombatLogsSystem : EntitySystem
         if (!TryComp<ActorComponent>(victim, out var actor))
             return;
 
-        var size = 19; // ERRORGATE: every combat message has the same (largest) size
+        var size = 16; // ERRORGATE: every combat message has the same size
         // hits go from orange to red with their size, bleeding is always red
         var color = fixedColor ?? Color.InterpolateBetween(Color.Orange, Color.Red, intensity);
 

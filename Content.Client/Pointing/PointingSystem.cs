@@ -22,14 +22,8 @@ public sealed partial class PointingSystem : SharedPointingSystem
         InitializeVisualizer();
     }
 
-    // ERRORGATE: no pointing
-    private static readonly bool PointingEnabled = false;
-
     private void AddPointingVerb(GetVerbsEvent<Verb> args)
     {
-        if (!PointingEnabled)
-            return;
-
         if (IsClientSide(args.Target))
             return;
 

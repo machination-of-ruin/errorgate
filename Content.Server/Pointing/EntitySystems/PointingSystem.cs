@@ -118,14 +118,8 @@ namespace Content.Server.Pointing.EntitySystems
             }
         }
 
-        // ERRORGATE: no pointing
-        private static readonly bool PointingEnabled = false;
-
         public bool TryPoint(ICommonSession? session, EntityCoordinates coordsPointed, EntityUid pointed)
         {
-            if (!PointingEnabled)
-                return false;
-
             if (session?.AttachedEntity is not { } player)
             {
                 Log.Warning($"Player {session} attempted to point without any attached entity");
