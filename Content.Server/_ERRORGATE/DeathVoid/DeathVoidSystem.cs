@@ -3,7 +3,9 @@ using Content.Server.Chat.Managers;
 using Content.Server.GameTicking;
 using Content.Server._White.MobThresholdSounds;
 using Content.Server.Ghost;
+using Content.Server.Body.Components;
 using Content.Shared._ERRORGATE.DeathVoid;
+using Content.Shared._ERRORGATE.CCVar;
 using Content.Shared.Actions;
 using Content.Shared.Chat;
 using Content.Shared.GameTicking;
@@ -13,9 +15,11 @@ using Content.Shared.Mobs;
 using Content.Shared.Mobs.Systems;
 using Robust.Server.GameObjects;
 using Robust.Shared.Audio.Systems;
+using Robust.Shared.Configuration;
 using Robust.Shared.Map;
 using Robust.Shared.Player;
 using Robust.Shared.Prototypes;
+using Robust.Shared.Timing;
 
 namespace Content.Server._ERRORGATE.DeathVoid;
 
@@ -36,6 +40,8 @@ public sealed class DeathVoidSystem : EntitySystem
     [Dependency] private readonly MobStateSystem _mobState = default!;
     [Dependency] private readonly SharedActionsSystem _actions = default!;
     [Dependency] private readonly SharedMindSystem _mind = default!;
+    [Dependency] private readonly IConfigurationManager _cfg = default!;
+    [Dependency] private readonly IGameTiming _timing = default!;
 
     private EntityUid? _voidMap;
     private MapId _voidMapId;
@@ -48,6 +54,7 @@ public sealed class DeathVoidSystem : EntitySystem
         SubscribeLocalEvent<GhostAttemptHandleEvent>(OnGhostAttempt);
         SubscribeLocalEvent<MindBodyDeletedEvent>(OnMindBodyDeleted);
         SubscribeLocalEvent<MindEvictedEvent>(OnMindEvicted);
+        SubscribeLocalEvent<BrainComponent, MindAddedMessage>(OnBrainMindAdded);
         SubscribeLocalEvent<RoundRestartCleanupEvent>(_ => _voidMap = null);
 
         SubscribeLocalEvent<DeathVoidComponent, DeadRespawnEvent>(OnRespawn);
@@ -84,6 +91,19 @@ public sealed class DeathVoidSystem : EntitySystem
         var voidEnt = SpawnVoid(args.MindId, args.Mind);
         _mind.TransferTo(args.MindId, voidEnt, mind: args.Mind);
         args.Handled = true;
+    }
+
+    /// <summary>
+    ///     A brain that ends up outside a body (organ dropped, removed by surgery or gibbed) takes the mind with it.
+    ///     A player does not live on in a brain: they go to the void instead.
+    /// </summary>
+    private void OnBrainMindAdded(EntityUid uid, BrainComponent brain, MindAddedMessage args)
+    {
+        if (args.Mind.Comp.UserId == null)
+            return;
+
+        var voidEnt = SpawnVoid(args.Mind.Owner, args.Mind.Comp);
+        _mind.TransferTo(args.Mind.Owner, voidEnt, mind: args.Mind.Comp);
     }
 
     /// <summary>
@@ -133,6 +153,13 @@ public sealed class DeathVoidSystem : EntitySystem
     private EntityUid SpawnVoid(EntityUid mindId, MindComponent mind)
     {
         var voidEnt = Spawn(VoidPrototype, new MapCoordinates(Vector2.Zero, EnsureVoidMap()));
+        var cooldown = _cfg.GetCVar(ErrorgateCVars.RespawnCooldown);
+        if (cooldown > 0f)
+        {
+            var voidComp = EnsureComp<DeathVoidComponent>(voidEnt);
+            voidComp.RespawnAt = _timing.CurTime + TimeSpan.FromSeconds(cooldown);
+            Dirty(voidEnt, voidComp);
+        }
         _actions.AddAction(voidEnt, RespawnAction);
 
         if (mind.Session is { } session)
@@ -179,7 +206,30 @@ public sealed class DeathVoidSystem : EntitySystem
             return;
 
         args.Handled = true;
-        _ticker.Respawn(actor.PlayerSession);
+        TryRespawn(actor.PlayerSession, out _);
+    }
+
+    /// <summary>
+    ///     Sends the player back to the lobby unless the respawn cooldown is still running.
+    /// </summary>
+    /// <param name="remaining">Time left until the player may respawn when this returns false.</param>
+    public bool TryRespawn(ICommonSession session, out TimeSpan remaining)
+    {
+        remaining = TimeSpan.Zero;
+
+        if (session.AttachedEntity is { } attached
+            && TryComp<DeathVoidComponent>(attached, out var voidComp)
+            && voidComp.RespawnAt is { } at
+            && at > _timing.CurTime)
+        {
+            remaining = at - _timing.CurTime;
+            _chat.DispatchServerMessage(session,
+                Loc.GetString("errorgate-death-void-wait", ("seconds", (int) Math.Ceiling(remaining.TotalSeconds))));
+            return false;
+        }
+
+        _ticker.Respawn(session);
+        return true;
     }
 
     private void OnUnvisited(EntityUid uid, DeathVoidComponent component, MindUnvisitedMessage args)

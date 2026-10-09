@@ -3,7 +3,7 @@
   id: MidRoundNukeops
   components:
   - type: LoadMapRule
-    mapPath: /Maps/Nonstations/nukieplanet.yml
+    mapPath: /Maps/Test/empty.yml
   - type: AntagSelection
     definitions:
     - spawnerPrototype: SpawnPointNukeopsCommander

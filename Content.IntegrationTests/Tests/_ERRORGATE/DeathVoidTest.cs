@@ -7,6 +7,7 @@ using Content.Shared.Damage;
 using Content.Shared.Damage.Prototypes;
 using Content.Shared.FixedPoint;
 using Content.Shared.Mind;
+using Content.Shared.Mind.Components;
 using Content.Shared.Mobs;
 using Content.Shared.Mobs.Components;
 using Content.Shared.Mobs.Systems;
@@ -184,6 +185,68 @@ public sealed class DeathVoidTest
         {
             Assert.That(session.AttachedEntity, Is.Not.EqualTo(body));
             Assert.That(entMan.GetComponent<MindComponent>(mindId).OwnedEntity, Is.Null.Or.Not.EqualTo(body));
+        });
+
+        await pair.CleanReturnAsync();
+    }
+
+    [Test]
+    public async Task RespawnWaitsForTheCooldown()
+    {
+        var (pair, body, mindId, session) = await Setup();
+        var server = pair.Server;
+        var entMan = server.EntMan;
+        var console = server.ResolveDependency<IServerConsoleHost>();
+        var cfg = server.ResolveDependency<Robust.Shared.Configuration.IConfigurationManager>();
+
+        await server.WaitPost(() => cfg.SetCVar(Content.Shared._ERRORGATE.CCVar.ErrorgateCVars.RespawnCooldown, 3600f));
+        await SetDamage(pair, body, 200);
+        var voidEnt = session.AttachedEntity;
+        await server.WaitPost(() => console.ExecuteCommand(session, "rise"));
+        await pair.RunTicksSync(5);
+        await server.WaitAssertion(() =>
+        {
+            Assert.That(session.AttachedEntity, Is.EqualTo(voidEnt), "The cooldown should keep the player in the void.");
+            Assert.That(entMan.GetComponent<DeathVoidComponent>(voidEnt!.Value).RespawnAt, Is.Not.Null);
+        });
+
+        await server.WaitPost(() => cfg.SetCVar(Content.Shared._ERRORGATE.CCVar.ErrorgateCVars.RespawnCooldown, 0f));
+        await pair.CleanReturnAsync();
+    }
+
+    [Test]
+    public async Task GibbedPlayerGoesToTheVoidNotToABrain()
+    {
+        await using var pair = await PoolManager.GetServerClient(new PoolSettings { DummyTicker = false, Connected = true, Dirty = true });
+        var server = pair.Server;
+        var entMan = server.EntMan;
+        var testMap = await pair.CreateTestMap();
+        var session = server.ResolveDependency<IPlayerManager>().Sessions.Single();
+
+        var oldBrains = new System.Collections.Generic.HashSet<EntityUid>();
+        await server.WaitPost(() =>
+        {
+            foreach (var (uid, _) in entMan.EntityQuery<Content.Server.Body.Components.BrainComponent>(true).Select(x => (x.Owner, x)))
+                oldBrains.Add(uid);
+        });
+
+        await server.WaitAssertion(() =>
+        {
+            var body = entMan.SpawnEntity("MobHuman", testMap.GridCoords);
+            var mindSystem = entMan.System<SharedMindSystem>();
+            var mindId = mindSystem.CreateMind(session.UserId);
+            mindSystem.TransferTo(mindId, body);
+            // what an explosion does: gib the body together with its organs
+            entMan.System<Content.Server.Body.Systems.BodySystem>().GibBody(body, gibOrgans: true);
+        });
+        await pair.RunTicksSync(10);
+
+        await server.WaitAssertion(() =>
+        {
+            Assert.That(entMan.EntityQuery<Content.Server.Body.Components.BrainComponent>().Any(b => !oldBrains.Contains(b.Owner)), Is.False,
+                "Gibbing should not leave a brain lying around.");
+            Assert.That(session.AttachedEntity, Is.Not.Null);
+            Assert.That(entMan.HasComponent<DeathVoidComponent>(session.AttachedEntity), "The mind should be in the void.");
         });
 
         await pair.CleanReturnAsync();

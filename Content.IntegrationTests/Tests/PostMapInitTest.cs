@@ -43,7 +43,7 @@ namespace Content.IntegrationTests.Tests
         {
             ///"/Maps/CentralCommand/main.yml",  WWDP edit, and now we have GREAT HUB
             /// "/Maps/CentralCommand/harmony.yml", // Harmony CC version, WWDP edit, no more CentCom rotation
-            "/Maps/_White/CentralCommand/hub.yml", // WD EDIT
+            // ERRORGATE: the CentComm hub map is gone
             AdminTestArenaSystem.ArenaMapPath,
         };
 
@@ -88,7 +88,6 @@ namespace Content.IntegrationTests.Tests
             "Kuznetsk",
             "TestTeg",
             "Lavatest", // Lavaland Change
-            "CentCommHub", //WWDP
         };
 
         /// <summary>

@@ -11,4 +11,11 @@ public sealed class ErrorgateCVars
     /// </summary>
     public static readonly CVarDef<bool> ImmersiveInteractions =
         CVarDef.Create("errorgate.immersive_interactions", true, CVar.SERVER | CVar.REPLICATED | CVar.ARCHIVE);
+
+    /// <summary>
+    ///     Seconds a dead player has to wait in the death void before they can respawn. 0 means immediately.
+    ///     Admins using <c>forcerespawn</c> ignore it.
+    /// </summary>
+    public static readonly CVarDef<float> RespawnCooldown =
+        CVarDef.Create("errorgate.respawn_cooldown", 0f, CVar.SERVER | CVar.ARCHIVE);
 }

@@ -113,9 +113,9 @@
                                     <Label Text="{Loc 'ui-lobby-server-info-block'}" StyleClasses="MenuLabel15" Align="Center"/>
                                     <info:ServerInfo Name="ServerInfo" Access="Public" MinSize="0 100" VerticalExpand="false"
                                                      Margin="3 3 3 3" MaxWidth="400" HorizontalAlignment="Left"/>
-                                    <Label Name="StationTime" Access="Public" FontColorOverride="{x:Static maths:Color.MediumVioletRed}"
+                                    <Label Name="StationTime" Access="Public" FontColorOverride="{x:Static maths:Color.Black}"
                                            Margin="3 3 3 3" HorizontalAlignment="Left" StyleClasses="MenuLabel15"/>
-                                    <Label Name="StartTime" Access="Public" FontColorOverride="{x:Static maths:Color.MediumVioletRed}"
+                                    <Label Name="StartTime" Access="Public" FontColorOverride="{x:Static maths:Color.Black}"
                                            Margin="3 3 3 3" StyleClasses="MenuLabel15" HorizontalExpand="True" />
                                 </BoxContainer>
                                 <controls:VSpacer Spacing="10"/>

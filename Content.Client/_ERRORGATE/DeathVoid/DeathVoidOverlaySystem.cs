@@ -5,6 +5,7 @@ using Robust.Client.ResourceManagement;
 using Robust.Client.UserInterface;
 using Robust.Shared.Enums;
 using Robust.Shared.Player;
+using Robust.Shared.Timing;
 
 namespace Content.Client._ERRORGATE.DeathVoid;
 
@@ -66,6 +67,9 @@ public sealed class DeathVoidOverlaySystem : EntitySystem
 public sealed class DeathVoidOverlay : Overlay
 {
     [Dependency] private readonly IResourceCache _cache = default!;
+    [Dependency] private readonly IEntityManager _entMan = default!;
+    [Dependency] private readonly ISharedPlayerManager _player = default!;
+    [Dependency] private readonly IGameTiming _timing = default!;
 
     public override OverlaySpace Space => OverlaySpace.ScreenSpace;
 
@@ -87,5 +91,17 @@ public sealed class DeathVoidOverlay : Overlay
         var size = handle.GetDimensions(_font, text, 1f);
         var pos = args.ViewportBounds.Center - size / 2;
         handle.DrawString(_font, new Vector2(pos.X, pos.Y), text, Color.DarkRed);
+
+        // respawn cooldown countdown
+        if (_player.LocalEntity is { } local
+            && _entMan.TryGetComponent(local, out DeathVoidComponent? voidComp)
+            && voidComp.RespawnAt is { } at
+            && at > _timing.CurTime)
+        {
+            var wait = Loc.GetString("errorgate-death-void-wait",
+                ("seconds", (int) Math.Ceiling((at - _timing.CurTime).TotalSeconds)));
+            var waitSize = handle.GetDimensions(_font, wait, 1f);
+            handle.DrawString(_font, new Vector2(args.ViewportBounds.Center.X - waitSize.X / 2, pos.Y + size.Y + 20), wait, Color.DarkRed);
+        }
     }
 }

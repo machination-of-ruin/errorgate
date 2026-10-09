@@ -516,10 +516,8 @@ public sealed partial class ExplosionSystem
             || tileDef.Indestructible)
             return;
 
-        if (!CanCreateVacuum)
-            canCreateVacuum = false;
-        else if (tileDef.MapAtmosphere)
-            canCreateVacuum = true; // is already a vacuum.
+        // ERRORGATE: underground, not a station in space. Floors break down to plating at most, never to space.
+        canCreateVacuum = false;
 
         int tileBreakages = 0;
         while (maxTileBreak > tileBreakages && _robustRandom.Prob(type.TileBreakChance(effectiveIntensity)))
@@ -534,7 +532,7 @@ public sealed partial class ExplosionSystem
             if (_tileDefinitionManager[tileDef.BaseTurf] is not ContentTileDefinition newDef)
                 break;
 
-            if (newDef.MapAtmosphere && !canCreateVacuum)
+            if (newDef.MapAtmosphere || newDef.ID == ContentTileDefinition.SpaceID) // ERRORGATE
                 break;
 
             tileDef = newDef;

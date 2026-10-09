@@ -110,7 +110,7 @@
   - type: GameRule
     minPlayers: 20
   - type: LoadMapRule
-    mapPath: /Maps/Nonstations/nukieplanet.yml
+    mapPath: /Maps/Test/empty.yml
   - type: AntagSelection
     selectionTime: PrePlayerSpawn
     definitions:
@@ -266,7 +266,7 @@
     - WizardSurviveObjective
     - WizardDemonstrateObjective
   - type: LoadMapRule
-    gridPath: /Maps/Shuttles/wizard.yml
+    gridPath: /Maps/Test/empty.yml
   - type: RuleGrids
   - type: AntagSelection
   - type: AntagLoadProfileRule

@@ -10,7 +10,7 @@ public sealed partial class WhiteCVars
         CVarDef.Create("asteroid_field.salvage_magnet_enabled", false, CVar.SERVER | CVar.ARCHIVE);
 
     public static readonly CVarDef<bool> AsteroidFieldEnabled =
-        CVarDef.Create("asteroid_field.enabled", true, CVar.SERVER | CVar.ARCHIVE);
+        CVarDef.Create("asteroid_field.enabled", false, CVar.SERVER | CVar.ARCHIVE); // ERRORGATE: no asteroid field
 
     public static readonly CVarDef<bool> AsteroidFieldSpawnBeacon =
         CVarDef.Create("asteroid_field.beacon_enabled", true, CVar.SERVER | CVar.ARCHIVE);

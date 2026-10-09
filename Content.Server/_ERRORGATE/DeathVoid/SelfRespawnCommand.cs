@@ -37,7 +37,7 @@ public abstract class SelfRespawnCommandBase : LocalizedEntityCommands
             return;
         }
 
-        _ticker.Respawn(player);
+        EntityManager.System<DeathVoidSystem>().TryRespawn(player, out _);
     }
 }
 

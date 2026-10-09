@@ -20,7 +20,7 @@ public sealed partial class StationCentcommComponent : Component
     {
         ///new("/Maps/CentralCommand/main.yml"), WWDP edit, and now we have GREAT HUB
         /// new("/Maps/CentralCommand/harmony.yml") WWDP edit, no more CentCom rotation
-        new("/Maps/_White/CentralCommand/hub.yml"), // WD EDIT
+        new("/Maps/Test/empty.yml"), // WD EDIT // ERRORGATE: the original map is deleted
     };
 
     /// <summary>

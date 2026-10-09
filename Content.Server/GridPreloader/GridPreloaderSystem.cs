@@ -13,6 +13,7 @@ using Content.Server.GameTicking;
 using Content.Shared.GameTicking;
 using JetBrains.Annotations;
 using Robust.Shared.EntitySerialization.Systems;
+using Robust.Shared.ContentPack; // ERRORGATE
 
 namespace Content.Server.GridPreloader;
 public sealed class GridPreloaderSystem : SharedGridPreloaderSystem
@@ -22,6 +23,7 @@ public sealed class GridPreloaderSystem : SharedGridPreloaderSystem
     [Dependency] private readonly MapLoaderSystem _mapLoader = default!;
     [Dependency] private readonly MetaDataSystem _meta = default!;
     [Dependency] private readonly IPrototypeManager _prototype = default!;
+    [Dependency] private readonly IResourceManager _res = default!; // ERRORGATE
     [Dependency] private readonly SharedTransformSystem _transform = default!;
 
     /// <summary>
@@ -70,6 +72,10 @@ public sealed class GridPreloaderSystem : SharedGridPreloaderSystem
         var globalXOffset = 0f;
         foreach (var proto in _prototype.EnumeratePrototypes<PreloadedGridPrototype>())
         {
+            // ERRORGATE: the shuttle maps were removed, skip prototypes whose map file no longer exists
+            if (!_res.ContentFileExists(proto.Path))
+                continue;
+
             for (var i = 0; i < proto.Copies; i++)
             {
                 if (!_mapLoader.TryLoadGrid(mapId, proto.Path, out var grid))

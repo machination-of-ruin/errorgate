@@ -46,7 +46,7 @@
   suffix: Cargo Shuttle Spawner, MAX ONE PER MAP
   components:
     - type: GridFill
-      path: /Maps/Shuttles/cargo.yml
+      path: /Maps/Test/empty.yml
 
 - type: entity
   parent: AirlockExternalGlassShuttleDart
@@ -54,7 +54,7 @@
   suffix: ERT Ship Spawner, MAX ONE PER MAP
   components:
     - type: GridFill
-      path: /Maps/Shuttles/dart.yml
+      path: /Maps/Test/empty.yml
 
 - type: entity
   parent: AirlockSyndicateGlassShuttleInfiltrator
@@ -62,7 +62,7 @@
   suffix: Infiltrator Ship Spawner, MAX ONE PER MAP
   components:
     - type: GridFill
-      path: /Maps/Shuttles/infiltrator.yml
+      path: /Maps/Test/empty.yml
 
 - type: entity
   parent: AirlockExternalGlassShuttlePathfinder
@@ -70,7 +70,7 @@
   suffix: Salvage Ship Spawner, MAX ONE PER MAP
   components:
     - type: GridFill
-      path: /Maps/Shuttles/pathfinder.yml
+      path: /Maps/Test/empty.yml
 
 - type: entity
   parent: AirlockSyndicateGlassShuttleSANDropship
@@ -78,4 +78,4 @@
   suffix: SAN Dropship Spawner, MAX ONE PER MAP
   components:
     - type: GridFill
-      path: /Maps/Shuttles/ShuttleEvent/SANDropship.yml
+      path: /Maps/Test/empty.yml

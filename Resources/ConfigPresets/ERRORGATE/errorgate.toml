@@ -5,6 +5,15 @@ soft_max_players = 30
 lobbyenabled       = true
 lobbyduration      = 240
 
+[shuttle]
+# no shuttles, arrivals or evacuation: only the chosen game map is loaded
+grid_fill = false
+arrivals  = false
+emergency = false
+
+[asteroid_field]
+enabled = false
+
 [net]
 tickrate = 30
 

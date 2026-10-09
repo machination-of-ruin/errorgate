@@ -36,8 +36,8 @@ Found while playing the `port/beyond` build. One line each, newest last.
 ## Found in the server log (not reported by the player)
 
 - [x] `station_record_key_storage` errors on every spawn: the Human Error lighter sits in the id slot and station records treat it as an ID card. Fixed in `StationRecordsSystem` (needs a rebuild and server restart to take effect).
-- [ ] "MainLoop: Cannot keep up" appeared 5 times in the first session. Check what spikes (map load, loot spawners, many DespawnItem items?).
-- [ ] Map warning: `PlushieLizard` is an obsolete prototype used by a map (6 times).
+- [x] (ignored, normal) "MainLoop: Cannot keep up" appeared 5 times in the first session. Check what spikes (map load, loot spawners, many DespawnItem items?).
+- [x] (it comes from the ghost bar map, which is gone; the plushies are in the WWDP migration as null) Map warning: `PlushieLizard` is an obsolete prototype used by a map (6 times).
 
 ## Round 2 (playtest reports)
 
@@ -97,4 +97,15 @@ Found while playing the `port/beyond` build. One line each, newest last.
 - [x] Human bodies butcher with a knife: 3 human meat, a skull and 4 bones (old commit 0c1e3c06e5, was marked done by mistake). Skull craft into a bone helmet (slice, 2 bones).
 - [x] `locale.culture` default was ru-RU, now en-US (ru-RU plural function registered only when that culture is chosen).
 - [x] Old `ERRORGATE/errorgate.toml` server preset ported (`Resources/ConfigPresets/ERRORGATE/errorgate.toml`, no rules_file: the rules are the guidebook page).
-- [ ] Still not ported from the old fork: starter backpack fills (`StarterGear`), night vision and thermal goggles cherry-pick (check upstream), old `errorgate_rules.txt`.
+- [x] (dropped by the owner) Still not ported from the old fork: starter backpack fills (`StarterGear`), night vision and thermal goggles cherry-pick (check upstream), old `errorgate_rules.txt`.
+
+## Round 6 (playtest reports)
+
+- [x] "RULES" header on the rules page.
+- [x] Lobby round-status lines black.
+- [x] A gibbed player ends in the death void: gibbing never drops organs, dropped parts lose their organs, a brain that receives a player's mind sends it to the void (`DeathVoidTest.GibbedPlayerGoesToTheVoidNotToABrain`).
+- [x] Explosions break floors down to plating only, never to space.
+- [x] Loading tips synced with the rules tips (12 tips; added worn bags insert and satchels always accessible).
+- [x] Respawn cooldown CVar `errorgate.respawn_cooldown` (seconds, default 0).
+- [x] Map cleanup: shuttles, CentComm, salvage, ghost bar, station and other fork maps deleted and their loaders switched off; Lavaland, Ruins and Dungeon kept for the planet plan. Dead map paths in prototypes and component defaults point at `/Maps/Test/empty.yml`.
+- [x] Design docs updated (maps, death, survival loop) and committed.

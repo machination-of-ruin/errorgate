@@ -323,6 +323,8 @@ public partial class SharedBodySystem
     {
         var gibs = new HashSet<EntityUid>();
 
+        gibOrgans = false; // ERRORGATE: gibbing never drops organs, a brain would keep the mind instead of the death void
+
         if (!Resolve(bodyId, ref body, logMissing: false))
             return gibs;
 
@@ -348,6 +350,16 @@ public partial class SharedBodySystem
                 _gibbingSystem.TryGibEntityWithRef(bodyId, organ.Id, GibType.Drop, GibContentsOption.Skip,
                     ref gibs, playAudio: false, launchImpulse: GibletLaunchImpulse * splatModifier,
                     launchImpulseVariance:GibletLaunchImpulseVariance, launchCone: splatCone);
+            }
+        }
+
+        // ERRORGATE: dropped parts (a head that cannot be gibbed) must not carry their organs along
+        foreach (var part in parts)
+        {
+            foreach (var organ in GetPartOrgans(part.Id, part.Component))
+            {
+                gibs.Remove(organ.Id);
+                QueueDel(organ.Id);
             }
         }
 

@@ -4,7 +4,9 @@ tips-dataset-3 = [color=#ff0000]YOU WILL DIE OF HUNGER.[/color] Scavenge or cook
 tips-dataset-4 = Butchering humans is a good source of food and equipment too.
 tips-dataset-5 = Running takes stamina, configure your controls in the settings and manage it carefully.
 tips-dataset-6 = You have to take off backpacks and dufflebags to open them, but not to put items in.
-tips-dataset-7 = You can wear most weapons in your back (suit) slot.
-tips-dataset-8 = You can shove other humans and any physical objects with an empty hand by right-clicking.
-tips-dataset-9 = You can look/aim in the distance by pressing Space.
-tips-dataset-10 = Wide crosshair with guns = bad accuracy. Stay still to hit well.
+tips-dataset-7 = You can put items into worn backpacks and dufflebags without taking them off.
+tips-dataset-8 = Satchels are always accessible, even when worn.
+tips-dataset-9 = You can wear most weapons in your back (suit) slot.
+tips-dataset-10 = You can shove other humans and any physical objects with an empty hand by right-clicking.
+tips-dataset-11 = You can look/aim in the distance by pressing Space.
+tips-dataset-12 = Wide crosshair with guns = bad accuracy. Stay still to hit well.

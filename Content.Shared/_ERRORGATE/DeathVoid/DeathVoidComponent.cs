@@ -1,4 +1,5 @@
 using Content.Shared.Actions;
+using Robust.Shared.GameStates;
 
 namespace Content.Shared._ERRORGATE.DeathVoid;
 
@@ -7,8 +8,15 @@ namespace Content.Shared._ERRORGATE.DeathVoid;
 ///     It lives on an otherwise empty map, so the player cannot see, hear or read anything
 ///     happening around their corpse.
 /// </summary>
-[RegisterComponent]
-public sealed partial class DeathVoidComponent : Component;
+[RegisterComponent, NetworkedComponent, AutoGenerateComponentState]
+public sealed partial class DeathVoidComponent : Component
+{
+    /// <summary>
+    ///     When the player may respawn. Null means right away.
+    /// </summary>
+    [DataField, AutoNetworkedField]
+    public TimeSpan? RespawnAt;
+}
 
 /// <summary>
 ///     Raised by the respawn action available while in the death void.
