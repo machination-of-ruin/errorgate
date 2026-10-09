@@ -143,3 +143,12 @@ Found while playing the `port/beyond` build. One line each, newest last.
 - [x] Campfire did not cook: the heater ignored a fire without power. `EntityHeater` has `requiresPower` again (`CampfireCooksHumanMeat`).
 - [x] Bone helmet is made from a human skull only (slice with a knife, then 2 bones). The 4-bones recipe, build menu entry and radial entry are gone.
 - [x] ERRORGATE crafts in radial menus: campfire (planks) and bone spear (bones) are there; no other ERRORGATE specific recipes exist.
+
+## Round 10 (playtest reports)
+
+- [x] Species selection: the Russian "Люди" came from the species guidebook page behind the info button. The button is hidden (the guidebook is gone).
+- [x] Examining a human reads "a man", "a woman" or "a person" instead of "a human" (`SharedHumanoidAppearanceSystem.OnExamined`).
+- [ ] Toxic gas: `AmmoniaMapTest` loads Kuznetsk and Edge of Entropy, puts a human on the tile with the most ammonia and the human gets Poison damage (200 on Kuznetsk after 25 s); `AmmoniaInTheAirPoisonsPlayers` shows even 12 mol in 2500 L poisons. It works in tests, so the live report needs the exact spot: which map, which gas cloud, how long the player stood in it.
+- [x] PVS: the owner set `net.pvs_range` to 30 and the pop-in is gone. The `LookFarPvsSystem` is removed, `pvs_range = 30` is in the ERRORGATE and development config presets.
+- [x] Barks: humans have no species speech sound any more (`speechSounds: null`), only the bark plays.
+- [x] Speech bubbles use the Hombre font (gothic, full Cyrillic coverage checked, `Resources/Fonts/_White/Hombre`). Other fonts with full Cyrillic: Cinzel, Cygre, Marauders Map, Boxfont Round, NK57 condensed, Bedstead, LCD14; change the id in `SpeechBubble.cs` to switch.

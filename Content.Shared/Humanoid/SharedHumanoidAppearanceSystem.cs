@@ -179,6 +179,15 @@ public abstract class SharedHumanoidAppearanceSystem : EntitySystem
     {
         var identity = Identity.Entity(uid, EntityManager);
         var species = GetSpeciesRepresentation(component.Species, component.CustomSpecieName).ToLower();
+        // ERRORGATE: everyone is human, so they read as a man or a woman
+        if (component.Species == DefaultSpecies && string.IsNullOrWhiteSpace(component.CustomSpecieName))
+            species = component.Sex switch
+            {
+                Sex.Male => "man",
+                Sex.Female => "woman",
+                _ => "person",
+            };
+
         var age = GetAgeRepresentation(component.Species, component.Age);
         if (HasComp<ShadowkinComponent>(uid))
         {

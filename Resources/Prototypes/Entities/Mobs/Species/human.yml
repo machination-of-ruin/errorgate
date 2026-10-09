@@ -10,9 +10,10 @@
     starvationDamage:
       types:
         Bloodloss: 1
+  - type: Speech # ERRORGATE: only the barks make a sound when speaking, not the species speech blips
+    speechSounds: null
   - type: EyeCursorOffset # ERRORGATE: look into the distance with Space (old fork "look far")
     maxOffset: 12 # almost a full screen ahead, as in the old build
-    pvsIncrease: 0.4 # the server PVS range grows with it, see LookFarPvsSystem
   - type: Icon # It will not have an icon in the adminspawn menu without this. Body parts seem fine for whatever reason.
     sprite: Mobs/Species/Human/parts.rsi
     state: full

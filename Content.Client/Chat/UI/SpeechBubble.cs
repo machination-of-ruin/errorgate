@@ -238,7 +238,7 @@ namespace Content.Client.Chat.UI
                 MaxWidth = SpeechMaxWidth,
             };
 
-            label.SetMessage(FormatSpeech(message.WrappedMessage, fontColor, "Bedstead")); // WWDP EDIT
+            label.SetMessage(FormatSpeech(message.WrappedMessage, fontColor, "HombreRegular")); // WWDP EDIT, ERRORGATE: Hombre (gothic, has Cyrillic)
 
             var panel = new PanelContainer
             {
@@ -268,7 +268,7 @@ namespace Content.Client.Chat.UI
                     MaxWidth = SpeechMaxWidth
                 };
 
-                label.SetMessage(FormatSpeech(SharedChatSystem.GetStringInsideTag(message, "BubbleContent"), fontColor, "Bedstead")); // WWDP EDIT // LESS USELESS ONE LINER FUNCS PLS
+                label.SetMessage(FormatSpeech(SharedChatSystem.GetStringInsideTag(message, "BubbleContent"), fontColor, "HombreRegular")); // WWDP EDIT, ERRORGATE: Hombre (gothic, has Cyrillic) // LESS USELESS ONE LINER FUNCS PLS
 
                 var unfanciedPanel = new PanelContainer
                 {
@@ -294,8 +294,8 @@ namespace Content.Client.Chat.UI
             };
 
             //We'll be honest. *Yes* this is hacky. Doing this in a cleaner way would require a bottom-up refactor of how saycode handles sending chat messages. -Myr
-            bubbleHeader.SetMessage(FormatSpeech(SharedChatSystem.GetStringInsideTag(message, "BubbleHeader"), fontColor, "Bedstead")); // WWDP EDIT // LESS USELESS ONE LINER FUNCS PLS
-            bubbleContent.SetMessage(FormatSpeech(SharedChatSystem.GetStringInsideTag(message, "BubbleContent"), fontColor, "Bedstead")); // WWDP EDIT
+            bubbleHeader.SetMessage(FormatSpeech(SharedChatSystem.GetStringInsideTag(message, "BubbleHeader"), fontColor, "HombreRegular")); // WWDP EDIT, ERRORGATE: Hombre (gothic, has Cyrillic) // LESS USELESS ONE LINER FUNCS PLS
+            bubbleContent.SetMessage(FormatSpeech(SharedChatSystem.GetStringInsideTag(message, "BubbleContent"), fontColor, "HombreRegular")); // WWDP EDIT, ERRORGATE: Hombre (gothic, has Cyrillic)
 
             //As for below: Some day this could probably be converted to xaml. But that is not today. -Myr
             var mainPanel = new PanelContainer

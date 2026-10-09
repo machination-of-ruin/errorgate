@@ -627,6 +627,7 @@ namespace Content.Client.Lobby.UI
             ShowClothes.OnToggled += _ => { SetProfile(Profile, CharacterSlot); };
             ShowLoadouts.OnToggled += _ => { SetProfile(Profile, CharacterSlot); };
 
+            SpeciesInfoButton.Visible = false; // ERRORGATE: the species guidebook is gone
             SpeciesInfoButton.OnPressed += OnSpeciesInfoButtonPressed;
             UpdateSpeciesGuidebookIcon();
 

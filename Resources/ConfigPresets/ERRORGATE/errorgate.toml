@@ -16,6 +16,7 @@ enabled = false
 
 [net]
 tickrate = 30
+pvs_range = 30 # look far (Space) moves the view 12 tiles, the default 25 pops entities in at the corners
 
 
 [infolinks]

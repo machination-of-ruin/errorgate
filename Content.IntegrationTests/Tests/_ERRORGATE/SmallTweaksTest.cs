@@ -230,4 +230,32 @@ public sealed class SmallTweaksTest
 
         await pair.CleanReturnAsync();
     }
+    [Test]
+    public async Task AmmoniaInTheAirPoisonsPlayers()
+    {
+        await using var pair = await PoolManager.GetServerClient(new PoolSettings { Dirty = true });
+        var server = pair.Server;
+        var entMan = server.EntMan;
+        var testMap = await pair.CreateTestMap();
+
+        EntityUid human = default;
+        await server.WaitAssertion(() =>
+        {
+            var mix = new Content.Shared.Atmos.GasMixture(2500f) { Temperature = 293.15f };
+            // pure ammonia at the map pressure
+            mix.AdjustMoles(Content.Shared.Atmos.Gas.Ammonia, 12f); mix.AdjustMoles(Content.Shared.Atmos.Gas.Oxygen, 20f);
+            entMan.System<Content.Server.Atmos.EntitySystems.AtmosphereSystem>().SetMapAtmosphere(testMap.MapUid, false, mix);
+            human = entMan.SpawnEntity("MobHuman", testMap.GridCoords);
+        });
+        await pair.RunSeconds(30);
+
+        await server.WaitAssertion(() =>
+        {
+            var damage = entMan.GetComponent<Content.Shared.Damage.DamageableComponent>(human).Damage.DamageDict;
+            Assert.That(damage.TryGetValue("Poison", out var poison) ? poison.Float() : 0f, Is.GreaterThan(0f),
+                "Breathing ammonia from the air should poison. " + string.Join(", ", damage.Select(d => d.Key + "=" + d.Value)));
+        });
+
+        await pair.CleanReturnAsync();
+    }
 }

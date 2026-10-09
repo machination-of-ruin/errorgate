@@ -46,3 +46,7 @@ enabled = false
 [asteroid_field]
 enabled = false
 # WD EDIT END
+
+# ERRORGATE: look far (Space) moves the view 12 tiles, the default PVS range of 25 pops entities in at the corners
+[net]
+pvs_range = 30

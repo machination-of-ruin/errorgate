@@ -41,6 +41,8 @@ public sealed class InlineExamineTest
 
             Assert.That(Examine(entMan, other, viewer), Does.Contain("no obvious wounds"),
                 "An unhurt person should read as healthy.");
+            Assert.That(Examine(entMan, other, viewer), Does.Contain("man.").And.Not.Contain("human."),
+                "Humans read as a man or a woman, not as a human.");
 
             var burn = new DamageSpecifier(server.ProtoMan.Index<DamageTypePrototype>("Blunt"), FixedPoint2.New(60));
             entMan.System<DamageableSystem>().TryChangeDamage(other, burn);
