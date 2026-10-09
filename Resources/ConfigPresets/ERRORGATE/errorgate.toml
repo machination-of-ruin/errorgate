@@ -16,7 +16,7 @@ enabled = false
 
 [net]
 tickrate = 30
-pvs_range = 30 # look far (Space) moves the view 12 tiles, the default 25 pops entities in at the corners
+pvs_range = 50 # look far (Space) moves the view 12 tiles, at 25 and 30 things pop in at the corners and load in chunks
 
 
 [infolinks]

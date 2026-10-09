@@ -534,6 +534,7 @@
       sprite: Objects/Weapons/Guns/Snipers/bolt_gun_wood.rsi
       state: sks
   - type: Gun
+    angleIncrease: 5 # ERRORGATE: a semi-auto rifle is point accurate when stationary (the bolt-action base kicks 30 degrees per shot)
     fireRate: 2
     selectedMode: SemiAuto
     availableModes:

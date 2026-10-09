@@ -49,4 +49,4 @@ enabled = false
 
 # ERRORGATE: look far (Space) moves the view 12 tiles, the default PVS range of 25 pops entities in at the corners
 [net]
-pvs_range = 30
+pvs_range = 50
