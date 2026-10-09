@@ -187,3 +187,7 @@ Decided: **keep** the nine WWDP "[Port]" features as upstream has them (telescop
 ## WWDP PRs by the owner already in master (overlap lookup)
 
 Shove: #280 #295 #304 #315 #347 #565 #582 #978. Examine: #269 #549 #574 #919 #925 #954 #972. Guns: #24 (right-click gun melee) #284 #285 #293 #312 #325 #329 #330 #336 #344 #356 #539 #545 #546 #547 #591 #630 #928 #1003. Melee: #264 #273 #286 #622 #623 #926 #960. Deafness: #265 #270 #384 #390 #395. Crafting: #578 #613 #619. Immersive interactions: #288 #351 (reverted upstream by #358; ported here). Character/identity: #334 #917 #956. Movement and crit: #259 #272 #403 #568 #593 #975. Sounds: #915 (death/crit). Misc removals: #596 popup spam, #962 lobby animations, #972 examine chat logging, #992 MRP+++ popup, #920 slop.
+
+## STATUS: CLOSED
+
+All PRs of the old survival fork are ported, covered by upstream or skipped by the owner. Playtest rounds 1 to 11 are fixed and confirmed (`docs/port/playtest-todo.md`). Left unported by decision: starter backpack fills, the goggles cherry-pick, the old `errorgate_rules.txt`, and the skips listed above. Open outside the ports: remote hosting (static IP and client download), psionics (the altar text is hidden and must be restored if implemented), and the design milestones in `docs/design/ROADMAP.md`.
