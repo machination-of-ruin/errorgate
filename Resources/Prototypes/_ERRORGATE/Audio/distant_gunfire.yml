@@ -1,5 +1,5 @@
-# Reverb the distant gunshots are played through: a dark, long, echoing tail (like the Mountains preset, with more of it
-# and almost no highs), so far shots read as a muffled boom rolling over the wasteland.
+# Reverb the distant gunshots are played through: a dark, long tail (like the Mountains preset, with more of it, almost no
+# highs and lows that ring longer than the rest), so far shots read as a deep boom rolling over the wasteland.
 - type: audioPreset
   id: DistantGunfire
   createAuxiliary: true
@@ -10,7 +10,7 @@
   gainLf: 1.0000
   decayTime: 6.0000
   decayHfRatio: 0.1500
-  decayLfRatio: 1.0000
+  decayLfRatio: 1.8000
   reflectionsGain: 0.2000
   reflectionsDelay: 0.3000
   reflectionsPan: 0,0,0
@@ -23,6 +23,6 @@
   modulationDepth: 0.0000
   airAbsorptionGainHf: 0.9943
   hfReference: 5000.0000
-  lfReference: 250.0000
+  lfReference: 400.0000
   roomRolloffFactor: 0.0000
   decayHfLimit: 0

@@ -46,14 +46,9 @@ public sealed class DistantGunfireSystem : EntitySystem
     // listener's game volume as much. The echoes and the reverb are what sells the distance.
     private const float NearVolume = -10f;
     private const float FarVolume = -16f;
-    private const float MinPitch = 0.55f;
-    private const float MaxPitch = 0.7f;
-    private const int EchoCount = 3;
-    private const float EchoMinDelay = 0.4f;
-    private const float EchoMaxDelay = 1.0f;
-    private const float EchoSpacing = 1.1f;
-    private const float EchoVolumeOffset = -4f;
-    private const float EchoPitchScale = 0.9f;
+    private const float NearPitch = 0.55f;
+    private const float FarPitch = 0.4f;
+    private const float PitchVariance = 0.03f;
 
     // The sound is played from a point this far from the listener, in the direction of the shot. The real distance is
     // not used: the audio entity has to stay inside the listener's PVS, the volume carries the distance instead.
@@ -68,7 +63,6 @@ public sealed class DistantGunfireSystem : EntitySystem
     // Ranges of cartridges that are about to be spent, the cartridge can be deleted before GunShotEvent is raised.
     private readonly Dictionary<EntityUid, float> _ammoRanges = new();
     private readonly Dictionary<ICommonSession, RecipientState> _recipients = new();
-    private readonly List<Echo> _echoes = new();
     private TimeSpan _nextPrune;
 
     private bool _enabled = true;
@@ -131,28 +125,14 @@ public sealed class DistantGunfireSystem : EntitySystem
 
             var t = Math.Clamp((distance - audible) / (range - audible), 0f, 1f);
             var volume = NearVolume + t * (FarVolume - NearVolume);
-            var pitch = _random.NextFloat(MinPitch, MaxPitch);
+            // Lower and slower the further away it is: the pitch drop stretches the shot and gives it bass
+            var pitch = float.Lerp(NearPitch, FarPitch, t) + _random.NextFloat(-PitchVariance, PitchVariance);
 
             if (!TryGetVirtualSource(session, origin, out var coords))
                 continue;
 
             var shotParams = baseParams.AddVolume(volume).WithPitchScale(baseParams.Pitch * pitch);
             PlayDistant(resolved, session, coords, shotParams);
-
-            // The echoes carry the distance: a rolling chain of copies that gets later, lower and quieter
-            var delay = EchoMinDelay + t * (EchoMaxDelay - EchoMinDelay);
-            for (var i = 0; i < EchoCount; i++)
-            {
-                _echoes.Add(new Echo
-                {
-                    At = now + TimeSpan.FromSeconds(delay * (i + 1) * EchoSpacing),
-                    Session = session,
-                    Sound = resolved,
-                    Coords = coords,
-                    Params = baseParams.AddVolume(volume + EchoVolumeOffset * (i + 1))
-                        .WithPitchScale(baseParams.Pitch * pitch * MathF.Pow(EchoPitchScale, i + 1)),
-                });
-            }
         }
     }
 
@@ -299,17 +279,6 @@ public sealed class DistantGunfireSystem : EntitySystem
 
         var now = _timing.CurTime;
 
-        for (var i = _echoes.Count - 1; i >= 0; i--)
-        {
-            var echo = _echoes[i];
-            if (echo.At > now)
-                continue;
-
-            _echoes.RemoveAt(i);
-            if (echo.Session.Status == SessionStatus.InGame)
-                PlayDistant(echo.Sound, echo.Session, echo.Coords, echo.Params);
-        }
-
         if (now < _nextPrune)
             return;
 
@@ -333,12 +302,4 @@ public sealed class DistantGunfireSystem : EntitySystem
         public int Count;
     }
 
-    private struct Echo
-    {
-        public TimeSpan At;
-        public ICommonSession Session;
-        public ResolvedSoundSpecifier Sound;
-        public EntityCoordinates Coords;
-        public AudioParams Params;
-    }
 }
