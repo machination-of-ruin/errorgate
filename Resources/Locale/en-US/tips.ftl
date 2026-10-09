@@ -10,15 +10,15 @@ tips-dataset-9 = You can wear most weapons in your back (suit) slot.
 tips-dataset-10 = You can shove other humans and any physical objects with an empty hand by right-clicking.
 tips-dataset-11 = You can look/aim in the distance by pressing Space.
 tips-dataset-12 = Wide crosshair with guns = bad accuracy. Stay still to hit well.
-tips-dataset-13 = Dead players wait in the void. Your body and everything on it stay where you fell, and anyone can loot it.
-tips-dataset-14 = Respawning makes a new character with nothing. Your old gear is only yours if you can get back to the body first.
-tips-dataset-15 = Items left on the ground rot away after 20 minutes. Bodies are gibbed after 10. Loot is finite until the wipe.
-tips-dataset-16 = Gunfire carries. Shots beyond your view still reach you, muffled and low, and tell you which way to avoid.
-tips-dataset-17 = Every shot is heard. Silence is safer than a gun.
-tips-dataset-18 = [color=#ff0000]THE WATER IS POISON.[/color] Do not drink from it, and do not stand in it.
-tips-dataset-19 = Ammonia gas is deadly. If you start to retch, leave the cloud and do not come back.
-tips-dataset-20 = Strangers are unknown. There are no names, no manifest, no HUDs. Trust what you see, and not even that.
-tips-dataset-21 = Nothing here is safe because nobody is watching. Something always is.
-tips-dataset-22 = Tired legs are slow legs. Sprint to escape, and not to travel.
-tips-dataset-23 = Gibbed bodies leave no organs and no way back. A destroyed body sends you straight to the void.
-tips-dataset-24 = Glowsticks and floodlights light up the dark, and show every watcher where you are.
+tips-dataset-13 = When you die you go to the death void. Your body and gear stay where you died, and anyone can loot them.
+tips-dataset-14 = Respawn with the action on the bar, or type /respawn or /rise. You come back as a new character with nothing.
+tips-dataset-15 = Items on the ground despawn after 20 minutes. Dead bodies are gibbed after 10 minutes.
+tips-dataset-16 = Loot is limited. Items that despawn go back into the loot pool, and the pool resets when the round restarts.
+tips-dataset-17 = Gunfire is audible far outside your view. Distant shots are quieter and lower, and you can tell the direction.
+tips-dataset-18 = Each caliber sounds different at range. Learn which gun you are hearing.
+tips-dataset-19 = Rifles, shotguns and SMGs are more accurate if you hold them with both hands.
+tips-dataset-20 = Guns spawn with the bolt closed. That doesn't mean the cartridge is chambered.
+tips-dataset-21 = A craftable campfire burns out after a while and also cooks meat.
+tips-dataset-22 = Do not eat yellow snow.
+tips-dataset-23 = Running drains stamina, and when you are tired you move slower.
+tips-dataset-24 = Watch out for spike traps.
