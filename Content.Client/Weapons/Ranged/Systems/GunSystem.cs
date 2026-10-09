@@ -238,11 +238,7 @@ public sealed partial class GunSystem : SharedGunSystem
         }
 
         // Define target coordinates relative to gun entity, so that network latency on moving grids doesn't fuck up the target location.
-        // ERRORGATE: relative to the grid or map the shooter stands on, not to the shooter. A target relative to the shooter
-        // rotates with the shooter, and the shooter turns to face the cursor while the shot is on its way to the server:
-        // a degree of difference between the client's and the server's rotation is half a tile at 25 tiles.
-        var parent = Transform(entity).ParentUid;
-        var coordinates = TransformSystem.ToCoordinates(parent.IsValid() ? parent : entity, mousePos);
+        var coordinates = TransformSystem.ToCoordinates(entity, mousePos);
 
         NetEntity? target = null;
         if (_state.CurrentState is GameplayStateBase screen)

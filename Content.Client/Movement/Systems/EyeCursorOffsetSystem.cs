@@ -8,6 +8,8 @@ using Robust.Client.Graphics;
 using Robust.Client.Input;
 using Robust.Shared.Map;
 using Robust.Client.Player;
+using Robust.Client.UserInterface;
+using Content.Client.UserInterface.Controls;
 using Robust.Shared.Input;
 using Robust.Shared.Input.Binding;
 using Robust.Shared.Player;
@@ -24,6 +26,7 @@ public sealed partial class EyeCursorOffsetSystem : EntitySystem
     [Dependency] private readonly SharedContentEyeSystem _contentEye = default!;
     [Dependency] private readonly IMapManager _mapManager = default!;
     [Dependency] private readonly IClyde _clyde = default!;
+    [Dependency] private readonly IUserInterfaceManager _ui = default!; // ERRORGATE
 
     // This value is here to make sure the user doesn't have to move their mouse
     // all the way out to the edge of the screen to get the full offset.
@@ -63,9 +66,22 @@ public sealed partial class EyeCursorOffsetSystem : EntitySystem
         var localPlayer = _player.LocalPlayer?.ControlledEntity;
         var mousePos = _inputManager.MouseScreenPosition;
         var screenSize = _clyde.MainWindow.Size;
-        var minValue = MathF.Min(screenSize.X / 2, screenSize.Y / 2) * _edgeOffset;
 
-        var mouseNormalizedPos = new Vector2(-(mousePos.X - screenSize.X / 2) / minValue, (mousePos.Y - screenSize.Y / 2) / minValue); // X needs to be inverted here for some reason, otherwise it ends up flipped.
+        // ERRORGATE: the neutral point is the middle of the game view, where the player is drawn, not the middle of the
+        // window. With the chat panel next to the view the two are about 2 tiles apart, which made the view jump that far
+        // as soon as look far was held and made "straight above the player" a cursor position that aimed to the side.
+        var center = new Vector2(screenSize.X / 2f, screenSize.Y / 2f);
+        var half = MathF.Min(screenSize.X / 2f, screenSize.Y / 2f);
+        if (_ui.ActiveScreen?.GetWidget<MainViewport>() is { } viewport && viewport.PixelSize.X > 0 && viewport.PixelSize.Y > 0)
+        {
+            var size = (Vector2) viewport.PixelSize;
+            center = (Vector2) viewport.GlobalPixelPosition + size / 2f;
+            half = MathF.Min(size.X, size.Y) / 2f;
+        }
+
+        var minValue = half * _edgeOffset;
+
+        var mouseNormalizedPos = new Vector2(-(mousePos.X - center.X) / minValue, (mousePos.Y - center.Y) / minValue); // X needs to be inverted here for some reason, otherwise it ends up flipped.
 
         if (localPlayer == null)
             return null;
