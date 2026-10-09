@@ -10,9 +10,18 @@ ERRORGATE: a PvPvE survival game built on SS14, forked from WWDP (WWhiteDreamPro
 
 The `>>> STYLE <<<` is of utmost priority. User-facing project text (README, window title, rules, tips, server info, PR template, announcements) is written in the ERRORGATE voice: ALL-CAPS headings, `>>>` / `<<<` markers (e.g. `## \>>> LINKS` in markdown), terse and ominous, glitch / error / ruin / entropy themes. Match the tone of `README.md` and the title "MACHINATION OF RUIN >>> ERRORGATE <<< RISE ON THE EDGE OF ENTROPY". Do not flatten it into plain corporate prose; keep technical accuracy (build steps, versions) inside it.
 
+## Notifications
+
+Desktop and push notifications are exempt from `>>> STYLE <<<` and any persona.
+
+- Plain, polite, professional language. No persona, slang or casual chat tone.
+- Report status only: what finished, what failed, what needs a decision.
+- Never phrase a notification as a command ("Review X", "Commit Y"). Use neutral wording instead: "Draft ready for review", "Changes are not yet committed".
+- One short sentence. No emoji.
+
 ## Design
 
-Vision, direction (strip the space station, enhanced combat, LLM-driven "AI GOD" gamerule) and open questions are in `docs/design/ROADMAP.md`. Read it, and any `docs/design/<feature>.md`, before working on a feature.
+Start with `docs/design/VIBE.md`: the intended experience (pure-horror wasteland ravaged by a broken AI GOD) that every feature must serve. Vision, direction (strip the space station, enhanced combat, LLM-driven "AI GOD" gamerule) and open questions are in `docs/design/ROADMAP.md`. Read it, and any `docs/design/<feature>.md`, before working on a feature.
 
 ## Setup and commands
 
