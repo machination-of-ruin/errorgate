@@ -42,14 +42,18 @@ public sealed class DistantGunfireSystem : EntitySystem
     /// <summary>Range for hitscan and energy projectiles.</summary>
     public const float DefaultEnergyRange = 25f;
 
+    // The volume only drops a little with distance and then cuts at the end of the range, so it does not depend on the
+    // listener's game volume as much. The echoes and the reverb are what sells the distance.
     private const float NearVolume = -10f;
-    private const float FarVolume = -32f;
+    private const float FarVolume = -16f;
     private const float MinPitch = 0.55f;
     private const float MaxPitch = 0.7f;
-    private const float EchoMinDelay = 0.35f;
-    private const float EchoMaxDelay = 0.8f;
-    private const float EchoVolumeOffset = -8f;
-    private const float EchoPitchScale = 0.85f;
+    private const int EchoCount = 3;
+    private const float EchoMinDelay = 0.4f;
+    private const float EchoMaxDelay = 1.0f;
+    private const float EchoSpacing = 1.1f;
+    private const float EchoVolumeOffset = -4f;
+    private const float EchoPitchScale = 0.9f;
 
     // The sound is played from a point this far from the listener, in the direction of the shot. The real distance is
     // not used: the audio entity has to stay inside the listener's PVS, the volume carries the distance instead.
@@ -135,15 +139,20 @@ public sealed class DistantGunfireSystem : EntitySystem
             var shotParams = baseParams.AddVolume(volume).WithPitchScale(baseParams.Pitch * pitch);
             PlayDistant(resolved, session, coords, shotParams);
 
-            _echoes.Add(new Echo
+            // The echoes carry the distance: a rolling chain of copies that gets later, lower and quieter
+            var delay = EchoMinDelay + t * (EchoMaxDelay - EchoMinDelay);
+            for (var i = 0; i < EchoCount; i++)
             {
-                At = now + TimeSpan.FromSeconds(EchoMinDelay + t * (EchoMaxDelay - EchoMinDelay)),
-                Session = session,
-                Sound = resolved,
-                Coords = coords,
-                Params = baseParams.AddVolume(volume + EchoVolumeOffset)
-                    .WithPitchScale(baseParams.Pitch * pitch * EchoPitchScale),
-            });
+                _echoes.Add(new Echo
+                {
+                    At = now + TimeSpan.FromSeconds(delay * (i + 1) * EchoSpacing),
+                    Session = session,
+                    Sound = resolved,
+                    Coords = coords,
+                    Params = baseParams.AddVolume(volume + EchoVolumeOffset * (i + 1))
+                        .WithPitchScale(baseParams.Pitch * pitch * MathF.Pow(EchoPitchScale, i + 1)),
+                });
+            }
         }
     }
 

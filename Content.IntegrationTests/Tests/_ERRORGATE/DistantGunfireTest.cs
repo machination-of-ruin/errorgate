@@ -70,6 +70,7 @@ public sealed class DistantGunfireTest
             // PVS is off in the test config, which makes everyone hear the real shot. Turn it on and give the test grid
             // a long strip of floor, the listeners are placed up to 70 tiles away.
             server.CfgMan.SetCVar(Robust.Shared.CVars.NetPVS, true);
+            server.CfgMan.SetCVar(Content.Shared._ERRORGATE.CCVar.ErrorgateCVars.DistantGunfireRangeScale, 0.7f); // the test distances assume 0.7, the default is 3
             var maps = entMan.System<Robust.Server.GameObjects.MapSystem>();
             for (var x = -2; x <= 120; x++)
                 maps.SetTile(testMap.Grid, new Robust.Shared.Maths.Vector2i(x, 0), new Robust.Shared.Map.Tile(1));
@@ -138,6 +139,7 @@ public sealed class DistantGunfireTest
         await server.WaitPost(() =>
         {
             server.CfgMan.SetCVar(Robust.Shared.CVars.NetPVS, true);
+            server.CfgMan.SetCVar(Content.Shared._ERRORGATE.CCVar.ErrorgateCVars.DistantGunfireRangeScale, 0.7f); // the test distances assume 0.7, the default is 3
             var maps = entMan.System<Robust.Server.GameObjects.MapSystem>();
             for (var x = -2; x <= 120; x++)
                 maps.SetTile(testMap.Grid, new Robust.Shared.Maths.Vector2i(x, 0), new Robust.Shared.Map.Tile(1));

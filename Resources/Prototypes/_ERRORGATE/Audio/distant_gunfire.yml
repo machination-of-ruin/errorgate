@@ -5,16 +5,16 @@
   createAuxiliary: true
   density: 1.0000
   diffusion: 0.2700
-  gain: 0.5000
-  gainHf: 0.0200
+  gain: 0.8000
+  gainHf: 0.0400
   gainLf: 1.0000
-  decayTime: 3.5000
+  decayTime: 6.0000
   decayHfRatio: 0.1500
   decayLfRatio: 1.0000
-  reflectionsGain: 0.1000
+  reflectionsGain: 0.2000
   reflectionsDelay: 0.3000
   reflectionsPan: 0,0,0
-  lateReverbGain: 0.4000
+  lateReverbGain: 0.7000
   lateReverbDelay: 0.1000
   lateReverbPan: 0,0,0
   echoTime: 0.2500
