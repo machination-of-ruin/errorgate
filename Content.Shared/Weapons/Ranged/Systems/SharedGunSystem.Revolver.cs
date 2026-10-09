@@ -23,6 +23,7 @@ public partial class SharedGunSystem
         SubscribeLocalEvent<RevolverAmmoProviderComponent, ComponentGetState>(OnRevolverGetState);
         SubscribeLocalEvent<RevolverAmmoProviderComponent, ComponentHandleState>(OnRevolverHandleState);
         SubscribeLocalEvent<RevolverAmmoProviderComponent, ComponentInit>(OnRevolverInit); // WWDP
+        SubscribeLocalEvent<RevolverAmmoProviderComponent, MapInitEvent>(OnRevolverMapInit); // ERRORGATE
         SubscribeLocalEvent<RevolverAmmoProviderComponent, TakeAmmoEvent>(OnRevolverTakeAmmo);
         SubscribeLocalEvent<RevolverAmmoProviderComponent, GetVerbsEvent<AlternativeVerb>>(OnRevolverVerbs);
         SubscribeLocalEvent<RevolverAmmoProviderComponent, InteractUsingEvent>(OnRevolverInteractUsing);
@@ -439,6 +440,22 @@ public partial class SharedGunSystem
         component.CurrentIndex = (component.CurrentIndex + count) % component.Capacity;
     }
 
+    // ERRORGATE: random-load revolvers spawn with some of the chambers empty. Done on map init, not on component
+    // init, so that loading and saving an entity does not change its data.
+    private void OnRevolverMapInit(EntityUid uid, RevolverAmmoProviderComponent component, MapInitEvent args)
+    {
+        if (!component.RandomizeAmmo)
+            return;
+
+        for (var i = 0; i < component.Chambers.Length; i++)
+        {
+            if (component.Chambers[i] == true && Random.NextDouble() < 0.5)
+                component.Chambers[i] = null;
+        }
+
+        Dirty(uid, component);
+    }
+
     private void OnRevolverInit(EntityUid uid, RevolverAmmoProviderComponent component, ComponentInit args) // WWDP
     {
         component.AmmoContainer = Containers.EnsureContainer<Container>(uid, RevolverContainer);
@@ -462,8 +479,7 @@ public partial class SharedGunSystem
                     continue;
                 }
 
-                // ERRORGATE: random-load revolvers
-                component.Chambers[i] = component.RandomizeAmmo && Random.NextDouble() < 0.5 ? null : true;
+                component.Chambers[i] = true;
             }
         }
 

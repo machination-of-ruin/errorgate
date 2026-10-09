@@ -24,6 +24,10 @@ public sealed class SmartMobSpawnerSystem : EntitySystem
     private void OnSpawnerShutdown(EntityUid uid, SmartMobSpawnerComponent component, ComponentShutdown args)
     {
         component.TokenSource?.Cancel();
+
+        // A deleted spawner takes its mob with it (mapping, tests): the mob would otherwise be left without an owner.
+        if (Exists(component.SpawnedMob) && !TerminatingOrDeleted(component.SpawnedMob))
+            QueueDel(component.SpawnedMob);
     }
 
     private void OnMobCompShutdown(EntityUid uid, SmartMobSpawnerSpawnedComponent component, ComponentShutdown args)
@@ -70,6 +74,10 @@ public sealed class SmartMobSpawnerSystem : EntitySystem
 
     private void SpawnMob(EntityUid uid, SmartMobSpawnerComponent component)
     {
+        // A spawner without a mob prototype (a blank component) has nothing to spawn
+        if (string.IsNullOrEmpty(component.MobPrototype))
+            return;
+
         var coordinates = Transform(uid).Coordinates;
         component.SpawnedMob = SpawnAtPosition(component.MobPrototype, coordinates);
         var spawnedMobComp = EnsureComp<SmartMobSpawnerSpawnedComponent>(component.SpawnedMob);

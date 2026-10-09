@@ -44,6 +44,10 @@ public sealed class LootManagerSystem : EntitySystem
     {
         LootManager = new();
 
+        // a blank component (no table set) has nothing to load
+        if (string.IsNullOrEmpty(component.GlobalLootTablePrototype.Id))
+            return;
+
         if (!_prototypeManager.TryIndex(component.GlobalLootTablePrototype, out var proto))
         {
             Log.Error("Could not find a global loot table");

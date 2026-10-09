@@ -49,6 +49,7 @@
       types:
         Slash: 3
   - type: MobThresholds
+    triggersAlerts: false # ERRORGATE: it has no alerts for its states and logged an error every time it died
     thresholds:
       0: Alive
       40: Dead

@@ -82,6 +82,9 @@ public sealed class PirateRadioSpawnRule : StationEventSystem<PirateRadioSpawnRu
             var randomer = _random.NextVector2(ent.Comp.DebrisMinimumOffset, ent.Comp.DebrisMaximumOffset); //Second random vector to ensure the outpost isn't perfectly centered in the debris field
 
             var salvPrototypes = _prototypeManager.EnumeratePrototypes<SalvageMapPrototype>().ToList();
+            if (salvPrototypes.Count == 0) // ERRORGATE: the salvage maps are deleted, there is no debris to spawn
+                return;
+
             var salvageProto = _random.Pick(salvPrototypes);
 
             if (!_mapSystem.MapExists(GameTicker.DefaultMap))

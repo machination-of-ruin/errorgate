@@ -3280,6 +3280,18 @@ entities:
       id: Kuznetsk
     - type: LootManager
       globalLootTablePrototype: Kuznetsk
+    # ERRORGATE: world faults placed over the map on map init
+    - type: AnomalyField
+      count: 3
+      unique: true
+      prototypes:
+      - ErrorgateAnomalyHeat
+      - ErrorgateAnomalyArc
+      - ErrorgateAnomalyCollapse
+      minDistanceBetween: 25
+      minDistanceFromSpawns: 20
+      freeRadius: 3
+      maxAttempts: 20000
     - type: Gravity
       gravityShakeSound: !type:SoundPathSpecifier
         path: /Audio/Effects/alert.ogg

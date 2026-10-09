@@ -190,3 +190,8 @@ Found while playing the `port/beyond` build. One line each, newest last.
 
 - [x] wwdpublic #984 mob collisions (see the ledger). Retest in play: two players walking into each other, crowds of walkers, dead bodies and lying players, conveyors, pulling.
 - [ ] Retest the Wizden ports in play: heat haze (`setatmostemp` on a tile), vacuum greying (remove gas), radio indicator, mobs around doors and walls (pathfinding rework), weather volume.
+
+## Features batch 3
+
+- [x] World anomalies (`AnomalyField` component, on Kuznetsk's grid): three deadly, STALKER-like faults placed at random walkable spots (distinct kinds, 25 tiles apart, 20 tiles away from spawn points). `heat fault` (fire and heat damage in a radius 3, heat haze), `arc fault` (lightning arcs, electrocution inside radius 2, screen static near it), `collapse fault` (gravity pull from 8 tiles, crushing at the centre, the world desaturates near it). Admin commands `spawnanomalies` and `listanomalies`. Tests: `AnomalyFieldTest`. Needs a look in play: visuals (heat haze, static, desaturation), pull strength, whether three is the right number.
+- [x] Fixes found by running the entity sweep tests (`EntityTest`): spawners with a blank config no longer throw, the pirate radio rule survives without salvage maps, `MobSpawnerBase` is abstract, a deleted mob spawner removes its mob, the gladiabot no longer logs an alert error, random-cylinder revolvers randomise on map init.

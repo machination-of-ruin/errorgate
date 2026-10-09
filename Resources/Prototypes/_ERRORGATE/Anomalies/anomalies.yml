@@ -1,0 +1,159 @@
+# ERRORGATE: world faults. Environmental hazards, not creatures: they sit where the map put them,
+# give a hint (light, sound, haze, static, a drained screen) and punish whatever steps into them.
+# No Physics and no Damageable on purpose: nothing collides with them, nothing breaks them, explosions skip them.
+
+- type: entity
+  abstract: true
+  id: ErrorgateAnomalyBase
+  components:
+  - type: Tag
+    tags:
+    - HideContextMenu
+  - type: ErrorgateAnomaly
+  - type: Sprite
+    noRot: true
+    drawdepth: Effects
+
+# HEAT FAULT: a zone of burning air. The haze is drawn by the client around the fault.
+- type: entity
+  id: ErrorgateAnomalyHeat
+  parent: ErrorgateAnomalyBase
+  components:
+  - type: ErrorgateAnomaly
+    kind: Heat
+    radius: 3
+    damageInterval: 0.5
+    damage:
+      types:
+        Heat: 10
+    tickSound:
+      path: /Audio/Effects/burning.ogg
+      params:
+        volume: -6
+  - type: HeatFault
+  - type: Sprite
+    layers:
+    - sprite: Structures/Specific/Anomalies/pyro_anom.rsi
+      state: anom
+      shader: unshaded
+      color: "#ff6a2a30"
+      scale: 3, 3
+    - sprite: Effects/fire.rsi
+      state: fire
+      shader: unshaded
+      color: "#ff5a1c60"
+      scale: 1.5, 1.5
+  - type: PointLight
+    enabled: true
+    radius: 5
+    energy: 1.5
+    softness: 1
+    color: "#e0561f"
+    castShadows: false
+  - type: LightBehaviour
+    behaviours:
+    - !type:RandomizeBehaviour
+      interpolate: Nearest
+      minDuration: 0.05
+      maxDuration: 0.25
+      startValue: 0.5
+      endValue: 2.4
+      property: Energy
+      isLooped: true
+      enabled: true
+  - type: AmbientSound
+    enabled: true
+    range: 8
+    volume: -10
+    sound:
+      path: /Audio/Ambience/Objects/fireplace.ogg
+
+# ARC FAULT: a discharge without a circuit. Throws arcs at whatever is near, shocks what stands in it,
+# and fills the screen of whoever comes close with static.
+- type: entity
+  id: ErrorgateAnomalyArc
+  parent: ErrorgateAnomalyBase
+  components:
+  - type: ErrorgateAnomaly
+    kind: Arc
+    radius: 2
+    warningRadius: 6
+    damageInterval: 1
+  - type: ArcFault
+  - type: Sprite
+    layers:
+    - sprite: Effects/electricity.rsi
+      state: electrified
+      shader: unshaded
+      color: "#8fb4ff90"
+      scale: 2, 2
+    - sprite: Structures/Specific/anomaly.rsi
+      state: anom3
+      shader: unshaded
+      color: "#9bbcff20"
+      scale: 2, 2
+  - type: PointLight
+    enabled: true
+    radius: 4
+    energy: 1.5
+    softness: 1
+    color: "#6f9bff"
+    castShadows: false
+  - type: LightBehaviour
+    behaviours:
+    - !type:RandomizeBehaviour
+      interpolate: Nearest
+      minDuration: 0.02
+      maxDuration: 0.18
+      startValue: 0
+      endValue: 3.2
+      property: Energy
+      isLooped: true
+      enabled: true
+  - type: AmbientSound
+    enabled: true
+    range: 9
+    volume: -8
+    sound:
+      path: /Audio/Ambience/Objects/light_hum.ogg
+
+# COLLAPSE FAULT: a gravity error. Everything loose falls toward it, the center crushes, the world loses its colour.
+- type: entity
+  id: ErrorgateAnomalyCollapse
+  parent: ErrorgateAnomalyBase
+  components:
+  - type: ErrorgateAnomaly
+    kind: Collapse
+    radius: 1.2
+    warningRadius: 10
+    damageInterval: 0.5
+    damage:
+      types:
+        Blunt: 35
+    tickSound:
+      path: /Audio/Ambience/Objects/crushing.ogg
+      params:
+        volume: -4
+  - type: CollapseFault
+  - type: Sprite
+    layers:
+    - sprite: Structures/Specific/Anomalies/shadow_anom.rsi
+      state: anom
+      color: "#10081890"
+      scale: 1.6, 1.6
+  - type: PointLight
+    enabled: true
+    radius: 5
+    energy: -2.5
+    softness: 1
+    color: "#1a0a1f"
+    castShadows: false
+  - type: SingularityDistortion
+    intensity: 3000
+    falloffPower: 2.7
+  - type: AmbientSound
+    enabled: true
+    range: 12
+    volume: -6
+    sound:
+      path: /Audio/Ambience/Objects/gravity_gen_hum.ogg

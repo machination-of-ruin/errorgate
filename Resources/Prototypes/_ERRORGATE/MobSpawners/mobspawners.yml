@@ -2,6 +2,7 @@
   name: mob spawner
   suffix: test
   id: MobSpawnerBase
+  abstract: true # ERRORGATE: a bare base spawner in the spawn menu left its mob behind when deleted
   parent: MarkerBase
   components:
     - type: Sprite

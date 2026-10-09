@@ -1,0 +1,5 @@
+# ERRORGATE: see-through screen static, shown near an arc fault
+- type: shader
+  id: ErrorgateAnomalyStatic
+  kind: source
+  path: "/Textures/_ERRORGATE/Shaders/anomaly_static.swsl"
