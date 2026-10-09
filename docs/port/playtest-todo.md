@@ -129,4 +129,5 @@ Found while playing the `port/beyond` build. One line each, newest last.
 - [x] "Your body cools down 15% slower" removed from mobs (temperature protection examine skips entities with a mob state).
 - [x] `PosterContrabandBeachStarYamamoto` on Edge of Entropy draws over the secret door (`drawdepth: Overdoors` on the map entity).
 - [x] Ammonia gas hurts and makes players vomit again: the old build values for the reagent were never ported (Poison 100 and 60% vomit in the lungs, Poison 5 and 10% vomit in the blood). Test: `BreathingAmmoniaPoisonsTheLungs`. Not checked against the map's own atmosphere.
+- [x] Look far (Space) reaches 12 tiles, about a screen ahead (`EyeCursorOffset maxOffset` on humans, was 3).
 - [x] Altars no longer say "This altar can be used to sacrifice Psionics" (`SharedSacrificialAltarSystem.OnExamined`, marked `// ERRORGATE`). **Revert this if psionics are ever implemented.**
