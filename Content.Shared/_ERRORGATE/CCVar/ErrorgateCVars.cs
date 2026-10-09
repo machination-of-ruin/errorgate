@@ -18,4 +18,16 @@ public sealed class ErrorgateCVars
     /// </summary>
     public static readonly CVarDef<float> RespawnCooldown =
         CVarDef.Create("errorgate.respawn_cooldown", 0f, CVar.SERVER | CVar.ARCHIVE);
+
+    /// <summary>
+    ///     Players beyond normal hearing range hear a muffled, echoing copy of gunshots on the same grid.
+    /// </summary>
+    public static readonly CVarDef<bool> DistantGunfireEnabled =
+        CVarDef.Create("errorgate.distant_gunfire_enabled", true, CVar.SERVER | CVar.ARCHIVE);
+
+    /// <summary>
+    ///     Multiplier for how far distant gunfire carries. 1 uses the per-caliber ranges as authored.
+    /// </summary>
+    public static readonly CVarDef<float> DistantGunfireRangeScale =
+        CVarDef.Create("errorgate.distant_gunfire_range_scale", 1f, CVar.SERVER | CVar.ARCHIVE);
 }

@@ -3,6 +3,8 @@
   id: CartridgeLapuaMagnum
   name: cartridge (.338 Lapua Magnum)
   components:
+  - type: DistantGunfireAudible # ERRORGATE
+    range: 100
   - type: Tag
     tags:
     - Cartridge

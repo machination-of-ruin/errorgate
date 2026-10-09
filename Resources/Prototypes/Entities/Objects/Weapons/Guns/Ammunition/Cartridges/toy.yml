@@ -4,6 +4,8 @@
   parent: BaseCartridge
   abstract: true
   components:
+  - type: DistantGunfireAudible # ERRORGATE
+    range: 0
   - type: Tag
     tags:
       - Cartridge

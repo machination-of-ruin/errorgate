@@ -168,3 +168,9 @@ Found while playing the `port/beyond` build. One line each, newest last.
 - [x] Combat log and bleeding text size 16 (was 19).
 - [x] Dead walkers and runners lie down (`RotationVisuals` 90 on `MobWalker` and its children).
 - [x] Glowsticks replace part of the flares in the loot tables (global table Flare 10 -> 5 plus five glowsticks; Kuznetsk Flare 5 -> 3 plus two).
+
+## Features batch 2
+
+- [x] Broken floodlight is a structure too (cannot be picked up).
+- [x] Pointing reworked: "Point at" is an interaction under Interactions in the right click menu (`PointAt`, popups like "Look at"), the pointing keybind runs the same interaction on the entity under the cursor, no arrow, no popup text for bare floor.
+- [x] Distant gunshots (`DistantGunfireSystem`): shooters are heard beyond normal hearing range, on the same grid only, up to a range tied to the caliber (9x19 45, .45 50, 5.56 65, 7.62x39 70, .357 60, 6mm 55, 12 gauge 60, .338 100, energy and unknown 25 to 50, silenced and toy none). The original shot sound is played lower in pitch and quieter with distance, with a delayed echo copy. CVars `errorgate.distant_gunfire_enabled` and `errorgate.distant_gunfire_range_scale`. Only the audience rules are tested; how it sounds needs a listen.

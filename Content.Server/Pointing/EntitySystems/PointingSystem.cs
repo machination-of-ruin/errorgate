@@ -8,7 +8,9 @@ using Content.Shared.Eye;
 using Content.Shared.Ghost;
 using Content.Shared.IdentityManagement;
 using Content.Shared.Input;
+using Content.Shared.Hands.Components;
 using Content.Shared.Interaction;
+using Content.Shared.InteractionVerbs;
 using Content.Shared.Mind;
 using Content.Shared.Pointing;
 using Content.Shared.Popups;
@@ -21,6 +23,7 @@ using Robust.Shared.GameStates;
 using Robust.Shared.Input.Binding;
 using Robust.Shared.Map;
 using Robust.Shared.Player;
+using Robust.Shared.Prototypes;
 using Robust.Shared.Replays;
 using Robust.Shared.Timing;
 
@@ -43,6 +46,8 @@ namespace Content.Server.Pointing.EntitySystems
         [Dependency] private readonly SharedMapSystem _map = default!;
         [Dependency] private readonly IAdminLogManager _adminLogger = default!;
         [Dependency] private readonly ExamineSystemShared _examine = default!;
+        [Dependency] private readonly SharedInteractionVerbsSystem _interactionVerbs = default!; // ERRORGATE
+        [Dependency] private readonly IPrototypeManager _protoManager = default!; // ERRORGATE
 
         private TimeSpan _pointDelay = TimeSpan.FromSeconds(0.5f);
 
@@ -157,100 +162,25 @@ namespace Content.Server.Pointing.EntitySystems
             var mapCoordsPointed = _transform.ToMapCoordinates(coordsPointed);
             _rotateToFaceSystem.TryFaceCoordinates(player, mapCoordsPointed.Position);
 
-            var arrow = EntityManager.SpawnEntity("PointingArrow", coordsPointed);
-
-            if (TryComp<PointingArrowComponent>(arrow, out var pointing))
+            // ERRORGATE: no arrow. Pointing at something is the PointAt interaction (same popup style as "Look at").
+            if (Exists(pointed) && _protoManager.TryIndex<InteractionVerbPrototype>("PointAt", out var pointAt))
             {
-                pointing.StartPosition = _transform.ToCoordinates((arrow, Transform(arrow)), _transform.ToMapCoordinates(Transform(player).Coordinates)).Position;
-                pointing.EndTime = _gameTiming.CurTime + PointDuration;
-
-                Dirty(arrow, pointing);
-            }
-
-            if (EntityQuery<PointingArrowAngeringComponent>().FirstOrDefault() != null)
-            {
-                if (TryComp<PointingArrowComponent>(arrow, out var pointingArrowComponent))
-                {
-                    pointingArrowComponent.Rogue = true;
-                }
-            }
-
-            var layer = (int) VisibilityFlags.Normal;
-            if (TryComp(player, out VisibilityComponent? playerVisibility))
-            {
-                var arrowVisibility = EntityManager.EnsureComponent<VisibilityComponent>(arrow);
-                layer = playerVisibility.Layer;
-                _visibilitySystem.SetLayer((arrow, arrowVisibility), (ushort) layer);
-            }
-
-            // Get players that are in range and whose visibility layer matches the arrow's.
-            bool ViewerPredicate(ICommonSession playerSession)
-            {
-                if (!_minds.TryGetMind(playerSession, out _, out var mind) ||
-                    mind.CurrentEntity is not { Valid: true } ent ||
-                    !TryComp(ent, out EyeComponent? eyeComp) ||
-                    (eyeComp.VisibilityMask & layer) == 0)
+                _pointers[session] = _gameTiming.CurTime;
+                var verbArgs = new InteractionArgs(player, pointed, null, true, true, HasComp<HandsComponent>(player), null);
+                if (!_interactionVerbs.StartVerb(pointAt, verbArgs))
                     return false;
 
-                return _transform.GetMapCoordinates(ent).InRange(_transform.GetMapCoordinates(player), PointingRange);
-            }
-
-            var viewers = Filter.Empty()
-                .AddWhere(session1 => ViewerPredicate(session1))
-                .Recipients;
-
-            string selfMessage;
-            string viewerMessage;
-            string? viewerPointedAtMessage = null;
-            var playerName = Identity.Entity(player, EntityManager);
-
-            if (Exists(pointed))
-            {
-                var pointedName = Identity.Entity(pointed, EntityManager);
-
-                selfMessage = player == pointed
-                    ? Loc.GetString("pointing-system-point-at-self")
-                    : Loc.GetString("pointing-system-point-at-other", ("other", pointedName));
-
-                viewerMessage = player == pointed
-                    ? Loc.GetString("pointing-system-point-at-self-others", ("otherName", playerName), ("other", playerName))
-                    : Loc.GetString("pointing-system-point-at-other-others", ("otherName", playerName), ("other", pointedName));
-
-                viewerPointedAtMessage = Loc.GetString("pointing-system-point-at-you-other", ("otherName", playerName));
-
-                var ev = new AfterPointedAtEvent(pointed);
-                RaiseLocalEvent(player, ref ev);
-                var gotev = new AfterGotPointedAtEvent(player);
-                RaiseLocalEvent(pointed, ref gotev);
+                var pointedEv = new AfterPointedAtEvent(pointed);
+                RaiseLocalEvent(player, ref pointedEv);
+                var gotPointedEv = new AfterGotPointedAtEvent(player);
+                RaiseLocalEvent(pointed, ref gotPointedEv);
 
                 _adminLogger.Add(LogType.Action, LogImpact.Low, $"{ToPrettyString(player):user} pointed at {ToPrettyString(pointed):target} {Transform(pointed).Coordinates}");
-            }
-            else
-            {
-                TileRef? tileRef = null;
-                string? position = null;
-
-                if (_mapManager.TryFindGridAt(mapCoordsPointed, out var gridUid, out var grid))
-                {
-                    position = $"EntId={gridUid} {_map.WorldToTile(gridUid, grid, mapCoordsPointed.Position)}";
-                    tileRef = _map.GetTileRef(gridUid, grid, _map.WorldToTile(gridUid, grid, mapCoordsPointed.Position));
-                }
-
-                var tileDef = _tileDefinitionManager[tileRef?.Tile.TypeId ?? 0];
-
-                var name = Loc.GetString(tileDef.Name);
-                selfMessage = Loc.GetString("pointing-system-point-at-tile", ("tileName", name));
-
-                viewerMessage = Loc.GetString("pointing-system-other-point-at-tile", ("otherName", playerName), ("tileName", name));
-
-                _adminLogger.Add(LogType.Action, LogImpact.Low, $"{ToPrettyString(player):user} pointed at {name} {(position == null ? mapCoordsPointed : position)}");
+                return true;
             }
 
-            _pointers[session] = _gameTiming.CurTime;
-
-            SendMessage(player, viewers, pointed, selfMessage, viewerMessage, viewerPointedAtMessage);
-
-            return true;
+            // ERRORGATE: nothing to point at (bare floor), no popup text at all
+            return false;
         }
 
         public override void Initialize()

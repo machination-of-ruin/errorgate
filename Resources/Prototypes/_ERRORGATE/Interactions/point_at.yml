@@ -1,0 +1,16 @@
+# Pointing is an interaction, shown under "Interactions" in the right click menu. The pointing keybind runs the same
+# interaction on whatever is under the cursor. No arrow, only the popup everyone nearby sees (like "Look at").
+- type: Interaction
+  id: PointAt
+  parent: BaseGlobal
+  priority: 5
+  requiresHands: false
+  requiresCanInteract: false
+  contactInteraction: false
+  allowSelfInteract: true
+  icon: /Textures/Interface/VerbIcons/point.svg.192dpi.png
+  range: {max: 15}
+  effectSuccess:
+    popup: Obvious
+  action:
+    !type:NoOpAction

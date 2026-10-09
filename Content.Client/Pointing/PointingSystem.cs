@@ -14,7 +14,8 @@ public sealed partial class PointingSystem : SharedPointingSystem
     {
         base.Initialize();
 
-        SubscribeLocalEvent<GetVerbsEvent<Verb>>(AddPointingVerb);
+        // ERRORGATE: pointing is the "Point at" entry of the interactions menu (PointAt interaction), not a plain verb
+        // SubscribeLocalEvent<GetVerbsEvent<Verb>>(AddPointingVerb);
         SubscribeLocalEvent<PointingArrowComponent, ComponentStartup>(OnArrowStartup);
         SubscribeLocalEvent<RoguePointingArrowComponent, ComponentStartup>(OnRogueArrowStartup);
         SubscribeLocalEvent<PointingArrowComponent, ComponentHandleState>(HandleCompState);

@@ -259,13 +259,12 @@
 - type: entity
   name: broken floodlight
   id: FloodlightBroken
-  parent: BaseItem
+  parent: BaseStructureDynamic # ERRORGATE: not an item, like the working floodlight
   description: A pole with powerful mounted lights on it. It's broken.
   components:
   - type: Sprite
     sprite: Objects/Misc/Lights/lights.rsi
     state: floodlight_broken
-  - type: Anchorable
   - type: Damageable
     damageContainer: StructuralInorganic
     damageModifierSet: Metallic
@@ -291,13 +290,3 @@
             max: 1
       - !type:DoActsBehavior
         acts: [ "Destruction" ]
-  - type: Physics
-  - type: Fixtures
-    fixtures:
-      fix1:
-        shape:
-          !type:PhysShapeAabb
-          bounds: "-0.2, -0.5, 0.2, 0.5"
-        density: 50
-        mask:
-        - HighImpassable
