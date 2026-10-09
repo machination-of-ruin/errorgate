@@ -189,3 +189,4 @@ Found while playing the `port/beyond` build. One line each, newest last.
 ## Ports
 
 - [x] wwdpublic #984 mob collisions (see the ledger). Retest in play: two players walking into each other, crowds of walkers, dead bodies and lying players, conveyors, pulling.
+- [ ] Retest the Wizden ports in play: heat haze (`setatmostemp` on a tile), vacuum greying (remove gas), radio indicator, mobs around doors and walls (pathfinding rework), weather volume.

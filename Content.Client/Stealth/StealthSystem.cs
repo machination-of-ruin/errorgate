@@ -45,17 +45,17 @@ public sealed class StealthSystem : SharedStealthSystem
         sprite.GetScreenTexture = enabled;
         sprite.RaiseShaderEvent = enabled;
 
-        if (!enabled)
+        if (enabled)
+        {
+            component.HadOutline = RemCompDeferred<InteractionOutlineComponent>(uid);
+        }
+        else
         {
             if (component.HadOutline && !TerminatingOrDeleted(uid))
+            {
                 EnsureComp<InteractionOutlineComponent>(uid);
-            return;
-        }
-
-        if (TryComp(uid, out InteractionOutlineComponent? outline))
-        {
-            RemCompDeferred(uid, outline);
-            component.HadOutline = true;
+                component.HadOutline = false;
+            }
         }
     }
 

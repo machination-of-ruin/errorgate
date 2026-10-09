@@ -197,3 +197,17 @@ All PRs of the old survival fork are ported, covered by upstream or skipped by t
 | PR | Title | Status |
 |---|---|---|
 | wwdpublic #984 | [Port] MOB COLLISIONS (Wizden #34580, #36296, #36851) | PORTED on the owner's request. The PR itself was closed unmerged upstream (WWDP reviewers rejected it). Mobs now push each other apart (`MobCollisionComponent` on `BaseMob`, `SharedMobCollisionSystem` with client and server parts, `movement.*` CVars, standing and conveyor tweaks). The old `physics.mob_pushing` CVar is replaced by `movement.mob_pushing` (default true). One hunk of the diff did not apply (`SharedMoverController` field rename) and a no-op loop in `UpdateAfterSolve` was left out. Tests: `MobCollisionTest` (overlapping mobs separate, the CVar switches it off). |
+| wizden #42968, #42973, #43397, #43732 | Camera static shader update, heat distortion (heat haze on hot gas tiles) | PORTED. Needed ThermalByte (#42613 partly: per-tile temperature in the gas overlay) and an `OverlayResourceCache` (#40181, adapted: our engine has no `IClydeViewport.Id`). `camera_static.swsl` replaced by the current upstream one. Heat haze shows on tiles over 300 K; the strength tops out around 0.4. Textures `Resources/Textures/Effects/HeatBlur/*.png` were taken from upstream (Wizden is MIT/CC-BY-SA). |
+| wizden #46038 | Vacuum shader | PORTED. Greys out depressurised tiles on an atmos grid. CVars `accessibility.vacuum_overlay` (default true) and `accessibility.vacuum_overlay_intensity`. |
+| wizden #45694 | Stealth system disables the interaction outline | PORTED. |
+| wizden #44735, #45108 | Post shaders multi-shader support, stealth shader SCREEN_UV | SKIPPED: our RobustToolbox lacks the multi post shader API and `SCREEN_UV`. |
+| wizden #38056 | Pathfinding obstacle avoidance rework | PORTED (NPC steering, obstacles, melee `TargetUnreachable`). Watch mobs near doors, windows and walls in play. |
+| wizden #45984 | Handheld radio lights up | PORTED as YAML (sprites kept: the PR's PNG edits could not be applied). |
+| wizden #46152 | Ling sounds for Paracusia | PORTED partly: three gib sounds; the three changeling sounds do not exist in the repo. |
+| wizden #45880 | Ambience volume controls weather sound | PORTED on the old weather code. |
+| wizden #46122 | Make logs sliceable | SKIPPED: our logs already become planks with any sharp item; the PR would stop axes. |
+| wizden #45846 | Printable light packages | SKIPPED: needs an EntityProvider system this fork never got. |
+| wizden #46223 | Rework Hemorr + hemotoxin sting | SKIPPED by the owner (reagent plus changeling sting, needs EntityConditions). |
+| wizden #41427, #45370 | Weather entities | BLOCKED: built on the new status effect system (`StatusEffectNew`), which this fork lacks. |
+
+**Base age:** the fork's Wizden base is about February 2025, not 2026 as assumed; many newer Wizden PRs build on frameworks added since (status effect rework, EntityConditions, EntityProvider, multi post shaders).
