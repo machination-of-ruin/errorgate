@@ -156,6 +156,10 @@ public sealed class BodySystem : SharedBodySystem
         if (Transform(partId).MapUid is null)
             return new HashSet<EntityUid>();
 
+        // ERRORGATE: the root part (torso) and parts that cannot be severed are never gibbed, the base method leaves
+        // them alone and so must we.
+        var untouchable = part.Body is { } owningBody && (IsPartRoot(owningBody, partId, part: part) || !part.CanSever);
+
         // ERRORGATE: the children (a hand on a gibbed arm) and organs of a gibbed part are dropped by the base method,
         // they are destroyed with it instead.
         var doomed = GetBodyPartChildren(partId, part).Select(c => c.Id)
@@ -163,6 +167,9 @@ public sealed class BodySystem : SharedBodySystem
 
         var gibs = base.GibPart(partId, part, launchGibs: launchGibs,
             splatDirection: splatDirection, splatModifier: splatModifier, splatCone: splatCone);
+
+        if (untouchable)
+            return gibs;
 
         foreach (var ent in doomed)
         {

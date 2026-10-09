@@ -10,17 +10,6 @@
   objectType: Item
 
 - type: construction
-  name: bone helmet
-  id: BoneHelmet
-  graph: BoneHelmet
-  startNode: start
-  targetNode: helmet
-  category: construction-category-clothing
-  description: Helmet made of bones.
-  icon: { sprite: Clothing/Head/Helmets/bone_helmet.rsi, state: icon }
-  objectType: Item
-
-- type: construction
   name: security glasses
   id: ClothingEyesGlassesSecurity
   graph: GlassesSecHUD

@@ -14,16 +14,9 @@
 
 - type: constructionGraph
   id: BoneHelmet
-  start: start
+  start: skull # ERRORGATE: a bone helmet is made from a human skull, as in the old build
   graph:
-  - node: start
-    edges:
-    - to: helmet
-      steps:
-      - material: Bones
-        amount: 4
-        doAfter: 1
-  - node: skull # ERRORGATE: a human skull becomes a helmet
+  - node: skull
     edges:
     - to: helmet
       steps:

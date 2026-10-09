@@ -31,10 +31,24 @@ public sealed class EntityHeaterSystem : EntitySystem
 
     public override void Update(float deltaTime)
     {
+        // ERRORGATE: heaters that do not need power (campfires)
+        var unpoweredQuery = EntityQueryEnumerator<EntityHeaterComponent, ItemPlacerComponent>();
+        while (unpoweredQuery.MoveNext(out _, out var fire, out var firePlacer))
+        {
+            if (fire.RequiresPower)
+                continue;
+
+            var fireEnergy = fire.Power * deltaTime;
+            foreach (var ent in firePlacer.PlacedEntities)
+            {
+                _temperature.ChangeHeat(ent, fireEnergy);
+            }
+        }
+
         var query = EntityQueryEnumerator<EntityHeaterComponent, ItemPlacerComponent, ApcPowerReceiverComponent>();
         while (query.MoveNext(out var uid, out var comp, out var placer, out var power))
         {
-            if (!power.Powered)
+            if (!comp.RequiresPower || !power.Powered)
                 continue;
 
             // don't divide by total entities since its a big grill

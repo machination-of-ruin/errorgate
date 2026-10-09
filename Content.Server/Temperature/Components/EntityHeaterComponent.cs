@@ -21,4 +21,11 @@ public sealed partial class EntityHeaterComponent : Component
     /// </summary>
     [DataField]
     public EntityHeaterSetting Setting = EntityHeaterSetting.Off;
+
+    /// <summary>
+    /// ERRORGATE: when false the heater always heats with <see cref="Power"/> and ignores the power network
+    /// (campfires, grills over a fire).
+    /// </summary>
+    [DataField]
+    public bool RequiresPower = true;
 }

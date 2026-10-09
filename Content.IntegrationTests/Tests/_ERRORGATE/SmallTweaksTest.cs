@@ -177,4 +177,57 @@ public sealed class SmallTweaksTest
 
         await pair.CleanReturnAsync();
     }
+    [Test]
+    public async Task CampfireCooksHumanMeat()
+    {
+        await using var pair = await PoolManager.GetServerClient(new PoolSettings { Dirty = true });
+        var server = pair.Server;
+        var entMan = server.EntMan;
+        var testMap = await pair.CreateTestMap();
+
+        await server.WaitAssertion(() =>
+        {
+            entMan.SpawnEntity("CampfireCraftable", testMap.GridCoords);
+            entMan.SpawnEntity("FoodMeatHuman", testMap.GridCoords);
+        });
+        await pair.RunSeconds(90);
+
+        await server.WaitAssertion(() =>
+        {
+            var cooked = entMan.EntityQuery<MetaDataComponent>()
+                .Any(m => m.EntityPrototype?.ID == "FoodHumanMeatCooked");
+            Assert.That(cooked, "Raw human meat on a campfire should cook into human steak.");
+        });
+
+        await pair.CleanReturnAsync();
+    }
+
+    [Test]
+    public async Task TorsoSurvivesChestHits()
+    {
+        await using var pair = await PoolManager.GetServerClient(new PoolSettings { Dirty = true });
+        var server = pair.Server;
+        var entMan = server.EntMan;
+        var testMap = await pair.CreateTestMap();
+
+        EntityUid human = default;
+        await server.WaitAssertion(() =>
+        {
+            human = entMan.SpawnEntity("MobHuman", testMap.GridCoords);
+            var dmg = new Content.Shared.Damage.DamageSpecifier(
+                server.ProtoMan.Index<Content.Shared.Damage.Prototypes.DamageTypePrototype>("Slash"), FixedPoint2.New(400));
+            entMan.System<Content.Shared.Damage.DamageableSystem>().TryChangeDamage(human, dmg, true,
+                targetPart: Content.Shared._Shitmed.Targeting.TargetBodyPart.Torso);
+        });
+        await pair.RunTicksSync(30);
+
+        await server.WaitAssertion(() =>
+        {
+            Assert.That(entMan.Deleted(human), Is.False, "The body should still exist (it may be dead).");
+            var body = entMan.System<BodySystem>();
+            Assert.That(body.GetRootPartOrNull(human), Is.Not.Null, "The torso must never be deleted by damage.");
+        });
+
+        await pair.CleanReturnAsync();
+    }
 }

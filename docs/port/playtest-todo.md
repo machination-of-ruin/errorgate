@@ -131,3 +131,15 @@ Found while playing the `port/beyond` build. One line each, newest last.
 - [x] Ammonia gas hurts and makes players vomit again: the old build values for the reagent were never ported (Poison 100 and 60% vomit in the lungs, Poison 5 and 10% vomit in the blood). Test: `BreathingAmmoniaPoisonsTheLungs`. Not checked against the map's own atmosphere.
 - [x] Look far (Space) reaches 12 tiles, about a screen ahead (`EyeCursorOffset maxOffset` on humans, was 3).
 - [x] Altars no longer say "This altar can be used to sacrifice Psionics" (`SharedSacrificialAltarSystem.OnExamined`, marked `// ERRORGATE`). **Revert this if psionics are ever implemented.**
+
+## Round 9 (playtest reports)
+
+- [x] Combat log messages all use the largest size (19).
+- [x] Torso vanished after chest hits: my round 8 change made every gibbed part delete itself, including the root torso. The torso and parts that cannot be severed are left alone again (`TorsoSurvivesChestHits`).
+- [x] Look far PVS pop-in: the server PVS range now grows with the look-far offset (`LookFarPvsSystem`, `pvsIncrease` 0.4 on humans = range 35).
+- [x] Bonfire recipe removed (campfire replaces it).
+- [x] Campfire sets players walking over it on fire (step trigger + ignite).
+- [x] Campfire is in the planks radial craft menu.
+- [x] Campfire did not cook: the heater ignored a fire without power. `EntityHeater` has `requiresPower` again (`CampfireCooksHumanMeat`).
+- [x] Bone helmet is made from a human skull only (slice with a knife, then 2 bones). The 4-bones recipe, build menu entry and radial entry are gone.
+- [x] ERRORGATE crafts in radial menus: campfire (planks) and bone spear (bones) are there; no other ERRORGATE specific recipes exist.
