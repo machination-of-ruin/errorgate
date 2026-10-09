@@ -101,6 +101,11 @@ public sealed class DistantGunfireTest
             xform.SetCoordinates(listener, new EntityCoordinates(testMap.Grid, 10, 0));
             Assert.That(system.GetAudience(origin, testMap.Grid, range), Is.Empty, "No second copy for those in PVS range.");
 
+            // The real shot only carries 15 tiles, the distant copy starts there: no gap of silence.
+            xform.SetCoordinates(listener, new EntityCoordinates(testMap.Grid, 20, 0));
+            Assert.That(system.GetAudience(origin, testMap.Grid, range, null, 15f), Has.Count.EqualTo(1),
+                "Just beyond the real shot's own range the distant copy takes over.");
+
             // Another grid in range is not on the shooter's grid.
             xform.SetCoordinates(listener, new EntityCoordinates(otherGrid, 55, 0));
             Assert.That(system.GetAudience(origin, testMap.Grid, range), Is.Empty, "Other grids do not hear the shot.");

@@ -57,15 +57,12 @@ public sealed class DistantGunfireSystem : EntitySystem
     private const float VirtualMaxDistance = 40f;
     private const string EffectPreset = "DistantGunfire";
 
-    private static readonly TimeSpan GunInterval = TimeSpan.FromSeconds(0.2);
     private static readonly TimeSpan RecipientWindow = TimeSpan.FromSeconds(1);
-    private const int RecipientMaxPerWindow = 6;
-    private const float SkippedShotBonus = 1.5f;
-    private const float MaxShotBonus = 4.5f;
+    // Only a safety net against lag, every shot of a burst is heard: no per-gun cooldown.
+    private const int RecipientMaxPerWindow = 24;
 
     // Ranges of cartridges that are about to be spent, the cartridge can be deleted before GunShotEvent is raised.
     private readonly Dictionary<EntityUid, float> _ammoRanges = new();
-    private readonly Dictionary<EntityUid, GunState> _guns = new();
     private readonly Dictionary<ICommonSession, RecipientState> _recipients = new();
     private readonly List<Echo> _echoes = new();
     private TimeSpan _nextPrune;
@@ -79,7 +76,6 @@ public sealed class DistantGunfireSystem : EntitySystem
 
         SubscribeLocalEvent<DistantGunfireAudibleComponent, AmmoShotEvent>(OnAmmoShot);
         SubscribeLocalEvent<GunComponent, GunShotEvent>(OnGunShot);
-        SubscribeLocalEvent<GunComponent, ComponentShutdown>(OnGunShutdown);
 
         Subs.CVar(_cfg, ErrorgateCVars.DistantGunfireEnabled, v => _enabled = v, true);
         Subs.CVar(_cfg, ErrorgateCVars.DistantGunfireRangeScale, v => _rangeScale = v, true);
@@ -91,11 +87,6 @@ public sealed class DistantGunfireSystem : EntitySystem
             _ammoRanges.Clear();
 
         _ammoRanges[ent.Owner] = ent.Comp.Range;
-    }
-
-    private void OnGunShutdown(Entity<GunComponent> ent, ref ComponentShutdown args)
-    {
-        _guns.Remove(ent.Owner);
     }
 
     private void OnGunShot(Entity<GunComponent> ent, ref GunShotEvent args)
@@ -114,21 +105,15 @@ public sealed class DistantGunfireSystem : EntitySystem
         if (sound == null)
             return;
 
-        var now = _timing.CurTime;
-        var state = _guns.GetValueOrDefault(ent.Owner);
-        if (now < state.Next)
-        {
-            state.Skipped++;
-            _guns[ent.Owner] = state;
-            return;
-        }
+        // The real shot is only heard as far as its own sound range (15 tiles unless the sound says otherwise), well inside
+        // PVS. The distant copy starts right where the real one fades out, there is no gap of silence.
+        var audible = Math.Min(pvsRange, sound.Params.MaxDistance);
 
-        var bonus = Math.Min(state.Skipped * SkippedShotBonus, MaxShotBonus);
-        _guns[ent.Owner] = new GunState { Next = now + GunInterval };
+        var now = _timing.CurTime;
 
         var origin = _xform.GetMapCoordinates(ent.Owner);
         var grid = Exists(args.User) ? Transform(args.User).GridUid : Transform(ent.Owner).GridUid;
-        var audience = GetAudience(origin, grid, range, args.User);
+        var audience = GetAudience(origin, grid, range, args.User, audible);
         if (audience.Count == 0)
             return;
 
@@ -140,8 +125,8 @@ public sealed class DistantGunfireSystem : EntitySystem
             if (!TryUseRecipientSlot(session, now))
                 continue;
 
-            var t = Math.Clamp((distance - pvsRange) / (range - pvsRange), 0f, 1f);
-            var volume = NearVolume + t * (FarVolume - NearVolume) + bonus;
+            var t = Math.Clamp((distance - audible) / (range - audible), 0f, 1f);
+            var volume = NearVolume + t * (FarVolume - NearVolume);
             var pitch = _random.NextFloat(MinPitch, MaxPitch);
 
             if (!TryGetVirtualSource(session, origin, out var coords))
@@ -217,10 +202,11 @@ public sealed class DistantGunfireSystem : EntitySystem
         MapCoordinates origin,
         EntityUid? grid,
         float range,
-        EntityUid? shooter = null)
+        EntityUid? shooter = null,
+        float? nearest = null)
     {
         var result = new List<(ICommonSession, float)>();
-        var hearing = GetHearingRange();
+        var hearing = nearest ?? GetHearingRange();
 
         var query = EntityQueryEnumerator<ActorComponent, TransformComponent>();
         while (query.MoveNext(out var uid, out var actor, out var xform))
@@ -330,12 +316,6 @@ public sealed class DistantGunfireSystem : EntitySystem
         {
             _recipients.Remove(session);
         }
-    }
-
-    private struct GunState
-    {
-        public TimeSpan Next;
-        public int Skipped;
     }
 
     private struct RecipientState
