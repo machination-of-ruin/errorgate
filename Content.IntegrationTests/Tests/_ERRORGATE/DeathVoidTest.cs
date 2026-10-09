@@ -224,10 +224,13 @@ public sealed class DeathVoidTest
         var session = server.ResolveDependency<IPlayerManager>().Sessions.Single();
 
         var oldBrains = new System.Collections.Generic.HashSet<EntityUid>();
+        var oldParts = new System.Collections.Generic.HashSet<EntityUid>();
         await server.WaitPost(() =>
         {
             foreach (var (uid, _) in entMan.EntityQuery<Content.Server.Body.Components.BrainComponent>(true).Select(x => (x.Owner, x)))
                 oldBrains.Add(uid);
+            foreach (var (uid, _) in entMan.EntityQuery<Content.Shared.Body.Part.BodyPartComponent>(true).Select(x => (x.Owner, x)))
+                oldParts.Add(uid);
         });
 
         await server.WaitAssertion(() =>
@@ -245,6 +248,8 @@ public sealed class DeathVoidTest
         {
             Assert.That(entMan.EntityQuery<Content.Server.Body.Components.BrainComponent>().Any(b => !oldBrains.Contains(b.Owner)), Is.False,
                 "Gibbing should not leave a brain lying around.");
+            Assert.That(entMan.EntityQuery<Content.Shared.Body.Part.BodyPartComponent>().Any(p => !oldParts.Contains(p.Owner)), Is.False,
+                "Gibbing should not leave hands, feet or other limbs lying around.");
             Assert.That(session.AttachedEntity, Is.Not.Null);
             Assert.That(entMan.HasComponent<DeathVoidComponent>(session.AttachedEntity), "The mind should be in the void.");
         });

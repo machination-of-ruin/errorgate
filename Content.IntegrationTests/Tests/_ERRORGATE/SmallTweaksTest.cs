@@ -129,4 +129,24 @@ public sealed class SmallTweaksTest
 
         await pair.CleanReturnAsync();
     }
+    [Test]
+    public async Task UnpoweredDoorTakesAboutASecondToPryByHand()
+    {
+        await using var pair = await PoolManager.GetServerClient(new PoolSettings { Dirty = true });
+        var server = pair.Server;
+        var entMan = server.EntMan;
+        var testMap = await pair.CreateTestMap();
+
+        await server.WaitAssertion(() =>
+        {
+            var door = entMan.SpawnEntity("Airlock", testMap.GridCoords);
+            var user = entMan.SpawnEntity("MobHuman", testMap.GridCoords);
+            entMan.System<Content.Shared.Prying.Systems.PryingSystem>().TryPry(door, user, out var id);
+            Assert.That(id, Is.Not.Null, "Prying by hand should start a do-after, not open the door instantly.");
+            var doAfter = entMan.GetComponent<Content.Shared.DoAfter.DoAfterComponent>(user).DoAfters.Values.Single();
+            Assert.That(doAfter.Args.Delay.TotalSeconds, Is.InRange(0.5, 2.0));
+        });
+
+        await pair.CleanReturnAsync();
+    }
 }

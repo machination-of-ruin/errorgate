@@ -15,7 +15,8 @@ public sealed class SurgeryToolExamineSystem : EntitySystem
 
     public override void Initialize()
     {
-        SubscribeLocalEvent<SurgeryToolComponent, GetVerbsEvent<ExamineVerb>>(OnGetVerbs);
+        // ERRORGATE: no surgery use list when examining tools, parts or organs
+        // SubscribeLocalEvent<SurgeryToolComponent, GetVerbsEvent<ExamineVerb>>(OnGetVerbs);
 
         SubscribeLocalEvent<BoneGelComponent, SurgeryToolExaminedEvent>(OnExamined);
         SubscribeLocalEvent<BoneSawComponent, SurgeryToolExaminedEvent>(OnExamined);

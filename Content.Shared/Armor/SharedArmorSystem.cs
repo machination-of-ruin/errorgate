@@ -1,6 +1,7 @@
 ﻿using Content.Shared.Damage;
 using Content.Shared.Examine;
 using Content.Shared.Inventory;
+using Content.Shared.Mobs.Components;
 using Content.Shared.Silicons.Borgs;
 using Content.Shared.Verbs;
 using Robust.Shared.Utility;
@@ -38,6 +39,9 @@ public abstract class SharedArmorSystem : EntitySystem
     private void OnArmorVerbExamine(EntityUid uid, ArmorComponent component, GetVerbsEvent<ExamineVerb> args)
     {
         if (!args.CanInteract || !args.CanAccess)
+            return;
+
+        if (HasComp<MobStateComponent>(uid)) // ERRORGATE: creatures do not list their armor
             return;
 
         var examineMarkup = GetArmorExamine(component.Modifiers);

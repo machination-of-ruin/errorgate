@@ -70,7 +70,7 @@
     containers:
       gun_magazine: !type:ContainerSlot
       gun_chamber: !type:ContainerSlot
-  - type: AmmoCounter
+  # - type: AmmoCounter # ERRORGATE
   - type: MagazineVisuals
     magState: mag
     steps: 1
@@ -237,7 +237,7 @@
     sprite: Objects/Weapons/Guns/Pistols/cobra.rsi
   - type: ChamberMagazineAmmoProvider
     boltClosed: null
-  - type: Gun
+  - type: Gun
     muzzleEffectRadius: 0 # ERRORGATE: silenced, no flash
     damageModifier: 1.25 # "Extra Robust" despite having an underpowered cartridge.
     fireRate: 4

@@ -194,7 +194,10 @@ public sealed class CombatLogsSystem : EntitySystem
                 var (root, present) = MeleeVerbs(hit.Weapon);
                 message = self
                     ? Loc.GetString("errorgate-combat-log-melee-self", ("verb", root), ("where", where), ("weapon", weapon!))
-                    : Loc.GetString("errorgate-combat-log-melee", ("attacker", attacker ?? Someone()), ("verb", present), ("where", where), ("weapon", weapon!));
+                    : attacker == null
+                        // the victim cannot see who it was (unconscious, blind), the weapon is what they notice
+                        ? Loc.GetString("errorgate-combat-log-melee-unseen", ("verb", present), ("where", where), ("weapon", weapon!))
+                        : Loc.GetString("errorgate-combat-log-melee", ("attacker", attacker), ("verb", present), ("where", where), ("weapon", weapon!));
                 break;
             case HitKind.Projectile:
                 message = attacker != null

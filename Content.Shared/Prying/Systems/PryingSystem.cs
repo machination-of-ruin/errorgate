@@ -138,7 +138,7 @@ public sealed class PryingSystem : EntitySystem
         // WD EDIT START
         var time = modEv.BaseTime * modEv.PryTimeModifier / toolModifier;
 
-        if (time <= modEv.Neglect)
+        if (tool != null && time <= modEv.Neglect) // ERRORGATE: prying with bare hands keeps its 1 second, only tools are instant
             time = 0;
         // WD EDIT END
 

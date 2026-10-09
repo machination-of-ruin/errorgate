@@ -353,7 +353,8 @@ public partial class SharedBodySystem
             }
         }
 
-        // ERRORGATE: dropped parts (a head that cannot be gibbed) must not carry their organs along
+        // ERRORGATE: parts that cannot be gibbed (heads, hands, feet) are dropped by the gibbing system. A gibbed body
+        // leaves no limbs or organs behind, they are removed with it.
         foreach (var part in parts)
         {
             foreach (var organ in GetPartOrgans(part.Id, part.Component))
@@ -361,6 +362,9 @@ public partial class SharedBodySystem
                 gibs.Remove(organ.Id);
                 QueueDel(organ.Id);
             }
+
+            gibs.Remove(part.Id);
+            QueueDel(part.Id);
         }
 
         var bodyTransform = Transform(bodyId);

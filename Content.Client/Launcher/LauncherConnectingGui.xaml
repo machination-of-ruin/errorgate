@@ -46,7 +46,7 @@
                             </BoxContainer>
                         </Control>
                         <BoxContainer Orientation="Horizontal">
-                            <Label Text="Точка доступа:" StyleClasses="DisplayLabel8"/>
+                            <Label Text="{Loc 'connecting-address'}" StyleClasses="DisplayLabel8"/> <!-- ERRORGATE -->
                             <Label Name="ConnectingAddress" StyleClasses="DisplayLabel8" />
                         </BoxContainer>
                     </BoxContainer>

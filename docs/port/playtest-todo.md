@@ -109,3 +109,14 @@ Found while playing the `port/beyond` build. One line each, newest last.
 - [x] Respawn cooldown CVar `errorgate.respawn_cooldown` (seconds, default 0).
 - [x] Map cleanup: shuttles, CentComm, salvage, ghost bar, station and other fork maps deleted and their loaders switched off; Lavaland, Ruins and Dungeon kept for the planet plan. Dead map paths in prototypes and component defaults point at `/Maps/Test/empty.yml`.
 - [x] Design docs updated (maps, death, survival loop) and committed.
+
+## Round 7 (playtest reports)
+
+- [x] Loading screen "Точка доступа" is now "Server address:" (`connecting-address`).
+- [x] Mobs no longer list "It provides the following protection" (armor examine skips entities with a mob state).
+- [x] Surgery tool, body part and organ examine list removed (`SurgeryToolExamineSystem` verb off).
+- [x] SIG P226 uses the old build sprite (`_ERRORGATE/Objects/Weapons/Guns/Pistols/p226.rsi`, copied from beyond/master `mk58.rsi`).
+- [x] No bullet ammo counter on the pistol and revolver bases (SMG, rifle, shotgun, sniper and LMG bases already had none).
+- [x] Hand-prying an unpowered door took no time at all: WD "Neglect" made every time under 5 s instant. Now only tools are instant, hands take about a second (`SmallTweaksTest.UnpoweredDoorTakesAboutASecondToPryByHand`).
+- [x] Unconscious combat log: "The <weapon> <verb> you in the <part>!" instead of "Someone ... with the <weapon>".
+- [x] Minibomb gibbing left hands and feet: gibbing now removes every part of the body, not only the ones that can gib.
