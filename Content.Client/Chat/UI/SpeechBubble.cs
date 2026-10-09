@@ -209,8 +209,7 @@ namespace Content.Client.Chat.UI
             if (fontId != null) // WWDP EDIT START
             {
                 msg.AddMarkupOrThrow($"[font=\"{fontId}\"]");
-                // ERRORGATE: the server wraps the speech in its own [font="Default"] tag, which would win over ours
-                msg.AddMarkupOrThrow(message.Replace("[font=\"Default\"", $"[font=\"{fontId}\""));
+                msg.AddMarkupOrThrow(message);
                 msg.AddMarkupOrThrow($"[/font]");
             }
             else
@@ -239,7 +238,7 @@ namespace Content.Client.Chat.UI
                 MaxWidth = SpeechMaxWidth,
             };
 
-            label.SetMessage(FormatSpeech(message.WrappedMessage, fontColor, "Cygre")); // WWDP EDIT, ERRORGATE: Cygre (has Cyrillic)
+            label.SetMessage(FormatSpeech(message.WrappedMessage, fontColor, "Bedstead")); // WWDP EDIT
 
             var panel = new PanelContainer
             {
@@ -269,7 +268,7 @@ namespace Content.Client.Chat.UI
                     MaxWidth = SpeechMaxWidth
                 };
 
-                label.SetMessage(FormatSpeech(SharedChatSystem.GetStringInsideTag(message, "BubbleContent"), fontColor, "Cygre")); // WWDP EDIT, ERRORGATE: Cygre (has Cyrillic) // LESS USELESS ONE LINER FUNCS PLS
+                label.SetMessage(FormatSpeech(SharedChatSystem.GetStringInsideTag(message, "BubbleContent"), fontColor, "Bedstead")); // WWDP EDIT // LESS USELESS ONE LINER FUNCS PLS
 
                 var unfanciedPanel = new PanelContainer
                 {
@@ -295,8 +294,8 @@ namespace Content.Client.Chat.UI
             };
 
             //We'll be honest. *Yes* this is hacky. Doing this in a cleaner way would require a bottom-up refactor of how saycode handles sending chat messages. -Myr
-            bubbleHeader.SetMessage(FormatSpeech(SharedChatSystem.GetStringInsideTag(message, "BubbleHeader"), fontColor, "Cygre")); // WWDP EDIT, ERRORGATE: Cygre (has Cyrillic) // LESS USELESS ONE LINER FUNCS PLS
-            bubbleContent.SetMessage(FormatSpeech(SharedChatSystem.GetStringInsideTag(message, "BubbleContent"), fontColor, "Cygre")); // WWDP EDIT, ERRORGATE: Cygre (has Cyrillic)
+            bubbleHeader.SetMessage(FormatSpeech(SharedChatSystem.GetStringInsideTag(message, "BubbleHeader"), fontColor, "Bedstead")); // WWDP EDIT // LESS USELESS ONE LINER FUNCS PLS
+            bubbleContent.SetMessage(FormatSpeech(SharedChatSystem.GetStringInsideTag(message, "BubbleContent"), fontColor, "Bedstead")); // WWDP EDIT
 
             //As for below: Some day this could probably be converted to xaml. But that is not today. -Myr
             var mainPanel = new PanelContainer

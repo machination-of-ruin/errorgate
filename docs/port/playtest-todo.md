@@ -151,11 +151,9 @@ Found while playing the `port/beyond` build. One line each, newest last.
 - [ ] Toxic gas: `AmmoniaMapTest` loads Kuznetsk and Edge of Entropy, puts a human on the tile with the most ammonia and the human gets Poison damage (200 on Kuznetsk after 25 s); `AmmoniaInTheAirPoisonsPlayers` shows even 12 mol in 2500 L poisons. It works in tests, so the live report needs the exact spot: which map, which gas cloud, how long the player stood in it.
 - [x] PVS: the owner set `net.pvs_range` to 30 and the pop-in is gone. The `LookFarPvsSystem` is removed, `pvs_range = 30` is in the ERRORGATE and development config presets.
 - [x] Barks: humans have no species speech sound any more (`speechSounds: null`), only the bark plays.
-- [x] Speech bubbles use the Cygre font (gothic, full Cyrillic coverage checked, `Resources/Fonts/_White/Hombre`). Other fonts with full Cyrillic: Cinzel, Cygre, Marauders Map, Boxfont Round, NK57 condensed, Bedstead, LCD14; change the id in `SpeechBubble.cs` to switch.
+- [x] Speech bubble font experiments (Hombre, Cygre) were tried and reverted: bubbles use Bedstead again. The server wraps speech in its own `[font="Default"]` tag, so a font swap has to replace that tag (see git history, commit 5c858e3aec). Fonts with full Cyrillic: Cinzel, Cygre, Hombre, Marauders Map, Boxfont Round, NK57 condensed, Bedstead, LCD14.
 
 ## Round 11 (playtest reports)
 
 - [x] "Люди" was the species window's info text (`ServerInfo/Guidebook/Mobs/Human.xml`), now English in the ERRORGATE voice.
-- [x] Speech bubble font did not change: the server wraps speech in its own `[font="Default"]` tag which beat the bubble font. The bubble now replaces it.
 - [x] Ammonia did not make anyone vomit: `ChemVomit` cancelled itself on any partial metabolism scale, the old build had that check commented out. `AmmoniaInTheAirPoisonsPlayers` now also checks for vomit and fails without the fix.
-- [x] Speech bubble font is Cygre now (was Hombre); the "last species standing" line is gone from the human page.
