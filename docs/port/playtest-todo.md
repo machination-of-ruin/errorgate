@@ -185,3 +185,7 @@ Found while playing the `port/beyond` build. One line each, newest last.
 - [x] Look-far aim "offset" and the 2 tile view jump on Space: the telescope's neutral point was the middle of the WINDOW, but the player is drawn in the middle of the game view, which sits right of the chat panel (126 px, 2 tiles at 62 px per tile in the debug log). Holding the cursor at the top of the window therefore pointed 2 tiles east of the player, and the view jumped 2 tiles on Space. The offset now measures from the middle of the game view (`EyeCursorOffsetSystem`, `MainViewport`). The shooting maths was exact all along (server log: shot angle equals the cursor direction; `AimAccuracyTest`). The earlier guesses (aim relative to the grid, lighter Simonov recoil) were reverted, no weapon stats changed.
 
 - [x] Simonov stab animation: the old build swung it with `wideAnimationRotation: 270` (LMB heavy swing); in this build LMB is a light stab, which uses `animationRotation` (default 0), so the rifle was drawn unrotated. `animationRotation: 270` added to the Simonov (same value as the old swing) so the bayonet leads the stab.
+
+## Ports
+
+- [x] wwdpublic #984 mob collisions (see the ledger). Retest in play: two players walking into each other, crowds of walkers, dead bodies and lying players, conveyors, pulling.

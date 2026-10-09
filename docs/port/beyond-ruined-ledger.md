@@ -191,3 +191,9 @@ Shove: #280 #295 #304 #315 #347 #565 #582 #978. Examine: #269 #549 #574 #919 #92
 ## STATUS: CLOSED
 
 All PRs of the old survival fork are ported, covered by upstream or skipped by the owner. Playtest rounds 1 to 11 are fixed and confirmed (`docs/port/playtest-todo.md`). Left unported by decision: starter backpack fills, the goggles cherry-pick, the old `errorgate_rules.txt`, and the skips listed above. Open outside the ports: remote hosting (static IP and client download), psionics (the altar text is hidden and must be restored if implemented), and the design milestones in `docs/design/ROADMAP.md`.
+
+## Later ports from WWDP
+
+| PR | Title | Status |
+|---|---|---|
+| wwdpublic #984 | [Port] MOB COLLISIONS (Wizden #34580, #36296, #36851) | PORTED on the owner's request. The PR itself was closed unmerged upstream (WWDP reviewers rejected it). Mobs now push each other apart (`MobCollisionComponent` on `BaseMob`, `SharedMobCollisionSystem` with client and server parts, `movement.*` CVars, standing and conveyor tweaks). The old `physics.mob_pushing` CVar is replaced by `movement.mob_pushing` (default true). One hunk of the diff did not apply (`SharedMoverController` field rename) and a no-op loop in `UpdateAfterSolve` was left out. Tests: `MobCollisionTest` (overlapping mobs separate, the CVar switches it off). |

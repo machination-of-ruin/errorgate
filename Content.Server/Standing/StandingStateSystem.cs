@@ -1,6 +1,7 @@
 using System.Numerics;
 using Content.Shared.Hands.Components;
 using Content.Shared.Hands.EntitySystems;
+using Content.Shared.Movement.Systems;
 using Content.Shared.Standing;
 using Content.Shared.Throwing;
 using Robust.Shared.Physics.Components;
@@ -41,13 +42,6 @@ public sealed class StandingStateSystem : EntitySystem
                 uid, 0);
         }
     }
-
-    public override void Initialize()
-    {
-        base.Initialize();
-        SubscribeLocalEvent<StandingStateComponent, DropHandItemsEvent>(FallOver);
-    }
-
 }
 
     /// <summary>
