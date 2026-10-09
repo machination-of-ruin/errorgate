@@ -23,9 +23,8 @@ namespace Content.Server.EntityEffects.Effects
 
         public override void Effect(EntityEffectBaseArgs args)
         {
-            if (args is EntityEffectReagentArgs reagentArgs)
-                if (reagentArgs.Scale != 1f)
-                    return;
+            // ERRORGATE: as in the old build, a partial metabolism scale does not cancel the vomit (breathing a thin gas
+            // metabolises less than a full unit per tick and used to never make anyone sick)
 
             var vomitSys = args.EntityManager.EntitySysManager.GetEntitySystem<VomitSystem>();
 

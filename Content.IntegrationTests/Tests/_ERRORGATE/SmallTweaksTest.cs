@@ -254,6 +254,7 @@ public sealed class SmallTweaksTest
             var damage = entMan.GetComponent<Content.Shared.Damage.DamageableComponent>(human).Damage.DamageDict;
             Assert.That(damage.TryGetValue("Poison", out var poison) ? poison.Float() : 0f, Is.GreaterThan(0f),
                 "Breathing ammonia from the air should poison. " + string.Join(", ", damage.Select(d => d.Key + "=" + d.Value)));
+            Assert.That(entMan.EntityQuery<Content.Shared.Fluids.Components.PuddleComponent>().Any(), "Breathing ammonia from the air should make the victim vomit.");
         });
 
         await pair.CleanReturnAsync();

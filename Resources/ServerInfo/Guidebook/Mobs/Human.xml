@@ -1,12 +1,12 @@
 <Document>
-  # Люди
+  # HUMAN
 
   <Box>
     <GuideEntityEmbed Entity="MobHumanDummy" Caption=""/>
   </Box>
 
-  В зависимости от точки зрения, люди — либо ничем не примечательные обитатели станции, либо эталон, по которому судят обо всех прочих.
+  THE LAST SPECIES STANDING. NO SPECIAL GIFTS. NO SECOND CHANCES.
 
-  У них нет уникальных способностей или особенностей.
-  Они просто... люди.
+  Humans bleed, starve and break like everything else out here.
+  The only edge you have is the other survivors.
 </Document>

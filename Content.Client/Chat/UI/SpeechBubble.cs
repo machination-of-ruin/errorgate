@@ -209,7 +209,8 @@ namespace Content.Client.Chat.UI
             if (fontId != null) // WWDP EDIT START
             {
                 msg.AddMarkupOrThrow($"[font=\"{fontId}\"]");
-                msg.AddMarkupOrThrow(message);
+                // ERRORGATE: the server wraps the speech in its own [font="Default"] tag, which would win over ours
+                msg.AddMarkupOrThrow(message.Replace("[font=\"Default\"", $"[font=\"{fontId}\""));
                 msg.AddMarkupOrThrow($"[/font]");
             }
             else
