@@ -208,6 +208,6 @@ All PRs of the old survival fork are ported, covered by upstream or skipped by t
 | wizden #46122 | Make logs sliceable | SKIPPED: our logs already become planks with any sharp item; the PR would stop axes. |
 | wizden #45846 | Printable light packages | SKIPPED: needs an EntityProvider system this fork never got. |
 | wizden #46223 | Rework Hemorr + hemotoxin sting | SKIPPED by the owner (reagent plus changeling sting, needs EntityConditions). |
-| wizden #41427, #45370 | Weather entities | BLOCKED: built on the new status effect system (`StatusEffectNew`), which this fork lacks. |
+| wizden #41427, #45370 | Weather entities | SKIPPED by the owner (it needs the new status effect system, `StatusEffectNew`, which this fork lacks). The old weather system stays; Lavaland storms work on it (`weather <mapId> Ashfall 120`). Revisit if the status effect rework is ever ported. |
 
 **Base age:** the fork's Wizden base is about February 2025, not 2026 as assumed; many newer Wizden PRs build on frameworks added since (status effect rework, EntityConditions, EntityProvider, multi post shaders).
