@@ -145,6 +145,11 @@ public sealed class DistantGunfireTest
         });
         await pair.RunTicksSync(5);
 
+        // the presets are created when a round starts, no round runs in this test
+        await server.WaitPost(() => entMan.System<Robust.Server.Audio.AudioSystem>().ReloadPresets());
+        Assert.That(entMan.System<Robust.Shared.Audio.Systems.SharedAudioSystem>().Auxiliaries.ContainsKey("DistantGunfire"),
+            "The reverb the distant shots play through should exist.");
+
         var before = pair.Client.EntMan.EntityQuery<Robust.Shared.Audio.Components.AudioComponent>().Count();
         await server.WaitPost(() =>
         {

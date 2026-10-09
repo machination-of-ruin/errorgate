@@ -22,7 +22,7 @@ namespace Content.Server._ERRORGATE.DistantGunfire;
 ///     the real one but still within the range of the caliber. Silenced guns are never heard from afar.
 /// </summary>
 /// <remarks>
-///     The copy is played with <see cref="SharedAudioSystem.PlayGlobal(ResolvedSoundSpecifier?, ICommonSession, AudioParams?)"/>
+
 ///     per player, like the far sound of explosions, so it is not culled by PVS. Robust's audio effects (reverb
 ///     presets) are auxiliary slots bound to the audio entity and are not worth the trouble for global sounds,
 ///     so the muffled feel is pitch, volume and a delayed second copy.
@@ -34,6 +34,7 @@ public sealed class DistantGunfireSystem : EntitySystem
     [Dependency] private readonly IRobustRandom _random = default!;
     [Dependency] private readonly SharedAudioSystem _audio = default!;
     [Dependency] private readonly SharedTransformSystem _xform = default!;
+    [Dependency] private readonly SharedMapSystem _map = default!;
 
     /// <summary>Range for cartridges without <see cref="DistantGunfireAudibleComponent"/>.</summary>
     public const float DefaultBallisticRange = 50f;
@@ -41,14 +42,20 @@ public sealed class DistantGunfireSystem : EntitySystem
     /// <summary>Range for hitscan and energy projectiles.</summary>
     public const float DefaultEnergyRange = 25f;
 
-    private const float NearVolume = -6f;
-    private const float FarVolume = -25f;
-    private const float MinPitch = 0.75f;
-    private const float MaxPitch = 0.9f;
-    private const float EchoMinDelay = 0.25f;
-    private const float EchoMaxDelay = 0.5f;
-    private const float EchoVolumeOffset = -7f;
+    private const float NearVolume = -10f;
+    private const float FarVolume = -32f;
+    private const float MinPitch = 0.55f;
+    private const float MaxPitch = 0.7f;
+    private const float EchoMinDelay = 0.35f;
+    private const float EchoMaxDelay = 0.8f;
+    private const float EchoVolumeOffset = -8f;
     private const float EchoPitchScale = 0.85f;
+
+    // The sound is played from a point this far from the listener, in the direction of the shot. The real distance is
+    // not used: the audio entity has to stay inside the listener's PVS, the volume carries the distance instead.
+    private const float VirtualDistance = 14f;
+    private const float VirtualMaxDistance = 40f;
+    private const string EffectPreset = "DistantGunfire";
 
     private static readonly TimeSpan GunInterval = TimeSpan.FromSeconds(0.2);
     private static readonly TimeSpan RecipientWindow = TimeSpan.FromSeconds(1);
@@ -137,13 +144,18 @@ public sealed class DistantGunfireSystem : EntitySystem
             var volume = NearVolume + t * (FarVolume - NearVolume) + bonus;
             var pitch = _random.NextFloat(MinPitch, MaxPitch);
 
-            _audio.PlayGlobal(resolved, session, baseParams.AddVolume(volume).WithPitchScale(baseParams.Pitch * pitch));
+            if (!TryGetVirtualSource(session, origin, out var coords))
+                continue;
+
+            var shotParams = baseParams.AddVolume(volume).WithPitchScale(baseParams.Pitch * pitch);
+            PlayDistant(resolved, session, coords, shotParams);
 
             _echoes.Add(new Echo
             {
                 At = now + TimeSpan.FromSeconds(EchoMinDelay + t * (EchoMaxDelay - EchoMinDelay)),
                 Session = session,
                 Sound = resolved,
+                Coords = coords,
                 Params = baseParams.AddVolume(volume + EchoVolumeOffset)
                     .WithPitchScale(baseParams.Pitch * pitch * EchoPitchScale),
             });
@@ -192,7 +204,8 @@ public sealed class DistantGunfireSystem : EntitySystem
     public float GetHearingRange()
     {
         // The same range Filter.Pvs uses for its default multiplier. Without PVS everyone hears the real shot.
-        return _cfg.GetCVar(CVars.NetPVS) ? _cfg.GetCVar(CVars.NetMaxUpdateRange) * 2f : float.PositiveInfinity;
+        // Sounds are entities, they only reach clients that have them in PVS: the PVS range, not twice that.
+        return _cfg.GetCVar(CVars.NetPVS) ? _cfg.GetCVar(CVars.NetMaxUpdateRange) : float.PositiveInfinity;
     }
 
     /// <summary>
@@ -228,6 +241,46 @@ public sealed class DistantGunfireSystem : EntitySystem
         return result;
     }
 
+    /// <summary>
+    ///     A point inside the listener's view that lies in the direction of the shot, so the shot has a direction.
+    /// </summary>
+    private bool TryGetVirtualSource(ICommonSession session, MapCoordinates origin, out EntityCoordinates coords)
+    {
+        coords = default;
+        if (session.AttachedEntity is not { } listener || !Exists(listener))
+            return false;
+
+        var listenerPos = _xform.GetMapCoordinates(listener);
+        if (listenerPos.MapId != origin.MapId)
+            return false;
+
+        var delta = origin.Position - listenerPos.Position;
+        if (delta.LengthSquared() < 0.01f)
+            return false;
+
+        var point = listenerPos.Position + System.Numerics.Vector2.Normalize(delta) * VirtualDistance;
+        var map = _map.GetMapOrInvalid(origin.MapId);
+        if (!map.IsValid())
+            return false;
+
+        coords = _xform.ToCoordinates(map, new MapCoordinates(point, origin.MapId));
+        return true;
+    }
+
+    private void PlayDistant(ResolvedSoundSpecifier sound, ICommonSession session, EntityCoordinates coords, AudioParams audioParams)
+    {
+        // an echo can outlive its map (round restart)
+        if (TerminatingOrDeleted(coords.EntityId))
+            return;
+
+        // no distance falloff from the virtual point, the volume already carries the real distance
+        var played = _audio.PlayStatic(sound, session, coords,
+            audioParams.WithMaxDistance(VirtualMaxDistance).WithRolloffFactor(0f));
+
+        if (played is { } audio && _audio.Auxiliaries.ContainsKey(EffectPreset))
+            _audio.SetEffect(audio.Entity, audio.Component, EffectPreset);
+    }
+
     private bool TryUseRecipientSlot(ICommonSession session, TimeSpan now)
     {
         var state = _recipients.GetValueOrDefault(session);
@@ -259,7 +312,7 @@ public sealed class DistantGunfireSystem : EntitySystem
 
             _echoes.RemoveAt(i);
             if (echo.Session.Status == SessionStatus.InGame)
-                _audio.PlayGlobal(echo.Sound, echo.Session, echo.Params);
+                PlayDistant(echo.Sound, echo.Session, echo.Coords, echo.Params);
         }
 
         if (now < _nextPrune)
@@ -296,6 +349,7 @@ public sealed class DistantGunfireSystem : EntitySystem
         public TimeSpan At;
         public ICommonSession Session;
         public ResolvedSoundSpecifier Sound;
+        public EntityCoordinates Coords;
         public AudioParams Params;
     }
 }
