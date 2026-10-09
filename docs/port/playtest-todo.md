@@ -120,3 +120,13 @@ Found while playing the `port/beyond` build. One line each, newest last.
 - [x] Hand-prying an unpowered door took no time at all: WD "Neglect" made every time under 5 s instant. Now only tools are instant, hands take about a second (`SmallTweaksTest.UnpoweredDoorTakesAboutASecondToPryByHand`).
 - [x] Unconscious combat log: "The <weapon> <verb> you in the <part>!" instead of "Someone ... with the <weapon>".
 - [x] Minibomb gibbing left hands and feet: gibbing now removes every part of the body, not only the ones that can gib.
+
+## Round 8 (playtest reports)
+
+- [x] Combat log font smaller (11 to 19, was 14 to 30).
+- [x] Unseen attackers read "Something" (could be a mob or an item). The separate unseen-weapon line from round 7 is reverted.
+- [x] Hands and feet dropped on an explosion gib: explosions no longer sever limbs, a gibbed part always deletes itself, its child parts and its organs (`ExplosionLeavesNoLimbsBehind` uses a real explosion).
+- [x] "Your body cools down 15% slower" removed from mobs (temperature protection examine skips entities with a mob state).
+- [x] `PosterContrabandBeachStarYamamoto` on Edge of Entropy draws over the secret door (`drawdepth: Overdoors` on the map entity).
+- [x] Ammonia gas hurts and makes players vomit again: the old build values for the reagent were never ported (Poison 100 and 60% vomit in the lungs, Poison 5 and 10% vomit in the blood). Test: `BreathingAmmoniaPoisonsTheLungs`. Not checked against the map's own atmosphere.
+- [x] Altars no longer say "This altar can be used to sacrifice Psionics" (`SharedSacrificialAltarSystem.OnExamined`, marked `// ERRORGATE`). **Revert this if psionics are ever implemented.**

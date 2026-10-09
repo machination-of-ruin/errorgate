@@ -34,6 +34,7 @@ Inspirations: DayZ, Rust, Project Zomboid, Cataclysm: DDA.
 - **en-US only.** No localizations. Do not add or maintain `ru-RU` or `nl-NL` strings. This replaces the usual WWDP practice.
 - Hard fork: upstream code is ported, not merged.
 - **Keep all `_Fork` modules for now.** Do not strip modules wholesale; remove or change only what breaks or conflicts with ERRORGATE, and note removals in the commit.
+- **Psionics are not implemented (for now).** Things hidden because of that must be restored if they are: the "sacrifice Psionics" altar examine text (`SharedSacrificialAltarSystem.OnExamined`, marked `// ERRORGATE`).
 
 ## Open questions
 

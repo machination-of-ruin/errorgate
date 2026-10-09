@@ -21,7 +21,8 @@ public abstract partial class SharedSacrificialAltarSystem : EntitySystem
 
     private void OnExamined(Entity<SacrificialAltarComponent> ent, ref ExaminedEvent args)
     {
-        args.PushMarkup(Loc.GetString("altar-examine"));
+        // ERRORGATE: psionics are not implemented, so the altar does not advertise them. REVERT this when psionics are implemented.
+        // args.PushMarkup(Loc.GetString("altar-examine"));
     }
 
     private void OnUnstrapped(Entity<SacrificialAltarComponent> ent, ref UnbuckledEvent args)

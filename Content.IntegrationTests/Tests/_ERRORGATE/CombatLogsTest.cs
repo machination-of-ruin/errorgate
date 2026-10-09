@@ -135,7 +135,7 @@ public sealed class CombatLogsTest
 
         var messages = Combat(log);
         Assert.That(messages, Has.Count.EqualTo(1), string.Join(" | ", log.Messages));
-        Assert.That(messages[0], Does.StartWith("Someone punches you"));
+        Assert.That(messages[0], Does.StartWith("Something punches you"));
 
         await pair.CleanReturnAsync();
     }

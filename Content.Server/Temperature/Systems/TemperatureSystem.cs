@@ -9,6 +9,7 @@ using Content.Shared.Damage;
 using Content.Shared.Database;
 using Content.Shared.Examine;
 using Content.Shared.Inventory;
+using Content.Shared.Mobs.Components;
 using Content.Shared.Rejuvenate;
 using Content.Shared.Temperature;
 using Robust.Shared.Physics.Components;
@@ -481,6 +482,9 @@ public sealed class TemperatureSystem : EntitySystem
     private void OnClothingVerbExamine(EntityUid uid, TemperatureProtectionComponent component, GetVerbsEvent<ExamineVerb> args)
     {
         if (!args.CanInteract || !args.CanAccess)
+            return;
+
+        if (HasComp<MobStateComponent>(uid)) // ERRORGATE: creatures do not list their temperature protection
             return;
 
         var cooling = component.CoolingCoefficient;

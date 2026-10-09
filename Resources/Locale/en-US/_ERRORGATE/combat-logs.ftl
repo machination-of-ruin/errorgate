@@ -1,6 +1,6 @@
 errorgate-combat-log-wrap = [font size={ $size }][bold]{ $message }[/bold][/font]
 
-errorgate-combat-log-someone = Someone
+errorgate-combat-log-someone = Something
 
 errorgate-combat-log-part-head = head
 errorgate-combat-log-part-torso = chest
@@ -18,7 +18,6 @@ errorgate-combat-log-where = in the { $part }
 errorgate-combat-log-melee-unarmed = { $attacker } { $verb } you{ $where }!
 errorgate-combat-log-melee-unarmed-self = You { $verb } yourself{ $where }!
 errorgate-combat-log-melee = { $attacker } { $verb } you{ $where } with the { $weapon }!
-errorgate-combat-log-melee-unseen = The { $weapon } { $verb } you{ $where }!
 errorgate-combat-log-melee-self = You { $verb } yourself{ $where } with the { $weapon }!
 errorgate-combat-log-shot = { $attacker } shoots you{ $where }! The { $weapon } hits!
 errorgate-combat-log-projectile = The { $weapon } hits you{ $where }!

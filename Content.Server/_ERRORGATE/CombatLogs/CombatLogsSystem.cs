@@ -194,10 +194,7 @@ public sealed class CombatLogsSystem : EntitySystem
                 var (root, present) = MeleeVerbs(hit.Weapon);
                 message = self
                     ? Loc.GetString("errorgate-combat-log-melee-self", ("verb", root), ("where", where), ("weapon", weapon!))
-                    : attacker == null
-                        // the victim cannot see who it was (unconscious, blind), the weapon is what they notice
-                        ? Loc.GetString("errorgate-combat-log-melee-unseen", ("verb", present), ("where", where), ("weapon", weapon!))
-                        : Loc.GetString("errorgate-combat-log-melee", ("attacker", attacker), ("verb", present), ("where", where), ("weapon", weapon!));
+                    : Loc.GetString("errorgate-combat-log-melee", ("attacker", attacker ?? Someone()), ("verb", present), ("where", where), ("weapon", weapon!));
                 break;
             case HitKind.Projectile:
                 message = attacker != null
@@ -279,7 +276,7 @@ public sealed class CombatLogsSystem : EntitySystem
         if (!TryComp<ActorComponent>(victim, out var actor))
             return;
 
-        var size = (int) float.Lerp(14, 30, intensity);
+        var size = (int) float.Lerp(11, 19, intensity);
         // hits go from orange to red with their size, bleeding is always red
         var color = fixedColor ?? Color.InterpolateBetween(Color.Orange, Color.Red, intensity);
 

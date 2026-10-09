@@ -149,4 +149,32 @@ public sealed class SmallTweaksTest
 
         await pair.CleanReturnAsync();
     }
+    [Test]
+    public async Task BreathingAmmoniaPoisonsTheLungs()
+    {
+        await using var pair = await PoolManager.GetServerClient(new PoolSettings { Dirty = true });
+        var server = pair.Server;
+        var entMan = server.EntMan;
+        var testMap = await pair.CreateTestMap();
+
+        EntityUid human = default;
+        await server.WaitAssertion(() =>
+        {
+            human = entMan.SpawnEntity("MobHuman", testMap.GridCoords);
+            var body = entMan.System<BodySystem>();
+            var lungs = body.GetBodyOrganEntityComps<Content.Server.Body.Components.LungComponent>((human, entMan.GetComponent<Content.Shared.Body.Components.BodyComponent>(human))).First();
+            var solutions = entMan.System<Content.Shared.Chemistry.EntitySystems.SharedSolutionContainerSystem>();
+            Assert.That(solutions.TryGetSolution(lungs.Owner, "Lung", out var soln, out _), "The lungs should have a solution.");
+            solutions.TryAddReagent(soln!.Value, new Content.Shared.Chemistry.Reagent.ReagentQuantity("Ammonia", 10), out _);
+        });
+        await pair.RunSeconds(6);
+
+        await server.WaitAssertion(() =>
+        {
+            var damage = entMan.GetComponent<Content.Shared.Damage.DamageableComponent>(human).Damage.DamageDict;
+            Assert.That(damage.TryGetValue("Poison", out var poison) ? poison.Float() : 0f, Is.GreaterThan(0f), "Ammonia in the lungs should poison.");
+        });
+
+        await pair.CleanReturnAsync();
+    }
 }

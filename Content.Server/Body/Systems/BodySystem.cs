@@ -156,14 +156,25 @@ public sealed class BodySystem : SharedBodySystem
         if (Transform(partId).MapUid is null)
             return new HashSet<EntityUid>();
 
+        // ERRORGATE: the children (a hand on a gibbed arm) and organs of a gibbed part are dropped by the base method,
+        // they are destroyed with it instead.
+        var doomed = GetBodyPartChildren(partId, part).Select(c => c.Id)
+            .Concat(GetPartOrgans(partId, part).Select(o => o.Id)).ToList();
+
         var gibs = base.GibPart(partId, part, launchGibs: launchGibs,
             splatDirection: splatDirection, splatModifier: splatModifier, splatCone: splatCone);
+
+        foreach (var ent in doomed)
+        {
+            gibs.Remove(ent);
+            QueueDel(ent);
+        }
 
         var ev = new BeingGibbedEvent(gibs);
         RaiseLocalEvent(partId, ref ev);
 
-        if (gibs.Any())
-            QueueDel(partId);
+        // ERRORGATE: a gibbed part is always destroyed, even when it had nothing to spill (hands and feet)
+        QueueDel(partId);
 
         return gibs;
     }

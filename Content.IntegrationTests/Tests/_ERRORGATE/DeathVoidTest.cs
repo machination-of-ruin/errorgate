@@ -256,4 +256,34 @@ public sealed class DeathVoidTest
 
         await pair.CleanReturnAsync();
     }
+    [Test]
+    public async Task ExplosionLeavesNoLimbsBehind()
+    {
+        await using var pair = await PoolManager.GetServerClient(new PoolSettings { DummyTicker = false, Connected = true, Dirty = true });
+        var server = pair.Server;
+        var entMan = server.EntMan;
+        var testMap = await pair.CreateTestMap();
+
+        var oldParts = new System.Collections.Generic.HashSet<EntityUid>();
+        EntityUid body = default;
+        await server.WaitAssertion(() =>
+        {
+            foreach (var (uid, _) in entMan.EntityQuery<Content.Shared.Body.Part.BodyPartComponent>(true).Select(x => (x.Owner, x)))
+                oldParts.Add(uid);
+            body = entMan.SpawnEntity("MobHuman", testMap.GridCoords);
+            var coords = entMan.System<TransformSystem>().GetMapCoordinates(body);
+            entMan.System<Content.Server.Explosion.EntitySystems.ExplosionSystem>()
+                .QueueExplosion(coords, "Default", 20000f, 10f, 2000f, null);
+        });
+        await pair.RunTicksSync(60);
+
+        await server.WaitAssertion(() =>
+        {
+            var loose = entMan.EntityQuery<Content.Shared.Body.Part.BodyPartComponent>()
+                .Where(p => !oldParts.Contains(p.Owner)).Select(p => entMan.ToPrettyString(p.Owner)).ToList();
+            Assert.That(loose, Is.Empty, "An explosion should not leave hands, feet or other limbs lying around.");
+        });
+
+        await pair.CleanReturnAsync();
+    }
 }

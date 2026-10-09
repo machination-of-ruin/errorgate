@@ -73324,6 +73324,8 @@ entities:
     - type: Transform
       pos: -53.5,-61.5
       parent: 2
+    - type: Sprite
+      drawdepth: Overdoors
 - proto: PosterContrabandBountyHunters
   entities:
   - uid: 11592
