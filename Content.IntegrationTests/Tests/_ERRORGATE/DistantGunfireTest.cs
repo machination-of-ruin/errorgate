@@ -4,6 +4,7 @@ using System.Linq;
 using Content.Server._ERRORGATE.DistantGunfire;
 using Content.Shared.Weapons.Ranged;
 using Content.Shared.Weapons.Ranged.Components;
+using Content.Shared.Weapons.Ranged.Systems;
 using Robust.Server.Player;
 using Robust.Shared.GameObjects;
 using Robust.Shared.Map;
@@ -70,7 +71,7 @@ public sealed class DistantGunfireTest
             // a long strip of floor, the listeners are placed up to 70 tiles away.
             server.CfgMan.SetCVar(Robust.Shared.CVars.NetPVS, true);
             var maps = entMan.System<Robust.Server.GameObjects.MapSystem>();
-            for (var x = -2; x <= 80; x++)
+            for (var x = -2; x <= 120; x++)
                 maps.SetTile(testMap.Grid, new Robust.Shared.Maths.Vector2i(x, 0), new Robust.Shared.Map.Tile(1));
         });
 
@@ -83,7 +84,7 @@ public sealed class DistantGunfireTest
         {
             var origin = xform.GetMapCoordinates(gun);
             var range = system.GetRange(gun, entMan.GetComponent<GunComponent>(gun), ammo);
-            Assert.That(range, Is.EqualTo(65f), "5.56 should carry 65 tiles.");
+            Assert.That(range, Is.EqualTo(system.GetHearingRange() + 65f * 0.7f).Within(0.01f), "5.56 carries 65 tiles (scaled by 0.7) beyond the normal hearing range.");
             Assert.That(system.GetRange(silenced, entMan.GetComponent<GunComponent>(silenced), ammo), Is.EqualTo(0f),
                 "A silenced gun should never be heard from afar.");
 
@@ -93,7 +94,7 @@ public sealed class DistantGunfireTest
             Assert.That(audience.Exists(a => a.Session == session), "A listener 60 tiles away should hear the shot.");
 
             // Beyond the range.
-            xform.SetCoordinates(listener, new EntityCoordinates(testMap.Grid, 70, 0));
+            xform.SetCoordinates(listener, new EntityCoordinates(testMap.Grid, 100, 0));
             Assert.That(system.GetAudience(origin, testMap.Grid, range), Is.Empty, "Beyond the range nothing is heard.");
 
             // Inside the normal hearing range the real shot is heard instead.
@@ -112,6 +113,51 @@ public sealed class DistantGunfireTest
             xform.SetCoordinates(listener, new EntityCoordinates(testMap.Grid, 60, 0));
             Assert.That(system.GetAudience(origin, testMap.Grid, range, listener), Is.Empty);
         });
+
+        await pair.CleanReturnAsync();
+    }
+    [Test]
+    public async Task DistantGunfireIsDeliveredToTheClient()
+    {
+        await using var pair = await PoolManager.GetServerClient(new PoolSettings { Connected = true, Dirty = true });
+        var server = pair.Server;
+        var entMan = server.EntMan;
+        var testMap = await pair.CreateTestMap();
+        var xform = entMan.System<SharedTransformSystem>();
+        var session = server.ResolveDependency<IPlayerManager>().Sessions.Single();
+
+        EntityUid listener = default;
+        EntityUid shooter = default;
+        EntityUid gun = default;
+        EntityUid cartridge = default;
+        await server.WaitPost(() =>
+        {
+            server.CfgMan.SetCVar(Robust.Shared.CVars.NetPVS, true);
+            var maps = entMan.System<Robust.Server.GameObjects.MapSystem>();
+            for (var x = -2; x <= 120; x++)
+                maps.SetTile(testMap.Grid, new Robust.Shared.Maths.Vector2i(x, 0), new Robust.Shared.Map.Tile(1));
+
+            shooter = entMan.SpawnEntity("DistantGunfireTestListener", testMap.GridCoords);
+            gun = entMan.SpawnEntity("DistantGunfireTestGun", testMap.GridCoords);
+            cartridge = entMan.SpawnEntity("Cartridge556x45", testMap.GridCoords);
+            listener = entMan.SpawnEntity("DistantGunfireTestListener", new EntityCoordinates(testMap.Grid, 70, 0));
+            server.PlayerMan.SetAttachedEntity(session, listener);
+        });
+        await pair.RunTicksSync(5);
+
+        var before = pair.Client.EntMan.EntityQuery<Robust.Shared.Audio.Components.AudioComponent>().Count();
+        await server.WaitPost(() =>
+        {
+            var ev = new GunShotEvent(shooter, new List<(EntityUid? Uid, IShootable Shootable)>
+            {
+                (cartridge, entMan.GetComponent<CartridgeAmmoComponent>(cartridge)),
+            });
+            entMan.EventBus.RaiseLocalEvent(gun, ref ev);
+        });
+        await pair.RunTicksSync(10);
+
+        var clientAudio = pair.Client.EntMan.EntityQuery<Robust.Shared.Audio.Components.AudioComponent>().Count();
+        Assert.That(clientAudio, Is.GreaterThan(before), "The listener 70 tiles away should receive the distant gunshot as audio.");
 
         await pair.CleanReturnAsync();
     }

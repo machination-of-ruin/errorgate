@@ -176,7 +176,16 @@ public sealed class DistantGunfireSystem : EntitySystem
             range = Math.Max(range, found);
         }
 
-        return range * Math.Max(_rangeScale, 0f);
+        if (range <= 0f)
+            return 0f;
+
+        // The cartridge range is the distance the shot carries on top of the normal hearing range (which is already
+        // twice the PVS range), otherwise nothing would ever be heard "beyond PVS".
+        var hearing = GetHearingRange();
+        if (float.IsInfinity(hearing))
+            return 0f;
+
+        return hearing + range * Math.Max(_rangeScale, 0f);
     }
 
     /// <summary>The distance within which the normal, PVS filtered shot is heard.</summary>

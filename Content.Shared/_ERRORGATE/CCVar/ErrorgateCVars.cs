@@ -26,8 +26,9 @@ public sealed class ErrorgateCVars
         CVarDef.Create("errorgate.distant_gunfire_enabled", true, CVar.SERVER | CVar.ARCHIVE);
 
     /// <summary>
-    ///     Multiplier for how far distant gunfire carries. 1 uses the per-caliber ranges as authored.
+    ///     Multiplier for how far distant gunfire carries beyond the normal hearing range (twice the PVS range).
+    ///     1 uses the per-caliber ranges as authored, the default 0.7 trims them.
     /// </summary>
     public static readonly CVarDef<float> DistantGunfireRangeScale =
-        CVarDef.Create("errorgate.distant_gunfire_range_scale", 1f, CVar.SERVER | CVar.ARCHIVE);
+        CVarDef.Create("errorgate.distant_gunfire_range_scale", 0.7f, CVar.SERVER | CVar.ARCHIVE);
 }
