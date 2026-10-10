@@ -25,4 +25,8 @@
     tasks:
       - !type:HTNCompoundTask
         task: SimpleHostileCompound
+  # ERRORGATE: a servant without a king (the ones the mob spawners place) has no orders. It used to do nothing at all, now it is hostile.
+  - tasks:
+      - !type:HTNCompoundTask
+        task: SimpleHostileCompound
 

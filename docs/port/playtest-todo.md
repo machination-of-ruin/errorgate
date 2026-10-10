@@ -226,7 +226,7 @@ Items and gear:
 
 Mobs:
 - [ ] Grabbed mobs do not fight back.
-- [ ] Rat servant is not hostile to humans (no AI at all).
+- [x] Rat servant is not hostile to humans (no AI at all). Every branch of its task needs an order from a rat king, and the spawner-placed ones have none; it falls back to the plain hostile task now (data test only: NPC planning does not run in the test world, so check in game).
 - [ ] Check spider and other mob stats.
 
 Server and admin:
