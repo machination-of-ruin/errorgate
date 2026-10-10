@@ -44,7 +44,7 @@ namespace Content.Shared.Jittering
         /// <param name="forceValueChange">Whether to change any existing jitter value even if they're greater than the ones we're setting.</param>
         /// <param name="status">The status effects component to modify.</param>
         public void DoJitter(EntityUid uid, TimeSpan time, bool refresh, float amplitude = 10f, float frequency = 4f, bool forceValueChange = false,
-            StatusEffectsComponent? status = null)
+            StatusEffectsComponent? status = null, float scale = 1f)
         {
             if (!Resolve(uid, ref status, false))
                 return;
@@ -61,6 +61,10 @@ namespace Content.Shared.Jittering
 
                 if (forceValueChange || jittering.Frequency < frequency)
                     jittering.Frequency = frequency;
+
+                // The strongest shake asked for wins, like the amplitude
+                if (forceValueChange || jittering.Scale < scale)
+                    jittering.Scale = scale;
             }
         }
 
@@ -72,6 +76,7 @@ namespace Content.Shared.Jittering
             var jitter = EnsureComp<JitteringComponent>(uid);
             jitter.Amplitude = amplitude;
             jitter.Frequency = frequency;
+            jitter.Scale = 1f;
             Dirty(uid, jitter);
         }
     }

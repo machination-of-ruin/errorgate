@@ -365,7 +365,7 @@ public sealed partial class StaminaSystem : EntitySystem
         {
             // goob edit - stunmeta
             // no slowdown because funny
-            _jitter.DoJitter(uid, TimeSpan.FromSeconds(10f), true);
+            _jitter.DoJitter(uid, TimeSpan.FromSeconds(10f), true, scale: 0.35f); // ERRORGATE: a gentle shake
             _stutter.DoStutter(uid, TimeSpan.FromSeconds(10f), true);
         }
 
