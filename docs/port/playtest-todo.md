@@ -225,7 +225,7 @@ Items and gear:
 - [ ] Item spawn "shining" effect.
 
 Mobs:
-- [ ] Grabbed mobs do not fight back.
+- [x] Grabbed mobs do not fight back. Cause (from the task data, not seen running: NPC planning does not run in tests): the melee task had a branch "if pulled, try to pull free" that came before attacking, so a held mob only struggled. The branch is gone; check in game.
 - [x] Rat servant is not hostile to humans (no AI at all). Every branch of its task needs an order from a rat king, and the spawner-placed ones have none; it falls back to the plain hostile task now (data test only: NPC planning does not run in the test world, so check in game).
 - [ ] Check spider and other mob stats.
 

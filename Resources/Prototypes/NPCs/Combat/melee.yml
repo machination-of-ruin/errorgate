@@ -21,13 +21,8 @@
           operator: !type:UnbuckleOperator
             shutdownState: TaskFinished
 
-    - preconditions:
-        - !type:PulledPrecondition
-          isPulled: true
-      tasks:
-        - !type:HTNPrimitiveTask
-          operator: !type:UnPullOperator
-            shutdownState: TaskFinished
+    # ERRORGATE: no branch for a mob that is being pulled. It used to spend its turn on trying to pull free (grab escape
+    # chances) and never hit back; now it fights whoever holds it.
 
     - preconditions:
         - !type:InContainerPrecondition
