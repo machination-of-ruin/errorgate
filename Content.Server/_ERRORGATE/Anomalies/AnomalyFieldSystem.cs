@@ -180,6 +180,12 @@ public sealed class AnomalyFieldSystem : EntitySystem
         public MapGridComponent Grid = default!;
         public AnomalyCoarseGrid Coarse = default!;
         public HashSet<Vector2i> Blocked = new();
+
+        /// <summary>
+        ///     Tiles a walker can get to from the start, null when that could not be worked out. Exact, unlike the
+        ///     coarse cells: a one tile wall ring does not stop a cell flood fill.
+        /// </summary>
+        public HashSet<Vector2i>? ReachableTiles;
         public Dictionary<Vector2i, bool> FreeCache = new();
 
         public List<Vector2> Spawns = new();
@@ -367,12 +373,99 @@ public sealed class AnomalyFieldSystem : EntitySystem
     }
 
     /// <summary>
+    ///     Flood fills the floor tile by tile (four directions, around solid things) from the spawn points, or from the
+    ///     biggest cluster if there are none. Whatever lies behind a wall, like the ring of mountains around the playable
+    ///     area, is never reached.
+    /// </summary>
+    private bool FindReachableTiles(PlacementState state)
+    {
+        var starts = new List<Vector2>(state.Spawns);
+        if (starts.Count == 0 && state.Clusters.Count > 0)
+            starts.Add(state.Clusters.OrderByDescending(c => c.Weight).First().Center);
+
+        var reached = new HashSet<Vector2i>();
+        var queue = new Queue<Vector2i>();
+
+        foreach (var start in starts)
+        {
+            var tile = new Vector2i((int) MathF.Floor(start.X), (int) MathF.Floor(start.Y));
+
+            // The spawn may stand next to something solid: take the closest free tile
+            for (var ring = 0; ring <= 6 && !reached.Contains(tile); ring++)
+            {
+                var found = false;
+                for (var dx = -ring; dx <= ring && !found; dx++)
+                {
+                    for (var dy = -ring; dy <= ring && !found; dy++)
+                    {
+                        if (Math.Max(Math.Abs(dx), Math.Abs(dy)) != ring)
+                            continue;
+
+                        var candidate = tile + new Vector2i(dx, dy);
+                        if (!IsFreeTile(state, candidate))
+                            continue;
+
+                        reached.Add(candidate);
+                        queue.Enqueue(candidate);
+                        found = true;
+                    }
+                }
+
+                if (found)
+                    break;
+            }
+        }
+
+        var directions = new[] { new Vector2i(1, 0), new Vector2i(-1, 0), new Vector2i(0, 1), new Vector2i(0, -1) };
+        while (queue.Count > 0)
+        {
+            var current = queue.Dequeue();
+            foreach (var direction in directions)
+            {
+                var next = current + direction;
+                if (reached.Contains(next) || !IsFreeTile(state, next))
+                    continue;
+
+                reached.Add(next);
+                queue.Enqueue(next);
+            }
+        }
+
+        if (reached.Count < 200)
+        {
+            Log.Warning($"Anomaly placement: only {reached.Count} floor tiles are reachable from the start, falling back to coarse reachability.");
+            return false;
+        }
+
+        state.ReachableTiles = reached;
+        return true;
+    }
+
+    /// <summary>
     ///     Flood fills the coarse grid from the spawn points, or from the biggest cluster if there are none.
     /// </summary>
     private void FindReachable(PlacementState state)
     {
         var coarse = state.Coarse;
         var walkable = coarse.Walkable.Count(w => w);
+
+        if (FindReachableTiles(state))
+        {
+            // A cell is reachable when a reachable tile lies in it
+            coarse.Reachable = new bool[coarse.Walkable.Length];
+            var cells = 0;
+            foreach (var tile in state.ReachableTiles!)
+            {
+                if (coarse.TryCellOf(tile, out var tileCell) && coarse.Walkable[tileCell] && !coarse.Reachable[tileCell])
+                {
+                    coarse.Reachable[tileCell] = true;
+                    cells++;
+                }
+            }
+
+            state.ReachableCells = cells;
+            return;
+        }
 
         var starts = new List<int>();
         foreach (var spawn in state.Spawns)
@@ -667,6 +760,7 @@ public sealed class AnomalyFieldSystem : EntitySystem
             var position = new Vector2(tile.X + 0.5f, tile.Y + 0.5f);
 
             if (!state.Coarse.TryCellOf(tile, out var cell) || !state.Coarse.Reachable[cell]
+                || state.ReachableTiles != null && !state.ReachableTiles.Contains(tile)
                 || NearAny(state.Spawns, position, field.MinDistanceFromSpawns)
                 || NearPoi(state, position, field.MinDistanceFromPoi))
             {
