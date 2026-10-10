@@ -631,6 +631,37 @@ public sealed class AnomalyFieldTest
     }
 
     [Test]
+    public async Task CollapseHoldsOnToSomeoneLyingAtItsCenter()
+    {
+        await using var pair = await PoolManager.GetServerClient(new PoolSettings { Dirty = true });
+        var server = pair.Server;
+        var entMan = server.EntMan;
+
+        var (_, mapId) = await CreateFloor(pair, 20);
+
+        EntityUid anomaly = default;
+        await server.WaitPost(() =>
+        {
+            anomaly = entMan.SpawnEntity(CollapseProto, new MapCoordinates(0.5f, 0.5f, mapId));
+            var comp = entMan.GetComponent<ErrorgateAnomalyComponent>(anomaly);
+
+            // A short window, and no damage so the victim survives: someone in its grip must keep it on past both
+            comp.ActiveSeconds = 2f;
+            comp.Damage = new DamageSpecifier();
+            entMan.SpawnEntity("MobHuman", new MapCoordinates(0.5f, 0.5f, mapId));
+        });
+
+        await pair.RunSeconds(6f);
+        await server.WaitAssertion(() =>
+        {
+            var comp = entMan.GetComponent<ErrorgateAnomalyComponent>(anomaly);
+            Assert.That(comp.Active && comp.Engaged, Is.True, "A collapse should not let go of someone lying at its center.");
+        });
+
+        await pair.CleanReturnAsync();
+    }
+
+    [Test]
     public async Task ArcIsQuietWhenNobodyIsInReach()
     {
         await using var pair = await PoolManager.GetServerClient(new PoolSettings { Dirty = true });

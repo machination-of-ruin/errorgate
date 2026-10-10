@@ -167,6 +167,13 @@ public sealed class ErrorgateAnomalySystem : EntitySystem
         if (anomaly.NextSwitch > curTime)
             return;
 
+        // It does not let go of someone it has caught: it stays on until nothing is in reach of it any more
+        if (anomaly.Active && anomaly.Engaged && anomaly.TriggerToEngage)
+        {
+            anomaly.NextSwitch = curTime + TimeSpan.FromSeconds(1);
+            return;
+        }
+
         anomaly.Active = !anomaly.Active;
         anomaly.Engaged = !anomaly.TriggerToEngage;
         var length = anomaly.Active ? anomaly.ActiveSeconds : anomaly.IdleSeconds;
