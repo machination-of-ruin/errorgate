@@ -11,7 +11,7 @@ public sealed partial class CollapseFaultComponent : Component
     ///     How far the pull reaches, tiles.
     /// </summary>
     [DataField]
-    public float PullRange = 8f;
+    public float PullRange = 5.5f;
 
     /// <summary>
     ///     Acceleration (tiles per second squared) at the edge of the pull range, for loose objects.
@@ -30,13 +30,13 @@ public sealed partial class CollapseFaultComponent : Component
     ///     Speed (tiles per second) of that pull at the edge of the range.
     /// </summary>
     [DataField]
-    public float MobMinSpeed = 0.8f;
+    public float MobMinSpeed = 0.6f;
 
     /// <summary>
-    ///     Speed of the pull on creatures at the center. The pull is weak in the outer ring (about 1 tile per second at
-    ///     six tiles), so it can be felt long before it holds anyone. A walker (3.5) cannot leave the inner three or four
-    ///     tiles, a sprinter (5) gets out from further in.
+    ///     Speed of the pull on creatures at the center. The pull is weak in the outer ring, so it can be felt long before it holds
+    ///     anyone. A walker (3.5) cannot leave the inner two or three tiles, a sprinter (5) always gets out.
+    ///     Only while the fault is switched on.
     /// </summary>
     [DataField]
-    public float MobMaxSpeed = 5.5f;
+    public float MobMaxSpeed = 4.5f;
 }

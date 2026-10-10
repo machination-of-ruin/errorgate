@@ -430,6 +430,7 @@ public sealed class AnomalyFieldTest
         await using var pair = await PoolManager.GetServerClient(new PoolSettings { Dirty = true });
         var server = pair.Server;
         var entMan = server.EntMan;
+        var timing = server.ResolveDependency<IGameTiming>();
 
         var (_, mapId) = await CreateFloor(pair, 20);
 
@@ -443,10 +444,13 @@ public sealed class AnomalyFieldTest
             far = entMan.SpawnEntity("MobHuman", new MapCoordinates(0.5f, -8.5f, mapId));
         });
 
-        // An arc is thrown every 2 to 6 seconds
-        await pair.RunSeconds(12);
+        // The arc fires at once when someone is in reach
+        await pair.RunSeconds(1);
         Assert.That(await ReadDamage(pair, near, "Shock"), Is.GreaterThanOrEqualTo(40f), "Someone within four tiles should be hit by an arc.");
         Assert.That(await ReadDamage(pair, far, "Shock"), Is.EqualTo(0f), "Eight tiles away nothing reaches.");
+
+        // ... and then recharges: the same fault does not fire again for a while
+        Assert.That(entMan.EntityQuery<ArcFaultComponent>().Single().NextArc, Is.GreaterThan(timing.CurTime), "The fault should be recharging.");
 
         // Inside the fault the shocks are as frequent as can be, but not chained
         EntityUid inside = default;
@@ -462,11 +466,15 @@ public sealed class AnomalyFieldTest
             inside = entMan.SpawnEntity("MobHuman", new MapCoordinates(0.5f, 0.5f, mapId));
         });
 
-        await pair.RunSeconds(1.5f);
-        await server.WaitAssertion(() =>
+        // The fault recharges for five seconds after the earlier shock, then shocks the newcomer
+        var immune = false;
+        for (var i = 0; i < 40 && !immune; i++)
         {
-            Assert.That(entMan.HasComponent<ArcShockImmunityComponent>(inside), Is.True, "A shocked person should be immune for a moment.");
-        });
+            await pair.RunSeconds(0.25f);
+            await server.WaitPost(() => immune = entMan.HasComponent<ArcShockImmunityComponent>(inside));
+        }
+
+        Assert.That(immune, Is.True, "A shocked person should be immune for a moment.");
 
         // The first shock was in the first second. With an immunity of 2.5 seconds there can be at most three more in
         // six more seconds (without it there would be one every second).
@@ -477,6 +485,81 @@ public sealed class AnomalyFieldTest
         Assert.That(shock, Is.GreaterThanOrEqualTo(arc.ArcDamage));
         Assert.That(shock, Is.LessThanOrEqualTo(biggest * 4f), "Shocks must not chain.");
 
+        await pair.CleanReturnAsync();
+    }
+
+    [Test]
+    public async Task ArcFiresAtAThrownObjectAndRecharges()
+    {
+        await using var pair = await PoolManager.GetServerClient(new PoolSettings { Dirty = true });
+        var server = pair.Server;
+        var entMan = server.EntMan;
+
+        var timing = server.ResolveDependency<IGameTiming>();
+        var (_, mapId) = await CreateFloor(pair, 20);
+
+        EntityUid arc = default;
+        await server.WaitPost(() =>
+        {
+            arc = entMan.SpawnEntity(ArcProto, new MapCoordinates(0.5f, 0.5f, mapId));
+            var crowbar = entMan.SpawnEntity("Crowbar", new MapCoordinates(3.5f, 0.5f, mapId));
+            // Mid flight: the component is what marks it, and it stays while the item is moving
+            entMan.System<ThrowingSystem>().TryThrow(crowbar, new Vector2(-1.5f, 0f), 6f);
+        });
+
+        await pair.RunSeconds(0.5f);
+        await server.WaitAssertion(() =>
+        {
+            Assert.That(entMan.EntityQuery<BeamComponent>().Count(), Is.GreaterThan(0), "A thrown object should set the arc off.");
+            Assert.That(entMan.GetComponent<ArcFaultComponent>(arc).NextArc, Is.GreaterThan(timing.CurTime));
+        });
+
+        await pair.CleanReturnAsync();
+    }
+
+    [Test]
+    public async Task CollapseSwitchesOnAndOff()
+    {
+        await using var pair = await PoolManager.GetServerClient(new PoolSettings { Dirty = true });
+        var server = pair.Server;
+        var entMan = server.EntMan;
+
+        var (_, mapId) = await CreateFloor(pair, 20);
+
+        EntityUid anomaly = default;
+        EntityUid human = default;
+        await server.WaitPost(() =>
+        {
+            anomaly = entMan.SpawnEntity(CollapseProto, new MapCoordinates(0.5f, 0.5f, mapId));
+            human = entMan.SpawnEntity("MobHuman", new MapCoordinates(0.5f, 4.5f, mapId));
+        });
+
+        var seenOn = false;
+        var seenOff = false;
+        for (var i = 0; i < 100; i++)
+        {
+            await pair.RunSeconds(0.25f);
+            await server.WaitPost(() =>
+            {
+                if (!entMan.EntityExists(human))
+                {
+                    // crushed in a long on stretch, pulled in
+                    seenOn = true;
+                    return;
+                }
+
+                var active = entMan.GetComponent<ErrorgateAnomalyComponent>(anomaly).Active;
+                if (active)
+                    seenOn = true;
+                else
+                    seenOff = true;
+            });
+
+            if (seenOn && seenOff)
+                break;
+        }
+
+        Assert.That(seenOn && seenOff, Is.True, "A collapse should switch on and off.");
         await pair.CleanReturnAsync();
     }
 
@@ -522,8 +605,10 @@ public sealed class AnomalyFieldTest
         await server.WaitPost(() =>
         {
             anomaly = entMan.SpawnEntity(CollapseProto, new MapCoordinates(0.5f, 0.5f, mapId));
-            item = entMan.SpawnEntity("Crowbar", new MapCoordinates(5.5f, 0.5f, mapId));
-            human = entMan.SpawnEntity("MobHuman", new MapCoordinates(0.5f, 6.5f, mapId));
+            // Always on, the cycle has its own test
+            entMan.GetComponent<ErrorgateAnomalyComponent>(anomaly).ActiveSeconds = 0f;
+            item = entMan.SpawnEntity("Crowbar", new MapCoordinates(4.5f, 0.5f, mapId));
+            human = entMan.SpawnEntity("MobHuman", new MapCoordinates(0.5f, 5.5f, mapId));
             outside = entMan.SpawnEntity("MobHuman", new MapCoordinates(-9.5f, 0.5f, mapId));
         });
 
@@ -538,7 +623,7 @@ public sealed class AnomalyFieldTest
         });
 
         // A standing person is dragged in: at least two tiles closer, or already crushed and torn apart
-        var closest = 6f;
+        var closest = 5f;
         var gone = false;
         for (var i = 0; i < 5; i++)
         {
@@ -554,7 +639,7 @@ public sealed class AnomalyFieldTest
 
         await server.WaitAssertion(() =>
         {
-            Assert.That(gone || closest <= 4f, Is.True, $"A person six tiles away should be dragged at least two tiles closer, got to {closest}.");
+            Assert.That(gone || closest <= 3.5f, Is.True, $"A person five tiles away should be dragged at least a tile and a half closer, got to {closest}.");
             Assert.That(Distance(item), Is.LessThan(itemBefore - 0.5f), "A loose item should be dragged toward the collapse.");
             Assert.That(Math.Abs(Distance(outside) - outsideBefore), Is.LessThan(0.2f), "Nothing beyond the pull range should move.");
         });
@@ -581,6 +666,7 @@ public sealed class AnomalyFieldTest
         {
             var coords = new MapCoordinates(0.5f, 0.5f, mapId);
             var anomaly = entMan.SpawnEntity(proto, coords);
+            entMan.GetComponent<ErrorgateAnomalyComponent>(anomaly).ActiveSeconds = 0f;
 
             // Make the shock certain, the real chance is below one
             if (entMan.TryGetComponent(anomaly, out ArcFaultComponent? arc))

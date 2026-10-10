@@ -5,7 +5,7 @@ namespace Content.Shared.Singularity.Components
 {
     [RegisterComponent, NetworkedComponent]
     [AutoGenerateComponentState]
-    [Access(typeof(SharedSingularitySystem))]
+    [Access(typeof(SharedSingularitySystem), typeof(Content.Shared._ERRORGATE.Anomalies.SharedAnomalyDistortionSystem))] // ERRORGATE
     public sealed partial class SingularityDistortionComponent : Component
     {
         [DataField, AutoNetworkedField, ViewVariables(VVAccess.ReadWrite)]
