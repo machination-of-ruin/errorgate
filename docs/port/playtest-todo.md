@@ -218,7 +218,7 @@ Found while playing the `port/beyond` build. One line each, newest last.
 
 Items and gear:
 - [ ] Make satchels smaller, like in the old build. Compare backpack and duffel sizes too.
-- [ ] Ammo boxes can be inserted into guns as a magazine.
+- [x] Ammo boxes can be inserted into guns as a magazine. Cause: the random-magazine loot guns replaced the whole magazine slot of their parent and lost its whitelist, so they took anything. Slots are written out in full now (`RandomMagGunsTest`).
 - [ ] Examining a gun: the chamber does not show the loaded ammo.
 - [ ] Bullet damage numbers: compare with the old build.
 - [ ] Ammo box fullness is not random; ammo boxes need to be random.
