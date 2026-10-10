@@ -165,8 +165,26 @@ public sealed class ErrorgateAnomalySystem : EntitySystem
         if (anomaly.NextSwitch > curTime)
             return;
 
-        anomaly.Active = !anomaly.Active;
-        var length = anomaly.Active ? anomaly.ActiveSeconds : anomaly.IdleSeconds;
+        // idle -> primed -> active -> idle
+        float length;
+        if (anomaly.Active)
+        {
+            anomaly.Active = false;
+            length = anomaly.IdleSeconds;
+        }
+        else if (anomaly.Primed || anomaly.PrimeSeconds <= 0f)
+        {
+            anomaly.Primed = false;
+            anomaly.Active = true;
+            length = anomaly.ActiveSeconds;
+        }
+        else
+        {
+            anomaly.Primed = true;
+            length = anomaly.PrimeSeconds;
+        }
+
+
         anomaly.NextSwitch = curTime + TimeSpan.FromSeconds(length * _random.NextFloat(0.75f, 1.25f));
         Dirty(uid, anomaly);
         SetVolume(uid, anomaly);
@@ -174,7 +192,10 @@ public sealed class ErrorgateAnomalySystem : EntitySystem
 
     private void SetVolume(EntityUid uid, ErrorgateAnomalyComponent anomaly)
     {
-        _ambient.SetVolume(uid, anomaly.Active ? anomaly.ActiveVolume : anomaly.IdleVolume);
+        var volume = anomaly.Active
+            ? anomaly.ActiveVolume
+            : anomaly.Primed ? (anomaly.ActiveVolume + anomaly.IdleVolume) / 2f : anomaly.IdleVolume;
+        _ambient.SetVolume(uid, volume);
     }
 
     /// <summary>

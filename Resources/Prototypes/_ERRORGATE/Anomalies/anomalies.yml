@@ -32,11 +32,12 @@
     tickSound:
       path: /Audio/Effects/burning.ogg
       params:
-        volume: -6
+        volume: 0
     revealSound:
-      path: /Audio/Effects/burning.ogg
+      path: /Audio/Effects/fire.ogg
       params:
-        volume: -10
+        volume: 4
+        maxDistance: 20
     restAlpha: 0
     restLightEnergy: 0
     restLightRadius: 2.5
@@ -115,8 +116,8 @@
     sound:
       path: /Audio/Ambience/Objects/emf_buzz.ogg
 
-# COLLAPSE FAULT: a gravity error. For a few seconds at a time everything loose falls toward it and the center crushes,
-# then it goes dark and invisible for a while (loot lying next to it can be taken then, at a risk). The world loses its colour near it.
+# COLLAPSE FAULT: a gravity error. It wakes with a faint lens (primed, harmless), then for several seconds everything loose
+# falls toward it, the center crushes and the lens widens to the pull area, then it goes dark and invisible for a while (loot lying next to it can be taken then, at a risk). The world loses its colour near it.
 - type: entity
   id: ErrorgateAnomalyCollapse
   parent: ErrorgateAnomalyBase
@@ -126,8 +127,9 @@
     radius: 2
     dangerRadius: 3.5
     revealRadius: 4
-    warningRadius: 7
+    warningRadius: 9
     damageInterval: 0.5
+    primeSeconds: 3
     activeSeconds: 10
     idleSeconds: 7
     activeVolume: -3

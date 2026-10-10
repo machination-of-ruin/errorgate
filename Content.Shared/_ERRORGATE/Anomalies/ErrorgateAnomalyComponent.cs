@@ -89,7 +89,7 @@ public sealed partial class ErrorgateAnomalyComponent : Component
     public TimeSpan NextTick;
 
     /// <summary>
-    ///     Seconds the fault stays switched on, then <see cref="IdleSeconds"/> off, and so on. Zero means always on.
+    ///     Seconds the fault stays switched on (pulling, hurting), then <see cref="IdleSeconds"/> off, and so on. Zero means always on.
     ///     While it is off it does no damage and (for a collapse) does not pull.
     /// </summary>
     [DataField]
@@ -97,6 +97,18 @@ public sealed partial class ErrorgateAnomalyComponent : Component
 
     [DataField]
     public float IdleSeconds;
+
+    /// <summary>
+    ///     Seconds the fault is primed before it switches on: awake and faintly visible, but harmless. Zero skips it.
+    /// </summary>
+    [DataField]
+    public float PrimeSeconds;
+
+    /// <summary>
+    ///     Primed, see <see cref="PrimeSeconds"/>. Never true together with <see cref="Active"/>.
+    /// </summary>
+    [DataField, AutoNetworkedField]
+    public bool Primed;
 
     /// <summary>
     ///     Whether the fault is switched on right now. Always true for faults without a cycle.
