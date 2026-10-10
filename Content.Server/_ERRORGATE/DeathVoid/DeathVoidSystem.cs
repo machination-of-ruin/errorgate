@@ -200,7 +200,7 @@ public sealed class DeathVoidSystem : EntitySystem
 
             // What happened to this character, as a technical log (ERRORGATE: life log)
             if (_lifeLog.BuildDeathLog(mindId) is { } log)
-                wrapped += $"[bold]{FormattedMessage.EscapeText(string.Join("\n", log))}[/bold]\n\n";
+                wrapped += $"[font size=10][bold]{FormattedMessage.EscapeText(string.Join("\n", log))}[/bold][/font]\n\n";
 
             wrapped += $"[bold]{Loc.GetString("errorgate-death-void-subtitle")}[/bold]\n\n\n";
 

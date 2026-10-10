@@ -17,20 +17,20 @@ Bodies follow the 10-minute despawn timer in [survival-loop.md](survival-loop.md
 
 ## Life log (what the dead see)
 
-The death message is one red block: the title, a technical log of the last 8 things that happened to the character, and the line "YOU FAILED TO ESCAPE THE MACHINATION OF RUIN. /RISE AND TRY AGAIN." at the bottom. The log is impersonal (no name of the dead, no "you", no "it"), counts time back from death in minutes, seconds and hundredths (the bars line up), has no header, and never says what to do or why a rule exists.
+The death message is one red block: the title, a technical log of the last 8 things that happened to the character, and the line "YOU FAILED TO ESCAPE THE MACHINATION OF RUIN. /RISE AND TRY AGAIN." at the bottom. The log is impersonal (no name of the dead, no "you", no "it"), counts time back from death in minutes, seconds and hundredths (the `>` separators line up) in a smaller font, so a line fits a narrow chat, has no header, and never says what to do or why a rule exists.
 
 ```
 ERROR:
 YOU ARE DEAD
 
-> T-23:10.04 |  SUBJECT INSTANTIATED
-> T-04:52.37 |  SPEECH      "stay back"
-> T-04:49.11 |  HEARD       URIST MCHANDS: "give me the rifle"
-> T-01:15.80 |  DAMAGE OUT  WALKER (601): 30
-> T-01:15.80 |  KILLED      WALKER (601)
-> T-00:41.02 |  DAMAGE IN   STARVATION: 12
-> T-00:03.55 |  DAMAGE IN   COLLAPSE FAULT: 175
-> T-00:00.00 |  SUBJECT TERMINATED
+T-23:10.04 >  SUBJECT INSTANTIATED
+T-04:52.37 >  SPEECH      "stay back"
+T-04:49.11 >  HEARD       URIST MCHANDS: "give me the rifle"
+T-01:15.80 >  DAMAGE OUT  WALKER (601): 30
+T-01:15.80 >  KILLED      WALKER (601)
+T-00:41.02 >  DAMAGE IN   STARVATION: 12
+T-00:03.55 >  DAMAGE IN   COLLAPSE FAULT: 175
+T-00:00.00 >  SUBJECT TERMINATED
 
 YOU FAILED TO ESCAPE THE MACHINATION OF RUIN. /RISE AND TRY AGAIN.
 ```
