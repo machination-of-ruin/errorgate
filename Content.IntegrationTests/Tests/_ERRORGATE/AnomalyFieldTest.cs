@@ -325,6 +325,50 @@ public sealed class AnomalyFieldTest
     }
 
     [Test]
+    public async Task NothingIsPlacedBehindAWallRing()
+    {
+        await using var pair = await PoolManager.GetServerClient(new PoolSettings { Dirty = true });
+        var server = pair.Server;
+        var entMan = server.EntMan;
+        var xformSys = entMan.System<SharedTransformSystem>();
+
+        var (grid, mapId) = await CreateFloor(pair, 100);
+
+        // A one tile wall ring around the playable area, like Kuznetsk's mountains, with floor and loot beyond it
+        await server.WaitPost(() =>
+        {
+            for (var i = -60; i <= 60; i++)
+            {
+                foreach (var tile in new[] { new Vector2(i, -60), new Vector2(i, 60), new Vector2(-60, i), new Vector2(60, i) })
+                {
+                    entMan.SpawnEntity("WallSolid", new MapCoordinates(tile + new Vector2(0.5f, 0.5f), mapId));
+                }
+            }
+        });
+        await pair.RunTicksSync(3);
+
+        await AddPois(pair, mapId, new[] { new Vector2(-30, -30), new Vector2(30, 30), new Vector2(-10, 30), new Vector2(0, 0), new Vector2(-85, 80), new Vector2(80, -85), new Vector2(85, 70), new Vector2(-80, -20) }, new Vector2(-50, -50));
+
+        await server.WaitPost(() => entMan.AddComponent(grid, new AnomalyFieldComponent { Count = 25, MinDistanceFromSpawns = 10, MinDistanceBetweenPacks = 15 }));
+        await pair.RunTicksSync(5);
+
+        await server.WaitAssertion(() =>
+        {
+            var anomalies = GetAnomalies(entMan);
+            Assert.That(anomalies, Is.Not.Empty);
+
+            foreach (var anomaly in anomalies)
+            {
+                var position = xformSys.GetWorldPosition(anomaly.Owner);
+                Assert.That(Math.Abs(position.X), Is.LessThan(60f), $"A fault stands beyond the wall ring at {position}.");
+                Assert.That(Math.Abs(position.Y), Is.LessThan(60f), $"A fault stands beyond the wall ring at {position}.");
+            }
+        });
+
+        await pair.CleanReturnAsync();
+    }
+
+    [Test]
     public async Task KuznetskGetsPacksOfOneKindAwayFromSpawns()
     {
         await using var pair = await PoolManager.GetServerClient(new PoolSettings { Dirty = true });
