@@ -73,7 +73,7 @@
     radius: 2
     dangerRadius: 4
     revealRadius: 4
-    warningRadius: 6.5
+    warningRadius: 5
     damageInterval: 1
     revealSound:
       path: /Audio/Effects/Lightning/lightningshock.ogg
