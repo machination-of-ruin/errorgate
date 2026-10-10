@@ -109,7 +109,7 @@ public sealed class CollapseFaultSystem : EntitySystem
 
             var displacement = center.Position - _transform.GetWorldPosition(targetXform);
             var distance = displacement.Length();
-            if (distance < 0.05f || distance > collapse.PullRange)
+            if (distance > collapse.PullRange)
                 continue;
 
             var isMob = _mobQuery.HasComp(target) || _moverQuery.HasComp(target);
@@ -118,7 +118,8 @@ public sealed class CollapseFaultSystem : EntitySystem
             if (isMob ? !_mobState.IsDead(target) : _thrownQuery.HasComp(target) || body.LinearVelocity.LengthSquared() > 0.09f)
                 triggered = true;
 
-            if (!engaged)
+            // Right at the center there is nowhere left to pull to (and whoever lies there still counts as in reach)
+            if (!engaged || distance < 0.05f)
                 continue;
 
             var closeness = 1f - distance / collapse.PullRange;
