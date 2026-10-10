@@ -217,10 +217,10 @@ Found while playing the `port/beyond` build. One line each, newest last.
 ## Multiplayer playtest, 2026-10-10 (hosted, ~3 h)
 
 Items and gear:
-- [ ] Make satchels smaller, like in the old build. Compare backpack and duffel sizes too.
+- [x] Make satchels smaller, like in the old build. Compare backpack and duffel sizes too. Satchel was 8x4 (32 cells, bigger than a backpack), the old one is 6x3 (18) and is back. Backpack (7x4) and duffel (8x5) already match the old build.
 - [x] Ammo boxes can be inserted into guns as a magazine. Cause: the random-magazine loot guns replaced the whole magazine slot of their parent and lost its whitelist, so they took anything. Slots are written out in full now (`RandomMagGunsTest`).
 - [x] Examining a gun: the chamber does not show the loaded ammo. Cause: the random-magazine loot guns had no chamber slot at all (a child prototype replaces all slots of its parent); they have it now, loaded like the parent (`RandomMagGunsTest`).
-- [ ] Bullet damage numbers: compare with the old build.
+- [x] Bullet damage numbers: compare with the old build. Restored the old values: .357 30 (AP 26), .45 ACP 22 (AP 26), 5.56 uranium 8, .60 Lapua 60 piercing / 30 structural. Left as they are (WWDP): energy and disabler damage types, the PKA kinetic bolt (25 old, 40 now). Old .45 and .60 bullets also dealt stamina damage (15 and 100; .60 is 60 now), not restored.
 - [x] Ammo box fullness is not random; ammo boxes need to be random. Loot tables spawn the `...Random` box variants now (`RandomAmmoBoxTest`); boxes from vendors, crafting and maps stay full.
 - [ ] Item spawn "shining" effect.
 
