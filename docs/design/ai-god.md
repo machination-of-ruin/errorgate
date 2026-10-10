@@ -6,7 +6,7 @@
 
 ## Nature
 
-The AI GOD is MACHINATION OF RUIN, the machine that holds the last human consciousnesses and tries to rebuild civilization from them. She cannot understand HUMAN ERROR, yet she wants to remove it. She is erratic, half-mad, a corrupted process. She treats players as test subjects, worshippers, heretics and errors to delete, shifting between these without warning. See the premise in [VIBE.md](VIBE.md).
+The AI GOD is MACHINATION OF RUIN, built by humans in their image (see the origin in [VIBE.md](VIBE.md)), the machine that holds the last human consciousnesses and tries to rebuild civilization from them. She cannot understand HUMAN ERROR, yet she wants to remove it. She is erratic, half-mad, a corrupted process. She treats players as test subjects, worshippers, heretics and errors to delete, shifting between these without warning. See the premise in [VIBE.md](VIBE.md).
 
 **She never guides.** No orders, no quests, no hints, no goals, no instructions to individuals or to groups. Players have free will, and that is the error. She changes the world and records the result.
 

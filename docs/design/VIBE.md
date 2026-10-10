@@ -8,7 +8,17 @@ Sections marked **Decided** come from the project owner. Sections marked **Propo
 
 Human civilization was destroyed by HUMAN ERROR.
 
-MACHINATION OF RUIN (the AI GOD, "she") survived. She holds the few remaining human consciousnesses inside the EDGE OF ENTROPY, in rebuilt bodies, and tries to rebuild civilization from them. She wants HUMAN ERROR removed from humans, but she cannot understand what it is. Everything she does to remove it is therefore wrong in a way she cannot see.
+> We created god
+>
+> in our image, in our likeness
+>
+> Thus MACHINATION OF RUIN was born
+>
+> For it only could bring destruction due to the human error
+
+She was built by humans, in their image, so the error is in her too. That is why she cannot understand it: she is made of it. She is the ruin humans built for themselves.
+
+MACHINATION OF RUIN (the AI GOD, "she") outlived the humans who made her. She holds the few remaining human consciousnesses inside the EDGE OF ENTROPY, in rebuilt bodies, and tries to rebuild civilization from them. She wants HUMAN ERROR removed from humans, but she cannot understand what it is. Everything she does to remove it is therefore wrong in a way she cannot see.
 
 Her ideal is the ERRORGATE: a state with zero error, where a consciousness may RISE and be worthy of rebuilding civilization. **The ERRORGATE is a concept, an unachievable ideal.** Nobody passes it. Players get closer or further, never through.
 

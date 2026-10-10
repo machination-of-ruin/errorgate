@@ -26,6 +26,7 @@ Inspirations: DayZ, Rust, Project Zomboid, Cataclysm: DDA.
 | Core loop | Needs, crafting, looting/scavenging, and cooperation forced by shared objectives and scarcity. | [survival-loop.md](survival-loop.md) |
 | Building | Full creative freedom, limited resources. Bases are existing ruins, held physically, raidable anytime. | [survival-loop.md](survival-loop.md) |
 | Loot | Finite per wipe, via the DayZ-style loot manager (ported). | [survival-loop.md](survival-loop.md) |
+| Progression | Only knowledge survives death. Player-made stashes and bases. One round only. Internal implants first, psionics and spells later and carefully. | [progression.md](progression.md) |
 | Pressure | She builds situations that need several people and logs the result. Never instructions. | [pressure.md](pressure.md) |
 | World hazards | STALKER-style faults (heat, arc, collapse) in packs near points of interest, nearly invisible, warned by screen effects and sound. | [anomalies.md](anomalies.md) |
 | Combat | Lethality, firearms depth, melee depth, dangerous PvE enemies. | [combat.md](combat.md) |
