@@ -19,10 +19,10 @@ public sealed class AnomalyVisualSystem : EntitySystem
     private const float FadeIn = 0.5f;
     private const float FadeOut = 2f;
 
-    // Lens of a collapse fault: the quiet look, and the look while it pulls (the lens then covers the pull area)
-    private const float IdleIntensity = 3000f;
+    // Lens of a collapse fault: none while it is off, and the look while it pulls (the lens then covers the pull area)
+    private const float IdleIntensity = 0f;
     private const float IdleFalloff = 2.7f;
-    private const float ActiveIntensity = 12000f;
+    private const float ActiveIntensity = 8000f;
     private const float ActiveFalloff = 2.2f;
     private const float SwitchSpeed = 2.5f;
 

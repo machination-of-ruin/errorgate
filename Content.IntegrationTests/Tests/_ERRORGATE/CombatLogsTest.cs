@@ -99,9 +99,9 @@ public sealed class CombatLogsTest
         await pair.CleanReturnAsync();
     }
 
-    [TestCase("ErrorgateAnomalyHeat", "THE HEAT ERROR BURNS YOU!")]
-    [TestCase("ErrorgateAnomalyArc", "AN ARC TEARS THROUGH YOU!")]
-    [TestCase("ErrorgateAnomalyCollapse", "THE COLLAPSE CRUSHES YOU!")]
+    [TestCase("ErrorgateAnomalyHeat", "THE HEAT FAULT BURNS YOU!")]
+    [TestCase("ErrorgateAnomalyArc", "AN ARC FAULT TEARS THROUGH YOU!")]
+    [TestCase("ErrorgateAnomalyCollapse", "THE COLLAPSE FAULT CRUSHES YOU!")]
     public async Task WorldFaultsHaveTheirOwnLine(string proto, string expected)
     {
         var (pair, victim, bystander, log) = await Setup();

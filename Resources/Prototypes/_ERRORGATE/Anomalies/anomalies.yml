@@ -37,8 +37,8 @@
       path: /Audio/Effects/burning.ogg
       params:
         volume: -10
-    restAlpha: 0.16
-    restLightEnergy: 0.5
+    restAlpha: 0
+    restLightEnergy: 0
     restLightRadius: 2.5
     revealedLightEnergy: 1.6
     revealedLightRadius: 5
@@ -116,7 +116,7 @@
       path: /Audio/Ambience/Objects/emf_buzz.ogg
 
 # COLLAPSE FAULT: a gravity error. For a few seconds at a time everything loose falls toward it and the center crushes,
-# then it goes quiet for a while (loot lying next to it can be taken then, at a risk). The world loses its colour near it.
+# then it goes dark and invisible for a while (loot lying next to it can be taken then, at a risk). The world loses its colour near it.
 - type: entity
   id: ErrorgateAnomalyCollapse
   parent: ErrorgateAnomalyBase
@@ -128,10 +128,10 @@
     revealRadius: 4
     warningRadius: 7
     damageInterval: 0.5
-    activeSeconds: 5
+    activeSeconds: 10
     idleSeconds: 7
-    activeVolume: -9
-    idleVolume: -18
+    activeVolume: -3
+    idleVolume: -12
     damage:
       types:
         Blunt: 35
@@ -143,8 +143,8 @@
       path: /Audio/Ambience/Objects/crushing.ogg
       params:
         volume: -12
-    restAlpha: 0.05
-    restLightEnergy: -0.4
+    restAlpha: 0
+    restLightEnergy: 0
     restLightRadius: 2
     revealedLightEnergy: -2.5
     revealedLightRadius: 5
@@ -169,7 +169,7 @@
   - type: AmbientSound
     enabled: true
     range: 8
-    volume: -9
+    volume: -3
     sound:
       path: /Audio/Effects/singularity.ogg
 

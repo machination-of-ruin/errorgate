@@ -33,6 +33,6 @@ errorgate-combat-log-hurt = You are hurt{ $where }!
 errorgate-combat-log-bleeding-start = You are bleeding!
 errorgate-combat-log-bleeding-stop = The bleeding stops.
 
-errorgate-combat-log-fault-heat = THE HEAT ERROR BURNS YOU!
-errorgate-combat-log-fault-arc = AN ARC TEARS THROUGH YOU!
-errorgate-combat-log-fault-collapse = THE COLLAPSE CRUSHES YOU!
+errorgate-combat-log-fault-heat = THE HEAT FAULT BURNS YOU!
+errorgate-combat-log-fault-arc = AN ARC FAULT TEARS THROUGH YOU!
+errorgate-combat-log-fault-collapse = THE COLLAPSE FAULT CRUSHES YOU!
