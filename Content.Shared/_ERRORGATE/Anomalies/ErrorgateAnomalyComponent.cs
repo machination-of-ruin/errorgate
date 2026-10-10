@@ -89,6 +89,34 @@ public sealed partial class ErrorgateAnomalyComponent : Component
     public TimeSpan NextTick;
 
     /// <summary>
+    ///     Seconds the fault stays switched on, then <see cref="IdleSeconds"/> off, and so on. Zero means always on.
+    ///     While it is off it does no damage and (for a collapse) does not pull.
+    /// </summary>
+    [DataField]
+    public float ActiveSeconds;
+
+    [DataField]
+    public float IdleSeconds;
+
+    /// <summary>
+    ///     Whether the fault is switched on right now. Always true for faults without a cycle.
+    /// </summary>
+    [DataField, AutoNetworkedField]
+    public bool Active = true;
+
+    [ViewVariables]
+    public TimeSpan NextSwitch;
+
+    /// <summary>
+    ///     Ambient sound volume (dB) while on / off, only used by faults with a cycle.
+    /// </summary>
+    [DataField]
+    public float ActiveVolume = -8f;
+
+    [DataField]
+    public float IdleVolume = -16f;
+
+    /// <summary>
     ///     While the game time is before this, the fault is revealed: its sprite and light show clearly.
     ///     Set when something is thrown into it or when it hurts a creature.
     /// </summary>

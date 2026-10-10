@@ -1,4 +1,5 @@
 using Content.Server.Beam.Components;
+using Content.Shared.Audio;
 using Content.Shared._ERRORGATE.Anomalies;
 using Content.Shared.Damage;
 using Content.Shared.Mobs.Components;
@@ -8,6 +9,7 @@ using Robust.Shared.Map;
 using Robust.Shared.Audio.Systems;
 using Robust.Shared.Physics;
 using Robust.Shared.Physics.Components;
+using Robust.Shared.Random;
 using Robust.Shared.Timing;
 
 namespace Content.Server._ERRORGATE.Anomalies;
@@ -20,6 +22,8 @@ namespace Content.Server._ERRORGATE.Anomalies;
 public sealed class ErrorgateAnomalySystem : EntitySystem
 {
     [Dependency] private readonly IGameTiming _timing = default!;
+    [Dependency] private readonly IRobustRandom _random = default!;
+    [Dependency] private readonly SharedAmbientSoundSystem _ambient = default!;
     [Dependency] private readonly SharedAudioSystem _audio = default!;
     [Dependency] private readonly DamageableSystem _damageable = default!;
     [Dependency] private readonly EntityLookupSystem _lookup = default!;
@@ -90,6 +94,8 @@ public sealed class ErrorgateAnomalySystem : EntitySystem
         {
             var center = _transform.GetMapCoordinates(uid, xform);
 
+            UpdateCycle(uid, anomaly, curTime);
+
             // Thrown things are fast, so this is looked at every update and not only on a damage tick
             CheckLooseThings(uid, anomaly, center, curTime);
 
@@ -97,6 +103,10 @@ public sealed class ErrorgateAnomalySystem : EntitySystem
                 continue;
 
             anomaly.NextTick = curTime + TimeSpan.FromSeconds(anomaly.DamageInterval);
+
+            // Switched off: harmless
+            if (!anomaly.Active)
+                continue;
 
             _targets.Clear();
             _hit.Clear();
@@ -133,6 +143,38 @@ public sealed class ErrorgateAnomalySystem : EntitySystem
             // It hurt something, so it shows
             Reveal(uid, anomaly);
         }
+    }
+
+    /// <summary>
+    ///     Switches faults with a cycle on and off. The first stretch is of random length, so faults placed together
+    ///     do not move in step.
+    /// </summary>
+    private void UpdateCycle(EntityUid uid, ErrorgateAnomalyComponent anomaly, TimeSpan curTime)
+    {
+        if (anomaly.ActiveSeconds <= 0f || anomaly.IdleSeconds <= 0f)
+            return;
+
+        if (anomaly.NextSwitch == TimeSpan.Zero)
+        {
+            // Starts on, so a freshly spawned fault always bites at first
+            anomaly.NextSwitch = curTime + TimeSpan.FromSeconds(_random.NextFloat(1f, anomaly.ActiveSeconds));
+            SetVolume(uid, anomaly);
+            return;
+        }
+
+        if (anomaly.NextSwitch > curTime)
+            return;
+
+        anomaly.Active = !anomaly.Active;
+        var length = anomaly.Active ? anomaly.ActiveSeconds : anomaly.IdleSeconds;
+        anomaly.NextSwitch = curTime + TimeSpan.FromSeconds(length * _random.NextFloat(0.75f, 1.25f));
+        Dirty(uid, anomaly);
+        SetVolume(uid, anomaly);
+    }
+
+    private void SetVolume(EntityUid uid, ErrorgateAnomalyComponent anomaly)
+    {
+        _ambient.SetVolume(uid, anomaly.Active ? anomaly.ActiveVolume : anomaly.IdleVolume);
     }
 
     /// <summary>

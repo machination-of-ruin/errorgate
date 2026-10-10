@@ -3,6 +3,7 @@ using Content.Server.Electrocution;
 using Content.Server.Lightning;
 using Content.Shared._ERRORGATE.Anomalies;
 using Content.Shared.Mobs.Components;
+using Content.Shared.Throwing;
 using Robust.Shared.Physics.Components;
 using Robust.Shared.Random;
 using Robust.Shared.Timing;
@@ -15,6 +16,7 @@ namespace Content.Server._ERRORGATE.Anomalies;
 public sealed class ArcFaultSystem : EntitySystem
 {
     [Dependency] private readonly IGameTiming _timing = default!;
+    [Dependency] private readonly ErrorgateAnomalySystem _anomaly = default!;
     [Dependency] private readonly IRobustRandom _random = default!;
     [Dependency] private readonly ElectrocutionSystem _electrocution = default!;
     [Dependency] private readonly EntityLookupSystem _lookup = default!;
@@ -28,27 +30,17 @@ public sealed class ArcFaultSystem : EntitySystem
     {
         base.Initialize();
 
-        SubscribeLocalEvent<ArcFaultComponent, MapInitEvent>(OnMapInit);
         SubscribeLocalEvent<ArcFaultComponent, ErrorgateAnomalyTickEvent>(OnTick);
-    }
-
-    private void OnMapInit(Entity<ArcFaultComponent> ent, ref MapInitEvent args)
-    {
-        ScheduleArc(ent.Comp);
-    }
-
-    private void ScheduleArc(ArcFaultComponent arc)
-    {
-        var seconds = _random.NextFloat(arc.MinArcInterval, arc.MaxArcInterval);
-        arc.NextArc = _timing.CurTime + TimeSpan.FromSeconds(seconds);
     }
 
     private void OnTick(Entity<ArcFaultComponent> ent, ref ErrorgateAnomalyTickEvent args)
     {
-        if (!_random.Prob(ent.Comp.InnerShockChance))
+        // Charged only
+        if (ent.Comp.NextArc > _timing.CurTime || !_random.Prob(ent.Comp.InnerShockChance))
             return;
 
-        Shock(ent.Owner, ent.Comp, args.Target, ent.Comp.InnerShockDamage);
+        if (Shock(ent.Owner, ent.Comp, args.Target, ent.Comp.InnerShockDamage))
+            Discharged(ent.Owner, ent.Comp);
     }
 
     public override void Update(float frameTime)
@@ -59,23 +51,26 @@ public sealed class ArcFaultSystem : EntitySystem
         var query = EntityQueryEnumerator<ArcFaultComponent>();
         while (query.MoveNext(out var uid, out var arc))
         {
-            if (arc.NextArc == TimeSpan.Zero)
-                ScheduleArc(arc);
-
-            if (arc.NextArc > curTime)
+            if (arc.NextArc > curTime || arc.NextScan > curTime)
                 continue;
 
-            ScheduleArc(arc);
+            arc.NextScan = curTime + TimeSpan.FromSeconds(arc.ScanInterval);
             FireArc(uid, arc);
         }
     }
 
-    private void Shock(EntityUid uid, ArcFaultComponent arc, EntityUid target, int damage)
+    private void Discharged(EntityUid uid, ArcFaultComponent arc)
+    {
+        arc.NextArc = _timing.CurTime + TimeSpan.FromSeconds(arc.CooldownSeconds);
+        _anomaly.Reveal(uid);
+    }
+
+    private bool Shock(EntityUid uid, ArcFaultComponent arc, EntityUid target, int damage)
     {
         // Whoever was just shocked is left alone for a moment, so shocks cannot be chained
         var now = _timing.CurTime;
         if (TryComp<ArcShockImmunityComponent>(target, out var immunity) && immunity.Until > now)
-            return;
+            return false;
 
         _lightning.ShootLightning(uid, target, arc.ArcPrototype, false);
         if (!_electrocution.TryDoElectrocution(
@@ -86,19 +81,22 @@ public sealed class ArcFaultSystem : EntitySystem
                 true,
                 ignoreInsulation: true))
         {
-            return;
+            return false;
         }
 
         EnsureComp<ArcShockImmunityComponent>(target).Until = now + TimeSpan.FromSeconds(arc.ImmunitySeconds);
+        return true;
     }
 
     /// <summary>
-    ///     Throws one arc at a random living thing in reach. With nobody in reach nothing happens at all, the fault
-    ///     stays silent and dark.
+    ///     Throws one arc at a random living thing in reach, or at a thrown object when there is no one: that is how a
+    ///     careful player sets it off and gets across while it recharges. With nothing in reach nothing happens at all,
+    ///     the fault stays silent and dark.
     /// </summary>
     private void FireArc(EntityUid uid, ArcFaultComponent arc)
     {
         var origin = _transform.GetMapCoordinates(uid);
+        var now = _timing.CurTime;
 
         _nearby.Clear();
         _living.Clear();
@@ -107,7 +105,8 @@ public sealed class ArcFaultSystem : EntitySystem
         foreach (var (target, _) in _nearby)
         {
             if (!HasComp<MobStateComponent>(target)
-                || (_transform.GetWorldPosition(target) - origin.Position).Length() > arc.ArcRange)
+                || (_transform.GetWorldPosition(target) - origin.Position).Length() > arc.ArcRange
+                || TryComp<ArcShockImmunityComponent>(target, out var immunity) && immunity.Until > now)
             {
                 continue;
             }
@@ -115,9 +114,27 @@ public sealed class ArcFaultSystem : EntitySystem
             _living.Add(target);
         }
 
-        if (_living.Count == 0)
-            return;
+        if (_living.Count > 0)
+        {
+            if (Shock(uid, arc, _random.Pick(_living), arc.ArcDamage))
+                Discharged(uid, arc);
 
-        Shock(uid, arc, _random.Pick(_living), arc.ArcDamage);
+            return;
+        }
+
+        var thrown = EntityQueryEnumerator<ThrownItemComponent, TransformComponent>();
+        while (thrown.MoveNext(out var item, out _, out var itemXform))
+        {
+            if (itemXform.MapID != origin.MapId
+                || (_transform.GetWorldPosition(itemXform) - origin.Position).Length() > arc.ArcRange)
+            {
+                continue;
+            }
+
+            // Only a bolt, nothing is hurt. The fault is spent.
+            _lightning.ShootLightning(uid, item, arc.ArcPrototype, false);
+            Discharged(uid, arc);
+            return;
+        }
     }
 }

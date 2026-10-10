@@ -60,9 +60,13 @@ public sealed class CollapseFaultSystem : EntitySystem
     {
         base.Update(frameTime);
 
-        var query = EntityQueryEnumerator<CollapseFaultComponent, TransformComponent>();
-        while (query.MoveNext(out var uid, out var collapse, out var xform))
+        var query = EntityQueryEnumerator<CollapseFaultComponent, ErrorgateAnomalyComponent, TransformComponent>();
+        while (query.MoveNext(out var uid, out var collapse, out var anomaly, out var xform))
         {
+            // Switched off: nothing is pulled
+            if (!anomaly.Active)
+                continue;
+
             Pull(uid, collapse, xform, frameTime);
         }
     }

@@ -37,11 +37,11 @@
       path: /Audio/Effects/burning.ogg
       params:
         volume: -10
-    restAlpha: 0.28
-    restLightEnergy: 0.8
-    restLightRadius: 3
-    revealedLightEnergy: 2
-    revealedLightRadius: 6
+    restAlpha: 0.16
+    restLightEnergy: 0.5
+    restLightRadius: 2.5
+    revealedLightEnergy: 1.6
+    revealedLightRadius: 5
   - type: HeatFault
   - type: Sprite
     color: "#ffffff48"
@@ -49,12 +49,12 @@
     - sprite: Structures/Specific/Anomalies/pyro_anom.rsi
       state: anom
       shader: unshaded
-      color: "#ff5a2ab0"
-      scale: 10, 10
+      color: "#ff5a2a70"
+      scale: 3, 3
   - type: PointLight
     enabled: true
-    radius: 3
-    energy: 0.8
+    radius: 2.5
+    energy: 0.5
     softness: 1
     color: "#e0561f"
     castShadows: false
@@ -76,7 +76,7 @@
     radius: 2
     dangerRadius: 4
     revealRadius: 4
-    warningRadius: 8
+    warningRadius: 6.5
     damageInterval: 1
     revealSound:
       path: /Audio/Effects/Lightning/lightningshock.ogg
@@ -111,11 +111,12 @@
   - type: AmbientSound
     enabled: true
     range: 8
-    volume: -6
+    volume: -2
     sound:
-      path: /Audio/Effects/tesla.ogg
+      path: /Audio/Ambience/Objects/emf_buzz.ogg
 
-# COLLAPSE FAULT: a gravity error. Everything loose falls toward it, the center crushes, the world loses its colour.
+# COLLAPSE FAULT: a gravity error. For a few seconds at a time everything loose falls toward it and the center crushes,
+# then it goes quiet for a while (loot lying next to it can be taken then, at a risk). The world loses its colour near it.
 - type: entity
   id: ErrorgateAnomalyCollapse
   parent: ErrorgateAnomalyBase
@@ -123,10 +124,14 @@
   - type: ErrorgateAnomaly
     kind: Collapse
     radius: 2
-    dangerRadius: 2.5
+    dangerRadius: 3.5
     revealRadius: 4
-    warningRadius: 8
+    warningRadius: 7
     damageInterval: 0.5
+    activeSeconds: 5
+    idleSeconds: 7
+    activeVolume: -9
+    idleVolume: -18
     damage:
       types:
         Blunt: 35
@@ -164,7 +169,7 @@
   - type: AmbientSound
     enabled: true
     range: 8
-    volume: -4
+    volume: -9
     sound:
       path: /Audio/Effects/singularity.ogg
 

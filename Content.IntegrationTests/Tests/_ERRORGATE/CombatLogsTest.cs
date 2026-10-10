@@ -114,7 +114,12 @@ public sealed class CombatLogsTest
 
             // Make the shock certain, the real chance is below one
             if (entMan.TryGetComponent(fault, out ArcFaultComponent? arc))
+            {
                 arc.InnerShockChance = 1f;
+
+                // The arc picks one target, make it the one with the log
+                entMan.DeleteEntity(bystander);
+            }
         });
         await pair.RunSeconds(1.5f);
 
