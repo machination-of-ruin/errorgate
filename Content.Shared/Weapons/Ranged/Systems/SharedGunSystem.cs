@@ -123,6 +123,13 @@ public abstract partial class SharedGunSystem : EntitySystem
 
         var rotDiff = Math.Abs(Angle.ShortestDistance(moveEvent.NewRotation, moveEvent.OldRotation).Degrees);
 
+        if (!double.IsFinite(posDiff) || !double.IsFinite(rotDiff))
+        {
+            Log.Warning($"Non-finite move of a gun holder: {ToPrettyString(uid)} held by {ToPrettyString(Transform(uid).ParentUid)}, " +
+                        $"position {moveEvent.OldPosition} -> {moveEvent.NewPosition}, rotation {moveEvent.OldRotation} -> {moveEvent.NewRotation}");
+            return;
+        }
+
         UpdateBonusAngles(Timing.CurTime, comp, posDiff * comp.BonusAngleIncreaseMove + rotDiff * comp.BonusAngleIncreaseTurn);
         Dirty(uid, comp);
     }
@@ -137,7 +144,8 @@ public abstract partial class SharedGunSystem : EntitySystem
         // If we ignore the first clamp, CurrentAngle may "go" into negatives, making the first shot after a while have less or even no inaccuracy
         var oldTheta = MathHelper.Clamp(component.CurrentAngle - component.AngleDecayModified * timeSinceLastFire, component.MinAngleModified, component.MaxAngleModified);
         var newTheta = MathHelper.Clamp(oldTheta + angleIncrease, component.MinAngleModified, component.MaxAngleModified.Theta);
-        component.CurrentAngle = new Angle(newTheta);
+        // ERRORGATE: one bad move event must not leave the gun with a NaN spread forever
+        component.CurrentAngle = double.IsFinite(newTheta) ? new Angle(newTheta) : component.MinAngleModified;
         component.CurrentAngleLastUpdate = curTime;
 
     }
@@ -150,7 +158,8 @@ public abstract partial class SharedGunSystem : EntitySystem
     protected void UpdateBonusAngles(TimeSpan curTime, GunComponent component, double angleIncrease = 0)
     {
         var timeSinceBonusUpdate = (curTime - component.BonusAngleLastUpdate).TotalSeconds;
-        component.BonusAngle = MathHelper.Clamp(component.BonusAngle + angleIncrease - component.BonusAngleDecayModified * timeSinceBonusUpdate, 0, component.MaxBonusAngleModified);
+        var bonus = MathHelper.Clamp(component.BonusAngle + angleIncrease - component.BonusAngleDecayModified * timeSinceBonusUpdate, 0, component.MaxBonusAngleModified);
+        component.BonusAngle = double.IsFinite(bonus) ? bonus : Angle.Zero; // ERRORGATE: see UpdateAngles
         component.BonusAngleLastUpdate = curTime;
     }
 	// WWDP EDIT END

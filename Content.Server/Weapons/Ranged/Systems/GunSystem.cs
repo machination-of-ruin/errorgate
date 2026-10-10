@@ -93,6 +93,16 @@ public sealed partial class GunSystem : SharedGunSystem
         var fromMap = fromCoordinates.ToMap(EntityManager, TransformSystem);
         var toMap = toCoordinates.ToMapPos(EntityManager, TransformSystem);
         var mapDirection = toMap - fromMap.Position;
+
+        // ERRORGATE: a NaN aim point (or a NaN shooter position) used to throw halfway through the shot
+        if (!float.IsFinite(mapDirection.X) || !float.IsFinite(mapDirection.Y))
+        {
+            Log.Warning($"Shot cancelled, non-finite aim: gun {ToPrettyString(gunUid)} user {(user == null ? "nobody" : ToPrettyString(user.Value))} " +
+                        $"from {fromCoordinates} (map {fromMap.Position}) to {toCoordinates} (map {toMap})");
+            userImpulse = false;
+            return;
+        }
+
         var mapAngle = mapDirection.ToAngle();
         var angle = GetRecoilAngle(Timing.CurTime, gun, mapDirection.ToAngle(), user);
 

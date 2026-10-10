@@ -143,7 +143,11 @@ public sealed class ThrowingSystem : EntitySystem
         bool unanchor = false,
         bool throwInAir = true) // WWDP
     {
-        if (baseThrowSpeed <= 0 || direction == Vector2Helpers.Infinity || direction == Vector2Helpers.NaN || direction == Vector2.Zero || friction < 0)
+        // ERRORGATE: comparing a vector with NaN is always false, so non-finite throws must be rejected by component
+        if (!float.IsFinite(direction.X) || !float.IsFinite(direction.Y) || !float.IsFinite(baseThrowSpeed))
+            Log.Warning($"Refused a throw with a non-finite value: {ToPrettyString(uid)} direction {direction} speed {baseThrowSpeed} by {(user == null ? "nobody" : ToPrettyString(user.Value))} at {Transform(uid).Coordinates}");
+
+        if (baseThrowSpeed <= 0 || !float.IsFinite(direction.X) || !float.IsFinite(direction.Y) || !float.IsFinite(baseThrowSpeed) || direction == Vector2.Zero || friction < 0)
             return;
 
         if (unanchor && HasComp<AnchorableComponent>(uid))
