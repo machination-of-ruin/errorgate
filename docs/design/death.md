@@ -13,6 +13,8 @@ Respawn, lose gear. A dead player stays in the death void until they decide to r
 - The death message is a server chat message split into short lines (a wrapped large font overlaps later messages in a narrow chat).
 - Code: `Content.Server/_ERRORGATE/DeathVoid/` (`DeathVoidSystem`, `SelfRespawnCommand`, `DeathVoidComponent`), client overlay in `Content.Client/_ERRORGATE/DeathVoid/`, prototype `Resources/Prototypes/_ERRORGATE/Mobs/death_void.yml`, strings `Resources/Locale/en-US/_ERRORGATE/death-void.ftl`, test `Content.IntegrationTests/Tests/_ERRORGATE/DeathVoidTest.cs`.
 
+Bodies follow the 10-minute despawn timer in [survival-loop.md](survival-loop.md), so a body is not lootable forever.
+
 ## Respawn cooldown
 
 CVar `errorgate.respawn_cooldown` (`ErrorgateCVars.RespawnCooldown`, seconds, server, default `0` = immediately). A player in the void sees the remaining time on the death overlay; the respawn action and the `/respawn` and `/rise` commands refuse until it has passed. `forcerespawn` (admin) ignores it. Covered by `DeathVoidTest.RespawnWaitsForTheCooldown`.
