@@ -110,11 +110,6 @@ public sealed class CombatLogsTest
         {
             var entMan = pair.Server.EntMan;
 
-            // A client that first sees a mob burning trips a debug assert in the upstream fire visualizer (it spawns the
-            // fire light while the state is being applied). Unrelated to the log line, so the victim cannot ignite here.
-            entMan.RemoveComponent<Content.Server.Atmos.Components.FlammableComponent>(victim);
-            entMan.RemoveComponent<Content.Server.Atmos.Components.FlammableComponent>(bystander);
-
             var fault = entMan.SpawnEntity(proto, entMan.GetComponent<TransformComponent>(victim).Coordinates);
 
             // Make the shock certain, the real chance is below one

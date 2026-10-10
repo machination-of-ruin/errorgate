@@ -48,7 +48,9 @@ public sealed class FireVisualizerSystem : VisualizerSystem<FireVisualsComponent
         if (component.Sprite != null)
             sprite.LayerSetRSI(FireVisualLayers.Fire, component.Sprite);
 
-        UpdateAppearance(uid, component, sprite, appearance);
+        // ERRORGATE: no UpdateAppearance here. It spawns the light entity, and spawning during ComponentInit while a game
+        // state is applied (a burning mob entering PVS) trips the "child added before initialized" debug assert and
+        // crashes debug clients. AppearanceSystem queues an update on startup, which does the same one tick later.
     }
 
     protected override void OnAppearanceChange(EntityUid uid, FireVisualsComponent component, ref AppearanceChangeEvent args)
