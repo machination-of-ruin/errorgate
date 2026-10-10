@@ -119,5 +119,23 @@ public sealed class ErrorgateCVars
     public static readonly CVarDef<int> GodMaxConversationMessages =
         CVarDef.Create("errorgate.god.max_conversation_messages", 12, CVar.SERVERONLY);
 
+    /// <summary>
+    ///     Side of a sector in tiles (a sector is a named square of the map, like C4). A SectorGrid component on a grid overrides it.
+    /// </summary>
+    public static readonly CVarDef<int> GodSectorSize =
+        CVarDef.Create("errorgate.god.sector_size", 64, CVar.SERVERONLY);
+
+    /// <summary>
+    ///     Ordinary speech lines kept as context for the model (besides the lines that mention her), newest ones.
+    /// </summary>
+    public static readonly CVarDef<int> GodContextLines =
+        CVarDef.Create("errorgate.god.context_lines", 12, CVar.SERVERONLY);
+
+    /// <summary>
+    ///     Most prayers and mention lines held between two calls.
+    /// </summary>
+    public static readonly CVarDef<int> GodMaxQuotes =
+        CVarDef.Create("errorgate.god.max_quotes", 40, CVar.SERVERONLY);
+
     #endregion
 }

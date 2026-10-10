@@ -1,0 +1,50 @@
+# ERRORGATE: what counts as a reference to MACHINATION OF RUIN or to a higher power in ordinary speech.
+# The speech filter of the AI GOD reads this. Words match whole words, case insensitive, and may end in more letters
+# (god also catches gods and godly). Pronouns only count next to a watch word.
+- type: godMentions
+  id: Default
+  words:
+  - god
+  - goddess
+  - lord
+  - divine
+  - savior
+  - creator
+  - machine
+  - machination
+  - ruin
+  - errorgate
+  - heaven
+  - hell
+  - pray
+  - prayer
+  - amen
+  - blessed
+  - cursed
+  - punish
+  - judgement
+  - judgment
+  - who is watching
+  - someone is watching
+  - is someone watching
+  - is something watching
+  - something is watching
+  - we are being watched
+  - being watched
+  pronouns:
+  - she
+  - her
+  - it
+  watchWords:
+  - watching
+  - watches
+  - listening
+  - listens
+  - hears
+  - sees
+  - knows
+  - judges
+  - punishes
+  - angry
+  - hates
+  - wants

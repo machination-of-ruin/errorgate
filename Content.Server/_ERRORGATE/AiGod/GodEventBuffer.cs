@@ -4,6 +4,8 @@ namespace Content.Server._ERRORGATE.AiGod;
 
 public enum GodEventKind : byte
 {
+    Prayer,
+
     Death,
     Combat,
     Arrival,
@@ -31,6 +33,22 @@ public readonly record struct GodEvent(
     IReadOnlyList<string> Subjects);
 
 /// <summary>
+///     A line somebody said or prayed, raw. The subject number is the ledger's, the name the character's.
+/// </summary>
+public readonly record struct GodQuote(TimeSpan Time, int Subject, string Name, string? Sector, string Text, bool Whisper);
+
+/// <summary>
+///     Everything taken out of the buffer for one call to the model.
+/// </summary>
+public sealed class GodDrain
+{
+    public List<GodEvent> Events = new();
+    public List<GodQuote> Prayers = new();
+    public List<GodQuote> Mentions = new();
+    public List<GodQuote> Speech = new();
+}
+
+/// <summary>
 ///     What has been observed since the model was last asked. A bounded list of events, plus a separate chat buffer
 ///     that is summarised into a single event when it is flushed, so a busy channel cannot flood a request.
 /// </summary>
@@ -43,6 +61,62 @@ public sealed class GodEventBuffer
 
     public int EventCapacity = 60;
     public int ChatCapacity = 80;
+
+    // Raw lines: prayers and mentions are kept in full, plus the last few ordinary lines as context
+    private readonly List<GodQuote> _prayers = new();
+    private readonly List<GodQuote> _mentions = new();
+    private readonly List<GodQuote> _speech = new();
+
+    public int QuoteCapacity = 40;
+    public int ContextCapacity = 12;
+
+    public IReadOnlyList<GodQuote> Prayers => _prayers;
+    public IReadOnlyList<GodQuote> Mentions => _mentions;
+    public IReadOnlyList<GodQuote> Speech => _speech;
+
+    public void AddPrayer(GodQuote quote)
+    {
+        _prayers.Add(quote);
+        if (QuoteCapacity > 0 && _prayers.Count > QuoteCapacity)
+            _prayers.RemoveRange(0, _prayers.Count - QuoteCapacity);
+    }
+
+    public void AddMention(GodQuote quote)
+    {
+        _mentions.Add(quote);
+        if (QuoteCapacity > 0 && _mentions.Count > QuoteCapacity)
+            _mentions.RemoveRange(0, _mentions.Count - QuoteCapacity);
+    }
+
+    /// <summary>
+    ///     An ordinary line of speech, kept only as context: the newest <see cref="ContextCapacity"/> stay.
+    /// </summary>
+    public void AddSpeech(GodQuote quote)
+    {
+        _speech.Add(quote);
+        if (ContextCapacity >= 0 && _speech.Count > ContextCapacity)
+            _speech.RemoveRange(0, _speech.Count - ContextCapacity);
+    }
+
+    /// <summary>
+    ///     Everything for one call: events (with the chat summary), prayers, mentions and the context speech.
+    ///     The buffer is emptied.
+    /// </summary>
+    public GodDrain DrainAll(TimeSpan now)
+    {
+        var drain = new GodDrain
+        {
+            Events = Drain(now),
+            Prayers = new List<GodQuote>(_prayers),
+            Mentions = new List<GodQuote>(_mentions),
+            Speech = new List<GodQuote>(_speech),
+        };
+
+        _prayers.Clear();
+        _mentions.Clear();
+        _speech.Clear();
+        return drain;
+    }
 
     public IReadOnlyList<GodEvent> Events => _events;
     public int ChatCount => _chat.Count;
@@ -108,5 +182,8 @@ public sealed class GodEventBuffer
     {
         _events.Clear();
         _chat.Clear();
+        _prayers.Clear();
+        _mentions.Clear();
+        _speech.Clear();
     }
 }

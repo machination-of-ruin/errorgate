@@ -6,6 +6,7 @@ using Content.Server.Popups;
 using Content.Shared.Database;
 using Content.Shared.Popups;
 using Content.Shared.Chat;
+using Content.Server._ERRORGATE.AiGod;
 using Content.Shared.Prayer;
 using Content.Shared.Verbs;
 using Robust.Server.GameObjects;
@@ -56,7 +57,12 @@ public sealed class PrayerSystem : EntitySystem
 
                 _quickDialog.OpenDialog(actor.PlayerSession, Loc.GetString(comp.Verb), Loc.GetString("prayer-popup-notify-pray-ui-message"), (string message) =>
                 {
+                    // ERRORGATE: a prayer is at most 600 characters, and the AI GOD hears the ones made at altars
+                    if (message.Length > 600)
+                        message = message[..600];
+
                     Pray(actor.PlayerSession, comp, message);
+                    RaiseLocalEvent(new PrayedEvent(actor.PlayerSession, uid, message));
                 });
             },
             Impact = LogImpact.Low,

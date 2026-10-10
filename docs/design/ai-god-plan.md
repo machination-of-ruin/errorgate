@@ -23,6 +23,10 @@ How MACHINATION OF RUIN is built. Read [VIBE.md](VIBE.md) and [ai-god.md](ai-god
 - Life log (`LifeLogSystem`): per-mind event list used for the death message. Its per-subject records are the base of the ledger below.
 - Existing systems to reuse: `PrayerSystem.SendSubtleMessage(...)` (local chat message plus popup, used by admins today), `ChatSystem.DispatchGlobalAnnouncement(...)`, `PrayableComponent` and `PrayerSystem.Pray(...)` (message to admins and the admin log), anomalies (`AnomalyField`), `SmartMobSpawner`, `LootManager`, the weather system, status effects, the death void.
 
+## Built so far (step 1)
+
+Sectors, ledger, altar prayers, mention filter, digest builder and the admin commands `godstatus`, `goddigest` and `godsectors`. Tests: `GodDigestTest` (unit), `GodStepOneTest`. Still to build for step 1: the action framework with validator, budget and approval, the scripted director, the LLM director, writer mode, and the `godlog`, `godapprove`, `goddeny`, `godpause` commands.
+
 ## Layers
 
 ```

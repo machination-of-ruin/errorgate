@@ -1,11 +1,14 @@
 using Content.Server.Chat.Systems;
+using Content.Shared._ERRORGATE.AiGod;
 using Content.Shared._ERRORGATE.CCVar;
+using Content.Shared.Chapel;
 using Content.Shared.Damage;
 using Content.Shared.GameTicking;
 using Content.Shared.Mobs;
 using Content.Shared.Mobs.Components;
 using Robust.Shared.Configuration;
 using Robust.Shared.Player;
+using Robust.Shared.Prototypes;
 using Robust.Shared.Timing;
 
 namespace Content.Server._ERRORGATE.AiGod;
@@ -20,6 +23,9 @@ public sealed class GodObserverSystem : EntitySystem
 {
     [Dependency] private readonly IConfigurationManager _cfg = default!;
     [Dependency] private readonly IGameTiming _timing = default!;
+    [Dependency] private readonly IPrototypeManager _proto = default!;
+    [Dependency] private readonly GodLedgerSystem _ledger = default!;
+    [Dependency] private readonly SectorSystem _sectors = default!;
 
     /// <summary>
     ///     Damage of one victim is noted at most this often, a firefight is one entry per few seconds, not one per bullet.
@@ -34,6 +40,7 @@ public sealed class GodObserverSystem : EntitySystem
 
     private bool _enabled;
     private bool _monitorChat = true;
+    private GodMentionFilter? _mentions;
 
     // Who last hurt a player, so a death can name them. Cleared at the end of the round.
     private readonly Dictionary<EntityUid, (string Name, TimeSpan Time)> _lastHarmedBy = new();
@@ -52,6 +59,7 @@ public sealed class GodObserverSystem : EntitySystem
         SubscribeLocalEvent<ActorComponent, DamageChangedEvent>(OnDamageChanged);
         SubscribeLocalEvent<PlayerSpawnCompleteEvent>(OnPlayerSpawned);
         SubscribeLocalEvent<EntitySpokeEvent>(OnEntitySpoke);
+        SubscribeLocalEvent<PrayedEvent>(OnPrayed);
         SubscribeLocalEvent<ActorComponent, PlayerAttachedEvent>((uid, _, _) => _playerBodies.Add(uid));
         SubscribeLocalEvent<RoundRestartCleanupEvent>(_ => Clear());
 
@@ -59,6 +67,8 @@ public sealed class GodObserverSystem : EntitySystem
         Subs.CVar(_cfg, ErrorgateCVars.GodMonitorChat, v => _monitorChat = v, true);
         Subs.CVar(_cfg, ErrorgateCVars.GodMaxEvents, v => Buffer.EventCapacity = v, true);
         Subs.CVar(_cfg, ErrorgateCVars.GodChatBufferSize, v => Buffer.ChatCapacity = v, true);
+        Subs.CVar(_cfg, ErrorgateCVars.GodContextLines, v => Buffer.ContextCapacity = v, true);
+        Subs.CVar(_cfg, ErrorgateCVars.GodMaxQuotes, v => Buffer.QuoteCapacity = v, true);
     }
 
     /// <summary>
@@ -149,8 +159,41 @@ public sealed class GodObserverSystem : EntitySystem
         if (!_enabled || !_monitorChat || !HasComp<ActorComponent>(args.Source))
             return;
 
-        Buffer.AddChat(Name(args.Source), args.Message, args.IsWhisper);
+        var name = Name(args.Source);
+        Buffer.AddChat(name, args.Message, args.IsWhisper);
+
+        // A reference to her goes in raw, anything else is only context
+        var quote = QuoteOf(args.Source, args.Message, args.IsWhisper);
+        if (Mentions.IsMention(args.Message))
+            Buffer.AddMention(quote);
+        else
+            Buffer.AddSpeech(quote);
     }
+
+    /// <summary>
+    ///     Prayers made at an altar reach her. Prayers at anything else only go to the admins, as before.
+    /// </summary>
+    private void OnPrayed(PrayedEvent args)
+    {
+        if (!_enabled || !HasComp<SacrificialAltarComponent>(args.Target) || args.Sender.AttachedEntity is not { } body)
+            return;
+
+        Buffer.AddPrayer(QuoteOf(body, args.Message, false));
+
+        if (_ledger.TrySubject(body, out var subject))
+        {
+            subject.Prayers++;
+            _ledger.Note(subject, "prayed");
+        }
+    }
+
+    private GodQuote QuoteOf(EntityUid body, string text, bool whisper)
+    {
+        var number = _ledger.TrySubject(body, out var subject) ? subject.Number : 0;
+        return new GodQuote(_timing.CurTime, number, Name(body), _sectors.SectorOf(body), text, whisper);
+    }
+
+    private GodMentionFilter Mentions => _mentions ??= new GodMentionFilter(_proto.Index<GodMentionsPrototype>("Default"));
 
     private string Name(EntityUid uid)
     {
