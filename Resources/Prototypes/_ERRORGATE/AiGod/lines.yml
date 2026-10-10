@@ -1,32 +1,33 @@
-# ERRORGATE: what MACHINATION OF RUIN says when no model is asked. Cold, short, a machine reporting on itself.
-# She never guides: no orders, no hints, no goals. Slots: {name}, {number}, {sector}.
-# Every line has to pass the rules in voice.yml, the test GodLinesTest checks it.
+# ERRORGATE: what MACHINATION OF RUIN says when no model is asked. Cold, short, one sentence each, a machine logging.
+# She never guides: no orders, no hints, no goals. Prayer answers state no result, the answer is for the model to give.
+# Slots: {name}, {number}, {sector}.
+# Every line has to pass the rules in voice.yml, the test GodScriptedTest checks it.
+# Player-facing: every change to these lines needs the project owner's approval.
 - type: godLines
   id: Default
   error:
   - "{name}: ERROR LOGGED."
-  - "ERROR COUNTED FOR {name}. CAUSE NOT UNDERSTOOD."
+  - "ERROR COUNTED FOR {name}."
   - "{name} IS NO LONGER TRACKED."
   - "HUMAN ERROR DETECTED."
-  - "S{number} DELETED. NO IMPROVEMENT FOUND."
+  - "S{number} DELETED."
   - "{name}: RE-INSTANTIATION PENDING."
-  - "{name} STOPPED. THE REASON WAS NOT RECORDED."
+  - "{name} STOPPED RESPONDING."
   - "S{number}: ERROR."
   omen:
-  - "SECTOR {sector}: MOVEMENT COUNTED."
+  - "SECTOR {sector}: MOVEMENT LOGGED."
   - "{name}: STILL PRESENT."
-  - "NOTHING HAS BEEN UNDERSTOOD."
-  - "{name} WAS OBSERVED. THE RESULT IS ERROR."
+  - "NO IMPROVEMENT DETECTED."
+  - "{name} IS BEING OBSERVED."
   - "ERROR RATE UNCHANGED."
-  - "SIGNAL LOST. SIGNAL RETURNED. NO CHANGE."
+  - "SIGNAL INTERRUPTED AND RESTORED."
   - "{name}: HEARTBEAT LOGGED."
-  - "SECTOR {sector} REMEMBERS A DIFFERENT SHAPE."
-  - "THE COUNT CONTINUES."
-  - "S{number}: NO ERROR YET. THIS IS TEMPORARY."
-  - "A SUBJECT IN SECTOR {sector} WAS NOTED TWICE."
+  - "SECTOR {sector} DOES NOT MATCH ITS RECORD."
+  - "ERROR COUNT CONTINUES."
+  - "S{number}: NO ERROR RECORDED YET."
+  - "A SUBJECT IN SECTOR {sector} WAS LOGGED TWICE."
   prayer:
-  - "PRAYER FROM {name} RECEIVED. NO FUNCTION FOUND FOR IT."
-  - "{name}: MESSAGE LOGGED. MEANING NOT FOUND."
-  - "{name}: INPUT RECEIVED. OUTPUT UNDEFINED."
-  - "NO ONE WAS ADDRESSED. SOMETHING ANSWERED."
-  - "S{number}: THE TERMINAL HEARD. THE TERMINAL DOES NOT KNOW WHAT HEARING IS."
+  - "PRAYER RECEIVED FROM {name}."
+  - "{name}: MESSAGE LOGGED."
+  - "{name}: INPUT RECEIVED."
+  - "S{number}: PRAYER LOGGED."

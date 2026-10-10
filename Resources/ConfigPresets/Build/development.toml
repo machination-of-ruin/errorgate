@@ -50,3 +50,14 @@ enabled = false
 # ERRORGATE: look far (Space) moves the view 12 tiles, the default PVS range of 25 pops entities in at the corners
 [net]
 pvs_range = 50
+
+# ERRORGATE: AI GOD playtest, step 1. Scripted voice, live, every action waits for an admin (godapprove / goddeny).
+# Quicker than the real values so a short test shows something. The production preset leaves her off.
+[errorgate.god]
+enabled = true
+mode = "scripted"
+dry_run = false
+approval = true
+quiet_seconds = 20.0
+whisper_interval = 60.0
+min_players = 1
