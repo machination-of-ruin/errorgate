@@ -15,15 +15,10 @@ public sealed class GodDigestSystem : EntitySystem
     [Dependency] private readonly GameTicker _ticker = default!;
     [Dependency] private readonly GodLedgerSystem _ledger = default!;
     [Dependency] private readonly GodObserverSystem _observer = default!;
-
-    /// <summary>Her last actions, newest last, worded for the digest. Filled by the director.</summary>
-    public readonly List<string> HerRecent = new();
+    [Dependency] private readonly GodDirectorSystem _director = default!;
 
     /// <summary>What she wrote last time.</summary>
     public string Notes = string.Empty;
-
-    /// <summary>Budget, cooldowns and mood in one line. Filled by the director.</summary>
-    public string State = string.Empty;
 
     public GodDigestResult Preview()
     {
@@ -68,8 +63,8 @@ public sealed class GodDigestSystem : EntitySystem
             FaultsAwake = FaultsAwake(),
             Subjects = subjects,
             Drain = drain,
-            HerRecent = HerRecent.ToList(),
-            State = State,
+            HerRecent = _director.RecentLines(GodDigest.MaxRecentLines),
+            State = _director.StateLine(),
             Notes = Notes,
             EarlierMentionsSummary = earlierMentions,
         };

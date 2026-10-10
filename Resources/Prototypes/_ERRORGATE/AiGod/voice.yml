@@ -1,0 +1,16 @@
+# ERRORGATE: what MACHINATION OF RUIN may not say. She never guides: no orders, no hints, no goals.
+# Text that matches an order pattern or contains a banned word is thrown away before it reaches a player.
+- type: godVoice
+  id: Default
+  bannedWords: []
+  orderPatterns:
+  # "you must", "you should", "you need to", "you have to", "you ought to"
+  - '\byou\s+(must|should|need\s+to|have\s+to|ought\s+to|shall|will\s+have\s+to)\b'
+  - '\b(we|they|everyone|all\s+of\s+you|he|she|the\s+\w+)\s+(must|should|needs?\s+to|has\s+to|have\s+to)\b'
+  # orders: a verb of doing at the start of a sentence, with something to do it to or toward
+  - '(^|[.!?:;]\s*)(go|run|walk|move|head|travel|return|come|follow|find|seek|search|take|bring|fetch|give|use|open|close|enter|leave|stay|hide|kill|attack|destroy|protect|help|save|trust|obey|worship|pray|kneel|rise|fight|stop|wait|listen|look|watch|remember)\s+(to|toward|towards|into|the|a|an|your|their|him|her|them|us|me|back|here|there|away|north|south|east|west|up|down|out|now|together|alone)\b'
+  # hints and goals
+  - '\b(the\s+way|the\s+key|the\s+answer|the\s+solution|your\s+(goal|task|mission|purpose|objective))\b'
+  - '\b(objective|mission|quest|task)\b'
+  - '\b(try|consider|remember)\s+(to|that|the)\b'
+  - '\bif\s+you\s+want\b'

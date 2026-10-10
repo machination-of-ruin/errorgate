@@ -137,5 +137,72 @@ public sealed class ErrorgateCVars
     public static readonly CVarDef<int> GodMaxQuotes =
         CVarDef.Create("errorgate.god.max_quotes", 40, CVar.SERVERONLY);
 
+    /// <summary>
+    ///     How she decides: "scripted" (fixed rules and a line bank, no model), "assisted" (the model picks, scripted rules fill the gaps)
+    ///     or "full" (the model alone). Anything else counts as scripted.
+    /// </summary>
+    public static readonly CVarDef<string> GodMode =
+        CVarDef.Create("errorgate.god.mode", "scripted", CVar.SERVERONLY);
+
+    /// <summary>
+    ///     Decide and log, but do nothing. On by default so that a new server never acts without an admin choosing it.
+    /// </summary>
+    public static readonly CVarDef<bool> GodDryRun =
+        CVarDef.Create("errorgate.god.dry_run", true, CVar.SERVERONLY);
+
+    /// <summary>
+    ///     An admin confirms every action (godapprove, goddeny). Unanswered ones expire as denied.
+    /// </summary>
+    public static readonly CVarDef<bool> GodApproval =
+        CVarDef.Create("errorgate.god.approval", true, CVar.SERVERONLY);
+
+    public static readonly CVarDef<int> GodApprovalTimeoutSeconds =
+        CVarDef.Create("errorgate.god.approval_timeout", 120, CVar.SERVERONLY);
+
+    /// <summary>
+    ///     Wrath points gained per minute, and the most that can be saved up. Every action costs points.
+    /// </summary>
+    public static readonly CVarDef<float> GodBudgetPerMinute =
+        CVarDef.Create("errorgate.god.budget_per_minute", 3f, CVar.SERVERONLY);
+
+    public static readonly CVarDef<float> GodBudgetCap =
+        CVarDef.Create("errorgate.god.budget_cap", 20f, CVar.SERVERONLY);
+
+    /// <summary>
+    ///     Seconds before the same subject can be the target of another action.
+    /// </summary>
+    public static readonly CVarDef<float> GodTargetCooldown =
+        CVarDef.Create("errorgate.god.target_cooldown", 90f, CVar.SERVERONLY);
+
+    /// <summary>
+    ///     Seconds between two global announcements, and the most per hour.
+    /// </summary>
+    public static readonly CVarDef<float> GodAnnounceCooldown =
+        CVarDef.Create("errorgate.god.announce_cooldown", 600f, CVar.SERVERONLY);
+
+    public static readonly CVarDef<int> GodAnnouncePerHour =
+        CVarDef.Create("errorgate.god.announce_per_hour", 3, CVar.SERVERONLY);
+
+    /// <summary>
+    ///     Players needed before she does anything, and seconds after the round starts in which she stays quiet.
+    /// </summary>
+    public static readonly CVarDef<int> GodMinPlayers =
+        CVarDef.Create("errorgate.god.min_players", 1, CVar.SERVERONLY);
+
+    public static readonly CVarDef<float> GodQuietSeconds =
+        CVarDef.Create("errorgate.god.quiet_seconds", 120f, CVar.SERVERONLY);
+
+    public static readonly CVarDef<int> GodSubtleMaxLength =
+        CVarDef.Create("errorgate.god.subtle_max_length", 140, CVar.SERVERONLY);
+
+    public static readonly CVarDef<int> GodAnnounceMaxLength =
+        CVarDef.Create("errorgate.god.announce_max_length", 200, CVar.SERVERONLY);
+
+    /// <summary>
+    ///     Her messages are shown in capitals, like a machine log.
+    /// </summary>
+    public static readonly CVarDef<bool> GodUppercase =
+        CVarDef.Create("errorgate.god.uppercase", true, CVar.SERVERONLY);
+
     #endregion
 }

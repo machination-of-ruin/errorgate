@@ -74,6 +74,21 @@ public sealed class SectorSystem : EntitySystem
     }
 
     /// <summary>
+    ///     Whether any grid in the world has a sector of this name.
+    /// </summary>
+    public bool AnyGridHas(string sector)
+    {
+        var query = EntityQueryEnumerator<MapGridComponent>();
+        while (query.MoveNext(out var uid, out var grid))
+        {
+            if (grid.ChunkCount > 0 && SectorsOf(uid, grid).Names.Contains(sector))
+                return true;
+        }
+
+        return false;
+    }
+
+    /// <summary>
     ///     The center of a sector in grid tile coordinates, for placing things in it.
     /// </summary>
     public bool TryGetCenter(EntityUid gridUid, MapGridComponent grid, string sector, out Vector2 center)

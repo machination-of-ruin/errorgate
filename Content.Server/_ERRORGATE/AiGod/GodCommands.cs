@@ -14,12 +14,14 @@ public sealed class GodStatusCommand : LocalizedEntityCommands
 {
     [Dependency] private readonly GodLedgerSystem _ledger = default!;
     [Dependency] private readonly GodObserverSystem _observer = default!;
+    [Dependency] private readonly GodDirectorSystem _director = default!;
 
     public override string Command => "godstatus";
 
     public override void Execute(IConsoleShell shell, string argStr, string[] args)
     {
         var subjects = _ledger.Ledger.All.OrderBy(s => s.Number).ToList();
+        shell.WriteLine($"{_director.StateLine()} | {_director.Pending.Count()} waiting for approval");
         shell.WriteLine($"Subjects: {subjects.Count}. Buffered: {_observer.Buffer.Events.Count} events, {_observer.Buffer.Prayers.Count} prayers, {_observer.Buffer.Mentions.Count} mentions, {_observer.Buffer.Speech.Count} context lines.");
 
         foreach (var s in subjects)
@@ -88,5 +90,191 @@ public sealed class GodSectorsCommand : LocalizedEntityCommands
 
         var names = _sectors.SectorNames(gridUid, gridComp);
         shell.WriteLine($"{names.Count} sectors: {string.Join(" ", names)}");
+    }
+}
+
+/// <summary>
+///     Shows the newest decisions: what she wanted to do, and what became of it.
+/// </summary>
+[AdminCommand(AdminFlags.Debug)]
+public sealed class GodLogCommand : LocalizedEntityCommands
+{
+    [Dependency] private readonly GodDirectorSystem _director = default!;
+
+    public override string Command => "godlog";
+
+    public override void Execute(IConsoleShell shell, string argStr, string[] args)
+    {
+        var count = args.Length > 0 && int.TryParse(args[0], out var n) ? n : 15;
+        shell.WriteLine(_director.StateLine());
+
+        var shown = _director.Log.TakeLast(Math.Max(1, count)).ToList();
+        if (shown.Count == 0)
+            shell.WriteLine("No decisions yet.");
+
+        foreach (var decision in shown)
+        {
+            shell.WriteLine(decision.ToString());
+        }
+    }
+}
+
+/// <summary>
+///     Says yes to a decision that waits for approval (a number, or "all").
+/// </summary>
+[AdminCommand(AdminFlags.Admin)]
+public sealed class GodApproveCommand : LocalizedEntityCommands
+{
+    [Dependency] private readonly GodDirectorSystem _director = default!;
+
+    public override string Command => "godapprove";
+
+    public override void Execute(IConsoleShell shell, string argStr, string[] args)
+    {
+        if (args.Length != 1)
+        {
+            shell.WriteError("godapprove <id|all>");
+            return;
+        }
+
+        foreach (var id in GodCommandHelpers.Ids(_director, args[0]))
+        {
+            _director.Approve(id, out var message);
+            shell.WriteLine(message);
+        }
+    }
+}
+
+/// <summary>
+///     Says no to a decision that waits for approval (a number, or "all").
+/// </summary>
+[AdminCommand(AdminFlags.Admin)]
+public sealed class GodDenyCommand : LocalizedEntityCommands
+{
+    [Dependency] private readonly GodDirectorSystem _director = default!;
+
+    public override string Command => "goddeny";
+
+    public override void Execute(IConsoleShell shell, string argStr, string[] args)
+    {
+        if (args.Length != 1)
+        {
+            shell.WriteError("goddeny <id|all>");
+            return;
+        }
+
+        foreach (var id in GodCommandHelpers.Ids(_director, args[0]))
+        {
+            _director.Deny(id, out var message);
+            shell.WriteLine(message);
+        }
+    }
+}
+
+/// <summary>
+///     Stops her from acting (godpause) and lets her act again (godresume), without touching the valves.
+/// </summary>
+[AdminCommand(AdminFlags.Admin)]
+public sealed class GodPauseCommand : LocalizedEntityCommands
+{
+    [Dependency] private readonly GodDirectorSystem _director = default!;
+
+    public override string Command => "godpause";
+
+    public override void Execute(IConsoleShell shell, string argStr, string[] args)
+    {
+        _director.Paused = true;
+        shell.WriteLine("She is paused.");
+    }
+}
+
+[AdminCommand(AdminFlags.Admin)]
+public sealed class GodResumeCommand : LocalizedEntityCommands
+{
+    [Dependency] private readonly GodDirectorSystem _director = default!;
+
+    public override string Command => "godresume";
+
+    public override void Execute(IConsoleShell shell, string argStr, string[] args)
+    {
+        _director.Paused = false;
+        shell.WriteLine("She acts again.");
+    }
+}
+
+/// <summary>
+///     Makes her do something now, through the same checks (but without approval and without points):
+///     <c>godforce subtle S4 text</c>, <c>godforce announce text</c>, <c>godforce glitch S4</c> or <c>godforce glitch C4</c>.
+/// </summary>
+[AdminCommand(AdminFlags.Admin)]
+public sealed class GodForceCommand : LocalizedEntityCommands
+{
+    [Dependency] private readonly GodDirectorSystem _director = default!;
+
+    public override string Command => "godforce";
+
+    public override void Execute(IConsoleShell shell, string argStr, string[] args)
+    {
+        if (args.Length < 2)
+        {
+            shell.WriteError("godforce subtle <S#> <text> | announce <text> | glitch <S#|sector>");
+            return;
+        }
+
+        var action = new GodAction();
+        switch (args[0].ToLowerInvariant())
+        {
+            case "subtle":
+                if (args.Length < 3 || !GodCommandHelpers.TryNumber(args[1], out var number))
+                {
+                    shell.WriteError("godforce subtle <S#> <text>");
+                    return;
+                }
+
+                action.Type = GodActionType.Subtle;
+                action.Targets.Add(number);
+                action.Text = string.Join(' ', args.Skip(2));
+                break;
+
+            case "announce":
+                action.Type = GodActionType.Announce;
+                action.Text = string.Join(' ', args.Skip(1));
+                break;
+
+            case "glitch":
+                action.Type = GodActionType.Glitch;
+                if (GodCommandHelpers.TryNumber(args[1], out var target))
+                    action.Targets.Add(target);
+                else
+                    action.Sector = args[1].ToUpperInvariant();
+
+                break;
+
+            default:
+                shell.WriteError("Unknown action.");
+                return;
+        }
+
+        shell.WriteLine(_director.Submit(action, GodSource.Admin).ToString());
+    }
+}
+
+internal static class GodCommandHelpers
+{
+    /// <summary>"S17" or "17".</summary>
+    public static bool TryNumber(string text, out int number)
+    {
+        if (text.Length > 1 && (text[0] == 'S' || text[0] == 's'))
+            text = text[1..];
+
+        return int.TryParse(text, out number);
+    }
+
+    public static IEnumerable<int> Ids(GodDirectorSystem director, string arg)
+    {
+        if (string.Equals(arg, "all", StringComparison.OrdinalIgnoreCase))
+            return director.Pending.Select(d => d.Id).ToList();
+
+        return int.TryParse(arg, out var id) ? new[] { id } : Array.Empty<int>();
     }
 }

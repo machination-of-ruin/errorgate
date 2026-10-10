@@ -8,6 +8,7 @@ using Content.Shared.Mobs;
 using Content.Shared.Mobs.Components;
 using Content.Shared.Mobs.Systems;
 using Robust.Shared.Network;
+using Robust.Shared.Player;
 using Robust.Shared.Timing;
 
 namespace Content.Server._ERRORGATE.AiGod;
@@ -97,9 +98,37 @@ public sealed class GodLedgerSystem : EntitySystem
         return true;
     }
 
+    /// <summary>
+    ///     The living body a subject plays right now, with the player's session, when they are in the world and not in the void.
+    /// </summary>
+    public bool TryGetReachable(Subject subject, out EntityUid body, out ICommonSession session)
+    {
+        body = default;
+        session = null!;
+
+        if (!subject.Alive)
+            return false;
+
+        foreach (var (candidate, user) in _bodies)
+        {
+            if (user != subject.User || !Exists(candidate) || !TryComp<ActorComponent>(candidate, out var actor))
+                continue;
+
+            if (TryComp<MobStateComponent>(candidate, out var state) && state.CurrentState == MobState.Dead)
+                continue;
+
+            body = candidate;
+            session = actor.PlayerSession;
+            return true;
+        }
+
+        return false;
+    }
+
     private void OnSpawned(PlayerSpawnCompleteEvent args)
     {
         var subject = Ledger.GetOrAdd(args.Player.UserId);
+        _bodies[args.Mob] = args.Player.UserId;
         subject.Name = MetaData(args.Mob).EntityName;
         subject.Lives++;
         subject.Alive = true;
@@ -193,7 +222,10 @@ public sealed class GodLedgerSystem : EntitySystem
         while (minds.MoveNext(out var uid, out var container, out _))
         {
             if (container.Mind is { } mindId && TryComp<MindComponent>(mindId, out var mind) && mind.UserId is { } user)
+            {
                 bodies[user] = uid;
+                _bodies[uid] = user;
+            }
         }
 
         var alive = new List<(Subject Subject, EntityUid Body)>();
