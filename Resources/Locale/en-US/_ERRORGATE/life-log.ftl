@@ -15,6 +15,7 @@ life-log-source-self = SELF
 life-log-source-fault = {$kind} FAULT
 
 life-log-env-fire = FIRE
+life-log-env-hot-air = HOT AIR
 life-log-env-cold = COLD
 life-log-env-air = NO AIR
 life-log-env-blood = BLOOD LOSS

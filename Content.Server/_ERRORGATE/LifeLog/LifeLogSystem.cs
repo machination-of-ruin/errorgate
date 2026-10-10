@@ -1,5 +1,6 @@
 using System.Linq;
 using Content.Server.Chat.Systems;
+using Content.Server.Atmos.Components;
 using Content.Shared._ERRORGATE.Anomalies;
 using Content.Shared.Chat;
 using Content.Shared.Damage;
@@ -8,6 +9,7 @@ using Content.Shared.Mind;
 using Content.Shared.Mind.Components;
 using Content.Shared.Mobs;
 using Content.Shared.Mobs.Components;
+using Content.Shared.Mobs.Systems;
 using Content.Shared.Nutrition.Components;
 using Content.Shared.Nutrition.EntitySystems;
 using Robust.Shared.Timing;
@@ -52,7 +54,9 @@ public sealed class LifeLogSystem : EntitySystem
         base.Initialize();
 
         SubscribeLocalEvent<PlayerSpawnCompleteEvent>(OnSpawned);
-        SubscribeLocalEvent<MobStateComponent, DamageChangedEvent>(OnDamageChanged);
+        // Before the thresholds: the hit that kills is what sends the player to the void and builds the log, so it has to be
+        // written down first
+        SubscribeLocalEvent<MobStateComponent, DamageChangedEvent>(OnDamageChanged, before: new[] { typeof(MobThresholdSystem) });
         SubscribeLocalEvent<MobStateChangedEvent>(OnMobStateChanged);
         SubscribeLocalEvent<EntitySpokeEvent>(OnSpoke);
         SubscribeLocalEvent<RoundRestartCleanupEvent>(_ => Clear());
@@ -101,17 +105,32 @@ public sealed class LifeLogSystem : EntitySystem
     {
         var now = _timing.CurTime;
 
-        if (kind is LogKind.DamageIn or LogKind.DamageOut
-            && record.Events.Count > 0
-            && record.Events[^1] is { } last
-            && last.Kind == kind
-            && last.Subject == subject
-            && now - last.Time < MergeWindow)
+        // The same source hitting again joins its earlier line, whatever small environmental damage (burning, bleeding)
+        // landed in between: those are mostly hidden and must not break the chain. It moves to the end with the time of
+        // the latest hit, so the log stays in order.
+        if (kind is LogKind.DamageIn or LogKind.DamageOut)
         {
-            last.Amount += amount;
-            last.Count++;
-            last.Time = now;
-            return;
+            for (var i = record.Events.Count - 1; i >= 0; i--)
+            {
+                var previous = record.Events[i];
+                if (now - previous.Time >= MergeWindow)
+                    break;
+
+                if (previous.Environmental)
+                    continue;
+
+                if (previous.Kind == kind && previous.Subject == subject)
+                {
+                    previous.Amount += amount;
+                    previous.Count++;
+                    previous.Time = now;
+                    record.Events.RemoveAt(i);
+                    record.Events.Add(previous);
+                    return;
+                }
+
+                break;
+            }
         }
 
         record.Events.Add(new LogEntry { Time = now, Kind = kind, Subject = subject, Text = text, Amount = amount });
@@ -225,7 +244,9 @@ public sealed class LifeLogSystem : EntitySystem
         var biggest = delta.DamageDict.Where(d => d.Value > 0).OrderByDescending(d => (float) d.Value).FirstOrDefault();
         var cause = biggest.Key switch
         {
-            "Heat" or "Caustic" => "fire",
+            // Burning is fire. Heat without flames is the air around a heat fault, which stays hot after the fire is out
+            "Heat" => TryComp<FlammableComponent>(victim, out var flammable) && flammable.OnFire ? "fire" : "hot-air",
+            "Caustic" => "fire",
             "Cold" => "cold",
             "Asphyxiation" => "air",
             "Bloodloss" => "blood",
