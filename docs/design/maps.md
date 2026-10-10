@@ -15,7 +15,7 @@ Test-only maps live in `Resources/Maps/Test` (`Empty`, `Dev`, `TestTeg`).
 ## Map design
 
 - **EDGE OF ENTROPY:** a claustrophobic underground map with places that recall the real world and liminal spaces between them. Many deadly hostile mobs and close spawns. The aim is to force players to cooperate early to go deeper and explore. Playtests confirmed it: players who meet early have nothing to lose and are eager to cooperate in an unknown, dangerous environment.
-- **KUZNETSK:** a larger open world with a day-night cycle and a constant snowstorm. A post-Soviet town with apartments and service buildings, and a factory with military loot and limited access. Mobs are slow and not very dangerous, which leaves players free to roam, fight each other and form gangs. Recent changes added anomalies to make travel between points of interest riskier.
+- **KUZNETSK:** a larger open world with a day-night cycle and a constant snowstorm. A post-Soviet town with apartments and service buildings, and a factory with military loot and limited access. Mobs are slow and not very dangerous, which leaves players free to roam, fight each other and form gangs. Anomalies (see [anomalies.md](anomalies.md)) make travel between points of interest riskier.
 
 ## Spawning
 
