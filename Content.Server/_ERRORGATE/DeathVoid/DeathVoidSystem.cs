@@ -208,6 +208,8 @@ public sealed class DeathVoidSystem : EntitySystem
 
         if (mind.Session is { } session && !AlreadyTold(mindId))
         {
+            _chat.SendAdminAnnouncement($"DEATH: {session.Name} as {mind.CharacterName ?? "unknown"} died.");
+
             // One message: the title, the life log, then the subtitle at the bottom. Large text is broken into short
             // lines by hand: a wrapped large font line overlaps the following messages in a narrow chat panel.
             // Trailing newlines keep later messages offset from it.
