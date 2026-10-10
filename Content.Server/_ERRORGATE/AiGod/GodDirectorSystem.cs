@@ -45,6 +45,9 @@ public sealed class GodDirectorSystem : EntitySystem
 
     public readonly GodBudget Budget = new();
 
+    /// <summary>Raised when a decision starts waiting for an admin.</summary>
+    public event Action<GodDecision>? DecisionPending;
+
     /// <summary>The newest decisions, oldest first.</summary>
     public readonly List<GodDecision> Log = new();
 
@@ -130,6 +133,7 @@ public sealed class GodDirectorSystem : EntitySystem
         {
             decision.Status = GodActionStatus.Pending;
             decision.ExpiresAt = now + TimeSpan.FromSeconds(_approvalTimeout);
+            DecisionPending?.Invoke(decision);
             return decision;
         }
 
@@ -244,6 +248,9 @@ public sealed class GodDirectorSystem : EntitySystem
         message = decision.ToString();
         return true;
     }
+
+    /// <summary>Seconds a decision waits before it expires.</summary>
+    public int ApprovalTimeout => _approvalTimeout;
 
     public IEnumerable<GodDecision> Pending => Log.Where(d => d.Status == GodActionStatus.Pending);
 

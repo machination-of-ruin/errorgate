@@ -1,4 +1,5 @@
 #nullable enable
+using System.Collections.Generic;
 using System.Linq;
 using Content.Client.UserInterface.Systems.Chat;
 using Content.Server._ERRORGATE.AiGod;
@@ -206,6 +207,30 @@ public sealed class GodDirectorTest
         // Godforce by an admin needs no approval
         var forced = await Submit(world, Subtle("Forced.", world.IvanNumber), GodSource.Admin);
         Assert.That(forced.Status, Is.EqualTo(GodActionStatus.Executed));
+
+        await world.Pair.CleanReturnAsync();
+    }
+
+    [Test]
+    public async Task EveryDecisionThatWaitsIsAnnouncedToTheAdmins()
+    {
+        var world = await Setup();
+        var server = world.Pair.Server;
+        var announced = new List<GodDecision>();
+        await server.WaitPost(() =>
+        {
+            server.CfgMan.SetCVar(ErrorgateCVars.GodApproval, true);
+            world.Director.DecisionPending += announced.Add;
+        });
+
+        var held = await Submit(world, Subtle("First.", world.IvanNumber));
+        var refused = await Submit(world, Subtle("Hello.", 99));
+        await server.WaitPost(() => server.CfgMan.SetCVar(ErrorgateCVars.GodApproval, false));
+        var done = await Submit(world, Subtle("Direct.", world.IvanNumber));
+
+        Assert.That(announced, Is.EqualTo(new[] { held }), "Only a decision that waits is announced, not a refused or an executed one.");
+        Assert.That(refused.Status, Is.EqualTo(GodActionStatus.Rejected));
+        Assert.That(done.Status, Is.EqualTo(GodActionStatus.Executed));
 
         await world.Pair.CleanReturnAsync();
     }
