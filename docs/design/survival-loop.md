@@ -6,7 +6,7 @@
 2. **Crafting.** Weapons, tools, medicine and gear made from scavenged materials.
 3. **Looting / scavenging.** Ruins and points of interest across the planet are the main source of gear and materials.
 4. **Cooperation.** Players are pushed together by:
-   - **Shared objectives:** world events and AI GOD goals that need several players to complete.
+   - **Shared objectives:** world events and AI GOD conditions (never goals or orders) that need several players to resolve.
    - **Scarcity:** resources and zones too scarce or dangerous to handle solo, which encourages groups.
 
 Not in scope for now: specialised skills that lock actions to certain players, and a trade/currency economy.
