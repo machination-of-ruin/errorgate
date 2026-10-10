@@ -3287,7 +3287,7 @@ entities:
       - ErrorgateAnomalyHeat
       - ErrorgateAnomalyArc
       - ErrorgateAnomalyCollapse
-      packSizeMin: 3
+      packSizeMin: 1
       packSizeMax: 5
       packRadius: 9
       minSpacingInPack: 4

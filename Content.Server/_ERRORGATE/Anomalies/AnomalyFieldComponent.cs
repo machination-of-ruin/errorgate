@@ -34,7 +34,7 @@ public sealed partial class AnomalyFieldComponent : Component
     ///     bigger pack of collapse faults some of the active ones would show only their sprite and no lens.
     /// </summary>
     [DataField]
-    public int PackSizeMin = 3;
+    public int PackSizeMin = 1;
 
     [DataField]
     public int PackSizeMax = 5;
