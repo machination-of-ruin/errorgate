@@ -7,7 +7,7 @@ How MACHINATION OF RUIN is built. Read [VIBE.md](VIBE.md) and [ai-god.md](ai-god
 | Topic | Decision |
 |---|---|
 | Speech | She may address players. **Subtle message** for one subject or a group, **global announcement** for the whole map, both through existing systems (see Communication). |
-| Hearing | Players reach her by **prayer**: a mechanic that sends a message visible to admins. Chat lines that mention her or refer to a higher power are also watched. |
+| Hearing | Players reach her by **prayer at an altar** (no self verb): the existing prayer message to admins. Regular speech that mentions her or a higher power is also watched. Prayers and mentions go to the model as **raw text**, nothing is lost to a summary. |
 | Error | **Death is an error.** Everything else is adaptation, for now. Other behaviour is still observed and told to the model, but it is not scored. |
 | Harm | **No instant kill.** Otherwise she can go wild: complicate lives, make people suffer, for better or worse. |
 | Targets | Individuals, groups and places. |
@@ -48,8 +48,28 @@ How MACHINATION OF RUIN is built. Read [VIBE.md](VIBE.md) and [ai-god.md](ai-god
 - **Subtle message:** one subject, or a group (one message per subject). Uses `SendSubtleMessage`. Voice: cold system-log language, sometimes the character's name. No instructions, hints or goals.
 - **Global announcement:** whole map. Uses `DispatchGlobalAnnouncement` with her own sender name. Rare and loud.
 - **Environmental whisper:** no text. Glitch bursts (static, flicker, sound) around a subject or a sector. Frequent and small.
-- **Prayer (Open: exact form):** a "pray" verb on every player body, using the existing prayer message to admins plus an event the observer records. An in-world altar can be added later. The text goes to admins and, if valves allow, to the model.
-- **Mentions:** a keyword prefilter (a prototype list: god, machine, machination, ruin, errorgate, creator, pray, lord, divine, savior, "who are you"...) selects chat lines. They are passed verbatim (cut to 120 characters, at most 5 per call) and the model decides what they mean.
+- **Prayer, at an altar only:** `AltarBase` already carries `Prayable` (context-menu verb, message to admins, entry in the admin log), and no altar is placed on EDGE OF ENTROPY or Kuznetsk today. The work is an ERRORGATE altar prototype (a monolith or terminal that fits the machine ruins, reusing the altar behaviour), a few placed per map (hand placed, or a spawner that picks one of several spots), and an event the observer records (the prayer text, the subject, the sector). Prayers are never dropped: they are the top section of every digest, raw, with a sanity cap of 600 characters enforced when the prayer is typed.
+- **Mentions in regular speech:** two stages.
+  1. **Prefilter** on the server, per speech line: a prototype list of words and phrases (god, gods, goddess, machine, machination, ruin, errorgate, creator, lord, divine, savior, heaven, hell, "who is watching", "someone is watching", "she sees", ...) matched on word boundaries, case insensitive. The list is data, so it can be tuned. A bare "her" or "she" is too common to filter on alone, so it only counts next to a watching, hearing or god word.
+  2. **Context lines:** besides the matches, the digest carries the last N ordinary speech lines (valve, default 12) so the model can notice a reference the filter missed.
+  Matched lines go in raw, up to 300 characters each. If more than 10 lines match between calls, the surplus is **summarised by a small extra call** before the main call, so context is compressed, never silently cut.
+- **Sectors (named places):** see "Sectors" below.
+
+## Sectors
+
+A sector is a named square of the map, used as her vocabulary for places and as the unit for where subjects are.
+
+**What it is used for**
+1. **Where things are:** the digest says `SECTOR C4` instead of coordinates, for subjects, fights and deaths.
+2. **Targets for place-based actions:** a glitch burst in a sector, a fault wake, a loot cache, a horde, weather over a sector.
+3. **Movement tracking:** how far a subject has gone and which sectors they have crossed, without storing paths.
+4. **Her voice:** "SUBJECT S17, SECTOR C4: ERROR LOGGED." She names a place only to state what happened, never to point anyone somewhere. The names are unexplained to players, which suits her.
+
+**How the map is split**
+- A fixed grid over the grid's bounds, columns lettered west to east, rows numbered north to south. The cell size is a map setting (a `SectorGrid` component on the map's grid, like `AnomalyField`).
+- Only cells that contain walkable floor inside the playable area get a name. Cells in the empty space or beyond the mountain ring do not exist for her.
+- Sizes (the grids are 512 by 448 tiles on Kuznetsk and 224 by 208 on EDGE OF ENTROPY, mostly empty space): 64 tiles on Kuznetsk (8 by 7 cells, roughly 25 of them playable) and 48 on EDGE OF ENTROPY (5 by 5, roughly 12 playable).
+- **Optional later:** a mapper can place named markers (FACTORY, APARTMENTS, BUNKER) and a cell containing one takes that name. Until then the grid is enough.
 
 ## Error accounting
 
@@ -67,13 +87,13 @@ Calls are **stateless**: a fixed system prompt plus a fresh digest. There is no 
 | Digest | up to 2,000, hard cap |
 | Response | up to 400 (`max_tokens`) |
 
-At one call every 8 minutes that is about 25,000 tokens an hour. A small local model with an 8,000-token window works.
+At one call every 8 minutes that is about 25,000 tokens an hour. A small local model with an 8,000-token window works. The digest cap includes the 800-token prayer and mention reserve.
 
 ### The digest, section by section (priority order, trimmed from the bottom)
 
 1. **ROUND** (about 40 tokens): minutes since start, players, deaths so far, day/night, weather, faults awake, loot left as a percentage.
 2. **SUBJECTS** (about 40 tokens each, top 8 by salience; the rest as one line, "12 others: quiet"): `S17 IVAN PETROV | alive 23m | lives 2 | errors 1 | SECTOR C4 | with S4,S9 | last: killed S4 T-3m | spoke 14 | last words "..."`. Salience is recency times severity times novelty. Numbers are stable for the round.
-3. **PRAYERS AND MENTIONS** (about 5 lines): verbatim, always included first when present.
+3. **PRAYERS AND MENTIONS** (reserved budget of 800 tokens): raw text, always included first when present. Prayers are never trimmed. Mentions beyond 10 lines are folded into one summary line by a pre-pass call (valve).
 4. **EVENTS** since the last call (up to 20 lines, about 25 tokens each): deaths, kills, big fights, faults triggered, arrivals, ranked by severity, repeated events merged ("S4 hurt S9 x6, 140 damage"). Chat is summarised into counts and quotes, never dumped.
 5. **HER RECENT** (last 6 actions: type, target, T-minus, result): memory of what she did, so she does not repeat herself.
 6. **STATE** (about 60 tokens): wrath budget, cooldowns of big acts, current mood.
@@ -137,7 +157,7 @@ All CVars (server config) with matching admin commands. Defaults are loose where
 | Protection | spawn grace (no harm within N seconds of a subject spawning), no body effects in the death void, the no-instant-kill clamp. |
 | Mood | weights for test subject, worshipper, heretic, error to delete. It drifts at random and is written into the digest. |
 | Safety | text length caps (subtle 140, announce 200), markup stripped, character set, banned words, a check that rejects text that reads as an order or hint, JSON schema checks. |
-| Privacy | whether chat is sent to the model, how many lines, character name or subject number. |
+| Privacy | whether chat is sent to the model (default yes, raw), how many context lines, character name or subject number. |
 
 ## Admin tools
 
@@ -173,8 +193,8 @@ Gifts and takes, complications, blessings, clamped damage.
 
 ## Open
 
-- Exact form of prayer (a self verb is proposed; an altar later).
-- Sector naming (a letter and number grid over the map's coarse grid is proposed).
+- The altar: its look and name, how many per map and where.
+- Sector size per map and whether to override cells with hand-named places (see Sectors).
 - Default values for the budget and cooldowns, to be tuned in the step 1 and 2 playtests.
 - The mood list and how strongly it drives the text.
-- Whether the model sees raw prayers or only a summary.
+- 
