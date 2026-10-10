@@ -8,6 +8,8 @@ using Content.Shared.Mind;
 using Content.Shared.Mind.Components;
 using Content.Shared.Mobs;
 using Content.Shared.Mobs.Components;
+using Content.Shared.Nutrition.Components;
+using Content.Shared.Nutrition.EntitySystems;
 using Robust.Shared.Timing;
 
 namespace Content.Server._ERRORGATE.LifeLog;
@@ -29,6 +31,11 @@ public sealed class LifeLogSystem : EntitySystem
     // Hits from the same source this close together are one line. A kill is credited to the last player who hurt the
     // victim within the blame window.
     private static readonly TimeSpan MergeWindow = TimeSpan.FromSeconds(5);
+
+    // Damage nobody dealt (bleeding, no air, starvation) arrives in tiny ticks. It is added up per cause over this long, and
+    // a cause that adds up to less than the minor limit is not in the log at all.
+    private static readonly TimeSpan EnvironmentWindow = TimeSpan.FromSeconds(30);
+    private const float MinorEnvironmentDamage = 5f;
     private static readonly TimeSpan BlameWindow = TimeSpan.FromSeconds(60);
 
     private const int MaxWordsLength = 40;
@@ -113,6 +120,37 @@ public sealed class LifeLogSystem : EntitySystem
             record.Events.RemoveRange(0, record.Events.Count - LifeRecord.Capacity);
     }
 
+    /// <summary>
+    ///     Adds damage nobody dealt. It joins the latest entry of the same cause within <see cref="EnvironmentWindow"/>,
+    ///     whatever happened in between, and moves to the end of the list so the log stays in order.
+    /// </summary>
+    private void AddEnvironment(LifeRecord record, string cause, float amount)
+    {
+        var now = _timing.CurTime;
+
+        for (var i = record.Events.Count - 1; i >= 0; i--)
+        {
+            var entry = record.Events[i];
+            if (now - entry.Time >= EnvironmentWindow)
+                break;
+
+            if (!entry.Environmental || entry.Subject != cause)
+                continue;
+
+            entry.Amount += amount;
+            entry.Count++;
+            entry.Time = now;
+            record.Events.RemoveAt(i);
+            record.Events.Add(entry);
+            return;
+        }
+
+        record.Events.Add(new LogEntry { Time = now, Kind = LogKind.DamageIn, Subject = cause, Amount = amount, Environmental = true });
+
+        if (record.Events.Count > LifeRecord.Capacity)
+            record.Events.RemoveRange(0, record.Events.Count - LifeRecord.Capacity);
+    }
+
     private void OnSpawned(PlayerSpawnCompleteEvent args)
     {
         if (TryPlayerMind(args.Mob, out var mindId))
@@ -156,8 +194,12 @@ public sealed class LifeLogSystem : EntitySystem
         string source;
 
         if (origin is not { } from)
-            source = EnvironmentCause(args.DamageDelta);
-        else if (from == ent.Owner)
+        {
+            AddEnvironment(victim, EnvironmentCause(ent.Owner, args.DamageDelta), total);
+            return;
+        }
+
+        if (from == ent.Owner)
             source = Loc.GetString("life-log-source-self");
         else if (TryComp<ErrorgateAnomalyComponent>(from, out var fault))
             source = Loc.GetString("life-log-source-fault", ("kind", Loc.GetString("life-log-fault-" + fault.Kind.ToString().ToLowerInvariant())));
@@ -167,8 +209,19 @@ public sealed class LifeLogSystem : EntitySystem
         Add(victim, LogKind.DamageIn, source, amount: total);
     }
 
-    private string EnvironmentCause(DamageSpecifier delta)
+    private string EnvironmentCause(EntityUid victim, DamageSpecifier delta)
     {
+        // Starvation deals blood loss. When a starving character takes exactly the damage hunger deals, that is the cause
+        // (a bleeding wound of the very same size in the same moment would be called starvation too)
+        if (TryComp<HungerComponent>(victim, out var hunger)
+            && hunger.CurrentThreshold <= HungerThreshold.Starving
+            && hunger.StarvationDamage is { } starvation
+            && starvation.DamageDict.Count > 0
+            && starvation.DamageDict.All(d => delta.DamageDict.TryGetValue(d.Key, out var dealt) && Math.Abs((float) (dealt - d.Value)) < 0.01f))
+        {
+            return Loc.GetString("life-log-env-starvation");
+        }
+
         var biggest = delta.DamageDict.Where(d => d.Value > 0).OrderByDescending(d => (float) d.Value).FirstOrDefault();
         var cause = biggest.Key switch
         {
@@ -238,26 +291,35 @@ public sealed class LifeLogSystem : EntitySystem
 
     public List<string> BuildLines(LifeRecord record, TimeSpan now)
     {
-        var lines = new List<string> { Loc.GetString("life-log-header") };
-
-        var shown = record.Events.Skip(Math.Max(0, record.Events.Count - ShownLines)).ToList();
+        // Small environmental damage (a few ticks of bleeding or no air) is not worth a line
+        var visible = record.Events.Where(e => !e.Environmental || e.Amount >= MinorEnvironmentDamage).ToList();
+        var shown = visible.Skip(Math.Max(0, visible.Count - ShownLines)).ToList();
 
         // A short life starts at its beginning
-        if (record.Events.Count < ShownLines)
-            lines.Add(Loc.GetString("life-log-born", ("time", Clock(now - record.Born))));
+        var born = visible.Count < ShownLines;
+
+        // The same width for every time, so the bars line up
+        var spans = shown.Select(e => now - e.Time).ToList();
+        if (born)
+            spans.Add(now - record.Born);
+
+        var minutesWidth = Math.Max(2, spans.Select(s => ((int) Math.Max(0, s.TotalMinutes)).ToString().Length).DefaultIfEmpty(2).Max());
+
+        var lines = new List<string>();
+        if (born)
+            lines.Add(Loc.GetString("life-log-born", ("time", Clock(now - record.Born, minutesWidth))));
 
         foreach (var entry in shown)
         {
-            lines.Add(Line(entry, now));
+            lines.Add(Line(entry, Clock(now - entry.Time, minutesWidth)));
         }
 
-        lines.Add(Loc.GetString("life-log-end"));
+        lines.Add(Loc.GetString("life-log-end", ("time", Clock(TimeSpan.Zero, minutesWidth))));
         return lines;
     }
 
-    private string Line(LogEntry entry, TimeSpan now)
+    private string Line(LogEntry entry, string time)
     {
-        var time = Clock(now - entry.Time);
         var amount = (int) MathF.Round(entry.Amount);
         var merged = entry.Count > 1;
 
@@ -275,14 +337,14 @@ public sealed class LifeLogSystem : EntitySystem
     }
 
     /// <summary>
-    ///     Minutes and seconds, 04:52.
+    ///     Minutes, seconds and hundredths, 04:52.37, so that lines do not share a time.
     /// </summary>
-    private static string Clock(TimeSpan span)
+    private static string Clock(TimeSpan span, int minutesWidth)
     {
         if (span < TimeSpan.Zero)
             span = TimeSpan.Zero;
 
-        return $"{(int) span.TotalMinutes:00}:{span.Seconds:00}";
+        return $"{((int) span.TotalMinutes).ToString().PadLeft(minutesWidth, '0')}:{span.Seconds:00}.{span.Milliseconds / 10:00}";
     }
 
     private static string Upper(string text) => text.ToUpperInvariant();

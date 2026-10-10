@@ -1,6 +1,7 @@
 #nullable enable
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using Content.Client.UserInterface.Systems.Chat;
 using Content.Server._ERRORGATE.LifeLog;
 using Content.Server.Chat.Systems;
@@ -12,6 +13,8 @@ using Content.Shared.Language;
 using Content.Shared.Mind;
 using Content.Shared.Mobs;
 using Content.Shared.Mobs.Systems;
+using Content.Shared.Nutrition.Components;
+using Content.Shared.Nutrition.EntitySystems;
 using Robust.Client.UserInterface;
 using Robust.Server.GameObjects;
 using Robust.Server.Player;
@@ -118,9 +121,9 @@ public sealed class LifeLogTest
             var lines = Lines(world);
             var text = string.Join("\n", lines);
 
-            Assert.That(lines[0], Is.EqualTo(">>> LOG <<<"));
-            Assert.That(lines[1], Does.Match(@"^T-\d\d:\d\d  SUBJECT INSTANTIATED$"));
-            Assert.That(lines[^1], Is.EqualTo("T-00:00  SUBJECT TERMINATED"));
+            Assert.That(lines[0], Does.Match(@"^T-\d\d:\d\d\.\d\d \|  SUBJECT INSTANTIATED$"));
+            Assert.That(lines[^1], Is.EqualTo("T-00:00.00 |  SUBJECT TERMINATED"));
+            Assert.That(text, Does.Not.Contain("LOG"), "No header line.");
 
             Assert.That(text, Does.Contain("SPEECH      \"stay back\""));
             Assert.That(text, Does.Contain("HEARD       BORIS: \"give me the rifle\""));
@@ -163,8 +166,8 @@ public sealed class LifeLogTest
             var lines = Lines(world);
             var text = string.Join("\n", lines);
 
-            // header, 8 events, closing line
-            Assert.That(lines, Has.Count.EqualTo(10), text);
+            // 8 events and the closing line
+            Assert.That(lines, Has.Count.EqualTo(9), text);
             Assert.That(text, Does.Not.Contain("INSTANTIATED"), "A long life no longer shows its beginning.");
             Assert.That(text, Does.Not.Contain("line number 4\""));
             Assert.That(text, Does.Contain("line number 5\""));
@@ -228,9 +231,102 @@ public sealed class LifeLogTest
         // No attacker, so it is the environment. Checked at once: the airless test floor soon adds damage of its own.
         await server.WaitAssertion(() =>
         {
-            Hurt(server, world.Ivan, null, type, 2);
+            Hurt(server, world.Ivan, null, type, 6);
             var text = string.Join("\n", Lines(world));
-            Assert.That(text, Does.Contain("DAMAGE IN   " + cause + ": 2"), text);
+            Assert.That(text, Does.Contain("DAMAGE IN   " + cause + ": 6"), text);
+        });
+
+        await world.Pair.CleanReturnAsync();
+    }
+
+    [Test]
+    public async Task MinorEnvironmentalDamageIsGroupedAndLeftOutUntilItAddsUp()
+    {
+        var world = await Setup();
+        var server = world.Pair.Server;
+
+        // Ticks of 1 from two causes, interleaved: they are added up per cause and 3 and 2 are too little to show
+        await server.WaitAssertion(() =>
+        {
+            for (var i = 0; i < 3; i++)
+            {
+                Hurt(server, world.Ivan, null, "Bloodloss", 1);
+                if (i < 2)
+                    Hurt(server, world.Ivan, null, "Asphyxiation", 1);
+            }
+
+            var text = string.Join("\n", Lines(world));
+            Assert.That(text, Does.Not.Contain("BLOOD LOSS"), text);
+            Assert.That(text, Does.Not.Contain("NO AIR"), text);
+
+            // Four more ticks of blood loss make 7 in one line
+            for (var i = 0; i < 4; i++)
+            {
+                Hurt(server, world.Ivan, null, "Bloodloss", 1);
+            }
+
+            text = string.Join("\n", Lines(world));
+            Assert.That(text, Does.Contain("DAMAGE IN   BLOOD LOSS: 7 x7"), text);
+            Assert.That(text, Does.Not.Contain("NO AIR"), "Still too little.");
+            Assert.That(Regex.Matches(text, "BLOOD LOSS").Count, Is.EqualTo(1), "One line for the cause, not one per tick.");
+        });
+
+        await world.Pair.CleanReturnAsync();
+    }
+
+    [Test]
+    public async Task StarvationIsNotCalledBloodLoss()
+    {
+        var world = await Setup();
+        var server = world.Pair.Server;
+        var entMan = server.EntMan;
+
+        await server.WaitAssertion(() =>
+        {
+            // Starving, and hunger deals 1 blood loss per tick
+            entMan.System<HungerSystem>().SetHunger(world.Ivan, 0f);
+            Assert.That(entMan.GetComponent<HungerComponent>(world.Ivan).CurrentThreshold, Is.LessThanOrEqualTo(HungerThreshold.Starving));
+
+            for (var i = 0; i < 6; i++)
+            {
+                Hurt(server, world.Ivan, null, "Bloodloss", 1);
+            }
+
+            var text = string.Join("\n", Lines(world));
+            Assert.That(text, Does.Contain("DAMAGE IN   STARVATION: 6 x6"), text);
+            Assert.That(text, Does.Not.Contain("BLOOD LOSS"));
+
+            // A bigger loss of blood than hunger deals is still blood loss
+            Hurt(server, world.Ivan, null, "Bloodloss", 9);
+            text = string.Join("\n", Lines(world));
+            Assert.That(text, Does.Contain("DAMAGE IN   BLOOD LOSS: 9"), text);
+        });
+
+        await world.Pair.CleanReturnAsync();
+    }
+
+    [Test]
+    public async Task TheBarsLineUpWhateverTheTimes()
+    {
+        var world = await Setup();
+        var server = world.Pair.Server;
+
+        await server.WaitPost(() =>
+        {
+            Say(server, world.Ivan, "one");
+            Hurt(server, world.Ivan, world.Boris, "Blunt", 20);
+        });
+
+        // Long enough for minutes of two digits not to matter and for the lines to have different times
+        await world.Pair.RunSeconds(75);
+        await server.WaitPost(() => Say(server, world.Ivan, "two"));
+
+        await server.WaitAssertion(() =>
+        {
+            var lines = Lines(world);
+            var bars = lines.Select(l => l.IndexOf('|')).Distinct().ToList();
+            Assert.That(bars, Has.Count.EqualTo(1), "Every line should have its bar in the same column:\n" + string.Join("\n", lines));
+            Assert.That(lines.Select(l => l[..l.IndexOf('|')]).Distinct().Count(), Is.GreaterThan(1), "The times differ.");
         });
 
         await world.Pair.CleanReturnAsync();
@@ -299,7 +395,7 @@ public sealed class LifeLogTest
 
         var wrapped = errors[0].Wrapped;
         var title = wrapped.IndexOf("YOU ARE DEAD", StringComparison.Ordinal);
-        var log = wrapped.IndexOf(">>> LOG <<<", StringComparison.Ordinal);
+        var log = wrapped.IndexOf("SUBJECT INSTANTIATED", StringComparison.Ordinal);
         var end = wrapped.IndexOf("SUBJECT TERMINATED", StringComparison.Ordinal);
         var subtitle = wrapped.IndexOf("YOU FAILED TO ESCAPE", StringComparison.Ordinal);
 

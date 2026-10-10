@@ -35,6 +35,9 @@ public sealed class LogEntry
 
     public float Amount;
     public int Count = 1;
+
+    /// <summary>Damage nobody dealt (fire, cold, no air, blood loss, starvation...). Small totals are left out of the log.</summary>
+    public bool Environmental;
 }
 
 /// <summary>
