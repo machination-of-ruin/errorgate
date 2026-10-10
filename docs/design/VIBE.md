@@ -4,9 +4,24 @@ Read this before any other design doc. Every system exists to create the experie
 
 Sections marked **Decided** come from the project owner. Sections marked **Proposed** are suggested ways to get there: use them as direction, and confirm before building anything large on them.
 
+## The premise (Decided)
+
+Human civilization was destroyed by HUMAN ERROR.
+
+MACHINATION OF RUIN (the AI GOD, "she") survived. She holds the few remaining human consciousnesses inside the EDGE OF ENTROPY, in rebuilt bodies, and tries to rebuild civilization from them. She wants HUMAN ERROR removed from humans, but she cannot understand what it is. Everything she does to remove it is therefore wrong in a way she cannot see.
+
+Her ideal is the ERRORGATE: a state with zero error, where a consciousness may RISE and be worthy of rebuilding civilization. **The ERRORGATE is a concept, an unachievable ideal.** Nobody passes it. Players get closer or further, never through.
+
+Players are those consciousnesses. In game they look and play as ordinary humans: the bodies are rebuilt, not cyborg. No cyborg or machine appearance, parts or rules for players.
+
+Two rules follow from this and bind every feature:
+
+1. **She does not guide.** She never gives orders, quests, hints or goals. Humans have free will, and their free will is the error she is trying to remove. She builds conditions, watches what the players do with them, and records it. What players do is on them.
+2. **Same for groups.** She does not tell players to cooperate, split or trust each other. She puts pressure on them (scarcity, sealed doors, shared danger) and watches who cooperates, who betrays and who abandons. Cooperation and betrayal are both the players' own choice.
+
 ## The world (Decided)
 
-The AI GOD ravaged the world. Then it broke. It never shut down: it is still running, erratic and half-mad, a corrupted process acting on a world it already destroyed.
+MACHINATION OF RUIN never shut down: she is still running, erratic and half-mad, a corrupted process acting on what is left of a world humans already destroyed. The places players walk through are her attempts to rebuild civilization from memory, and they are wrong in small ways.
 
 What is left is a scorched planet surface covered in the remains of its war: dead machines, glitched zones where reality has stopped working properly, and the leftovers of people who did not make it.
 
@@ -20,7 +35,7 @@ To the GOD, survivors are test subjects, worshippers, heretics and errors to del
 
 - **First hour: dread.** Alone, watched, hunted. Every sound and every stranger is a threat.
 - **The GOD is a constant whisper.** Frequent small signs that it is watching. Players never forget it is there.
-- **Purpose comes from the machine.** There is no win condition. The GOD hands out trials, goals and prophecies. Following them is optional, and they may not be what they seem.
+- **Purpose comes from the players.** There is no win condition and the GOD gives no goals. It builds conditions and logs the result. Players invent their own reasons: reach the next depth, hold a ruin, survive the night, kill each other, protect each other.
 
 ## Who is out there (Decided)
 
@@ -38,6 +53,10 @@ Four layers, mixed across the map:
 3. **Glitched reality:** zones where physics, visuals or sound break down.
 4. **Human remnants:** abandoned camps, graffiti, corpses, notes from people who did not make it.
 
+## Pressure, not instructions (Decided)
+
+Two-key doors, power relays and scarcity need several people. She builds them and logs the result. Betrayal and sharing are both valid. Mechanisms and open questions: [pressure.md](pressure.md).
+
 ## How to achieve it (Proposed)
 
 ### Dread comes from not knowing
@@ -51,8 +70,8 @@ Four layers, mixed across the map:
 
 - A **glitch layer** that runs all the time: brief screen distortion or static, flickering lights, corrupted lines in chat, radios catching fragments of its voice. Small and frequent.
 - **Big acts are rare and loud**: when the GOD truly intervenes (a horde, a curse, an airdrop), everyone nearby should notice and stop.
-- **Its voice**: cold, broken, sometimes addressing one player by name. Never friendly, never jokey.
-- **Erratic by design**: it sometimes contradicts itself, rewards for nothing, punishes obedience. Players should never fully figure out its rules.
+- **Its voice**: cold, broken, sometimes addressing one player by name. Never friendly, never jokey. It records and observes in system-log language ("SUBJECT 4417: ERROR LOGGED"), it never instructs.
+- **Erratic because she cannot understand error**: she logs a kindness as an error and a murder as noise, rewards for nothing, punishes obedience. Players should never fully figure out her rules, because she does not know them either.
 - **Works without the LLM**: a scripted fallback keeps the whisper layer running when no LLM is configured or it fails, so the vibe never depends on an API being up.
 
 ### The world is a wound
@@ -68,10 +87,11 @@ Four layers, mixed across the map:
 - Cultists of the GOD connect the worship side of its nature to the world.
 - Lethal combat, full loot on death and no offline protection make every player encounter tense.
 
-### Goals that create tension
+### Conditions that create tension
 
-- GOD-given goals that need several players push strangers who do not trust each other to cooperate. That forced trust is a source of dread too.
-- Goals may be traps or lies.
+- **Conditions, not goals.** She sets up situations that need several players (a vault with two far-apart switches, a sealed sector, a power relay) and says nothing about them. Players decide whether to cooperate, and the outcome is logged either way.
+- Forced trust between strangers who may betray each other is a source of dread.
+- A condition may be a trap. She does not know it is one.
 
 ### Remove what breaks the vibe
 
@@ -79,8 +99,20 @@ Four layers, mixed across the map:
 - Comic and meme content: clown/mime gear, bike horns, joke items, silly emotes and chemicals.
 - Bright, clean, safe-looking spaces.
 
+## Showing the premise through play (Proposed)
+
+The premise must be felt, not explained. She never says it. Directions to confirm before building anything large:
+
+- **Error is counted, never explained.** Deaths, betrayals, abandoned teammates and waste are logged against a subject. Players may see log lines, never the rules. A distance-to-ERRORGATE readout approaches zero but never reaches it.
+- **Places are her reconstructions.** The liminal spaces in EDGE OF ENTROPY and the town in KUZNETSK are civilization rebuilt from memory and slightly wrong: mismatched signs, rooms that repeat, a snowstorm that is a rendering fault, anomalies where a rebuild failed.
+- **Depth is the only direction.** Going deeper is the only thing the world rewards and it gets harder. No one tells players to go. Reaching the ERRORGATE shows it as a sealed, impossible structure; it never opens.
+- **Death is re-instantiation.** The death void is her buffer. Dying is logged as an error and the consciousness is loaded into a new body with nothing. `/rise` is the word for it.
+- **She misjudges.** She logs a kindness as an error and a murder as noise. Her rewards and punishments feel arbitrary because she does not know what error is.
+- **No guidance in the interface.** No quest log, markers or objectives. All information is physical: notes, terminals, corpses, her log lines.
+
 ## The test for any feature
 
 1. Does it make players feel watched, hunted or unsure?
 2. Does it make the world feel ruined by a broken machine?
 3. Does it give players too much information or too much safety? If so, cut it back.
+4. Does it tell players what to do? She never guides: cut any order, quest, marker or hint.

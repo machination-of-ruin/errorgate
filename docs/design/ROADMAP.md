@@ -4,7 +4,7 @@ General notes. Each feature has its own `docs/design/<feature>.md`; read it befo
 
 ## Vision
 
-**Read [VIBE.md](VIBE.md) first.** It defines the experience every feature serves: a pure-horror wasteland ravaged by a broken AI GOD that is still running.
+**Read [VIBE.md](VIBE.md) first.** It defines the premise and the experience every feature serves: a pure-horror wasteland where a broken AI, MACHINATION OF RUIN, tries to rebuild civilization from the last human consciousnesses and cannot understand HUMAN ERROR. The ERRORGATE is an unachievable ideal. She never guides the players.
 
 ERRORGATE is an immersive PvPvE survival experience set in a harsh world. There is no obligation to roleplay. Players are free to make allies or enemies and to enjoy fights with enhanced combat mechanics.
 
@@ -14,7 +14,7 @@ Inspirations: DayZ, Rust, Project Zomboid, Cataclysm: DDA.
 
 1. **Strip the space station.** Remove most station-specific content (departments, shuttles, round flow, roles that only make sense on a station) and reshape the game into a gritty multiplayer survival simulator.
 2. **Enhance combat.** Deeper, more lethal combat mechanics to support PvP and PvE fights.
-3. **AI "GOD".** An in-game gamerule with a system that tracks player behaviour and uses an LLM to formulate responses, set goals, and punish or reward players.
+3. **AI "GOD".** An in-game gamerule with a system that tracks player behaviour and uses an LLM to formulate responses, build conditions, and punish or reward players. It never gives goals or orders.
 
 ## Decisions
 
@@ -26,6 +26,7 @@ Inspirations: DayZ, Rust, Project Zomboid, Cataclysm: DDA.
 | Core loop | Needs, crafting, looting/scavenging, and cooperation forced by shared objectives and scarcity. | [survival-loop.md](survival-loop.md) |
 | Building | Full creative freedom, limited resources. Bases are existing ruins, held physically, raidable anytime. | [survival-loop.md](survival-loop.md) |
 | Loot | Finite per wipe, via the DayZ-style loot manager (ported). | [survival-loop.md](survival-loop.md) |
+| Pressure | She builds situations that need several people and logs the result. Never instructions. | [pressure.md](pressure.md) |
 | Combat | Lethality, firearms depth, melee depth, dangerous PvE enemies. | [combat.md](combat.md) |
 | AI GOD | Both an event director for the world and a judge of individual players. Whitelisted actions (events, messages, items, bodies), loose strength limits. Pluggable LLM provider. | [ai-god.md](ai-god.md) |
 

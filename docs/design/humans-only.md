@@ -2,6 +2,10 @@
 
 ERRORGATE is a **human-only** fork. Every survivor is a human.
 
+## Lore
+
+Survivors are human consciousnesses in bodies rebuilt by MACHINATION OF RUIN (see the premise in [VIBE.md](VIBE.md)). They look and play as plain humans. No cyborg appearance, parts or rules.
+
 ## What this means
 
 - Only the `Human` species is selectable at roundstart (`roundStart: false` on every other species) and the random species weights contain only `Human`. See port #4, commit `affa868b99`.
