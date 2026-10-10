@@ -35,13 +35,23 @@ public sealed class RandomMagGunsTest
                 var gun = entMan.SpawnEntity(variant.ID, testMap.GridCoords);
                 var parent = entMan.SpawnEntity(variant.Parents![0], testMap.GridCoords);
 
-                Assert.That(slots.TryGetSlot(gun, "gun_magazine", out var slot) && slot != null, Is.True, variant.ID);
-                Assert.That(slots.TryGetSlot(parent, "gun_magazine", out var parentSlot) && parentSlot != null, Is.True, variant.ID);
+                var parentSlots = entMan.GetComponent<ItemSlotsComponent>(parent).Slots;
+                var gunSlots = entMan.GetComponent<ItemSlotsComponent>(gun).Slots;
 
-                Assert.That(slot!.Whitelist, Is.Not.Null, $"{variant.ID} takes anything in its magazine slot");
-                Assert.That(slot.Whitelist!.Tags, Is.EquivalentTo(parentSlot!.Whitelist!.Tags!), $"{variant.ID} accepts other magazines than {variant.Parents![0]}");
-                Assert.That(slot.InsertSound?.ToString(), Is.EqualTo(parentSlot.InsertSound?.ToString()), variant.ID);
-                Assert.That(slot.Priority, Is.EqualTo(parentSlot.Priority), variant.ID);
+                Assert.That(gunSlots.Keys, Is.EquivalentTo(parentSlots.Keys), $"{variant.ID} lost a slot of {variant.Parents![0]}");
+
+                foreach (var (id, parentSlot) in parentSlots)
+                {
+                    var slot = gunSlots[id];
+                    Assert.That(slot.Whitelist?.Tags, Is.EquivalentTo(parentSlot.Whitelist?.Tags ?? new()), $"{variant.ID} slot {id} accepts other things than its parent");
+                    Assert.That(slot.InsertSound?.ToString(), Is.EqualTo(parentSlot.InsertSound?.ToString()), $"{variant.ID} {id}");
+                    Assert.That(slot.Priority, Is.EqualTo(parentSlot.Priority), $"{variant.ID} {id}");
+                    Assert.That(slot.Locked, Is.EqualTo(parentSlot.Locked), $"{variant.ID} {id}");
+
+                    // The chamber is loaded exactly like the parent's
+                    if (id == "gun_chamber")
+                        Assert.That(slots.GetItemOrNull(gun, id) != null, Is.EqualTo(slots.GetItemOrNull(parent, id) != null), $"{variant.ID} chamber");
+                }
             }
         });
 

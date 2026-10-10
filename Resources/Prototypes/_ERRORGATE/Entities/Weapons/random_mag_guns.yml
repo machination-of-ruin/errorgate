@@ -1,4 +1,4 @@
-# The slot is written out in full: an entry in a child prototype replaces the whole slot of the parent, and a slot without a whitelist takes anything (ammo boxes, junk).
+# Every slot is written out in full: a slots entry in a child prototype replaces all the slots of the parent (a missing whitelist takes anything, a missing chamber slot leaves the gun unable to chamber).
 # Guns that start with a randomly loaded magazine. The normal guns always spawn with a full one.
 
 - type: entity
@@ -17,6 +17,13 @@
           tags:
           - Magazine9x19
         startingItem: Magazine9x19Random
+      gun_chamber:
+        name: Chamber
+        priority: 1
+        locked: true
+        whitelist:
+          tags:
+          - Cartridge9x19
 
 - type: entity
   id: WeaponPistolBerettaRandomMag
@@ -35,6 +42,13 @@
           - Magazine9x19
           - Magazine9x19HighCapacity
         startingItem: Magazine9x19Random
+      gun_chamber:
+        name: Chamber
+        priority: 1
+        locked: true
+        whitelist:
+          tags:
+          - Cartridge9x19
 
 - type: entity
   id: WeaponPistolM1911RandomMag
@@ -52,6 +66,13 @@
           tags:
           - Magazine45ACP
         startingItem: Magazine45ACPRandom
+      gun_chamber:
+        name: Chamber
+        priority: 1
+        locked: true
+        whitelist:
+          tags:
+          - Cartridge45ACP
 
 - type: entity
   id: WeaponPistolStechkinRandomMag
@@ -70,6 +91,13 @@
           - Magazine9x19
           - Magazine9x19HighCapacity
         startingItem: Magazine9x19HighCapacityRandom
+      gun_chamber:
+        name: Chamber
+        priority: 1
+        locked: true
+        whitelist:
+          tags:
+          - Cartridge9x19
 
 - type: entity
   id: WeaponPistolGlockRandomMag
@@ -88,6 +116,13 @@
           - Magazine9x19
           - Magazine9x19HighCapacity
         startingItem: Magazine9x19Random
+      gun_chamber:
+        name: Chamber
+        priority: 1
+        locked: true
+        whitelist:
+          tags:
+          - Cartridge9x19
 
 - type: entity
   id: WeaponPistolUSPRandomMag
@@ -105,6 +140,13 @@
           tags:
           - MagazineUSP45ACP
         startingItem: MagazineUSP45ACPRandom
+      gun_chamber:
+        name: Chamber
+        priority: 1
+        locked: true
+        whitelist:
+          tags:
+          - Cartridge45ACP
 
 - type: entity
   id: WeaponRifleAkRandomMag
@@ -123,6 +165,13 @@
           - Magazine762x39
         whitelistFailPopup: gun-magazine-whitelist-fail
         startingItem: Magazine762x39Random
+      gun_chamber:
+        name: Chamber
+        startingItem: Cartridge762x39
+        priority: 1
+        whitelist:
+          tags:
+          - Cartridge762x39
 
 - type: entity
   id: WeaponRifleM90GrenadeLauncherRandomMag
@@ -141,6 +190,13 @@
           - Magazine556x45
         whitelistFailPopup: gun-magazine-whitelist-fail
         startingItem: Magazine556x45Random
+      gun_chamber:
+        name: Chamber
+        startingItem: Cartridge556x45
+        priority: 1
+        whitelist:
+          tags:
+          - Cartridge556x45
 
 - type: entity
   id: WeaponRifleLecterRandomMag
@@ -159,6 +215,13 @@
           - Magazine556x45
         whitelistFailPopup: gun-magazine-whitelist-fail
         startingItem: Magazine556x45Random
+      gun_chamber:
+        name: Chamber
+        startingItem: Cartridge556x45
+        priority: 1
+        whitelist:
+          tags:
+          - Cartridge556x45
 
 - type: entity
   id: WeaponRifleL1A1RandomMag
@@ -176,6 +239,13 @@
           tags:
           - Magazine762x39
         startingItem: Magazine762x39ShortRandom
+      gun_chamber:
+        name: Chamber
+        priority: 1
+        locked: true
+        whitelist:
+          tags:
+          - Cartridge762x39
 
 - type: entity
   id: WeaponRifleJackdawRandomMag
@@ -193,6 +263,13 @@
           tags:
           - Magazine6mmCaseless
         startingItem: Magazine6mmCaselessRandom
+      gun_chamber:
+        name: Chamber
+        startingItem: Cartridge6mmCaseless
+        priority: 1
+        whitelist:
+          tags:
+          - Cartridge6mmCaseless
 
 - type: entity
   id: WeaponRifleTenebraRandomMag
@@ -210,6 +287,13 @@
           tags:
           - Magazine556x45
         startingItem: Magazine556x45Random
+      gun_chamber:
+        name: Chamber
+        startingItem: Cartridge556x45
+        priority: 1
+        whitelist:
+          tags:
+          - Cartridge556x45
 
 - type: entity
   id: WeaponRifleASValRandomMag
@@ -227,6 +311,13 @@
           tags:
           - Magazine762x39
         startingItem: Magazine762x39Random
+      gun_chamber:
+        name: Chamber
+        priority: 1
+        locked: true
+        whitelist:
+          tags:
+          - Cartridge762x39
 
 - type: entity
   id: WeaponSubMachineGunMP5RandomMag
@@ -244,6 +335,12 @@
           tags:
           - Magazine9x19SubMachineGun
         startingItem: Magazine9x19SubMachineGunRandom
+      gun_chamber:
+        name: Chamber
+        priority: 1
+        whitelist:
+          tags:
+          - Cartridge9x19
 
 - type: entity
   id: WeaponSubMachineGunVector45ACPRandomMag
@@ -261,6 +358,13 @@
           tags:
           - Magazine45ACPSubMachineGun
         startingItem: Magazine45ACPSubMachineGunRandom
+      gun_chamber:
+        name: Chamber
+        priority: 1
+        locked: true
+        whitelist:
+          tags:
+          - Cartridge45ACP
 
 - type: entity
   id: WeaponSubMachineGunVector9x19mmRandomMag
@@ -279,6 +383,13 @@
           - Magazine9x19
           - Magazine9x19HighCapacity
         startingItem: Magazine9x19UltraHighCapacityRandom
+      gun_chamber:
+        name: Chamber
+        priority: 1
+        locked: true
+        whitelist:
+          tags:
+          - Cartridge9x19
 
 - type: entity
   id: WeaponSubMachineGunWt550RandomMag
@@ -297,6 +408,13 @@
           - Magazine9x19SubMachineGunTopMounted
         whitelistFailPopup: gun-magazine-whitelist-fail
         startingItem: Magazine9x19SubMachineGunTopMountedRandom
+      gun_chamber:
+        name: Chamber
+        startingItem: Cartridge9x19
+        priority: 1
+        whitelist:
+          tags:
+          - Cartridge9x19
 
 - type: entity
   id: WeaponSubMachineGunThompsonRandomMag
@@ -314,6 +432,13 @@
           tags:
           - Magazine45ACPSubMachineGun
         startingItem: Magazine45ACPSubMachineGunRandom
+      gun_chamber:
+        name: Chamber
+        priority: 1
+        locked: true
+        whitelist:
+          tags:
+          - Cartridge45ACP
 
 - type: entity
   id: WeaponPistolP226RandomMag
@@ -332,6 +457,13 @@
           - Magazine9x19
         whitelistFailPopup: gun-magazine-whitelist-fail
         startingItem: Magazine9x19Random
+      gun_chamber:
+        name: Chamber
+        startingItem: Cartridge9x19
+        priority: 1
+        whitelist:
+          tags:
+          - Cartridge9x19
 
 - type: entity
   id: WeaponSubMachineMP9RandomMag
@@ -350,6 +482,13 @@
           - Magazine9x19SubMachineGun
         whitelistFailPopup: gun-magazine-whitelist-fail
         startingItem: Magazine9x19SubMachineGunRandom
+      gun_chamber:
+        name: Chamber
+        startingItem: Cartridge9x19
+        priority: 1
+        whitelist:
+          tags:
+          - Cartridge9x19
 
 - type: entity
   id: WeaponLightMachineM249RandomMag
@@ -366,6 +505,12 @@
           tags:
           - Magazine556x45Box
         startingItem: Magazine556x45BoxRandom
+      gun_chamber:
+        startingItem: Cartridge556x45
+        priority: 0
+        whitelist:
+          tags:
+          - Cartridge556x45
 
 - type: entity
   id: WeaponShotgunBulldogRandomMag
@@ -384,6 +529,14 @@
           - MagazineShotgun
         whitelistFailPopup: gun-magazine-whitelist-fail
         startingItem: MagazineShotgunRandom
+      gun_chamber:
+        name: Chamber
+        startingItem: ShellShotgun
+        priority: 1
+        locked: true
+        whitelist:
+          tags:
+          - ShellShotgun
 
 # Guns with an internal magazine: the load itself is random.
 
