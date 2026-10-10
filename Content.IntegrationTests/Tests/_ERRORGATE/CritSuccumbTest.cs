@@ -20,8 +20,9 @@ namespace Content.IntegrationTests.Tests._ERRORGATE;
 [TestFixture]
 public sealed class CritSuccumbTest
 {
-    [Test]
-    public async Task SuccumbingKillsAndStaysDeadWhileDamageContinues()
+    [TestCase(false)]
+    [TestCase(true)]
+    public async Task SuccumbingKillsAndStaysDead(bool damageContinues)
     {
         var pair = await PoolManager.GetServerClient(new PoolSettings { Connected = true, Dirty = true });
         var server = pair.Server;
@@ -38,6 +39,11 @@ public sealed class CritSuccumbTest
         {
             entMan.System<MapSystem>().CreateMap(out var mapId);
             human = entMan.SpawnEntity("MobHuman", new MapCoordinates(0, 0, mapId));
+            // No ambient damage of the test world (vacuum, cold, no air), so the only damage there is, is what the test deals
+            entMan.RemoveComponent<Content.Server.Atmos.Components.BarotraumaComponent>(human);
+            entMan.RemoveComponent<Content.Server.Body.Components.RespiratorComponent>(human);
+            entMan.RemoveComponent<Content.Server.Temperature.Components.TemperatureComponent>(human);
+
             var mind = entMan.System<SharedMindSystem>();
             mind.TransferTo(mind.CreateMind(session.UserId), human);
 
@@ -52,8 +58,14 @@ public sealed class CritSuccumbTest
         await pair.RunTicksSync(5);
 
         // Damage keeps coming, like burning or no air
-        for (var i = 0; i < 20; i++)
+        for (var i = 0; i < (damageContinues ? 20 : 4); i++)
         {
+            if (!damageContinues)
+            {
+                await pair.RunTicksSync(5);
+                continue;
+            }
+
             await server.WaitPost(() =>
             {
                 if (entMan.EntityExists(human))
