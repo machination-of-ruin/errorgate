@@ -25,12 +25,12 @@
 - type: lootEntry
   id: KukriKnife
   rarityTiers: [2]
-  locations: [Living, Industial, Prison]
+  locations: [Living, Industrial, Prison]
 
 - type: lootEntry
   id: FireAxe
   rarityTiers: [2, 3]
-  locations: [Industial]
+  locations: [Industrial]
 
 
 # Rarity 3
