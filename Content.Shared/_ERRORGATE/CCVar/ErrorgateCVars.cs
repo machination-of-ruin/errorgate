@@ -216,5 +216,35 @@ public sealed class ErrorgateCVars
     public static readonly CVarDef<float> GodPrayerDelay =
         CVarDef.Create("errorgate.god.prayer_delay", 8f, CVar.SERVERONLY);
 
+    /// <summary>
+    ///     Seconds between two calls to the model when nothing urgent happens.
+    /// </summary>
+    public static readonly CVarDef<float> GodLlmInterval =
+        CVarDef.Create("errorgate.god.llm_interval", 480f, CVar.SERVERONLY);
+
+    /// <summary>
+    ///     Least seconds between two calls even when something urgent happens (a prayer, a run of deaths).
+    /// </summary>
+    public static readonly CVarDef<float> GodLlmEarlyGap =
+        CVarDef.Create("errorgate.god.llm_early_gap", 90f, CVar.SERVERONLY);
+
+    /// <summary>
+    ///     This many deaths within a minute count as urgent.
+    /// </summary>
+    public static readonly CVarDef<int> GodLlmSpikeDeaths =
+        CVarDef.Create("errorgate.god.llm_spike_deaths", 3, CVar.SERVERONLY);
+
+    /// <summary>
+    ///     Seconds between asking the model for new lines for her line bank. 0 turns writer mode off.
+    /// </summary>
+    public static readonly CVarDef<float> GodWriterInterval =
+        CVarDef.Create("errorgate.god.writer_interval", 1800f, CVar.SERVERONLY);
+
+    /// <summary>
+    ///     Chance (0 to 1) that a subject close to a death is told of it, for each of them (two at most).
+    /// </summary>
+    public static readonly CVarDef<float> GodDeathLineChance =
+        CVarDef.Create("errorgate.god.death_line_chance", 0.4f, CVar.SERVERONLY);
+
     #endregion
 }

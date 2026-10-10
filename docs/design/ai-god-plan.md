@@ -25,7 +25,21 @@ How MACHINATION OF RUIN is built. Read [VIBE.md](VIBE.md) and [ai-god.md](ai-god
 
 ## Built so far (step 1)
 
-Sectors, ledger, altar prayers, mention filter, digest builder and the admin commands `godstatus`, `goddigest` and `godsectors`. Tests: `GodDigestTest` (unit), `GodStepOneTest`. The action pipeline (`GodDirectorSystem`: validator, wrath budget, cooldowns, dry-run, approval with expiry, decision log) with subtle messages, announcements and glitch events, the voice rules (`godVoice` prototype), and the commands `godlog`, `godapprove`, `goddeny`, `godpause`, `godresume`, `godforce`. Tests: `GodActionTest` (unit), `GodDirectorTest`. The client glitch overlay (static, reusing the arc fault shader), and the scripted director (`GodScriptedSystem`: a small sign every ~150 s for a subject chosen by salience, a line for the witnesses of a death, an answer to a prayer at an altar, lines in `godLines`, tested against the voice rules). Mode `off` and `full` switch it off. Tests: `GodScriptedTest`. Still to build for step 1: the LLM director and writer mode.
+Sectors, ledger, altar prayers, mention filter, digest builder and the admin commands `godstatus`, `goddigest` and `godsectors`. Tests: `GodDigestTest` (unit), `GodStepOneTest`. The action pipeline (`GodDirectorSystem`: validator, wrath budget, cooldowns, dry-run, approval with expiry, decision log) with subtle messages, announcements and glitch events, the voice rules (`godVoice` prototype), and the commands `godlog`, `godapprove`, `goddeny`, `godpause`, `godresume`, `godforce`. Tests: `GodActionTest` (unit), `GodDirectorTest`. The client glitch overlay (static, reusing the arc fault shader), and the scripted director (`GodScriptedSystem`: a small sign every ~150 s for a subject chosen by salience, a line for the witnesses of a death, an answer to a prayer at an altar, lines in `godLines`, tested against the voice rules). Mode `off` and `full` switch it off. Tests: `GodScriptedTest`. The LLM director (`GodLlmDirectorSystem`: stateless turns, digest in, JSON out, notes carried over, summary pre-pass for mention overflow, restore on failure, early calls on a prayer or three deaths in a minute, scripted fallback in `full` mode) and writer mode (validated extra lines for the line bank), the fixed texts in `prompt.yml`, and the commands `godprompt` and `godcall`. Tests: `GodReplyParserTest` (unit), `GodLlmDirectorTest` (fake model). **Step 1 is built and waits for a playtest.**
+
+## Running step 1 in a playtest
+
+Everything is off or held back by default (a new server logs decisions and sends nothing). In the server console or config:
+
+| Goal | Settings |
+|---|---|
+| Watch only | `errorgate.god.enabled true`, leave `dry_run true`. Use `godstatus`, `goddigest`, `godlog`. |
+| Scripted voice, you confirm each action | `enabled true`, `mode scripted`, `dry_run false`, `approval true`. Answer with `godapprove <id|all>` or `goddeny <id|all>`. |
+| Scripted voice, no confirmation | the same with `approval false`. |
+| With a model | `mode assisted` (scripted rules plus the model) or `full` (the model, scripted rules only as fallback). Set `llm_api_url`, `llm_api_key`, `llm_model`. `godcall` asks now, `godprompt` shows the last digest and reply. |
+| Stop | `godpause`, or `enabled false`. |
+
+Other valves: `whisper_interval`, `llm_interval`, `llm_min_interval`, `llm_max_calls_per_round`, `budget_per_minute`, `budget_cap`, `target_cooldown`, `announce_cooldown`, `quiet_seconds`, `min_players`, `sector_size`, `uppercase`. Every player-facing line must be approved by the project owner before it goes in.
 
 ## Layers
 

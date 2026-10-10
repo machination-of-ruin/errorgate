@@ -66,7 +66,9 @@ public sealed class GodLlmSystem : EntitySystem
     /// <summary>
     ///     Asks the model. Null when the system is off, the request was refused by a limit, or anything went wrong.
     /// </summary>
-    public async Task<string?> Complete(IReadOnlyList<LlmMessage> messages)
+    /// <param name="chained">A second call of the same turn (a summary before the main call): it may follow at once, the
+    /// minimum interval does not apply, but the cap and the backoff still do.</param>
+    public async Task<string?> Complete(IReadOnlyList<LlmMessage> messages, bool chained = false)
     {
         if (!_cfg.GetCVar(ErrorgateCVars.GodEnabled))
             return null;
@@ -79,7 +81,7 @@ public sealed class GodLlmSystem : EntitySystem
         }
 
         var now = _timing.RealTime;
-        if (now < _nextAllowed)
+        if (now < _nextAllowed && !(chained && _failures == 0))
         {
             Log.Debug("LLM request refused: inside the minimum interval or the failure backoff.");
             return null;

@@ -118,6 +118,24 @@ public sealed class GodEventBuffer
         return drain;
     }
 
+    /// <summary>
+    ///     Puts a drain back, for when the call it was taken for failed. What came in meanwhile stays after it.
+    /// </summary>
+    public void Restore(GodDrain drain)
+    {
+        _events.InsertRange(0, drain.Events);
+        if (EventCapacity > 0 && _events.Count > EventCapacity)
+            _events.RemoveRange(0, _events.Count - EventCapacity);
+
+        _prayers.InsertRange(0, drain.Prayers);
+        if (QuoteCapacity > 0 && _prayers.Count > QuoteCapacity)
+            _prayers.RemoveRange(0, _prayers.Count - QuoteCapacity);
+
+        _mentions.InsertRange(0, drain.Mentions);
+        if (QuoteCapacity > 0 && _mentions.Count > QuoteCapacity)
+            _mentions.RemoveRange(0, _mentions.Count - QuoteCapacity);
+    }
+
     public IReadOnlyList<GodEvent> Events => _events;
     public int ChatCount => _chat.Count;
 

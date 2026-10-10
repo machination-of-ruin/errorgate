@@ -51,6 +51,12 @@ public sealed class GodDirectorSystem : EntitySystem
     /// <summary>Stops everything (godpause) without changing the valves.</summary>
     public bool Paused;
 
+    /// <summary>True while the model is not answering in full mode: the scripted rules take over.</summary>
+    public bool LlmFailing;
+
+    /// <summary>Lines the model wrote in writer mode, by category (error, omen, prayer), with their slots.</summary>
+    public readonly Dictionary<string, List<string>> ExtraLines = new();
+
     private GodActionValidator? _validator;
     private int _nextId = 1;
     private bool _enabled;
@@ -90,6 +96,8 @@ public sealed class GodDirectorSystem : EntitySystem
     public void Reset()
     {
         Log.Clear();
+        ExtraLines.Clear();
+        LlmFailing = false;
         _nextId = 1;
         Paused = false;
         Budget.Reset(_timing.CurTime);
@@ -126,6 +134,25 @@ public sealed class GodDirectorSystem : EntitySystem
         }
 
         Carry(decision, source != GodSource.Admin);
+        return decision;
+    }
+
+    /// <summary>
+    ///     Writes down something that was thrown away before it became an action (a reply the parser could not use).
+    /// </summary>
+    public GodDecision RecordRejected(GodSource source, string reason, GodAction? action = null)
+    {
+        var decision = new GodDecision
+        {
+            Id = _nextId++,
+            Time = _timing.CurTime,
+            Source = source,
+            Action = action ?? new GodAction(),
+            Status = GodActionStatus.Rejected,
+            Reason = reason,
+        };
+
+        Remember(decision);
         return decision;
     }
 

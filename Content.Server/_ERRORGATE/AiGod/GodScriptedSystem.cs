@@ -41,6 +41,7 @@ public sealed class GodScriptedSystem : EntitySystem
     private string _mode = "scripted";
     private float _interval = 150f;
     private float _prayerDelay = 8f;
+    private float _deathLineChance = 0.4f;
 
     public override void Initialize()
     {
@@ -48,12 +49,7 @@ public sealed class GodScriptedSystem : EntitySystem
 
         SubscribeLocalEvent<GodSubjectDiedEvent>(OnDied);
         SubscribeLocalEvent<PrayedEvent>(OnPrayed);
-        SubscribeLocalEvent<RoundRestartCleanupEvent>(_ =>
-        {
-            _later.Clear();
-            _said.Clear();
-            _nextWhisper = TimeSpan.Zero;
-        });
+        SubscribeLocalEvent<RoundRestartCleanupEvent>(_ => Reset());
 
         Subs.CVar(_cfg, ErrorgateCVars.GodEnabled, v => _enabled = v, true);
         Subs.CVar(_cfg, ErrorgateCVars.GodMode, v => _mode = v.Trim().ToLowerInvariant(), true);
@@ -64,12 +60,23 @@ public sealed class GodScriptedSystem : EntitySystem
             _nextWhisper = TimeSpan.Zero;
         }, true);
         Subs.CVar(_cfg, ErrorgateCVars.GodPrayerDelay, v => _prayerDelay = v, true);
+        Subs.CVar(_cfg, ErrorgateCVars.GodDeathLineChance, v => _deathLineChance = v, true);
     }
 
     /// <summary>
-    ///     The scripted rules run in "scripted" and "assisted" mode (and later as the fallback of "full").
+    ///     Forgets what was scheduled and what was said, for a new round.
     /// </summary>
-    private bool Active => _enabled && _mode is not ("off" or "full");
+    public void Reset()
+    {
+        _later.Clear();
+        _said.Clear();
+        _nextWhisper = TimeSpan.Zero;
+    }
+
+    /// <summary>
+    ///     The scripted rules run in "scripted" and "assisted" mode, and as the fallback of "full" while the model is not answering.
+    /// </summary>
+    private bool Active => _enabled && (_mode is not ("off" or "full") || _mode == "full" && _director.LlmFailing);
 
     private GodLinesPrototype Lines => _proto.Index<GodLinesPrototype>("Default");
 
@@ -123,13 +130,13 @@ public sealed class GodScriptedSystem : EntitySystem
             return;
         }
 
-        var line = PickLine(Lines.Omen, subject, subject.Sector);
+        var line = PickLine(WithExtras(Lines.Omen, "omen"), subject, subject.Sector);
         if (line != null)
             _director.Submit(new GodAction { Type = GodActionType.Subtle, Targets = { subject.Number }, Text = line }, GodSource.Scripted);
     }
 
     /// <summary>
-    ///     A few seconds after a death, the ones who were close hear of it. A death alone in the wilderness is silent.
+    ///     A few seconds after a death, some of the ones who were close hear of it, each by chance. A death alone in the wilderness is silent.
     /// </summary>
     private void OnDied(GodSubjectDiedEvent ev)
     {
@@ -147,7 +154,11 @@ public sealed class GodScriptedSystem : EntitySystem
                 if (heard >= MaxWitnesses || _ledger.Ledger.ByNumber(number) is not { } witness || !_ledger.TryGetReachable(witness, out _, out _))
                     continue;
 
-                var line = PickLine(Lines.Error, dead, dead.Sector);
+                // Not everyone nearby hears of it: each witness only with some chance
+                if (!_random.Prob(_deathLineChance))
+                    continue;
+
+                var line = PickLine(WithExtras(Lines.Error, "error"), dead, dead.Sector);
                 if (line == null)
                     return;
 
@@ -168,7 +179,7 @@ public sealed class GodScriptedSystem : EntitySystem
         var delay = _prayerDelay * _random.NextFloat(0.7f, 1.5f);
         _later.Add((_timing.CurTime + TimeSpan.FromSeconds(delay), () =>
         {
-            var line = PickLine(Lines.Prayer, subject, subject.Sector);
+            var line = PickLine(WithExtras(Lines.Prayer, "prayer"), subject, subject.Sector);
             if (line != null)
                 _director.Submit(new GodAction { Type = GodActionType.Subtle, Targets = { subject.Number }, Text = line }, GodSource.Scripted);
         }));
@@ -204,6 +215,14 @@ public sealed class GodScriptedSystem : EntitySystem
             _said.RemoveAt(0);
 
         return chosen;
+    }
+
+    /// <summary>
+    ///     The prototype's lines and the ones the model wrote this round.
+    /// </summary>
+    private List<string> WithExtras(List<string> lines, string category)
+    {
+        return _director.ExtraLines.TryGetValue(category, out var extra) ? lines.Concat(extra).ToList() : lines;
     }
 
     public static string Fill(string line, Subject about, string? sector)

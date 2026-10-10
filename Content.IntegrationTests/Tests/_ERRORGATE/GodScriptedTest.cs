@@ -87,11 +87,13 @@ public sealed class GodScriptedTest
             cfg.SetCVar(ErrorgateCVars.GodBudgetPerMinute, 60f);
             cfg.SetCVar(ErrorgateCVars.GodWhisperInterval, whisperInterval);
             cfg.SetCVar(ErrorgateCVars.GodPrayerDelay, 0.3f);
+            cfg.SetCVar(ErrorgateCVars.GodDeathLineChance, 1f);
 
             entMan.System<GodObserverSystem>().Clear();
             var ledgerSystem = entMan.System<GodLedgerSystem>();
             ledgerSystem.Clear();
             world.Director.Reset();
+            entMan.System<GodScriptedSystem>().Reset();
             world.Director.Budget.Points = 100f;
 
             entMan.System<MapSystem>().CreateMap(out var mapId);
@@ -181,6 +183,26 @@ public sealed class GodScriptedTest
             Assert.That(sent[0].Action.Text, Does.Contain("BORIS").Or.Contain($"S{world.BorisSubject.Number}"));
         });
 
+        await world.Pair.CleanReturnAsync();
+    }
+
+    [Test]
+    public async Task NotEveryWitnessHearsOfADeath()
+    {
+        var world = await Setup();
+        var server = world.Pair.Server;
+
+        // With no chance at all, nobody is told, however close they stood
+        await server.WaitPost(() =>
+        {
+            server.CfgMan.SetCVar(ErrorgateCVars.GodDeathLineChance, 0f);
+            world.BorisSubject.Near.Add(world.IvanSubject.Number);
+            Kill(server, world.Boris, world.Ivan);
+        });
+
+        await world.Pair.RunSeconds(5);
+
+        Assert.That(world.Director.Log, Is.Empty, Describe(world));
         await world.Pair.CleanReturnAsync();
     }
 

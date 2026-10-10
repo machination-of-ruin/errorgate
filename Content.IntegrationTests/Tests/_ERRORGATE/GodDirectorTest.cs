@@ -67,6 +67,7 @@ public sealed class GodDirectorTest
             var ledgerSystem = entMan.System<GodLedgerSystem>();
             ledgerSystem.Clear();
             world.Director.Reset();
+            entMan.System<GodScriptedSystem>().Reset();
             world.Director.Budget.Points = 100f;
 
             entMan.System<MapSystem>().CreateMap(out var mapId);

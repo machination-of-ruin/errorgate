@@ -259,7 +259,7 @@ public sealed class GodForceCommand : LocalizedEntityCommands
     }
 }
 
-internal static class GodCommandHelpers
+public static class GodCommandHelpers
 {
     /// <summary>"S17" or "17".</summary>
     public static bool TryNumber(string text, out int number)
@@ -276,5 +276,48 @@ internal static class GodCommandHelpers
             return director.Pending.Select(d => d.Id).ToList();
 
         return int.TryParse(arg, out var id) ? new[] { id } : Array.Empty<int>();
+    }
+}
+
+/// <summary>
+///     Shows the last digest sent to the model, the last reply, and what was wrong with it.
+/// </summary>
+[AdminCommand(AdminFlags.Debug)]
+public sealed class GodPromptCommand : LocalizedEntityCommands
+{
+    [Dependency] private readonly GodLlmDirectorSystem _llm = default!;
+    [Dependency] private readonly GodDirectorSystem _director = default!;
+
+    public override string Command => "godprompt";
+
+    public override void Execute(IConsoleShell shell, string argStr, string[] args)
+    {
+        shell.WriteLine($"Calls {_llm.Calls}, failures {_llm.Failures}, model {(_director.LlmFailing ? "not answering" : "ok")}.");
+        shell.WriteLine("--- last digest ---");
+        shell.WriteLine(_llm.LastDigest == string.Empty ? "(none yet)" : _llm.LastDigest);
+        shell.WriteLine("--- last reply ---");
+        shell.WriteLine(_llm.LastReply == string.Empty ? "(none yet)" : _llm.LastReply);
+
+        foreach (var problem in _llm.LastProblems)
+        {
+            shell.WriteLine($"problem: {problem}");
+        }
+    }
+}
+
+/// <summary>
+///     Asks the model now (as soon as the minimum gap allows) instead of waiting for the next turn.
+/// </summary>
+[AdminCommand(AdminFlags.Admin)]
+public sealed class GodCallCommand : LocalizedEntityCommands
+{
+    [Dependency] private readonly GodLlmDirectorSystem _llm = default!;
+
+    public override string Command => "godcall";
+
+    public override void Execute(IConsoleShell shell, string argStr, string[] args)
+    {
+        _llm.RequestSoon();
+        shell.WriteLine("The model will be asked at the next opportunity (godlog and godprompt show what comes back).");
     }
 }
