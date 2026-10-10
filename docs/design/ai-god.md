@@ -2,7 +2,13 @@
 
 ## Status
 
-**Not implemented. No code exists for MACHINATION OF RUIN yet**: no gamerule, no event director, no error logging, no LLM provider, no whisper layer. Everything here is design. When implementation starts, a good first slice that works without the LLM is a scripted log: lines such as "SUBJECT X: DOOR CLOSED, 3 INSIDE" written when players use the final bunker doors on EDGE OF ENTROPY (see [pressure.md](pressure.md)).
+**Plumbing only, no gamerule yet.** Built on branch `ai-god` (code in `Content.Server/_ERRORGATE/AiGod/`, CVars `errorgate.god.*` in `ErrorgateCVars`, tests in `GodTest`):
+
+- `GodLlmSystem`: the OpenAI-compatible client. Off by default (`errorgate.god.enabled`). Any failure gives null and the caller skips the turn, failed requests back off (15 s up to 10 min), requests are limited by `llm_min_interval` and `llm_max_calls_per_round`, reasoning blocks (`<think>`) are stripped, the key is confidential and only travels in the bearer header. Only `http`/`https` addresses are used.
+- `GodEventBuffer` and `GodObserverSystem`: what she has noticed since the model was last asked (player deaths with the last attacker, damage taken, arrivals, speech summarised into one entry). Other systems report world happenings with `GodObserverSystem.Record` (anomalies, storms, airdrops).
+- Not built: the gamerule that reads the buffer on a timer, the prompt, the action whitelist and executor, the error log, the whisper layer.
+
+The earlier attempt on the `machination` branch was not merged (111 commits behind, station framing, assigned objectives). Only its HTTP client and CVar set were ported, rewritten, and the event buffer idea reused. A good first slice that works without the LLM is a scripted log: lines such as "SUBJECT X: DOOR CLOSED, 3 INSIDE" written when players use the final bunker doors on EDGE OF ENTROPY (see [pressure.md](pressure.md)).
 
 ## Nature
 
@@ -32,7 +38,7 @@ The LLM picks actions from a whitelist. All four categories are allowed:
 
 ## LLM provider
 
-Pluggable. The server config picks the provider, endpoint, model and API key through an OpenAI-compatible API, so a local model (Ollama, LM Studio) or a cloud provider both work. API keys come from server config and are never committed.
+Pluggable. The server config picks the provider, endpoint, model and API key through an OpenAI-compatible API, so a local model (Ollama, LM Studio) or a cloud provider both work. API keys come from server config (`errorgate.god.llm_api_key`, confidential) and are never committed.
 
 ## Open
 

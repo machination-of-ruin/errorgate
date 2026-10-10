@@ -206,3 +206,4 @@ Found while playing the `port/beyond` build. One line each, newest last.
 - [x] Anomalies v3.7: placement no longer requires the whole danger radius to be clear floor, only `FreeRadius` (Kuznetsk 1, default 1.5), so faults can stand in alleys, yards and between buildings; their danger zone ignores walls and reaches into nearby buildings.
 - [x] Arc fault static radius lowered from 6.5 to 5 tiles.
 - [x] Playtest confirmed: distant gunfire, heat haze and vacuum shaders (seen with the anomalies), mob pathfinding rework (looked fine). Anomalies closed for now. Still unchecked: radio indicator, weather volume.
+- [x] AI GOD plumbing (branch `ai-god`): LLM client ported from the old `machination` branch and rewritten (off by default, backoff, rate and per-round caps), `errorgate.god.*` CVars, event buffer and observer system, `GodTest` (14 tests). No gamerule, prompt or actions yet.
