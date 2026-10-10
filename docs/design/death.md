@@ -23,20 +23,20 @@ The death message is one red block: the title, a technical log of the last 8 thi
 ERROR:
 YOU ARE DEAD
 
-T-23:10.04 |  SUBJECT INSTANTIATED
-T-04:52.37 |  SPEECH      "stay back"
-T-04:49.11 |  HEARD       URIST MCHANDS: "give me the rifle"
-T-01:15.80 |  DAMAGE OUT  WALKER (601): 30
-T-01:15.80 |  DELETED     WALKER (601)
-T-00:41.02 |  DAMAGE IN   STARVATION: 12 x12
-T-00:03.55 |  DAMAGE IN   COLLAPSE FAULT: 175 x3
-T-00:00.00 |  SUBJECT TERMINATED
+> T-23:10.04 |  SUBJECT INSTANTIATED
+> T-04:52.37 |  SPEECH      "stay back"
+> T-04:49.11 |  HEARD       URIST MCHANDS: "give me the rifle"
+> T-01:15.80 |  DAMAGE OUT  WALKER (601): 30
+> T-01:15.80 |  KILLED      WALKER (601)
+> T-00:41.02 |  DAMAGE IN   STARVATION: 12
+> T-00:03.55 |  DAMAGE IN   COLLAPSE FAULT: 175
+> T-00:00.00 |  SUBJECT TERMINATED
 
 YOU FAILED TO ESCAPE THE MACHINATION OF RUIN. /RISE AND TRY AGAIN.
 ```
 
 - **Entries:** speech and whispers (cut at 40 characters), speech heard from players in range (voice 10 tiles, whisper 2), harm taken, harm dealt to players and mobs, and kills. A kill is credited to the last player who hurt the victim in the last minute. The "SUBJECT INSTANTIATED" line only appears when the whole life fits in the log.
-- **Harm sources:** the player, mob or object that dealt it, a world fault ("HEAT FAULT"), "SELF", or, when nobody dealt it, the environment (FIRE, COLD, NO AIR, BLOOD LOSS, POISON, RADIATION). Hits from the same source within 5 seconds merge into one line with the total and a count.
+- **Harm sources:** the player, mob or object that dealt it, a world fault ("HEAT FAULT"), "SELF", or, when nobody dealt it, the environment (FIRE, COLD, NO AIR, BLOOD LOSS, POISON, RADIATION). Hits from the same source within 5 seconds merge into one line with the total.
 - **Minor damage:** damage nobody dealt (bleeding, no air, starvation) comes in tiny ticks. It is added up per cause over 30 seconds, whatever happened in between, and a cause that adds up to less than 5 does not appear at all. Starvation deals blood loss, so a starving character who takes exactly the damage hunger deals is logged as STARVATION (a wound of the very same size in the same moment would be called starvation too).
 - **One message:** a mind is sent to the void once. A corpse that is gibbed or crushed afterwards (a collapse fault does this) does not send the death message again, and the dead do not see their own death emote ("seizes up...") because the void handles the death before the emote goes out.
 - **Not yet:** talking to MACHINATION OF RUIN (no channel exists), more event types (loot, building, food), a final line written by the model.
