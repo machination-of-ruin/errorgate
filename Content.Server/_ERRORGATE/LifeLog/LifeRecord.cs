@@ -1,58 +1,51 @@
-using Content.Shared._ERRORGATE.Anomalies;
-
 namespace Content.Server._ERRORGATE.LifeLog;
 
-public enum HarmSource : byte
+public enum LogKind : byte
 {
-    None,
+    /// <summary>Said by the character out loud.</summary>
+    Speech,
 
-    /// <summary>Another player.</summary>
-    Player,
+    /// <summary>Whispered by the character.</summary>
+    Whisper,
 
-    /// <summary>A mob, or an object somebody used.</summary>
-    Thing,
+    /// <summary>Said by somebody else within hearing range.</summary>
+    Heard,
 
-    /// <summary>A world fault (heat, arc, collapse).</summary>
-    Fault,
+    /// <summary>Harm the character took. The subject is who or what dealt it.</summary>
+    DamageIn,
 
-    /// <summary>The player's own doing.</summary>
-    Self,
+    /// <summary>Harm the character dealt to a player or a mob.</summary>
+    DamageOut,
 
-    /// <summary>Fire, cold, no air, blood loss, poison: damage nobody dealt.</summary>
-    Environment,
+    /// <summary>A kill by the character.</summary>
+    Deleted,
 }
 
 /// <summary>
-///     What happened to one character during one life, kept to write the log shown at death. Plain data. The names are the
-///     character names at the time, not account names.
+///     One line of the log. For damage, <see cref="Amount"/> is the total of <see cref="Count"/> hits merged into the line.
+/// </summary>
+public sealed class LogEntry
+{
+    public TimeSpan Time;
+    public LogKind Kind;
+    public string Subject = string.Empty;
+
+    /// <summary>The words, for speech.</summary>
+    public string Text = string.Empty;
+
+    public float Amount;
+    public int Count = 1;
+}
+
+/// <summary>
+///     What happened to one character during one life, as a list of events, to write the log shown at death. Plain data.
+///     Names are character names at the time of the event, not account names.
 /// </summary>
 public sealed class LifeRecord
 {
+    /// <summary>Events kept per life, the oldest are dropped.</summary>
+    public const int Capacity = 24;
+
     public TimeSpan Born;
-    public string Name = string.Empty;
-
-    // Who or what harmed this character last. Attacks and environmental damage are kept apart, so that blood loss
-    // after a shot does not hide who fired it.
-    public HarmSource LastAttackKind;
-    public string LastAttackName = string.Empty;
-    public ErrorgateAnomalyKind LastAttackFault;
-    public float LastAttackDamage;
-    public TimeSpan LastAttackTime;
-
-    public string LastEnvironment = string.Empty;
-    public TimeSpan LastEnvironmentTime;
-
-    // What this character did to others
-    public readonly Dictionary<string, float> HurtPlayers = new();
-    public readonly Dictionary<string, float> HurtMobs = new();
-    public readonly List<string> KilledPlayers = new();
-    public readonly List<string> KilledMobs = new();
-
-    // Talk: players who were in hearing range when this character spoke, with the number of lines
-    public readonly Dictionary<string, int> SpokeWith = new();
-    public int LinesSpoken;
-    public string? LastWords;
-
-    // Players who spoke to this character: names with line counts
-    public readonly Dictionary<string, int> SpokenToBy = new();
+    public readonly List<LogEntry> Events = new();
 }

@@ -1,9 +1,11 @@
+using System.Linq;
 using System.Numerics;
 using Content.Server._ERRORGATE.LifeLog;
 using Content.Server.Chat.Managers;
 using Content.Server.GameTicking;
 using Content.Server._White.MobThresholdSounds;
 using Content.Server.Ghost;
+using Content.Server.Mobs;
 using Content.Server.Body.Components;
 using Content.Shared._ERRORGATE.DeathVoid;
 using Content.Shared._ERRORGATE.CCVar;
@@ -33,6 +35,9 @@ namespace Content.Server._ERRORGATE.DeathVoid;
 public sealed class DeathVoidSystem : EntitySystem
 {
     private static readonly EntProtoId VoidPrototype = "ErrorgateDeathVoid";
+
+    // The void each mind was sent to, so a corpse that is gibbed or crushed later does not send it there again
+    private readonly Dictionary<EntityUid, EntityUid> _voids = new();
     private static readonly EntProtoId RespawnAction = "ActionDeadRespawn";
 
     [Dependency] private readonly IChatManager _chat = default!;
@@ -53,12 +58,17 @@ public sealed class DeathVoidSystem : EntitySystem
     {
         base.Initialize();
 
-        SubscribeLocalEvent<MindContainerComponent, MobStateChangedEvent>(OnMobStateChanged);
+        // Before the death gasp, so the player is already in the void when the emote goes out and does not see their own
+        SubscribeLocalEvent<MindContainerComponent, MobStateChangedEvent>(OnMobStateChanged, before: new[] { typeof(DeathgaspSystem) });
         SubscribeLocalEvent<GhostAttemptHandleEvent>(OnGhostAttempt);
         SubscribeLocalEvent<MindBodyDeletedEvent>(OnMindBodyDeleted);
         SubscribeLocalEvent<MindEvictedEvent>(OnMindEvicted);
         SubscribeLocalEvent<BrainComponent, MindAddedMessage>(OnBrainMindAdded);
-        SubscribeLocalEvent<RoundRestartCleanupEvent>(_ => _voidMap = null);
+        SubscribeLocalEvent<RoundRestartCleanupEvent>(_ =>
+        {
+            _voidMap = null;
+            _voids.Clear();
+        });
 
         SubscribeLocalEvent<DeathVoidComponent, DeadRespawnEvent>(OnRespawn);
         SubscribeLocalEvent<DeathVoidComponent, MindUnvisitedMessage>(OnUnvisited);
@@ -91,7 +101,7 @@ public sealed class DeathVoidSystem : EntitySystem
     /// </summary>
     private void OnMindBodyDeleted(ref MindBodyDeletedEvent args)
     {
-        var voidEnt = SpawnVoid(args.MindId, args.Mind);
+        var voidEnt = VoidFor(args.MindId, args.Mind);
         _mind.TransferTo(args.MindId, voidEnt, mind: args.Mind);
         args.Handled = true;
     }
@@ -105,7 +115,7 @@ public sealed class DeathVoidSystem : EntitySystem
         if (args.Mind.Comp.UserId == null)
             return;
 
-        var voidEnt = SpawnVoid(args.Mind.Owner, args.Mind.Comp);
+        var voidEnt = VoidFor(args.Mind.Owner, args.Mind.Comp);
         _mind.TransferTo(args.Mind.Owner, voidEnt, mind: args.Mind.Comp);
     }
 
@@ -126,7 +136,7 @@ public sealed class DeathVoidSystem : EntitySystem
             return;
         }
 
-        var voidEnt = SpawnVoid(args.MindId, mind);
+        var voidEnt = VoidFor(args.MindId, mind);
         _mind.TransferTo(args.MindId, voidEnt, mind: mind);
     }
 
@@ -153,9 +163,23 @@ public sealed class DeathVoidSystem : EntitySystem
             _audio.PlayGlobal(sounds.DeathSounds, session);
     }
 
+    /// <summary>
+    ///     The void a mind goes to. A mind that is already in one (it died, and now its corpse is gibbed, deleted or
+    ///     crushed) keeps that void: no second void and no second death message.
+    /// </summary>
+    private EntityUid VoidFor(EntityUid mindId, MindComponent mind)
+    {
+        // Remembered, because the mind does not point at the void any more once a brain or another body took it
+        if (_voids.TryGetValue(mindId, out var existing) && !TerminatingOrDeleted(existing))
+            return existing;
+
+        return SpawnVoid(mindId, mind);
+    }
+
     private EntityUid SpawnVoid(EntityUid mindId, MindComponent mind)
     {
         var voidEnt = Spawn(VoidPrototype, new MapCoordinates(Vector2.Zero, EnsureVoidMap()));
+        _voids[mindId] = voidEnt;
         var cooldown = _cfg.GetCVar(ErrorgateCVars.RespawnCooldown);
         if (cooldown > 0f)
         {
@@ -167,30 +191,26 @@ public sealed class DeathVoidSystem : EntitySystem
 
         if (mind.Session is { } session)
         {
-            // Large text is broken into short lines by hand: a wrapped large font line overlaps the following
-            // messages in a narrow chat panel. Trailing newlines keep later messages offset from it.
+            // One message: the title, the life log, then the subtitle at the bottom. Large text is broken into short
+            // lines by hand: a wrapped large font line overlaps the following messages in a narrow chat panel.
+            // Trailing newlines keep later messages offset from it.
             var message = Loc.GetString("errorgate-death-void-title");
             var lines = message.Replace(": ", ":\n");
+            var wrapped = $"\n\n[font size=32][bold]{lines}[/bold][/font]\n\n";
+
+            // What happened to this character, as a technical log (ERRORGATE: life log)
+            if (_lifeLog.BuildDeathLog(mindId) is { } log)
+                wrapped += $"[bold]{FormattedMessage.EscapeText(string.Join("\n", log))}[/bold]\n\n";
+
+            wrapped += $"[bold]{Loc.GetString("errorgate-death-void-subtitle")}[/bold]\n\n\n";
+
             _chat.ChatMessageToOne(ChatChannel.Server,
                 message,
-                $"\n\n[font size=32][bold]{lines}[/bold][/font]\n[bold]{Loc.GetString("errorgate-death-void-subtitle")}[/bold]\n\n\n",
+                wrapped,
                 EntityUid.Invalid,
                 false,
                 session.Channel,
                 Color.Red);
-
-            // What happened to this character, in a few cold lines (ERRORGATE: life log)
-            if (_lifeLog.BuildDeathLog(mindId) is { } log)
-            {
-                var text = string.Join("\n", log);
-                _chat.ChatMessageToOne(ChatChannel.Server,
-                    text,
-                    $"[bold]{FormattedMessage.EscapeText(text)}[/bold]\n\n",
-                    EntityUid.Invalid,
-                    false,
-                    session.Channel,
-                    Color.Gray);
-            }
         }
 
         return voidEnt;

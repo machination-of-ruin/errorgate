@@ -17,23 +17,30 @@ Bodies follow the 10-minute despawn timer in [survival-loop.md](survival-loop.md
 
 ## Life log (what the dead see)
 
-With the death message, the player gets a short cold log of that character's life, with fixed wording and names of characters (not accounts). It records only what happened, never what to do, and never why a rule exists. Example:
+The death message is one red block: the title, a technical log of the last 8 things that happened to the character, and the line "YOU FAILED TO ESCAPE THE MACHINATION OF RUIN. /RISE AND TRY AGAIN." at the bottom. The log is impersonal (no name of the dead, no "you", no "it"), counts time back from death, and never says what to do or why a rule exists.
 
 ```
->>> LOG OF IVAN PETROV <<<
-ERRORS COUNTED: 23 MINUTES.
-LAST HARMED BY BORIS: 20 DAMAGE.
-IT DELETED: SEWER RAT.
-IT SPOKE WITH BORIS: 2 LINES.
-LAST WORDS RECORDED: "wait"
-ERROR NOT CORRECTED.
+ERROR:
+YOU ARE DEAD
+
+>>> LOG <<<
+T-23:10  SUBJECT INSTANTIATED
+T-04:52  SPEECH      "stay back"
+T-04:49  HEARD       URIST MCHANDS: "give me the rifle"
+T-01:15  DAMAGE OUT  WALKER (601): 30
+T-01:15  DELETED     WALKER (601)
+T-00:09  DAMAGE IN   HEAT FAULT: 6
+T-00:03  DAMAGE IN   COLLAPSE FAULT: 175 x3
+T-00:00  SUBJECT TERMINATED
+
+YOU FAILED TO ESCAPE THE MACHINATION OF RUIN. /RISE AND TRY AGAIN.
 ```
 
-- **Harm:** the last attacker is a player, a mob or object, a world fault ("A HEAT FAULT"), the character itself, or, when nobody dealt it (and no attack in the last minute), the environment: fire, cold, no air, blood loss, poison, radiation.
-- **Deeds:** who the character hurt, and who they deleted (kills of players and mobs, credited to the last player who hurt the victim in the last minute).
-- **Talk:** players within hearing range when the character spoke (voice 10 tiles, whisper 2), line count, and the last words. If the character never spoke but was spoken to, it names those who spoke.
-- **Not yet:** talking to MACHINATION OF RUIN (no channel exists), more deeds (loot, building, food), a final line written by the model.
-- Code: `Content.Server/_ERRORGATE/LifeLog/` (`LifeLogSystem`, `LifeRecord`), hook in `DeathVoidSystem.SpawnVoid`, strings `Resources/Locale/en-US/_ERRORGATE/life-log.ftl`, test `LifeLogTest`. The record belongs to the mind, so it survives a gibbed body.
+- **Entries:** speech and whispers (cut at 40 characters), speech heard from players in range (voice 10 tiles, whisper 2), harm taken, harm dealt to players and mobs, and kills. A kill is credited to the last player who hurt the victim in the last minute. The "SUBJECT INSTANTIATED" line only appears when the whole life fits in the log.
+- **Harm sources:** the player, mob or object that dealt it, a world fault ("HEAT FAULT"), "SELF", or, when nobody dealt it, the environment (FIRE, COLD, NO AIR, BLOOD LOSS, POISON, RADIATION). Hits from the same source within 5 seconds merge into one line with the total and a count.
+- **One message:** a mind is sent to the void once. A corpse that is gibbed or crushed afterwards (a collapse fault does this) does not send the death message again, and the dead do not see their own death emote ("seizes up...") because the void handles the death before the emote goes out.
+- **Not yet:** talking to MACHINATION OF RUIN (no channel exists), more event types (loot, building, food), a final line written by the model.
+- Code: `Content.Server/_ERRORGATE/LifeLog/` (`LifeLogSystem`, `LifeRecord`), the message is built in `DeathVoidSystem.SpawnVoid`, strings `Resources/Locale/en-US/_ERRORGATE/life-log.ftl`, test `LifeLogTest`. The record belongs to the mind, so it survives a gibbed body.
 
 ## Respawn cooldown
 
