@@ -30,13 +30,9 @@
     warningRadius: 8
     damageInterval: 0.5
     tickSound:
-      path: /Audio/Effects/burning.ogg
-      params:
-        volume: 0
-    revealSound:
       path: /Audio/Magic/fireball.ogg
       params:
-        volume: 4
+        volume: 2
         maxDistance: 20
     restAlpha: 0
     restLightEnergy: 0

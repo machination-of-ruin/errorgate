@@ -14,7 +14,7 @@ World faults: STALKER-style environmental hazards for KUZNETSK. They make travel
 
 | Fault | Danger | Behaviour | Warning |
 |---|---|---|---|
-| Heat | 5 tiles | Fire inside the radius, 6 damage/s at the edge rising to 30 inside 2.5 tiles. Invisible until revealed (red sphere). Fireball sound on reveal. | Heat haze out to 8 tiles, `fireplace.ogg` hum (8 tiles). |
+| Heat | 5 tiles | Fire inside the radius, 6 damage/s at the edge rising to 30 inside 2.5 tiles. Invisible until revealed (red sphere). Fireball sound on every damage tick. | Heat haze out to 8 tiles, `fireplace.ogg` hum (8 tiles). |
 | Arc | 4 tiles | Fires at once at the first living thing or thrown object in reach (45 shock damage, 0.6 s stun, 2.5 s immunity so it never stunlocks), then recharges 5 s. A bolt only ever hits a target, nothing flashes at empty ground. | Screen static out to 6.5 tiles, `emf_buzz.ogg` hum. |
 | Collapse | pull 5.5, crush 2 | Cycles off (about 7 s, invisible, harmless) and on (about 12 s). While on it waits behind a faint lens until a living thing or a thrown or moving object comes within 5.5 tiles, then it pulls, crushes and shows a wide lens. It holds on to whoever it caught until they are dead or gone. Mobs are dragged at 0.6 to 4.5 tiles/s (a walker cannot leave the inner 2 to 3 tiles, a sprinter can). | Desaturation out to 9 tiles, singularity hum. |
 
