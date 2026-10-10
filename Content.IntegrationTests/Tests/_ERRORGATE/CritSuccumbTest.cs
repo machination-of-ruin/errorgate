@@ -49,7 +49,7 @@ public sealed class CritSuccumbTest
 
             // Into crit with damage, as in a fight: just over the crit threshold, well short of the death one
             Assert.That(thresholds.TryGetThresholdForState(human, MobState.Critical, out var crit), Is.True);
-            damageable.TryChangeDamage(human, new DamageSpecifier(blunt, crit.Value + 1), true);
+            damageable.TryChangeDamage(human, new DamageSpecifier(blunt, crit!.Value + 1), true);
             Assert.That(mobState.IsCritical(human), Is.True, "The test character should be in crit.");
         });
 
