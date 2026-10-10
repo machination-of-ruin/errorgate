@@ -9,7 +9,7 @@ public sealed partial class CCVars
     ///     Goes from to 0 (completely transparent) to 1 (completely opaque)
     /// </summary>
     public static readonly CVarDef<float> ChatWindowOpacity =
-        CVarDef.Create("accessibility.chat_window_transparency", 0.85f, CVar.CLIENTONLY | CVar.ARCHIVE);
+        CVarDef.Create("accessibility.chat_window_transparency", 1.0f, CVar.CLIENTONLY | CVar.ARCHIVE);
 
     /// <summary>
     ///     Toggle for visual effects that may potentially cause motion sickness.
