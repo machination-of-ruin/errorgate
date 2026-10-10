@@ -221,7 +221,7 @@ Items and gear:
 - [x] Ammo boxes can be inserted into guns as a magazine. Cause: the random-magazine loot guns replaced the whole magazine slot of their parent and lost its whitelist, so they took anything. Slots are written out in full now (`RandomMagGunsTest`).
 - [ ] Examining a gun: the chamber does not show the loaded ammo.
 - [ ] Bullet damage numbers: compare with the old build.
-- [ ] Ammo box fullness is not random; ammo boxes need to be random.
+- [x] Ammo box fullness is not random; ammo boxes need to be random. Loot tables spawn the `...Random` box variants now (`RandomAmmoBoxTest`); boxes from vendors, crafting and maps stay full.
 - [ ] Item spawn "shining" effect.
 
 Mobs:

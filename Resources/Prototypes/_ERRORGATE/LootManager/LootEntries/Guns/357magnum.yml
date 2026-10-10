@@ -6,7 +6,7 @@
   locations: [Church, Security, Living]
 
 - type: lootEntry
-  id: AmmoBox357Magnum
+  id: AmmoBox357MagnumRandom
   rarityTiers: [1, 2, 3]
   locations: [Church, Security, Living]
 

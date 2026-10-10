@@ -12,7 +12,7 @@
   locations: [Church, Security, Military, Living]
 
 - type: lootEntry
-  id: AmmoBox45ACP
+  id: AmmoBox45ACPRandom
   rarityTiers: [1, 2]
   locations: [Church, Security, Military, Prison, Living]
 
@@ -30,7 +30,7 @@
   locations: [Security, Prison]
 
 - type: lootEntry
-  id: AmmoBox45ACPBig
+  id: AmmoBox45ACPBigRandom
   rarityTiers: [2, 3]
   locations: [Security, Prison, Military]
 

@@ -1,0 +1,105 @@
+# Random-load ammo boxes for the loot tables. Separate prototypes on purpose: the normal boxes always spawn full.
+
+- type: entity
+  id: AmmoBox9x19Random
+  suffix: Random
+  parent: AmmoBox9x19
+  components:
+  - type: BallisticAmmoProvider
+    randomizeAmmo: true
+
+- type: entity
+  id: AmmoBox9x19BigRandom
+  suffix: Random
+  parent: AmmoBox9x19Big
+  components:
+  - type: BallisticAmmoProvider
+    randomizeAmmo: true
+
+- type: entity
+  id: AmmoBox45ACPRandom
+  suffix: Random
+  parent: AmmoBox45ACP
+  components:
+  - type: BallisticAmmoProvider
+    randomizeAmmo: true
+
+- type: entity
+  id: AmmoBox45ACPBigRandom
+  suffix: Random
+  parent: AmmoBox45ACPBig
+  components:
+  - type: BallisticAmmoProvider
+    randomizeAmmo: true
+
+- type: entity
+  id: AmmoBox357MagnumRandom
+  suffix: Random
+  parent: AmmoBox357Magnum
+  components:
+  - type: BallisticAmmoProvider
+    randomizeAmmo: true
+
+- type: entity
+  id: AmmoBox556x45Random
+  suffix: Random
+  parent: AmmoBox556x45
+  components:
+  - type: BallisticAmmoProvider
+    randomizeAmmo: true
+
+- type: entity
+  id: AmmoBox556x45BigRandom
+  suffix: Random
+  parent: AmmoBox556x45Big
+  components:
+  - type: BallisticAmmoProvider
+    randomizeAmmo: true
+
+- type: entity
+  id: AmmoBox762x39Random
+  suffix: Random
+  parent: AmmoBox762x39
+  components:
+  - type: BallisticAmmoProvider
+    randomizeAmmo: true
+
+- type: entity
+  id: AmmoBox762x39BigRandom
+  suffix: Random
+  parent: AmmoBox762x39Big
+  components:
+  - type: BallisticAmmoProvider
+    randomizeAmmo: true
+
+- type: entity
+  id: AmmoBoxSniperRandom
+  suffix: Random
+  parent: AmmoBoxSniper
+  components:
+  - type: BallisticAmmoProvider
+    randomizeAmmo: true
+
+- type: entity
+  id: AmmoBoxSniperBigRandom
+  suffix: Random
+  parent: AmmoBoxSniperBig
+  components:
+  - type: BallisticAmmoProvider
+    randomizeAmmo: true
+
+- type: entity
+  id: BoxShotgun00BuckshotRandom
+  suffix: Random
+  parent: BoxShotgun00Buckshot
+  components:
+  - type: BallisticAmmoProvider
+    randomizeAmmo: true
+
+- type: entity
+  id: BoxShotgunSlugRandom
+  suffix: Random
+  parent: BoxShotgunSlug
+  components:
+  - type: BallisticAmmoProvider
+    randomizeAmmo: true

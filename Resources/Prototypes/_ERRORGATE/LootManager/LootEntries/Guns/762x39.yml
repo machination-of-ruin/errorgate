@@ -11,7 +11,7 @@
   locations: [Living, Industrial]
 
 - type: lootEntry
-  id: AmmoBox762x39
+  id: AmmoBox762x39Random
   rarityTiers: [1, 2]
   locations: [Living, Industrial, Military]
 
@@ -40,7 +40,7 @@
   locations: [Military, Prison]
 
 - type: lootEntry
-  id: AmmoBox762x39Big
+  id: AmmoBox762x39BigRandom
   rarityTiers: [2, 3]
   locations: [Military, Prison]
 

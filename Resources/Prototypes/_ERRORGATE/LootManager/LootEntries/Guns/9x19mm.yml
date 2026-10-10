@@ -18,7 +18,7 @@
   locations: [Living, Prison, Security, Military]
 
 - type: lootEntry
-  id: AmmoBox9x19
+  id: AmmoBox9x19Random
   rarityTiers: [1, 2]
   locations: [Living, Prison, Security, Military]
 
@@ -53,7 +53,7 @@
   locations: [Security, Military]
 
 - type: lootEntry
-  id: AmmoBox9x19Big
+  id: AmmoBox9x19BigRandom
   rarityTiers: [2, 3]
   locations: [Prison, Living, Security, Military]
 

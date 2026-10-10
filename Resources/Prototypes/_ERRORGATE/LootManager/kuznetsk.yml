@@ -11,8 +11,8 @@
     Magazine9x19Random: 8
     Magazine9x19HighCapacityRandom: 2
 
-    AmmoBox9x19: 6
-    AmmoBox9x19Big: 2
+    AmmoBox9x19Random: 6
+    AmmoBox9x19BigRandom: 2
     ## 45 ACP
     WeaponPistolM1911RandomMag: 2
 
@@ -22,13 +22,13 @@
 
     Magazine45ACPSubMachineGunRandom: 2
 
-    AmmoBox45ACP: 4
-    AmmoBox45ACPBig: 2
+    AmmoBox45ACPRandom: 4
+    AmmoBox45ACPBigRandom: 2
     ## 357 Magnum
     WeaponRevolverSmithAndWessonRandomMag: 2
     WeaponRevolverPythonRandomMag: 1
 
-    AmmoBox357Magnum: 4
+    AmmoBox357MagnumRandom: 4
     SpeedLoader357MagnumRandom: 3
     ## 7.62x39
     WeaponSniperSKSRandomMag: 3
@@ -38,16 +38,16 @@
     WeaponRifleASValRandomMag: 1
     Magazine762x39Random: 5
 
-    AmmoBox762x39: 5
-    AmmoBox762x39Big: 2
+    AmmoBox762x39Random: 5
+    AmmoBox762x39BigRandom: 2
     ## Shotguns
     WeaponShotgunDoubleBarreledRandomMag: 3
     WeaponShotgunSawnRandomMag: 1
     WeaponShotgunRemingtonRandomMag: 2
     WeaponShotgunBenelliRandomMag: 1
 
-    BoxShotgun00Buckshot: 8
-    BoxShotgunSlug: 3
+    BoxShotgun00BuckshotRandom: 8
+    BoxShotgunSlugRandom: 3
 
     # Explosives
     ExGrenade: 3
