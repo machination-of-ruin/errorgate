@@ -1,4 +1,4 @@
-# Random-load ammo boxes for the loot tables. Separate prototypes on purpose: the normal boxes always spawn full.
+# Random-load ammo boxes (bias 1, like the old fork) for the loot tables. Separate prototypes on purpose: the normal boxes always spawn full.
 
 - type: entity
   id: AmmoBox9x19Random
@@ -7,6 +7,7 @@
   components:
   - type: BallisticAmmoProvider
     randomizeAmmo: true
+    randomizeAmmoBias: 1 # old fork: even spread from empty to full (the default 5 gives mostly a few rounds)
 
 - type: entity
   id: AmmoBox9x19BigRandom
@@ -15,6 +16,7 @@
   components:
   - type: BallisticAmmoProvider
     randomizeAmmo: true
+    randomizeAmmoBias: 1 # old fork: even spread from empty to full (the default 5 gives mostly a few rounds)
 
 - type: entity
   id: AmmoBox45ACPRandom
@@ -23,6 +25,7 @@
   components:
   - type: BallisticAmmoProvider
     randomizeAmmo: true
+    randomizeAmmoBias: 1 # old fork: even spread from empty to full (the default 5 gives mostly a few rounds)
 
 - type: entity
   id: AmmoBox45ACPBigRandom
@@ -31,6 +34,7 @@
   components:
   - type: BallisticAmmoProvider
     randomizeAmmo: true
+    randomizeAmmoBias: 1 # old fork: even spread from empty to full (the default 5 gives mostly a few rounds)
 
 - type: entity
   id: AmmoBox357MagnumRandom
@@ -39,6 +43,7 @@
   components:
   - type: BallisticAmmoProvider
     randomizeAmmo: true
+    randomizeAmmoBias: 1 # old fork: even spread from empty to full (the default 5 gives mostly a few rounds)
 
 - type: entity
   id: AmmoBox556x45Random
@@ -47,6 +52,7 @@
   components:
   - type: BallisticAmmoProvider
     randomizeAmmo: true
+    randomizeAmmoBias: 1 # old fork: even spread from empty to full (the default 5 gives mostly a few rounds)
 
 - type: entity
   id: AmmoBox556x45BigRandom
@@ -55,6 +61,7 @@
   components:
   - type: BallisticAmmoProvider
     randomizeAmmo: true
+    randomizeAmmoBias: 1 # old fork: even spread from empty to full (the default 5 gives mostly a few rounds)
 
 - type: entity
   id: AmmoBox762x39Random
@@ -63,6 +70,7 @@
   components:
   - type: BallisticAmmoProvider
     randomizeAmmo: true
+    randomizeAmmoBias: 1 # old fork: even spread from empty to full (the default 5 gives mostly a few rounds)
 
 - type: entity
   id: AmmoBox762x39BigRandom
@@ -71,6 +79,7 @@
   components:
   - type: BallisticAmmoProvider
     randomizeAmmo: true
+    randomizeAmmoBias: 1 # old fork: even spread from empty to full (the default 5 gives mostly a few rounds)
 
 - type: entity
   id: AmmoBoxSniperRandom
@@ -79,6 +88,7 @@
   components:
   - type: BallisticAmmoProvider
     randomizeAmmo: true
+    randomizeAmmoBias: 1 # old fork: even spread from empty to full (the default 5 gives mostly a few rounds)
 
 - type: entity
   id: AmmoBoxSniperBigRandom
@@ -87,6 +97,7 @@
   components:
   - type: BallisticAmmoProvider
     randomizeAmmo: true
+    randomizeAmmoBias: 1 # old fork: even spread from empty to full (the default 5 gives mostly a few rounds)
 
 - type: entity
   id: BoxShotgun00BuckshotRandom
@@ -95,6 +106,7 @@
   components:
   - type: BallisticAmmoProvider
     randomizeAmmo: true
+    randomizeAmmoBias: 1 # old fork: even spread from empty to full (the default 5 gives mostly a few rounds)
 
 - type: entity
   id: BoxShotgunSlugRandom
@@ -103,3 +115,4 @@
   components:
   - type: BallisticAmmoProvider
     randomizeAmmo: true
+    randomizeAmmoBias: 1 # old fork: even spread from empty to full (the default 5 gives mostly a few rounds)
