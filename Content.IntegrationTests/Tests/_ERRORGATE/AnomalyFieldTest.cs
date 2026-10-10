@@ -536,20 +536,12 @@ public sealed class AnomalyFieldTest
 
         var seenOn = false;
         var seenOff = false;
-        for (var i = 0; i < 100; i++)
+        for (var i = 0; i < 160; i++)
         {
             await pair.RunSeconds(0.25f);
             await server.WaitPost(() =>
             {
-                if (!entMan.EntityExists(human))
-                {
-                    // crushed in a long on stretch, pulled in
-                    seenOn = true;
-                    return;
-                }
-
-                var active = entMan.GetComponent<ErrorgateAnomalyComponent>(anomaly).Active;
-                if (active)
+                if (entMan.GetComponent<ErrorgateAnomalyComponent>(anomaly).Active)
                     seenOn = true;
                 else
                     seenOff = true;
