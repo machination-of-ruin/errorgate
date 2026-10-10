@@ -20,6 +20,7 @@ jobs:
     - uses: PaulRitter/yaml-schema-validator@v1
       with:
         schema: .github/Schemas/rga.yml
-        path_pattern: .*attributions.ya?ml$
+        # ERRORGATE: the lobby playlist is commercial music chosen by the project owner and has no license or source url to give
+        path_pattern: ^(?!.*/Audio/Lobby/).*attributions.ya?ml$
         validators_path: RobustToolbox/Schemas/rga_validators.py
         validators_requirements: .github/Schemas/rga_requirements.txt
