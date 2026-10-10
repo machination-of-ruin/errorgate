@@ -11,5 +11,5 @@ public sealed partial class CCVars
         CVarDef.Create("ghost.respawn_max_players", 999, CVar.SERVERONLY); // WWDP no player limit for respawning
 
     public static readonly CVarDef<bool> GhostAllowSameCharacter =
-        CVarDef.Create("ghost.allow_same_character", false, CVar.SERVERONLY);
+        CVarDef.Create("ghost.allow_same_character", true, CVar.SERVERONLY);
 }

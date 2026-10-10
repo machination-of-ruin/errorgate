@@ -213,3 +213,31 @@ Found while playing the `port/beyond` build. One line each, newest last.
 - [x] Life log: the hit that kills is now in the log (the log recorder runs before the mob thresholds), hits from one source add up even with small burning or bleeding ticks in between, Heat damage without flames is HOT AIR (burning stays FIRE). Tests `TheKillingBlowIsInTheLog`, `HitsFromOneFaultAddUp...`, `AnEntryCarriesTheTimeOfItsLastHit`.
 - [x] Fixed: succumb and say last words now really kill (they deal the missing damage to the death threshold), a forced Dead state was reverted to crit by the next damage tick. `CritSuccumbTest`.
 - [x] Fixed the double death message when a gib moves the mind through the brain: the void deletes itself when its mind leaves it, so the body-deleted path found no void and made a second one with a second message (found by logging in a real session). The death message is now sent at most once per mind within 3 s. `LifeLogTest` (21).
+
+## Multiplayer playtest, 2026-10-10 (hosted, ~3 h)
+
+Items and gear:
+- [ ] Make satchels smaller, like in the old build. Compare backpack and duffel sizes too.
+- [ ] Ammo boxes can be inserted into guns as a magazine.
+- [ ] Examining a gun: the chamber does not show the loaded ammo.
+- [ ] Bullet damage numbers: compare with the old build.
+- [ ] Ammo box fullness is not random; ammo boxes need to be random.
+- [ ] Item spawn "shining" effect.
+
+Mobs:
+- [ ] Grabbed mobs do not fight back.
+- [ ] Rat servant is not hostile to humans (no AI at all).
+- [ ] Check spider and other mob stats.
+
+Server and admin:
+- [x] Set the CVar `ghost.allow_same_character` to True (default changed in `CCVars.GhostRespawn.cs`).
+- [ ] Trash maps load in the release build, like lavaland. Only the ERRORGATE map should.
+- [ ] Admin notification when players spawn and die.
+- [ ] Remove the sprite from the observer.
+
+Systems and visuals:
+- [ ] Check that deafness in crit works.
+- [ ] Water visuals do not always apply: water tiles should cover a character's legs to show they are walking in deep water.
+- [ ] Collapse faults stay in the "damaging" visual state with items under them and never go off, so players cannot loot.
+- [ ] NaN positions: a player got stuck (black screen for everyone who followed them, could not be grabbed, shot or shoved, could not walk after a teleport). Guards and server warnings are in; the cause is unknown. If the log shows a "Non-finite" warning, follow it up.
+- [ ] Jumpsuit storage vanishes about 5 seconds after spawn (no UI, the verb reads "close storage").
