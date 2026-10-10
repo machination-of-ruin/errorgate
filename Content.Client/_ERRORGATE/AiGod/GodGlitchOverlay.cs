@@ -10,8 +10,8 @@ using Robust.Shared.Timing;
 namespace Content.Client._ERRORGATE.AiGod;
 
 /// <summary>
-///     Screen static when MACHINATION OF RUIN glitches the player (<see cref="GodGlitchEvent"/>). It reuses the static shader of
-///     the arc fault, builds up fast and fades out. With reduced motion it is much weaker.
+///     Screen static when MACHINATION OF RUIN glitches the player (<see cref="GodGlitchEvent"/>). It uses a red, fainter version of the static
+///     shader of the arc fault, builds up fast and fades out. With reduced motion it is much weaker.
 /// </summary>
 public sealed class GodGlitchOverlay : Overlay
 {
@@ -22,7 +22,7 @@ public sealed class GodGlitchOverlay : Overlay
 
     public override OverlaySpace Space => OverlaySpace.ScreenSpace;
 
-    private static readonly ProtoId<ShaderPrototype> StaticShader = "ErrorgateAnomalyStatic";
+    private static readonly ProtoId<ShaderPrototype> StaticShader = "ErrorgateGodStatic";
 
     private const float ReducedMotionFactor = 0.3f;
 

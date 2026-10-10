@@ -3,3 +3,9 @@
   id: ErrorgateAnomalyStatic
   kind: source
   path: "/Textures/_ERRORGATE/Shaders/anomaly_static.swsl"
+
+# ERRORGATE: red, fainter screen static for the glitches of MACHINATION OF RUIN
+- type: shader
+  id: ErrorgateGodStatic
+  kind: source
+  path: "/Textures/_ERRORGATE/Shaders/god_static.swsl"

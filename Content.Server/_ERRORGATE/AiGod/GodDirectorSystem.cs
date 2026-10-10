@@ -3,15 +3,11 @@ using Content.Server.Administration.Logs;
 using Content.Server.Chat.Managers;
 using Content.Server.Chat.Systems;
 using Content.Server.GameTicking;
-using Content.Server.Popups;
 using Content.Shared._ERRORGATE.AiGod;
 using Content.Shared._ERRORGATE.CCVar;
 using Content.Shared.Chat;
 using Content.Shared.Database;
 using Content.Shared.GameTicking;
-using Content.Shared.Popups;
-using Robust.Shared.Audio;
-using Robust.Shared.Audio.Systems;
 using Robust.Shared.Configuration;
 using Robust.Shared.Player;
 using Robust.Shared.Prototypes;
@@ -33,17 +29,17 @@ public sealed class GodDirectorSystem : EntitySystem
     [Dependency] private readonly IChatManager _chatManager = default!;
     [Dependency] private readonly IAdminLogManager _adminLogger = default!;
     [Dependency] private readonly ChatSystem _chat = default!;
-    [Dependency] private readonly PopupSystem _popup = default!;
-    [Dependency] private readonly SharedAudioSystem _audio = default!;
     [Dependency] private readonly GameTicker _ticker = default!;
     [Dependency] private readonly GodLedgerSystem _ledger = default!;
     [Dependency] private readonly SectorSystem _sectors = default!;
 
     private const int LogSize = 100;
-    private static readonly SoundPathSpecifier GlitchSound = new("/Audio/Effects/Lightning/lightningshock.ogg", AudioParams.Default.WithVolume(-10f));
     public const string Sender = "MACHINATION OF RUIN";
 
     public readonly GodBudget Budget = new();
+
+    /// <summary>Raised when an action has been done (or logged as a dry run).</summary>
+    public event Action<GodDecision>? DecisionDone;
 
     /// <summary>Raised when a decision starts waiting for an admin.</summary>
     public event Action<GodDecision>? DecisionPending;
@@ -199,11 +195,13 @@ public sealed class GodDirectorSystem : EntitySystem
         if (_dryRun)
         {
             decision.Status = GodActionStatus.DryRun;
+            DecisionDone?.Invoke(decision);
             return;
         }
 
         Execute(decision.Action);
         decision.Status = GodActionStatus.Executed;
+        DecisionDone?.Invoke(decision);
     }
 
     /// <summary>
@@ -354,8 +352,7 @@ public sealed class GodDirectorSystem : EntitySystem
                 {
                     if (_ledger.TryGetReachable(subject, out _, out var session))
                     {
-                        RaiseNetworkEvent(new GodGlitchEvent(4f, 0.8f), session);
-                        _audio.PlayGlobal(GlitchSound, session);
+                        RaiseNetworkEvent(new GodGlitchEvent(4f, 0.6f), session);
                     }
                 }
 
@@ -375,7 +372,7 @@ public sealed class GodDirectorSystem : EntitySystem
     {
         var shown = Shown(text);
 
-        _popup.PopupEntity(shown, body, session, PopupType.Large);
+        // No popup: this fork logs popups in the chat, so the message would show twice
         _chatManager.ChatMessageToOne(
             ChatChannel.Local,
             shown,

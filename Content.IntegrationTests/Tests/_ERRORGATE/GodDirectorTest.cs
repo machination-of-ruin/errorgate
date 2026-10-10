@@ -236,6 +236,32 @@ public sealed class GodDirectorTest
     }
 
     [Test]
+    public async Task EveryActionDoneIsAnnouncedToTheAdminsAndItShowsOnceToThePlayer()
+    {
+        var world = await Setup();
+        var server = world.Pair.Server;
+        var done = new List<GodDecision>();
+        await server.WaitPost(() => world.Director.DecisionDone += done.Add);
+
+        var subtle = await Submit(world, Subtle("Logged.", world.IvanNumber));
+        var glitch = await Submit(world, new GodAction { Type = GodActionType.Glitch, Targets = { world.IvanNumber } });
+        var refused = await Submit(world, Subtle("Hello.", 99));
+        await server.WaitPost(() => server.CfgMan.SetCVar(ErrorgateCVars.GodDryRun, true));
+        var dry = await Submit(world, Subtle("Dry.", world.IvanNumber));
+
+        Assert.That(done, Is.EqualTo(new[] { subtle, glitch, dry }), "Each action done, and each dry run, but no refusal.");
+        Assert.That(refused.Status, Is.EqualTo(GodActionStatus.Rejected));
+
+        // One line in the chat, not the line plus a popup copy of it
+        await world.Pair.RunTicksSync(5);
+        var lines = 0;
+        await world.Pair.Client.WaitPost(() => lines = world.Chat.History.Count(m => m.Msg.Message == "LOGGED."));
+        Assert.That(lines, Is.EqualTo(1));
+
+        await world.Pair.CleanReturnAsync();
+    }
+
+    [Test]
     public async Task UnansweredApprovalsExpireAsDenied()
     {
         var world = await Setup();

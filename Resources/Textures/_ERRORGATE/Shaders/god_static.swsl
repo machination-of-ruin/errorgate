@@ -1,0 +1,19 @@
+// Screen static when MACHINATION OF RUIN glitches a player. Like anomaly_static.swsl but red and fainter.
+uniform highp float strength; // 0 to 1, how visible the static is
+
+void fragment() {
+    highp vec2 coords = FRAGCOORD.xy * SCREEN_PIXEL_SIZE;
+
+    // Grain, new every frame
+    highp float grain = abs(zRandom(coords + vec2(fract(TIME))).x);
+
+    // Torn horizontal lines that jump around
+    highp float row = floor(coords.y * 48.0);
+    highp float tear = step(0.93, fract(sin(row * 12.9898 + floor(TIME * 9.0) * 78.233) * 43758.5453));
+
+    // Heavier toward the edges of the screen
+    highp float edge = smoothstep(0.15, 0.85, length(coords - vec2(0.5)) * 1.5);
+
+    highp float alpha = strength * 0.6 * (0.35 * grain + 0.65 * tear * grain) * mix(0.5, 1.0, edge);
+    COLOR = vec4(vec3(0.85, 0.04, 0.04) * grain, clamp(alpha, 0.0, 1.0));
+}
