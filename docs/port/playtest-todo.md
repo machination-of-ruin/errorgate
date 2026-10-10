@@ -205,3 +205,4 @@ Found while playing the `port/beyond` build. One line each, newest last.
 - [x] Anomalies v3.6: pack size is 1 to 5 (was 6 to 12, Kuznetsk too) and the singularity overlay is back to upstream. Known limit: the singularity shader draws at most 5 distortions at once, so five or more collapse faults in view at once (two packs close together) can leave some active ones with a sprite and no lens. Keep `PackSizeMax` at 5 or less.
 - [x] Anomalies v3.7: placement no longer requires the whole danger radius to be clear floor, only `FreeRadius` (Kuznetsk 1, default 1.5), so faults can stand in alleys, yards and between buildings; their danger zone ignores walls and reaches into nearby buildings.
 - [x] Arc fault static radius lowered from 6.5 to 5 tiles.
+- [x] Playtest confirmed: distant gunfire, heat haze and vacuum shaders (seen with the anomalies), mob pathfinding rework (looked fine). Anomalies closed for now. Still unchecked: radio indicator, weather volume.
