@@ -6,9 +6,10 @@
 
 - `GodLlmSystem`: the OpenAI-compatible client. Off by default (`errorgate.god.enabled`). Any failure gives null and the caller skips the turn, failed requests back off (15 s up to 10 min), requests are limited by `llm_min_interval` and `llm_max_calls_per_round`, reasoning blocks (`<think>`) are stripped, the key is confidential and only travels in the bearer header. Only `http`/`https` addresses are used.
 - `GodEventBuffer` and `GodObserverSystem`: what she has noticed since the model was last asked (player deaths with the last attacker, damage taken, arrivals, speech summarised into one entry). Other systems report world happenings with `GodObserverSystem.Record` (anomalies, storms, airdrops).
+- Life log: the scripted, model-free first slice (a log shown at death, see [death.md](death.md)). It tracks PvP and PvE harm, kills and speech per character. Its record is the natural thing to hand the model later.
 - Not built: the gamerule that reads the buffer on a timer, the prompt, the action whitelist and executor, the error log, the whisper layer.
 
-The earlier attempt on the `machination` branch was not merged (111 commits behind, station framing, assigned objectives). Only its HTTP client and CVar set were ported, rewritten, and the event buffer idea reused. A good first slice that works without the LLM is a scripted log: lines such as "SUBJECT X: DOOR CLOSED, 3 INSIDE" written when players use the final bunker doors on EDGE OF ENTROPY (see [pressure.md](pressure.md)).
+The earlier attempt on the `machination` branch was not merged (111 commits behind, station framing, assigned objectives). Only its HTTP client and CVar set were ported, rewritten, and the event buffer idea reused. Bunker door lines ("SUBJECT X: DOOR CLOSED, 3 INSIDE", see [pressure.md](pressure.md)) are parked; the first scripted log is about immediate player interactions instead (PvP, PvE, talk).
 
 ## Nature
 

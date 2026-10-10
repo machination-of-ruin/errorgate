@@ -1,4 +1,5 @@
 using System.Numerics;
+using Content.Server._ERRORGATE.LifeLog;
 using Content.Server.Chat.Managers;
 using Content.Server.GameTicking;
 using Content.Server._White.MobThresholdSounds;
@@ -20,6 +21,7 @@ using Robust.Shared.Map;
 using Robust.Shared.Player;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Timing;
+using Robust.Shared.Utility;
 
 namespace Content.Server._ERRORGATE.DeathVoid;
 
@@ -34,6 +36,7 @@ public sealed class DeathVoidSystem : EntitySystem
     private static readonly EntProtoId RespawnAction = "ActionDeadRespawn";
 
     [Dependency] private readonly IChatManager _chat = default!;
+    [Dependency] private readonly LifeLogSystem _lifeLog = default!;
     [Dependency] private readonly SharedAudioSystem _audio = default!;
     [Dependency] private readonly GameTicker _ticker = default!;
     [Dependency] private readonly MapSystem _map = default!;
@@ -175,6 +178,19 @@ public sealed class DeathVoidSystem : EntitySystem
                 false,
                 session.Channel,
                 Color.Red);
+
+            // What happened to this character, in a few cold lines (ERRORGATE: life log)
+            if (_lifeLog.BuildDeathLog(mindId) is { } log)
+            {
+                var text = string.Join("\n", log);
+                _chat.ChatMessageToOne(ChatChannel.Server,
+                    text,
+                    $"[bold]{FormattedMessage.EscapeText(text)}[/bold]\n\n",
+                    EntityUid.Invalid,
+                    false,
+                    session.Channel,
+                    Color.Gray);
+            }
         }
 
         return voidEnt;
