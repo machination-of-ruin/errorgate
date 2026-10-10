@@ -1,25 +1,31 @@
 #nullable enable
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Numerics;
 using Content.IntegrationTests.Pair;
 using Content.Server._ERRORGATE.Anomalies;
+using Content.Server._ERRORGATE.LootManager;
+using Content.Server.Beam.Components;
 using Content.Server.GameTicking;
 using Content.Server.Maps;
 using Content.Server.Spawners.Components;
 using Content.Shared._ERRORGATE.Anomalies;
 using Content.Shared.Damage;
 using Content.Shared.Gravity;
+using Content.Shared.Throwing;
 using Robust.Shared.EntitySerialization;
 using Robust.Shared.GameObjects;
 using Robust.Shared.Map;
 using Robust.Shared.Map.Components;
 using Robust.Shared.Maths;
+using Robust.Shared.Timing;
 
 namespace Content.IntegrationTests.Tests._ERRORGATE;
 
 /// <summary>
-///     World faults: the field places them, each one hurts in its own way, they leave bystanders alone.
+///     World faults: the field places packs of them, each kind hurts in its own way and only inside its radius,
+///     and they show themselves when something is thrown into them or when they hurt someone.
 /// </summary>
 [TestFixture]
 public sealed class AnomalyFieldTest
@@ -68,6 +74,39 @@ public sealed class AnomalyFieldTest
         return (gridUid, mapId);
     }
 
+    /// <summary>
+    ///     Loot spawners (the points of interest) in small groups around each of the given centers, and a spawn point.
+    /// </summary>
+    private static async Task<(List<Vector2> Pois, Vector2 Spawn)> AddPois(TestPair pair, MapId mapId, IEnumerable<Vector2> centers, Vector2 spawn)
+    {
+        var server = pair.Server;
+        var entMan = server.EntMan;
+        var pois = new List<Vector2>();
+
+        await server.WaitPost(() =>
+        {
+            foreach (var center in centers)
+            {
+                foreach (var offset in new[] { new Vector2(0, 0), new Vector2(3, 2), new Vector2(-2, 4) })
+                {
+                    var position = center + offset;
+                    var spawner = entMan.SpawnEntity(null, new MapCoordinates(position, mapId));
+                    entMan.AddComponent(spawner, new LootSpawnerComponent { SpawnRate = 0f });
+                    pois.Add(position);
+                }
+            }
+
+            entMan.SpawnEntity("SpawnPointLatejoin", new MapCoordinates(spawn, mapId));
+        });
+
+        return (pois, spawn);
+    }
+
+    private static readonly Vector2[] PoiCenters =
+    {
+        new(-60, -60), new(-60, 50), new(0, 0), new(50, -50), new(60, 60), new(-20, 70), new(70, 0),
+    };
+
     private static List<Entity<ErrorgateAnomalyComponent>> GetAnomalies(IEntityManager entMan)
     {
         var anomalies = new List<Entity<ErrorgateAnomalyComponent>>();
@@ -85,8 +124,15 @@ public sealed class AnomalyFieldTest
         return entMan.GetComponent<MetaDataComponent>(uid).EntityPrototype?.ID ?? string.Empty;
     }
 
+    private static float Danger(IEntityManager entMan, EntityUid uid)
+    {
+        return entMan.GetComponent<ErrorgateAnomalyComponent>(uid).EffectiveDanger;
+    }
+
+    // Placement
+
     [Test]
-    public async Task FieldPlacesOneOfEachApart()
+    public async Task FieldPlacesTheWantedCountInPacksAwayFromSpawnsAndLoot()
     {
         await using var pair = await PoolManager.GetServerClient(new PoolSettings { Dirty = true });
         var server = pair.Server;
@@ -94,38 +140,140 @@ public sealed class AnomalyFieldTest
         var mapSys = entMan.System<SharedMapSystem>();
         var xformSys = entMan.System<SharedTransformSystem>();
 
-        var (grid, _) = await CreateFloor(pair, 45);
+        var (grid, mapId) = await CreateFloor(pair, 100);
+        var (pois, spawn) = await AddPois(pair, mapId, PoiCenters, new Vector2(-90, -90));
 
-        await server.WaitPost(() => entMan.AddComponent(grid, new AnomalyFieldComponent()));
+        await server.WaitPost(() => entMan.AddComponent(grid, new AnomalyFieldComponent { Count = 40 }));
         await pair.RunTicksSync(5);
 
-        var field = entMan.GetComponent<AnomalyFieldComponent>(grid);
-        var anomalies = GetAnomalies(entMan);
+        // Place them again, timed. Several hundred thousand tiles worth of work must stay well below two seconds.
+        var watch = new System.Diagnostics.Stopwatch();
+        var placed = 0;
+        await server.WaitPost(() =>
+        {
+            watch.Start();
+            placed = entMan.System<AnomalyFieldSystem>().SpawnAnomalies(grid, entMan.GetComponent<AnomalyFieldComponent>(grid));
+            watch.Stop();
+        });
+        await pair.RunTicksSync(5);
 
-        Assert.That(anomalies, Has.Count.EqualTo(3), "The field should have placed exactly three anomalies.");
-        Assert.That(field.Spawned, Has.Count.EqualTo(3));
-        Assert.That(anomalies.Select(a => ProtoOf(entMan, a.Owner)).Distinct().Count(), Is.EqualTo(3),
-            "Every prototype should be used exactly once.");
+        Assert.That(watch.ElapsedMilliseconds, Is.LessThan(2000), "Placing the anomalies took too long.");
+        Assert.That(placed, Is.EqualTo(40), "The count is the total number of faults wanted.");
 
         await server.WaitAssertion(() =>
         {
-            foreach (var anomaly in anomalies)
+            var field = entMan.GetComponent<AnomalyFieldComponent>(grid);
+            var anomalies = GetAnomalies(entMan);
+
+            Assert.That(anomalies, Has.Count.EqualTo(40));
+            Assert.That(field.Spawned, Has.Count.EqualTo(40));
+            Assert.That(field.Packs.Sum(p => p.Members.Count), Is.EqualTo(40));
+            Assert.That(field.Packs.Select(p => p.Proto.Id).Distinct().Count(), Is.EqualTo(3), "All three kinds should be used.");
+
+            foreach (var pack in field.Packs)
             {
-                var coords = entMan.GetComponent<TransformComponent>(anomaly.Owner).Coordinates;
-                Assert.That(mapSys.TryGetTileRef(grid, entMan.GetComponent<MapGridComponent>(grid), coords, out var tile), Is.True);
-                Assert.That(tile.Tile.IsEmpty, Is.False, "Anomalies belong on floor tiles.");
+                // One kind per pack
+                Assert.That(pack.Members.Select(m => ProtoOf(entMan, m)).Distinct().Single(), Is.EqualTo(pack.Proto.Id));
+
+                // Inside the blob
+                foreach (var member in pack.Members)
+                {
+                    Assert.That((xformSys.GetWorldPosition(member) - pack.Center).Length(), Is.LessThanOrEqualTo(pack.Radius + 1.5f),
+                        "A fault lies outside the blob of its pack.");
+                }
+
+                // Spaced by their danger zones, never overlapping
+                for (var i = 0; i < pack.Members.Count; i++)
+                {
+                    for (var j = i + 1; j < pack.Members.Count; j++)
+                    {
+                        var distance = (xformSys.GetWorldPosition(pack.Members[i]) - xformSys.GetWorldPosition(pack.Members[j])).Length();
+                        Assert.That(distance, Is.GreaterThanOrEqualTo(field.MinSpacingInPack - 0.01f));
+                        Assert.That(distance, Is.GreaterThanOrEqualTo(Danger(entMan, pack.Members[i]) + Danger(entMan, pack.Members[j]) - 0.01f),
+                            "Two danger zones overlap.");
+                    }
+                }
+
+                // Near loot
+                Assert.That(pois.Min(p => (p - pack.Center).Length()), Is.LessThanOrEqualTo(60f), "A pack is far from every point of interest.");
             }
 
-            for (var i = 0; i < anomalies.Count; i++)
+            var gridComp = entMan.GetComponent<MapGridComponent>(grid);
+            foreach (var anomaly in anomalies)
             {
-                for (var j = i + 1; j < anomalies.Count; j++)
-                {
-                    var distance = (xformSys.GetWorldPosition(anomalies[i].Owner) - xformSys.GetWorldPosition(anomalies[j].Owner)).Length();
-                    Assert.That(distance, Is.GreaterThanOrEqualTo(field.MinDistanceBetween),
-                        "Anomalies must keep their distance from each other.");
-                }
+                var position = xformSys.GetWorldPosition(anomaly.Owner);
+                Assert.That((position - spawn).Length(), Is.GreaterThanOrEqualTo(field.MinDistanceFromSpawns), "A fault is too close to a spawn point.");
+                Assert.That(pois.Min(p => (p - position).Length()), Is.GreaterThanOrEqualTo(field.MinDistanceFromPoi), "A fault is too close to loot.");
+
+                var coords = entMan.GetComponent<TransformComponent>(anomaly.Owner).Coordinates;
+                Assert.That(mapSys.TryGetTileRef(grid, gridComp, coords, out var tile), Is.True);
+                Assert.That(tile.Tile.IsEmpty, Is.False, "Anomalies belong on floor tiles.");
             }
         });
+
+        await pair.CleanReturnAsync();
+    }
+
+    [Test]
+    public async Task PacksCanMostlyBeWalkedThroughAndGapsAreMostlyWide()
+    {
+        await using var pair = await PoolManager.GetServerClient(new PoolSettings { Dirty = true });
+        var server = pair.Server;
+        var entMan = server.EntMan;
+        var xformSys = entMan.System<SharedTransformSystem>();
+
+        var (grid, mapId) = await CreateFloor(pair, 100);
+        await AddPois(pair, mapId, PoiCenters, new Vector2(-90, -90));
+        await server.WaitPost(() => entMan.AddComponent(grid, new AnomalyFieldComponent { Count = 40 }));
+        await pair.RunTicksSync(3);
+
+        var packs = 0;
+        var passable = 0;
+        var faults = 0;
+        var wide = 0;
+
+        // Several random fields
+        for (var run = 0; run < 5; run++)
+        {
+            await server.WaitPost(() => entMan.System<AnomalyFieldSystem>().SpawnAnomalies(grid, entMan.GetComponent<AnomalyFieldComponent>(grid)));
+            await pair.RunTicksSync(2);
+
+            await server.WaitAssertion(() =>
+            {
+                foreach (var pack in entMan.GetComponent<AnomalyFieldComponent>(grid).Packs)
+                {
+                    packs++;
+                    if (pack.Passable)
+                        passable++;
+
+                    // The gap to the nearest neighbour in the pack
+                    foreach (var member in pack.Members)
+                    {
+                        var nearest = float.MaxValue;
+                        foreach (var other in pack.Members)
+                        {
+                            if (other == member)
+                                continue;
+
+                            var distance = (xformSys.GetWorldPosition(member) - xformSys.GetWorldPosition(other)).Length();
+                            nearest = MathF.Min(nearest, distance - Danger(entMan, member) - Danger(entMan, other));
+                        }
+
+                        if (pack.Members.Count < 2)
+                            continue;
+
+                        faults++;
+                        Assert.That(nearest, Is.GreaterThanOrEqualTo(-0.01f), "Two danger zones overlap.");
+                        if (nearest >= 1.5f)
+                            wide++;
+                    }
+                }
+            });
+        }
+
+        Assert.That(packs, Is.GreaterThan(10));
+        Assert.That(passable / (float) packs, Is.GreaterThanOrEqualTo(0.7f), $"Only {passable} of {packs} packs can be walked through.");
+        Assert.That(wide / (float) faults, Is.GreaterThanOrEqualTo(0.45f), $"Only {wide} of {faults} faults have a gap of 1.5 tiles to their nearest neighbour.");
 
         await pair.CleanReturnAsync();
     }
@@ -137,12 +285,14 @@ public sealed class AnomalyFieldTest
         var server = pair.Server;
         var entMan = server.EntMan;
 
-        var (grid, _) = await CreateFloor(pair, 45);
+        var (grid, mapId) = await CreateFloor(pair, 60);
+        await AddPois(pair, mapId, new[] { new Vector2(0, 0), new Vector2(-30, 30) }, new Vector2(-55, -55));
 
-        await server.WaitPost(() => entMan.AddComponent(grid, new AnomalyFieldComponent()));
+        await server.WaitPost(() => entMan.AddComponent(grid, new AnomalyFieldComponent { Count = 10 }));
         await pair.RunTicksSync(5);
-        Assert.That(GetAnomalies(entMan), Has.Count.EqualTo(3));
 
+        var firstCount = GetAnomalies(entMan).Count;
+        Assert.That(firstCount, Is.GreaterThan(0));
         var first = GetAnomalies(entMan).Select(a => a.Owner).ToHashSet();
 
         var placed = 0;
@@ -150,9 +300,8 @@ public sealed class AnomalyFieldTest
             .SpawnAnomalies(grid, entMan.GetComponent<AnomalyFieldComponent>(grid)));
         await pair.RunTicksSync(5);
 
-        Assert.That(placed, Is.EqualTo(3));
         var second = GetAnomalies(entMan);
-        Assert.That(second, Has.Count.EqualTo(3), "The old anomalies should be gone.");
+        Assert.That(second, Has.Count.EqualTo(placed), "The old anomalies should be gone.");
         Assert.That(second.Any(a => first.Contains(a.Owner)), Is.False);
 
         await pair.CleanReturnAsync();
@@ -165,15 +314,255 @@ public sealed class AnomalyFieldTest
         var server = pair.Server;
         var entMan = server.EntMan;
 
-        // 11x11 tiles: room for one anomaly, never three 25 tiles apart
+        // 11x11 tiles: no room for 36 faults
         var (grid, _) = await CreateFloor(pair, 5);
 
         await server.WaitPost(() => entMan.AddComponent(grid, new AnomalyFieldComponent()));
         await pair.RunTicksSync(5);
 
-        Assert.That(GetAnomalies(entMan).Count, Is.LessThan(3), "A small floor cannot hold three anomalies.");
+        Assert.That(GetAnomalies(entMan).Count, Is.LessThan(36), "A small floor cannot hold the default count.");
         await pair.CleanReturnAsync();
     }
+
+    [Test]
+    public async Task KuznetskGetsPacksOfOneKindAwayFromSpawns()
+    {
+        await using var pair = await PoolManager.GetServerClient(new PoolSettings { Dirty = true });
+        var server = pair.Server;
+        var entMan = server.EntMan;
+        var xformSys = entMan.System<SharedTransformSystem>();
+
+        await server.WaitPost(() =>
+        {
+            var ticker = entMan.System<GameTicker>();
+            var opts = DeserializationOptions.Default with { InitializeMaps = true };
+            ticker.LoadGameMap(server.ProtoMan.Index<GameMapPrototype>("Kuznetsk"), out _, opts);
+        });
+        await pair.RunTicksSync(10);
+
+        var field = entMan.EntityQuery<AnomalyFieldComponent>().Single();
+        var anomalies = GetAnomalies(entMan);
+
+        Assert.That(anomalies, Has.Count.EqualTo(field.Spawned.Count));
+        Assert.That(anomalies.Count, Is.InRange(field.Count - 8, field.Count), $"Kuznetsk should carry about {field.Count} anomalies.");
+
+        await server.WaitAssertion(() =>
+        {
+            var spawns = entMan.EntityQuery<SpawnPointComponent>().Select(s => xformSys.GetWorldPosition(s.Owner)).ToList();
+            Assert.That(spawns, Is.Not.Empty, "Kuznetsk should have spawn points.");
+
+            foreach (var anomaly in anomalies)
+            {
+                var position = xformSys.GetWorldPosition(anomaly.Owner);
+                foreach (var spawn in spawns)
+                {
+                    Assert.That((position - spawn).Length(), Is.GreaterThanOrEqualTo(field.MinDistanceFromSpawns),
+                        "Nobody should spawn inside an anomaly.");
+                }
+            }
+
+            foreach (var pack in field.Packs)
+            {
+                Assert.That(pack.Members.Select(m => ProtoOf(entMan, m)).Distinct().Count(), Is.EqualTo(1), "A pack is of one kind.");
+            }
+        });
+
+        await pair.CleanReturnAsync();
+    }
+
+    // Effects
+
+    private static async Task<float> ReadDamage(TestPair pair, EntityUid human, string type)
+    {
+        var entMan = pair.Server.EntMan;
+        var result = 0f;
+        await pair.Server.WaitPost(() =>
+        {
+            if (entMan.EntityExists(human)
+                && entMan.GetComponent<DamageableComponent>(human).Damage.DamageDict.TryGetValue(type, out var value))
+            {
+                result = value.Float();
+            }
+        });
+        return result;
+    }
+
+    [Test]
+    public async Task HeatIsLethalInsideAndHarmlessOutside()
+    {
+        await using var pair = await PoolManager.GetServerClient(new PoolSettings { Dirty = true });
+        var server = pair.Server;
+        var entMan = server.EntMan;
+
+        var (_, mapId) = await CreateFloor(pair, 20);
+
+        EntityUid inner = default;
+        EntityUid edge = default;
+        EntityUid outside = default;
+        EntityUid heat = default;
+        await server.WaitPost(() =>
+        {
+            heat = entMan.SpawnEntity(HeatProto, new MapCoordinates(0.5f, 0.5f, mapId));
+            inner = entMan.SpawnEntity("MobHuman", new MapCoordinates(1.5f, 0.5f, mapId));
+            edge = entMan.SpawnEntity("MobHuman", new MapCoordinates(0.5f, 4.9f, mapId));
+            outside = entMan.SpawnEntity("MobHuman", new MapCoordinates(-6.5f, 0.5f, mapId));
+        });
+
+        // A few seconds at the edge are survivable
+        await pair.RunSeconds(3);
+        Assert.That(await ReadDamage(pair, edge, "Heat"), Is.GreaterThan(0f).And.LessThan(100f), "The edge of the heat should hurt, not kill, in three seconds.");
+
+        await pair.RunSeconds(2);
+        Assert.That(await ReadDamage(pair, inner, "Heat"), Is.GreaterThanOrEqualTo(100f), "Five seconds close to the heat fault should take a human down.");
+        Assert.That(await ReadDamage(pair, outside, "Heat"), Is.LessThan(5f), "Six tiles away is outside the heat (the airless test floor adds a little Heat by itself).");
+
+        await server.WaitAssertion(() =>
+        {
+            Assert.That(entMan.GetComponent<ErrorgateAnomalyComponent>(heat).RevealedUntil, Is.Not.Null, "Hurting someone reveals a fault.");
+        });
+
+        await pair.CleanReturnAsync();
+    }
+
+    [Test]
+    public async Task ArcReachesFourTilesAndNeverChainsShocks()
+    {
+        await using var pair = await PoolManager.GetServerClient(new PoolSettings { Dirty = true });
+        var server = pair.Server;
+        var entMan = server.EntMan;
+
+        var (_, mapId) = await CreateFloor(pair, 20);
+
+        // Three tiles from the arc is outside the shock zone but inside the reach of an arc, six is out of reach
+        EntityUid near = default;
+        EntityUid far = default;
+        await server.WaitPost(() =>
+        {
+            entMan.SpawnEntity(ArcProto, new MapCoordinates(0.5f, 0.5f, mapId));
+            near = entMan.SpawnEntity("MobHuman", new MapCoordinates(3.5f, 0.5f, mapId));
+            far = entMan.SpawnEntity("MobHuman", new MapCoordinates(0.5f, -8.5f, mapId));
+        });
+
+        // An arc is thrown every 2 to 6 seconds
+        await pair.RunSeconds(12);
+        Assert.That(await ReadDamage(pair, near, "Shock"), Is.GreaterThanOrEqualTo(40f), "Someone within four tiles should be hit by an arc.");
+        Assert.That(await ReadDamage(pair, far, "Shock"), Is.EqualTo(0f), "Eight tiles away nothing reaches.");
+
+        // Inside the fault the shocks are as frequent as can be, but not chained
+        EntityUid inside = default;
+        await server.WaitPost(() =>
+        {
+            foreach (var fault in entMan.EntityQuery<ArcFaultComponent>())
+            {
+                fault.InnerShockChance = 1f;
+            }
+
+            // A human in the middle and no one else in reach of the arcs
+            entMan.DeleteEntity(near);
+            inside = entMan.SpawnEntity("MobHuman", new MapCoordinates(0.5f, 0.5f, mapId));
+        });
+
+        await pair.RunSeconds(1.5f);
+        await server.WaitAssertion(() =>
+        {
+            Assert.That(entMan.HasComponent<ArcShockImmunityComponent>(inside), Is.True, "A shocked person should be immune for a moment.");
+        });
+
+        // The first shock was in the first second. With an immunity of 2.5 seconds there can be at most three more in
+        // six more seconds (without it there would be one every second).
+        await pair.RunSeconds(6);
+        var shock = await ReadDamage(pair, inside, "Shock");
+        var arc = entMan.EntityQuery<ArcFaultComponent>().Single();
+        var biggest = Math.Max(arc.InnerShockDamage, arc.ArcDamage);
+        Assert.That(shock, Is.GreaterThanOrEqualTo(arc.ArcDamage));
+        Assert.That(shock, Is.LessThanOrEqualTo(biggest * 4f), "Shocks must not chain.");
+
+        await pair.CleanReturnAsync();
+    }
+
+    [Test]
+    public async Task ArcIsQuietWhenNobodyIsInReach()
+    {
+        await using var pair = await PoolManager.GetServerClient(new PoolSettings { Dirty = true });
+        var server = pair.Server;
+        var entMan = server.EntMan;
+
+        var (_, mapId) = await CreateFloor(pair, 20);
+
+        await server.WaitPost(() =>
+        {
+            entMan.SpawnEntity(ArcProto, new MapCoordinates(0.5f, 0.5f, mapId));
+
+            // Objects are no targets, and a human beyond four tiles is out of reach
+            entMan.SpawnEntity("Crowbar", new MapCoordinates(2.5f, 0.5f, mapId));
+            entMan.SpawnEntity("MobHuman", new MapCoordinates(0.5f, 6.5f, mapId));
+        });
+
+        // Longer than the longest time between two arcs
+        await pair.RunSeconds(10);
+
+        Assert.That(entMan.EntityQuery<BeamComponent>().Count(), Is.EqualTo(0), "An arc fault with nobody in reach must stay dark.");
+        await pair.CleanReturnAsync();
+    }
+
+    [Test]
+    public async Task CollapsePullsPeopleAndLooseThingsIn()
+    {
+        await using var pair = await PoolManager.GetServerClient(new PoolSettings { Dirty = true });
+        var server = pair.Server;
+        var entMan = server.EntMan;
+        var xformSys = entMan.System<SharedTransformSystem>();
+
+        var (_, mapId) = await CreateFloor(pair, 20);
+
+        EntityUid anomaly = default;
+        EntityUid item = default;
+        EntityUid human = default;
+        EntityUid outside = default;
+        await server.WaitPost(() =>
+        {
+            anomaly = entMan.SpawnEntity(CollapseProto, new MapCoordinates(0.5f, 0.5f, mapId));
+            item = entMan.SpawnEntity("Crowbar", new MapCoordinates(5.5f, 0.5f, mapId));
+            human = entMan.SpawnEntity("MobHuman", new MapCoordinates(0.5f, 6.5f, mapId));
+            outside = entMan.SpawnEntity("MobHuman", new MapCoordinates(-9.5f, 0.5f, mapId));
+        });
+
+        float Distance(EntityUid uid) => (xformSys.GetWorldPosition(uid) - xformSys.GetWorldPosition(anomaly)).Length();
+
+        var itemBefore = 0f;
+        var outsideBefore = 0f;
+        await server.WaitPost(() =>
+        {
+            itemBefore = Distance(item);
+            outsideBefore = Distance(outside);
+        });
+
+        // A standing person is dragged in: at least two tiles closer, or already crushed and torn apart
+        var closest = 6f;
+        var gone = false;
+        for (var i = 0; i < 5; i++)
+        {
+            await pair.RunSeconds(1);
+            await server.WaitPost(() =>
+            {
+                if (!entMan.EntityExists(human))
+                    gone = true;
+                else
+                    closest = Math.Min(closest, Distance(human));
+            });
+        }
+
+        await server.WaitAssertion(() =>
+        {
+            Assert.That(gone || closest <= 4f, Is.True, $"A person six tiles away should be dragged at least two tiles closer, got to {closest}.");
+            Assert.That(Distance(item), Is.LessThan(itemBefore - 0.5f), "A loose item should be dragged toward the collapse.");
+            Assert.That(Math.Abs(Distance(outside) - outsideBefore), Is.LessThan(0.2f), "Nothing beyond the pull range should move.");
+        });
+
+        await pair.CleanReturnAsync();
+    }
+
+    // Damage by kind, and the reveal
 
     // The test floor has no air, so the vacuum adds a little Blunt damage: the collapse is held to a high bar
     [TestCase(HeatProto, "Heat", 20f)]
@@ -226,123 +615,40 @@ public sealed class AnomalyFieldTest
     }
 
     [Test]
-    public async Task BystandersFarAwayAreUnharmed()
+    public async Task ThrowingSomethingInRevealsAFaultForAWhile()
     {
         await using var pair = await PoolManager.GetServerClient(new PoolSettings { Dirty = true });
         var server = pair.Server;
         var entMan = server.EntMan;
+        var timing = server.ResolveDependency<IGameTiming>();
 
-        var (_, mapId) = await CreateFloor(pair, 60);
+        var (_, mapId) = await CreateFloor(pair, 20);
 
-        EntityUid farHuman = default;
-        EntityUid edgeHuman = default;
-        var farStart = Vector2.Zero;
+        EntityUid arc = default;
+        EntityUid crowbar = default;
         await server.WaitPost(() =>
         {
-            entMan.SpawnEntity(HeatProto, new MapCoordinates(0.5f, 0.5f, mapId));
-            entMan.SpawnEntity(ArcProto, new MapCoordinates(40.5f, 0.5f, mapId));
-            entMan.SpawnEntity(CollapseProto, new MapCoordinates(-40.5f, 0.5f, mapId));
-
-            // 40 tiles from all of them
-            farHuman = entMan.SpawnEntity("MobHuman", new MapCoordinates(0.5f, 40.5f, mapId));
-
-            // Just outside the heat zone: the heat has no pull and no reach past its radius
-            edgeHuman = entMan.SpawnEntity("MobHuman", new MapCoordinates(5.5f, 0.5f, mapId));
-
-            farStart = entMan.System<SharedTransformSystem>().GetWorldPosition(farHuman);
+            arc = entMan.SpawnEntity(ArcProto, new MapCoordinates(0.5f, 0.5f, mapId));
+            crowbar = entMan.SpawnEntity("Crowbar", new MapCoordinates(7.5f, 0.5f, mapId));
         });
 
-        await pair.RunSeconds(6);
-
-        await server.WaitAssertion(() =>
+        bool Revealed()
         {
-            // The floor has no air: both humans take the same environmental damage (a little Heat and Blunt).
-            // The one 40 tiles away from everything is the baseline, the one at the edge of the heat zone must match it.
-            float Dmg(EntityUid human, string type) =>
-                entMan.GetComponent<DamageableComponent>(human).Damage.DamageDict.TryGetValue(type, out var v) ? v.Float() : 0f;
+            var comp = entMan.GetComponent<ErrorgateAnomalyComponent>(arc);
+            return comp.RevealedUntil is { } until && until > timing.CurTime;
+        }
 
-            Assert.That(Dmg(edgeHuman, "Heat"), Is.EqualTo(Dmg(farHuman, "Heat")).Within(0.5f),
-                "A human outside the heat zone should not burn.");
-            foreach (var human in new[] { farHuman, edgeHuman })
-            {
-                Assert.That(Dmg(human, "Shock"), Is.EqualTo(0f), "A human outside every anomaly should not be shocked.");
-            }
+        await pair.RunSeconds(1);
+        await server.WaitAssertion(() => Assert.That(Revealed(), Is.False, "A fault starts hidden."));
 
-            var moved = (entMan.System<SharedTransformSystem>().GetWorldPosition(farHuman) - farStart).Length();
-            Assert.That(moved, Is.LessThan(0.5f), "A human far from the collapse should not be pulled.");
-        });
+        // Throw it right through the fault
+        await server.WaitPost(() => entMan.System<ThrowingSystem>().TryThrow(crowbar, new Vector2(-8, 0), 8f, playSound: false));
+        await pair.RunSeconds(1);
+        await server.WaitAssertion(() => Assert.That(Revealed(), Is.True, "Something thrown into a fault should reveal it."));
 
-        await pair.CleanReturnAsync();
-    }
-
-    [Test]
-    public async Task CollapsePullsLooseThingsIn()
-    {
-        await using var pair = await PoolManager.GetServerClient(new PoolSettings { Dirty = true });
-        var server = pair.Server;
-        var entMan = server.EntMan;
-        var xformSys = entMan.System<SharedTransformSystem>();
-
-        var (_, mapId) = await CreateFloor(pair, 15);
-
-        EntityUid anomaly = default;
-        EntityUid item = default;
-        await server.WaitPost(() =>
-        {
-            anomaly = entMan.SpawnEntity(CollapseProto, new MapCoordinates(0.5f, 0.5f, mapId));
-            item = entMan.SpawnEntity("Crowbar", new MapCoordinates(5.5f, 0.5f, mapId));
-        });
-
-        var before = 0f;
-        await server.WaitPost(() => before = (xformSys.GetWorldPosition(item) - xformSys.GetWorldPosition(anomaly)).Length());
-
-        await pair.RunSeconds(2);
-
-        var after = 0f;
-        await server.WaitPost(() => after = (xformSys.GetWorldPosition(item) - xformSys.GetWorldPosition(anomaly)).Length());
-
-        Assert.That(after, Is.LessThan(before - 0.5f), "A loose item should be dragged toward the collapse.");
-        await pair.CleanReturnAsync();
-    }
-
-    [Test]
-    public async Task KuznetskGetsOneOfEachAwayFromSpawns()
-    {
-        await using var pair = await PoolManager.GetServerClient(new PoolSettings { Dirty = true });
-        var server = pair.Server;
-        var entMan = server.EntMan;
-        var xformSys = entMan.System<SharedTransformSystem>();
-
-        await server.WaitPost(() =>
-        {
-            var ticker = entMan.System<GameTicker>();
-            var opts = DeserializationOptions.Default with { InitializeMaps = true };
-            ticker.LoadGameMap(server.ProtoMan.Index<GameMapPrototype>("Kuznetsk"), out _, opts);
-        });
-        await pair.RunTicksSync(10);
-
-        var anomalies = GetAnomalies(entMan);
-        Assert.That(anomalies, Has.Count.EqualTo(3), "Kuznetsk should carry exactly three anomalies.");
-        Assert.That(anomalies.Select(a => ProtoOf(entMan, a.Owner)).Distinct().Count(), Is.EqualTo(3),
-            "Kuznetsk should carry one of each anomaly.");
-
-        var field = entMan.EntityQuery<AnomalyFieldComponent>().Single();
-
-        await server.WaitAssertion(() =>
-        {
-            var spawns = entMan.EntityQuery<SpawnPointComponent>().Select(s => xformSys.GetWorldPosition(s.Owner)).ToList();
-            Assert.That(spawns, Is.Not.Empty, "Kuznetsk should have spawn points.");
-
-            foreach (var anomaly in anomalies)
-            {
-                var position = xformSys.GetWorldPosition(anomaly.Owner);
-                foreach (var spawn in spawns)
-                {
-                    Assert.That((position - spawn).Length(), Is.GreaterThanOrEqualTo(field.MinDistanceFromSpawns),
-                        "Nobody should spawn inside an anomaly.");
-                }
-            }
-        });
+        // Nothing else happens: the item has come to rest and the reveal runs out
+        await pair.RunSeconds(15);
+        await server.WaitAssertion(() => Assert.That(Revealed(), Is.False, "The reveal should end after its timer."));
 
         await pair.CleanReturnAsync();
     }

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Content.IntegrationTests.Pair;
+using Content.Server._ERRORGATE.Anomalies;
 using Content.Server._ERRORGATE.CombatLogs;
 using Content.Shared._Shitmed.Targeting;
 using Content.Shared.Damage;
@@ -94,6 +95,35 @@ public sealed class CombatLogsTest
         Assert.That(messages, Has.Count.EqualTo(1), string.Join(" | ", log.Messages));
         Assert.That(messages[0], Does.Contain("punches you"));
         Assert.That(messages[0], Does.Contain("left arm"));
+
+        await pair.CleanReturnAsync();
+    }
+
+    [TestCase("ErrorgateAnomalyHeat", "THE HEAT ERROR BURNS YOU!")]
+    [TestCase("ErrorgateAnomalyArc", "AN ARC TEARS THROUGH YOU!")]
+    [TestCase("ErrorgateAnomalyCollapse", "THE COLLAPSE CRUSHES YOU!")]
+    public async Task WorldFaultsHaveTheirOwnLine(string proto, string expected)
+    {
+        var (pair, victim, bystander, log) = await Setup();
+
+        await pair.Server.WaitPost(() =>
+        {
+            var entMan = pair.Server.EntMan;
+
+            // A client that first sees a mob burning trips a debug assert in the upstream fire visualizer (it spawns the
+            // fire light while the state is being applied). Unrelated to the log line, so the victim cannot ignite here.
+            entMan.RemoveComponent<Content.Server.Atmos.Components.FlammableComponent>(victim);
+            entMan.RemoveComponent<Content.Server.Atmos.Components.FlammableComponent>(bystander);
+
+            var fault = entMan.SpawnEntity(proto, entMan.GetComponent<TransformComponent>(victim).Coordinates);
+
+            // Make the shock certain, the real chance is below one
+            if (entMan.TryGetComponent(fault, out ArcFaultComponent? arc))
+                arc.InnerShockChance = 1f;
+        });
+        await pair.RunSeconds(1.5f);
+
+        Assert.That(log.Messages, Has.Some.Contains(expected), string.Join(" | ", log.Messages));
 
         await pair.CleanReturnAsync();
     }

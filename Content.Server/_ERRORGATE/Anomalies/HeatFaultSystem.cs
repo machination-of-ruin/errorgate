@@ -3,6 +3,10 @@ using Content.Server.Atmos.Components;
 using Content.Server.Atmos.EntitySystems;
 using Content.Shared._ERRORGATE.Anomalies;
 using Content.Shared.Atmos.Components;
+using Content.Shared.Damage;
+using Content.Shared.Damage.Prototypes;
+using Content.Shared.FixedPoint;
+using Robust.Shared.Prototypes;
 using Robust.Shared.Map.Components;
 using Robust.Shared.Timing;
 
@@ -14,9 +18,14 @@ namespace Content.Server._ERRORGATE.Anomalies;
 public sealed class HeatFaultSystem : EntitySystem
 {
     [Dependency] private readonly IGameTiming _timing = default!;
+    [Dependency] private readonly DamageableSystem _damageable = default!;
+    [Dependency] private readonly IPrototypeManager _proto = default!;
     [Dependency] private readonly AtmosphereSystem _atmos = default!;
     [Dependency] private readonly FlammableSystem _flammable = default!;
     [Dependency] private readonly SharedMapSystem _map = default!;
+
+    [ValidatePrototypeId<DamageTypePrototype>]
+    private const string HeatDamageType = "Heat";
 
     private EntityQuery<FlammableComponent> _flammableQuery;
 
@@ -31,9 +40,20 @@ public sealed class HeatFaultSystem : EntitySystem
 
     private void OnTick(Entity<HeatFaultComponent> ent, ref ErrorgateAnomalyTickEvent args)
     {
-        if (!_flammableQuery.TryComp(args.Target, out var flammable))
+        if (!TryComp<ErrorgateAnomalyComponent>(ent, out var anomaly))
             return;
 
+        // Heat damage that grows toward the center: a few seconds at the edge are survivable, the middle is not
+        var edge = MathF.Max(anomaly.Radius, ent.Comp.InnerRadius + 0.01f);
+        var closeness = 1f - Math.Clamp((args.Distance - ent.Comp.InnerRadius) / (edge - ent.Comp.InnerRadius), 0f, 1f);
+        var perSecond = MathHelper.Lerp(ent.Comp.OuterDamagePerSecond, ent.Comp.InnerDamagePerSecond, closeness);
+        var damage = new DamageSpecifier(_proto.Index<DamageTypePrototype>(HeatDamageType), FixedPoint2.New(perSecond * anomaly.DamageInterval));
+        _damageable.TryChangeDamage(args.Target, damage, origin: ent.Owner);
+
+        if (TerminatingOrDeleted(args.Target) || !_flammableQuery.TryComp(args.Target, out var flammable))
+            return;
+
+        // Everyone inside burns
         _flammable.AdjustFireStacks(args.Target, ent.Comp.FireStacks, flammable);
         _flammable.Ignite(args.Target, ent.Owner, flammable);
     }

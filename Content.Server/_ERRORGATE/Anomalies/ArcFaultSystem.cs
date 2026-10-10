@@ -1,11 +1,8 @@
 using System.Numerics;
-using Content.Server.Beam.Components;
 using Content.Server.Electrocution;
 using Content.Server.Lightning;
 using Content.Shared._ERRORGATE.Anomalies;
 using Content.Shared.Mobs.Components;
-using Robust.Shared.Map;
-using Robust.Shared.Map.Components;
 using Robust.Shared.Physics.Components;
 using Robust.Shared.Random;
 using Robust.Shared.Timing;
@@ -26,7 +23,6 @@ public sealed class ArcFaultSystem : EntitySystem
 
     private readonly HashSet<Entity<PhysicsComponent>> _nearby = new();
     private readonly List<EntityUid> _living = new();
-    private readonly List<EntityUid> _objects = new();
 
     public override void Initialize()
     {
@@ -76,18 +72,29 @@ public sealed class ArcFaultSystem : EntitySystem
 
     private void Shock(EntityUid uid, ArcFaultComponent arc, EntityUid target, int damage)
     {
+        // Whoever was just shocked is left alone for a moment, so shocks cannot be chained
+        var now = _timing.CurTime;
+        if (TryComp<ArcShockImmunityComponent>(target, out var immunity) && immunity.Until > now)
+            return;
+
         _lightning.ShootLightning(uid, target, arc.ArcPrototype, false);
-        _electrocution.TryDoElectrocution(
-            target,
-            uid,
-            damage,
-            TimeSpan.FromSeconds(arc.ShockTime),
-            true,
-            ignoreInsulation: true);
+        if (!_electrocution.TryDoElectrocution(
+                target,
+                uid,
+                damage,
+                TimeSpan.FromSeconds(arc.ShockTime),
+                true,
+                ignoreInsulation: true))
+        {
+            return;
+        }
+
+        EnsureComp<ArcShockImmunityComponent>(target).Until = now + TimeSpan.FromSeconds(arc.ImmunitySeconds);
     }
 
     /// <summary>
-    ///     Throws one arc at a random thing in reach, preferably something alive.
+    ///     Throws one arc at a random living thing in reach. With nobody in reach nothing happens at all, the fault
+    ///     stays silent and dark.
     /// </summary>
     private void FireArc(EntityUid uid, ArcFaultComponent arc)
     {
@@ -95,38 +102,22 @@ public sealed class ArcFaultSystem : EntitySystem
 
         _nearby.Clear();
         _living.Clear();
-        _objects.Clear();
         _lookup.GetEntitiesInRange(origin, arc.ArcRange, _nearby, LookupFlags.Uncontained);
 
         foreach (var (target, _) in _nearby)
         {
-            if (target == uid
-                || HasComp<ErrorgateAnomalyComponent>(target)
-                || HasComp<MapGridComponent>(target)
-                || HasComp<BeamComponent>(target))
+            if (!HasComp<MobStateComponent>(target)
+                || (_transform.GetWorldPosition(target) - origin.Position).Length() > arc.ArcRange)
+            {
                 continue;
+            }
 
-            if (HasComp<MobStateComponent>(target))
-                _living.Add(target);
-            else if (!HasComp<ArcFaultComponent>(target))
-                _objects.Add(target);
+            _living.Add(target);
         }
 
-        var pickLiving = _living.Count > 0 && (_objects.Count == 0 || _random.Prob(arc.LivingTargetChance));
+        if (_living.Count == 0)
+            return;
 
-        if (pickLiving)
-        {
-            Shock(uid, arc, _random.Pick(_living), arc.ArcDamage);
-        }
-        else if (_objects.Count > 0)
-        {
-            _lightning.ShootLightning(uid, _random.Pick(_objects), arc.ArcPrototype, false);
-        }
-        else
-        {
-            // Nothing to reach for: it tears at the empty ground
-            var offset = _random.NextAngle().ToVec() * _random.NextFloat(arc.ArcRange * 0.4f, arc.ArcRange);
-            _lightning.ShootLightning(origin, new MapCoordinates(origin.Position + offset, origin.MapId), arc.ArcPrototype, false);
-        }
+        Shock(uid, arc, _random.Pick(_living), arc.ArcDamage);
     }
 }

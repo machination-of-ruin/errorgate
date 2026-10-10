@@ -1,5 +1,6 @@
 using Content.Server.Body.Components;
 using Content.Server.Chat.Managers;
+using Content.Shared._ERRORGATE.Anomalies;
 using Content.Shared._Shitmed.Targeting;
 using Content.Shared.Chat;
 using Content.Shared.CombatMode;
@@ -130,8 +131,14 @@ public sealed class CombatLogsSystem : EntitySystem
         hit.Damage += (float) total;
 
         // Damage that nothing above explained, but that someone caused.
-        if (hit.Kind == HitKind.None && args.Origin is { } origin)
-            hit.SetContext(HitKind.Generic, origin, null);
+        if (hit.Kind <= HitKind.Generic && args.Origin is { } origin)
+        {
+            // A world fault has its own line
+            if (HasComp<ErrorgateAnomalyComponent>(origin))
+                hit.SetContext(HitKind.Fault, origin, null);
+            else if (hit.Kind == HitKind.None)
+                hit.SetContext(HitKind.Generic, origin, null);
+        }
 
         // The body system hits the part the attacker is aiming at, so that is where it landed.
         if (hit.Part == null && args.Origin is { } aimer && TryComp<TargetingComponent>(aimer, out var aim))
@@ -213,6 +220,9 @@ public sealed class CombatLogsSystem : EntitySystem
                 break;
             case HitKind.Shove:
                 message = Loc.GetString("errorgate-combat-log-shove", ("attacker", attacker ?? Someone()));
+                break;
+            case HitKind.Fault:
+                message = Loc.GetString(FaultLine(hit.Attacker));
                 break;
             default:
                 message = attacker != null && !self
@@ -318,6 +328,18 @@ public sealed class CombatLogsSystem : EntitySystem
         return ("hit", "hits");
     }
 
+    /// <summary>
+    ///     The log line of the world fault that did the damage.
+    /// </summary>
+    private string FaultLine(EntityUid? fault)
+    {
+        var kind = fault is { } uid && TryComp<ErrorgateAnomalyComponent>(uid, out var anomaly)
+            ? anomaly.Kind
+            : ErrorgateAnomalyKind.Heat;
+
+        return "errorgate-combat-log-fault-" + kind.ToString().ToLowerInvariant();
+    }
+
     private string Name(EntityUid uid) => MetaData(uid).EntityName;
 
     private string Someone() => Loc.GetString("errorgate-combat-log-someone");
@@ -326,6 +348,7 @@ public sealed class CombatLogsSystem : EntitySystem
     {
         None,
         Generic,
+        Fault,
         Melee,
         Projectile,
         Beam,

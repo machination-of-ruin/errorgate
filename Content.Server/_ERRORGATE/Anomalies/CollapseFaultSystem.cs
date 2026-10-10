@@ -1,8 +1,11 @@
+using System.Linq;
 using System.Numerics;
 using Content.Shared._ERRORGATE.Anomalies;
 using Content.Shared.Body.Components;
 using Content.Shared.Body.Systems;
+using Content.Shared.Mobs.Components;
 using Content.Shared.Mobs.Systems;
+using Content.Shared.Movement.Components;
 using Content.Shared.Physics;
 using Robust.Shared.Map.Components;
 using Robust.Shared.Physics;
@@ -22,7 +25,12 @@ public sealed class CollapseFaultSystem : EntitySystem
     [Dependency] private readonly SharedPhysicsSystem _physics = default!;
     [Dependency] private readonly SharedTransformSystem _transform = default!;
 
+    // Nothing but walls and closed doors stops a creature from being dragged in
+    private const CollisionGroup PullBlockers = CollisionGroup.Impassable | CollisionGroup.HighImpassable;
+
     private EntityQuery<PhysicsComponent> _physicsQuery;
+    private EntityQuery<MobStateComponent> _mobQuery;
+    private EntityQuery<InputMoverComponent> _moverQuery;
     private readonly HashSet<EntityUid> _pulled = new();
 
     public override void Initialize()
@@ -30,6 +38,8 @@ public sealed class CollapseFaultSystem : EntitySystem
         base.Initialize();
 
         _physicsQuery = GetEntityQuery<PhysicsComponent>();
+        _mobQuery = GetEntityQuery<MobStateComponent>();
+        _moverQuery = GetEntityQuery<InputMoverComponent>();
 
         SubscribeLocalEvent<CollapseFaultComponent, ErrorgateAnomalyTickEvent>(OnTick);
     }
@@ -68,7 +78,8 @@ public sealed class CollapseFaultSystem : EntitySystem
         {
             if (target == uid
                 || !_physicsQuery.TryComp(target, out var body)
-                || body.BodyType != BodyType.Dynamic
+                // creatures are kinematic controllers, loose things dynamic bodies
+                || body.BodyType != BodyType.Dynamic && !(body.BodyType == BodyType.KinematicController && (_mobQuery.HasComp(target) || _moverQuery.HasComp(target)))
                 || body.CollisionLayer == (int) CollisionGroup.GhostImpassable
                 || HasComp<MapGridComponent>(target)
                 || HasComp<MapComponent>(target)
@@ -87,6 +98,23 @@ public sealed class CollapseFaultSystem : EntitySystem
                 continue;
 
             var closeness = 1f - distance / collapse.PullRange;
+
+            if (_mobQuery.HasComp(target) || _moverQuery.HasComp(target))
+            {
+                // Move the creature itself. Forces on a mob are eaten by its mover and by friction.
+                var speed = MathHelper.Lerp(collapse.MobMinSpeed, collapse.MobMaxSpeed, closeness);
+                var direction = displacement / distance;
+                var step = MathF.Min(speed * frameTime, distance);
+
+                // Do not drag anyone through a wall
+                var ray = new CollisionRay(_transform.GetWorldPosition(targetXform), direction, (int) PullBlockers);
+                if (_physics.IntersectRay(center.MapId, ray, step + 0.3f, target, true).Any())
+                    continue;
+
+                _transform.SetWorldPosition(target, _transform.GetWorldPosition(targetXform) + direction * step);
+                continue;
+            }
+
             var acceleration = MathHelper.Lerp(collapse.MinAcceleration, collapse.MaxAcceleration, closeness * closeness);
 
             // Same acceleration for everything, light or heavy

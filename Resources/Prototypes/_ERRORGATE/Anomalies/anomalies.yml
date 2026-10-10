@@ -1,5 +1,9 @@
-# ERRORGATE: world faults. Environmental hazards, not creatures: they sit where the map put them,
-# give a hint (light, sound, haze, static, a drained screen) and punish whatever steps into them.
+# ERRORGATE: world faults. Environmental hazards, not creatures: they sit where the field put them and punish whatever
+# steps into them. They are nearly invisible: the screen effects (haze, static, drained colour) are the warning.
+# Rule: damage radius <= screen effect radius ("warningRadius", also the range of the ambient sound) <= ~8 tiles, the
+# throwing range, so a player who does not rush notices the fault, and can test it with a thrown item, before it hurts.
+# A fault shows itself for a few seconds when something is thrown into it or when it hurts someone: the sprite layers
+# below hold that revealed look, the client scales their opacity down to "restAlpha" while hidden.
 # No Physics and no Damageable on purpose: nothing collides with them, nothing breaks them, explosions skip them.
 
 - type: entity
@@ -10,61 +14,54 @@
     tags:
     - HideContextMenu
   - type: ErrorgateAnomaly
+    revealDuration: 8
   - type: Sprite
     noRot: true
     drawdepth: Effects
 
-# HEAT FAULT: a zone of burning air. The haze is drawn by the client around the fault.
+# HEAT FAULT: a zone of burning air. The haze is drawn by the client around the fault. The red sphere is always there.
 - type: entity
   id: ErrorgateAnomalyHeat
   parent: ErrorgateAnomalyBase
   components:
   - type: ErrorgateAnomaly
     kind: Heat
-    radius: 3
+    radius: 5
+    warningRadius: 8
     damageInterval: 0.5
-    damage:
-      types:
-        Heat: 10
     tickSound:
       path: /Audio/Effects/burning.ogg
       params:
         volume: -6
+    revealSound:
+      path: /Audio/Effects/burning.ogg
+      params:
+        volume: -10
+    restAlpha: 0.28
+    restLightEnergy: 0.8
+    restLightRadius: 3
+    revealedLightEnergy: 2
+    revealedLightRadius: 6
   - type: HeatFault
   - type: Sprite
+    color: "#ffffff48"
     layers:
     - sprite: Structures/Specific/Anomalies/pyro_anom.rsi
       state: anom
       shader: unshaded
-      color: "#ff6a2a30"
-      scale: 3, 3
-    - sprite: Effects/fire.rsi
-      state: fire
-      shader: unshaded
-      color: "#ff5a1c60"
-      scale: 1.5, 1.5
+      color: "#ff5a2ab0"
+      scale: 10, 10
   - type: PointLight
     enabled: true
-    radius: 5
-    energy: 1.5
+    radius: 3
+    energy: 0.8
     softness: 1
     color: "#e0561f"
     castShadows: false
-  - type: LightBehaviour
-    behaviours:
-    - !type:RandomizeBehaviour
-      interpolate: Nearest
-      minDuration: 0.05
-      maxDuration: 0.25
-      startValue: 0.5
-      endValue: 2.4
-      property: Energy
-      isLooped: true
-      enabled: true
   - type: AmbientSound
     enabled: true
     range: 8
-    volume: -10
+    volume: -2
     sound:
       path: /Audio/Ambience/Objects/fireplace.ogg
 
@@ -77,45 +74,46 @@
   - type: ErrorgateAnomaly
     kind: Arc
     radius: 2
-    warningRadius: 6
+    dangerRadius: 4
+    revealRadius: 4
+    warningRadius: 8
     damageInterval: 1
+    revealSound:
+      path: /Audio/Effects/Lightning/lightningshock.ogg
+      params:
+        volume: -12
+    restAlpha: 0.04
+    restLightEnergy: 0.25
+    restLightRadius: 1.2
+    revealedLightEnergy: 2.2
+    revealedLightRadius: 4
   - type: ArcFault
   - type: Sprite
+    color: "#ffffff0a"
     layers:
     - sprite: Effects/electricity.rsi
       state: electrified
       shader: unshaded
-      color: "#8fb4ff90"
+      color: "#8fb4ffd0"
       scale: 2, 2
     - sprite: Structures/Specific/anomaly.rsi
       state: anom3
       shader: unshaded
-      color: "#9bbcff20"
+      color: "#9bbcff50"
       scale: 2, 2
   - type: PointLight
     enabled: true
-    radius: 4
-    energy: 1.5
+    radius: 1.2
+    energy: 0.25
     softness: 1
     color: "#6f9bff"
     castShadows: false
-  - type: LightBehaviour
-    behaviours:
-    - !type:RandomizeBehaviour
-      interpolate: Nearest
-      minDuration: 0.02
-      maxDuration: 0.18
-      startValue: 0
-      endValue: 3.2
-      property: Energy
-      isLooped: true
-      enabled: true
   - type: AmbientSound
     enabled: true
-    range: 9
-    volume: -8
+    range: 8
+    volume: -6
     sound:
-      path: /Audio/Ambience/Objects/light_hum.ogg
+      path: /Audio/Effects/tesla.ogg
 
 # COLLAPSE FAULT: a gravity error. Everything loose falls toward it, the center crushes, the world loses its colour.
 - type: entity
@@ -124,8 +122,10 @@
   components:
   - type: ErrorgateAnomaly
     kind: Collapse
-    radius: 1.2
-    warningRadius: 10
+    radius: 2
+    dangerRadius: 2.5
+    revealRadius: 4
+    warningRadius: 8
     damageInterval: 0.5
     damage:
       types:
@@ -134,17 +134,27 @@
       path: /Audio/Ambience/Objects/crushing.ogg
       params:
         volume: -4
+    revealSound:
+      path: /Audio/Ambience/Objects/crushing.ogg
+      params:
+        volume: -12
+    restAlpha: 0.05
+    restLightEnergy: -0.4
+    restLightRadius: 2
+    revealedLightEnergy: -2.5
+    revealedLightRadius: 5
   - type: CollapseFault
   - type: Sprite
+    color: "#ffffff0d"
     layers:
     - sprite: Structures/Specific/Anomalies/shadow_anom.rsi
       state: anom
-      color: "#10081890"
+      color: "#100818d0"
       scale: 1.6, 1.6
   - type: PointLight
     enabled: true
-    radius: 5
-    energy: -2.5
+    radius: 2
+    energy: -0.4
     softness: 1
     color: "#1a0a1f"
     castShadows: false
@@ -153,7 +163,17 @@
     falloffPower: 2.7
   - type: AmbientSound
     enabled: true
-    range: 12
-    volume: -6
+    range: 8
+    volume: -4
     sound:
-      path: /Audio/Ambience/Objects/gravity_gen_hum.ogg
+      path: /Audio/Effects/singularity.ogg
+
+# The arc of an arc fault. A plain lightning bolt, but touching it does nothing: the shock is dealt by the fault,
+# once, and with the immunity window.
+- type: entity
+  id: ErrorgateArcBolt
+  parent: Lightning
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: Electrified
+    enabled: false

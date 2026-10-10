@@ -10,6 +10,7 @@ namespace Content.Server._ERRORGATE.Anomalies;
 /// <summary>
 ///     Clears and places the world faults again. Without an argument every anomaly field is redone,
 ///     with a grid or map uid only that one (a default field is added to it if it has none).
+///     A number sets the total count of faults wanted.
 /// </summary>
 [AdminCommand(AdminFlags.Admin)]
 public sealed class SpawnAnomaliesCommand : LocalizedEntityCommands
@@ -20,60 +21,90 @@ public sealed class SpawnAnomaliesCommand : LocalizedEntityCommands
 
     public override void Execute(IConsoleShell shell, string argStr, string[] args)
     {
-        if (args.Length > 1)
+        if (args.Length > 2)
         {
             shell.WriteError(Loc.GetString("cmd-spawnanomalies-invalid-args"));
             return;
         }
 
-        if (args.Length == 1)
+        EntityUid? target = null;
+        int? count = null;
+
+        // spawnanomalies [grid] [count], or spawnanomalies [count]
+        foreach (var arg in args)
         {
-            if (!NetEntity.TryParse(args[0], out var netEntity)
-                || !EntityManager.TryGetEntity(netEntity, out var target)
-                || !EntityManager.EntityExists(target))
+            if (target == null && TryGetGrid(arg, out var grid))
             {
-                shell.WriteError(Loc.GetString("cmd-spawnanomalies-no-entity", ("entity", args[0])));
-                return;
+                target = grid;
+                continue;
             }
 
-            if (!EntityManager.HasComponent<MapGridComponent>(target) && !EntityManager.HasComponent<MapComponent>(target))
+            if (count == null && int.TryParse(arg, out var parsed) && parsed >= 0)
             {
-                shell.WriteError(Loc.GetString("cmd-spawnanomalies-not-grid", ("entity", args[0])));
-                return;
+                count = parsed;
+                continue;
             }
 
-            var field = EntityManager.EnsureComponent<AnomalyFieldComponent>(target.Value);
-            Respawn(shell, target.Value, field);
+            shell.WriteError(Loc.GetString("cmd-spawnanomalies-no-entity", ("entity", arg)));
             return;
         }
 
-        var any = false;
-        var query = EntityManager.EntityQueryEnumerator<AnomalyFieldComponent>();
+        if (target is { } uid)
+        {
+            Respawn(shell, uid, EntityManager.EnsureComponent<AnomalyFieldComponent>(uid), count);
+            return;
+        }
+
         var fields = new List<(EntityUid, AnomalyFieldComponent)>();
-        while (query.MoveNext(out var uid, out var comp))
+        var query = EntityManager.EntityQueryEnumerator<AnomalyFieldComponent>();
+        while (query.MoveNext(out var fieldUid, out var comp))
         {
-            fields.Add((uid, comp));
+            fields.Add((fieldUid, comp));
         }
 
-        foreach (var (uid, comp) in fields)
+        if (fields.Count == 0)
         {
-            any = true;
-            Respawn(shell, uid, comp);
-        }
-
-        if (!any)
             shell.WriteError(Loc.GetString("cmd-spawnanomalies-no-field"));
+            return;
+        }
+
+        foreach (var (fieldUid, comp) in fields)
+        {
+            Respawn(shell, fieldUid, comp, count);
+        }
     }
 
-    private void Respawn(IConsoleShell shell, EntityUid uid, AnomalyFieldComponent field)
+    private bool TryGetGrid(string arg, out EntityUid grid)
     {
-        var count = _field.SpawnAnomalies(uid, field);
-        shell.WriteLine(Loc.GetString("cmd-spawnanomalies-done", ("entity", EntityManager.ToPrettyString(uid).ToString()), ("count", count)));
+        grid = default;
+
+        if (!NetEntity.TryParse(arg, out var netEntity)
+            || !EntityManager.TryGetEntity(netEntity, out var entity)
+            || !EntityManager.EntityExists(entity)
+            || !EntityManager.HasComponent<MapGridComponent>(entity) && !EntityManager.HasComponent<MapComponent>(entity))
+        {
+            return false;
+        }
+
+        grid = entity.Value;
+        return true;
+    }
+
+    private void Respawn(IConsoleShell shell, EntityUid uid, AnomalyFieldComponent field, int? count)
+    {
+        if (count != null)
+            field.Count = count.Value;
+
+        var placed = _field.SpawnAnomalies(uid, field);
+        shell.WriteLine(Loc.GetString("cmd-spawnanomalies-done",
+            ("entity", EntityManager.ToPrettyString(uid).ToString()),
+            ("count", placed),
+            ("packs", field.Packs.Count)));
     }
 }
 
 /// <summary>
-///     Prints where every world fault is.
+///     Prints where every world fault is, grouped by pack.
 /// </summary>
 [AdminCommand(AdminFlags.Admin)]
 public sealed class ListAnomaliesCommand : LocalizedEntityCommands
@@ -84,21 +115,59 @@ public sealed class ListAnomaliesCommand : LocalizedEntityCommands
 
     public override void Execute(IConsoleShell shell, string argStr, string[] args)
     {
-        var count = 0;
-        var query = EntityManager.EntityQueryEnumerator<ErrorgateAnomalyComponent, TransformComponent>();
-        while (query.MoveNext(out var uid, out var anomaly, out var xform))
+        var listed = new HashSet<EntityUid>();
+
+        var fieldQuery = EntityManager.EntityQueryEnumerator<AnomalyFieldComponent>();
+        while (fieldQuery.MoveNext(out var fieldUid, out var field))
         {
+            for (var i = 0; i < field.Packs.Count; i++)
+            {
+                var pack = field.Packs[i];
+                shell.WriteLine(Loc.GetString("cmd-listanomalies-pack",
+                    ("field", EntityManager.ToPrettyString(fieldUid).ToString()),
+                    ("index", i),
+                    ("proto", pack.Proto.Id),
+                    ("count", pack.Members.Count),
+                    ("x", pack.Center.X.ToString("0.0")),
+                    ("y", pack.Center.Y.ToString("0.0")),
+                    ("radius", pack.Radius.ToString("0.0")),
+                    ("passable", pack.Passable ? "PASSABLE" : "CLOSED")));
+
+                foreach (var member in pack.Members)
+                {
+                    if (EntityManager.TryGetComponent(member, out ErrorgateAnomalyComponent? anomaly)
+                        && listed.Add(member))
+                    {
+                        WriteFault(shell, member, anomaly);
+                    }
+                }
+            }
+        }
+
+        // Faults that no field placed
+        var count = listed.Count;
+        var query = EntityManager.EntityQueryEnumerator<ErrorgateAnomalyComponent>();
+        while (query.MoveNext(out var uid, out var anomaly))
+        {
+            if (!listed.Add(uid))
+                continue;
+
             count++;
-            var position = _transform.GetMapCoordinates(uid, xform);
-            shell.WriteLine(Loc.GetString("cmd-listanomalies-line",
-                ("kind", anomaly.Kind.ToString()),
-                ("entity", EntityManager.ToPrettyString(uid).ToString()),
-                ("map", position.MapId.ToString()),
-                ("x", position.X.ToString("0.0")),
-                ("y", position.Y.ToString("0.0"))));
+            WriteFault(shell, uid, anomaly);
         }
 
         if (count == 0)
             shell.WriteLine(Loc.GetString("cmd-listanomalies-none"));
+    }
+
+    private void WriteFault(IConsoleShell shell, EntityUid uid, ErrorgateAnomalyComponent anomaly)
+    {
+        var position = _transform.GetMapCoordinates(uid);
+        shell.WriteLine(Loc.GetString("cmd-listanomalies-line",
+            ("kind", anomaly.Kind.ToString()),
+            ("entity", EntityManager.ToPrettyString(uid).ToString()),
+            ("map", position.MapId.ToString()),
+            ("x", position.X.ToString("0.0")),
+            ("y", position.Y.ToString("0.0"))));
     }
 }

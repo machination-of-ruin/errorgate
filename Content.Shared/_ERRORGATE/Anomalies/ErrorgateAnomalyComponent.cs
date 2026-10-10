@@ -39,8 +39,29 @@ public sealed partial class ErrorgateAnomalyComponent : Component
     public float Radius = 3f;
 
     /// <summary>
-    ///     Distance at which the client starts to show the fault on the screen (static, desaturation).
-    ///     Zero means the fault has no screen effect.
+    ///     How far the whole fault can hurt, if that is more than <see cref="Radius"/> (an arc reaches further than
+    ///     the zone it shocks inside of all the time). Placement keeps this much room around every fault.
+    ///     Zero means <see cref="Radius"/>.
+    /// </summary>
+    [DataField]
+    public float DangerRadius;
+
+    /// <summary>
+    ///     Things flying inside this distance reveal the fault, if that is more than <see cref="Radius"/>.
+    /// </summary>
+    [DataField]
+    public float RevealRadius;
+
+    /// <summary>
+    ///     The distance the fault can hurt from.
+    /// </summary>
+    public float EffectiveDanger => MathF.Max(Radius, DangerRadius);
+
+    /// <summary>
+    ///     Distance at which the client starts to show the fault on the screen (static, desaturation, haze).
+    ///     Zero means the fault has no screen effect. It is meant to be at least the danger radius, and at most the
+    ///     throwing range (about eight tiles), so a careful player sees it, and can test it with a thrown item,
+    ///     before it can hurt.
     /// </summary>
     [DataField, AutoNetworkedField]
     public float WarningRadius;
@@ -66,6 +87,49 @@ public sealed partial class ErrorgateAnomalyComponent : Component
 
     [ViewVariables]
     public TimeSpan NextTick;
+
+    /// <summary>
+    ///     While the game time is before this, the fault is revealed: its sprite and light show clearly.
+    ///     Set when something is thrown into it or when it hurts a creature.
+    /// </summary>
+    [DataField, AutoNetworkedField]
+    public TimeSpan? RevealedUntil;
+
+    /// <summary>
+    ///     Seconds a reveal lasts.
+    /// </summary>
+    [DataField, AutoNetworkedField]
+    public float RevealDuration = 8f;
+
+    /// <summary>
+    ///     Played at the fault when it goes from hidden to revealed.
+    /// </summary>
+    [DataField]
+    public SoundSpecifier? RevealSound;
+
+    /// <summary>
+    ///     Opacity of the sprite while hidden (0 to 1), the sprite layers hold the revealed look.
+    /// </summary>
+    [DataField]
+    public float RestAlpha = 0.05f;
+
+    /// <summary>
+    ///     Light while hidden. The client flickers it a little.
+    /// </summary>
+    [DataField]
+    public float RestLightEnergy = 0.4f;
+
+    [DataField]
+    public float RestLightRadius = 1.5f;
+
+    /// <summary>
+    ///     Light while revealed.
+    /// </summary>
+    [DataField]
+    public float RevealedLightEnergy = 2f;
+
+    [DataField]
+    public float RevealedLightRadius = 4f;
 }
 
 /// <summary>

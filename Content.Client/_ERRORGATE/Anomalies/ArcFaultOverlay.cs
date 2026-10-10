@@ -43,8 +43,9 @@ public sealed class ArcFaultOverlay : Overlay
     {
         var proximity = AnomalyProximity.Get(_entMan, _xformSys, _player, ErrorgateAnomalyKind.Arc);
 
-        // Ramp up quickly when getting close, fade out slower
-        var target = proximity * proximity;
+        // Already clearly there at three quarters of the way out (6 of 8 tiles), ramp up quickly when getting close,
+        // fade out slower
+        var target = MathF.Pow(proximity, 0.6f);
         var speed = target > _strength ? 6f : 2f;
         _strength += (target - _strength) * MathF.Min(1f, speed * args.DeltaSeconds);
     }

@@ -41,8 +41,8 @@ public sealed class HeatFaultOverlay : Overlay
     private readonly OverlayResourceCache<CachedResources> _resources = new();
     private readonly List<(Vector2 Position, float Radius, float Phase)> _visible = new();
 
-    // The haze reaches a bit past the danger radius, so it can be seen before it burns
-    private const float HazeScale = 2.2f;
+    // Without a warning radius the haze reaches a bit past the danger radius
+    private const float DefaultHazeScale = 2.2f;
 
     private const float ShaderStrength = 0.05f;
     private const float ShaderScale = 1f;
@@ -71,6 +71,14 @@ public sealed class HeatFaultOverlay : Overlay
         _shader.SetParameter("speed_scale", reducedMotion ? ShaderSpeedReducedMotion : ShaderSpeed);
     }
 
+    /// <summary>
+    ///     How far the haze reaches: the warning radius of the fault.
+    /// </summary>
+    private static float HazeRadius(ErrorgateAnomalyComponent anomaly)
+    {
+        return anomaly.WarningRadius > 0f ? anomaly.WarningRadius : anomaly.Radius * DefaultHazeScale;
+    }
+
     protected override bool BeforeDraw(in OverlayDrawArgs args)
     {
         if (args.MapId == MapId.Nullspace)
@@ -84,11 +92,11 @@ public sealed class HeatFaultOverlay : Overlay
                 continue;
 
             var position = _xformSys.GetWorldPosition(xform);
-            var reach = anomaly.Radius * HazeScale;
+            var reach = HazeRadius(anomaly);
             if (!args.WorldAABB.Intersects(Box2.CenteredAround(position, new Vector2(reach * 2f, reach * 2f))))
                 continue;
 
-            _visible.Add((position, anomaly.Radius, uid.Id));
+            _visible.Add((position, reach, uid.Id));
         }
 
         if (_visible.Count == 0)
@@ -122,7 +130,7 @@ public sealed class HeatFaultOverlay : Overlay
                 foreach (var (position, radius, phase) in _visible)
                 {
                     var flicker = 0.8f + 0.2f * MathF.Sin(time * 2.3f + phase);
-                    var size = radius * HazeScale * 2f;
+                    var size = radius * 2f;
                     worldHandle.DrawTextureRect(
                         _gradientTexture,
                         Box2.CenteredAround(position, new Vector2(size, size)),

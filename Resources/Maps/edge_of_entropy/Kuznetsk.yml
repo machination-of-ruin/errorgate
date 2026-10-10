@@ -3282,15 +3282,21 @@ entities:
       globalLootTablePrototype: Kuznetsk
     # ERRORGATE: world faults placed over the map on map init
     - type: AnomalyField
-      count: 3
-      unique: true
+      count: 40
       prototypes:
       - ErrorgateAnomalyHeat
       - ErrorgateAnomalyArc
       - ErrorgateAnomalyCollapse
-      minDistanceBetween: 25
-      minDistanceFromSpawns: 20
+      packSizeMin: 6
+      packSizeMax: 12
+      packRadius: 9
+      minSpacingInPack: 4
+      minDistanceBetweenPacks: 30
+      minDistanceFromSpawns: 25
+      minDistanceFromPoi: 8
+      maxDistanceFromPoi: 40
       freeRadius: 3
+      useRoutes: true
       maxAttempts: 20000
     - type: Gravity
       gravityShakeSound: !type:SoundPathSpecifier

@@ -8,6 +8,21 @@ namespace Content.Server._ERRORGATE.Anomalies;
 public sealed partial class HeatFaultComponent : Component
 {
     /// <summary>
+    ///     Heat damage per second at the edge of the fault.
+    /// </summary>
+    [DataField]
+    public float OuterDamagePerSecond = 6f;
+
+    /// <summary>
+    ///     Heat damage per second inside <see cref="InnerRadius"/>. In between it grows with the closeness.
+    /// </summary>
+    [DataField]
+    public float InnerDamagePerSecond = 30f;
+
+    [DataField]
+    public float InnerRadius = 2.5f;
+
+    /// <summary>
     ///     Fire stacks added to every living thing inside the fault on each tick.
     /// </summary>
     [DataField]
