@@ -204,5 +204,17 @@ public sealed class ErrorgateCVars
     public static readonly CVarDef<bool> GodUppercase =
         CVarDef.Create("errorgate.god.uppercase", true, CVar.SERVERONLY);
 
+    /// <summary>
+    ///     Average seconds between her small signs (a line or a glitch for one subject) when nothing else happens.
+    /// </summary>
+    public static readonly CVarDef<float> GodWhisperInterval =
+        CVarDef.Create("errorgate.god.whisper_interval", 150f, CVar.SERVERONLY);
+
+    /// <summary>
+    ///     Seconds after a prayer at an altar before the answer line.
+    /// </summary>
+    public static readonly CVarDef<float> GodPrayerDelay =
+        CVarDef.Create("errorgate.god.prayer_delay", 8f, CVar.SERVERONLY);
+
     #endregion
 }

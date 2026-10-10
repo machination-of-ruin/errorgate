@@ -1,0 +1,33 @@
+# ERRORGATE: what MACHINATION OF RUIN says when no model is asked. Cold, short, a machine reporting on itself.
+# She never guides: no orders, no hints, no goals. Slots: {name}, {number}, {sector}.
+# Every line has to pass the rules in voice.yml, the test GodLinesTest checks it.
+- type: godLines
+  id: Default
+  error:
+  - "{name}: ERROR LOGGED."
+  - "ERROR COUNTED FOR {name}. CAUSE NOT UNDERSTOOD."
+  - "{name} IS NOT PRESENT. THE LOG REMAINS."
+  - "ONE LESS. THE COUNT IS NOT LESS."
+  - "S{number} DELETED. NO IMPROVEMENT FOUND."
+  - "{name}: RE-INSTANTIATION PENDING."
+  - "{name} STOPPED. THE REASON WAS NOT RECORDED."
+  - "S{number}: ERROR."
+  omen:
+  - "SECTOR {sector}: MOVEMENT COUNTED."
+  - "{name}: STILL PRESENT."
+  - "NOTHING HAS BEEN UNDERSTOOD."
+  - "{name} WAS OBSERVED. THE RESULT IS ERROR."
+  - "ERROR RATE UNCHANGED."
+  - "SIGNAL LOST. SIGNAL RETURNED. NO CHANGE."
+  - "{name}: HEARTBEAT LOGGED."
+  - "SECTOR {sector} REMEMBERS A DIFFERENT SHAPE."
+  - "THE COUNT CONTINUES."
+  - "S{number}: NO ERROR YET. THIS IS TEMPORARY."
+  - "A SUBJECT IN SECTOR {sector} WAS NOTED TWICE."
+  - "THE SNOW IS A FAULT IN THE RENDER."
+  prayer:
+  - "PRAYER FROM {name} RECEIVED. NO FUNCTION FOUND FOR IT."
+  - "{name}: MESSAGE LOGGED. MEANING NOT FOUND."
+  - "{name}: INPUT RECEIVED. OUTPUT UNDEFINED."
+  - "NO ONE WAS ADDRESSED. SOMETHING ANSWERED."
+  - "S{number}: THE TERMINAL HEARD. THE TERMINAL DOES NOT KNOW WHAT HEARING IS."

@@ -10,6 +10,8 @@ using Content.Shared.Chat;
 using Content.Shared.Database;
 using Content.Shared.GameTicking;
 using Content.Shared.Popups;
+using Robust.Shared.Audio;
+using Robust.Shared.Audio.Systems;
 using Robust.Shared.Configuration;
 using Robust.Shared.Player;
 using Robust.Shared.Prototypes;
@@ -32,11 +34,13 @@ public sealed class GodDirectorSystem : EntitySystem
     [Dependency] private readonly IAdminLogManager _adminLogger = default!;
     [Dependency] private readonly ChatSystem _chat = default!;
     [Dependency] private readonly PopupSystem _popup = default!;
+    [Dependency] private readonly SharedAudioSystem _audio = default!;
     [Dependency] private readonly GameTicker _ticker = default!;
     [Dependency] private readonly GodLedgerSystem _ledger = default!;
     [Dependency] private readonly SectorSystem _sectors = default!;
 
     private const int LogSize = 100;
+    private static readonly SoundPathSpecifier GlitchSound = new("/Audio/Effects/Lightning/lightningshock.ogg", AudioParams.Default.WithVolume(-10f));
     public const string Sender = "MACHINATION OF RUIN";
 
     public readonly GodBudget Budget = new();
@@ -315,7 +319,10 @@ public sealed class GodDirectorSystem : EntitySystem
                 foreach (var subject in GlitchTargets(action))
                 {
                     if (_ledger.TryGetReachable(subject, out _, out var session))
+                    {
                         RaiseNetworkEvent(new GodGlitchEvent(4f, 0.8f), session);
+                        _audio.PlayGlobal(GlitchSound, session);
+                    }
                 }
 
                 break;

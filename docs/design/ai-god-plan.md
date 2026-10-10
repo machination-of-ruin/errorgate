@@ -25,7 +25,7 @@ How MACHINATION OF RUIN is built. Read [VIBE.md](VIBE.md) and [ai-god.md](ai-god
 
 ## Built so far (step 1)
 
-Sectors, ledger, altar prayers, mention filter, digest builder and the admin commands `godstatus`, `goddigest` and `godsectors`. Tests: `GodDigestTest` (unit), `GodStepOneTest`. The action pipeline (`GodDirectorSystem`: validator, wrath budget, cooldowns, dry-run, approval with expiry, decision log) with subtle messages, announcements and glitch events, the voice rules (`godVoice` prototype), and the commands `godlog`, `godapprove`, `goddeny`, `godpause`, `godresume`, `godforce`. Tests: `GodActionTest` (unit), `GodDirectorTest`. Still to build for step 1: the client glitch overlay, the scripted director with its line bank, the LLM director, writer mode.
+Sectors, ledger, altar prayers, mention filter, digest builder and the admin commands `godstatus`, `goddigest` and `godsectors`. Tests: `GodDigestTest` (unit), `GodStepOneTest`. The action pipeline (`GodDirectorSystem`: validator, wrath budget, cooldowns, dry-run, approval with expiry, decision log) with subtle messages, announcements and glitch events, the voice rules (`godVoice` prototype), and the commands `godlog`, `godapprove`, `goddeny`, `godpause`, `godresume`, `godforce`. Tests: `GodActionTest` (unit), `GodDirectorTest`. The client glitch overlay (static, reusing the arc fault shader), and the scripted director (`GodScriptedSystem`: a small sign every ~150 s for a subject chosen by salience, a line for the witnesses of a death, an answer to a prayer at an altar, lines in `godLines`, tested against the voice rules). Mode `off` and `full` switch it off. Tests: `GodScriptedTest`. Still to build for step 1: the LLM director and writer mode.
 
 ## Layers
 

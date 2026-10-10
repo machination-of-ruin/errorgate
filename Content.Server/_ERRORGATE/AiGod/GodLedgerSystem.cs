@@ -171,6 +171,7 @@ public sealed class GodLedgerSystem : EntitySystem
             victim.Errors++;
             victim.Alive = false;
             Note(victim, "died");
+            RaiseLocalEvent(new GodSubjectDiedEvent(victim));
         }
 
         _bodies.Remove(args.Target);
@@ -259,5 +260,18 @@ public sealed class GodLedgerSystem : EntitySystem
         subject.Sector = sector;
         if (sector != null)
             subject.SectorsVisited.Add(sector);
+    }
+}
+
+/// <summary>
+///     Raised (broadcast) when a subject has died. The subject's <see cref="Subject.Near"/> still lists who was around.
+/// </summary>
+public sealed class GodSubjectDiedEvent : EntityEventArgs
+{
+    public readonly Subject Subject;
+
+    public GodSubjectDiedEvent(Subject subject)
+    {
+        Subject = subject;
     }
 }
