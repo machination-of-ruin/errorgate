@@ -474,7 +474,85 @@ public sealed class LifeLogTest
         await world.Pair.Client.WaitPost(() => wrapped = string.Join("\n", chat.History.Select(m => m.Msg.WrappedMessage)));
 
         Assert.That(wrapped, Does.Contain("YOU ARE DEAD"));
+        Assert.That(System.Text.RegularExpressions.Regex.Matches(wrapped, "YOU ARE DEAD").Count, Is.EqualTo(1), "A killing blow that also gibs the body must still send one death message.");
         Assert.That(wrapped, Does.Contain(selfInflicted ? "DAMAGE IN   SELF: 900" : "DAMAGE IN   BORIS: 900"), "The hit that killed is the last line of the log.");
+
+        await world.Pair.CleanReturnAsync();
+    }
+
+    [Test]
+    public async Task ACollapseFaultKillsAPlayerWithOneDeathMessage()
+    {
+        var world = await Setup();
+        var server = world.Pair.Server;
+        var entMan = server.EntMan;
+        var chat = world.Pair.Client.ResolveDependency<IUserInterfaceManager>().GetUIController<ChatUIController>();
+        await world.Pair.Client.WaitPost(() => chat.History.Clear());
+
+        // A collapse fault on top of the player, always on and engaged: it crushes, then tears the corpse apart
+        await server.WaitPost(() =>
+        {
+            // Hurt already, as after a fight, so that the fault finishes the player off
+            Hurt(server, world.Ivan, null, "Blunt", 150);
+            var coords = entMan.GetComponent<TransformComponent>(world.Ivan).Coordinates;
+            var fault = entMan.SpawnEntity("ErrorgateAnomalyCollapse", coords);
+            entMan.GetComponent<Content.Shared._ERRORGATE.Anomalies.ErrorgateAnomalyComponent>(fault).ActiveSeconds = 0f;
+        });
+
+        await world.Pair.RunSeconds(10);
+
+        var deaths = 0;
+        var wrapped = "";
+        await world.Pair.Client.WaitPost(() =>
+        {
+            deaths = chat.History.Count(m => m.Msg.WrappedMessage.Contains("YOU ARE DEAD"));
+            wrapped = string.Join(" ==== ", chat.History.Where(m => m.Msg.WrappedMessage.Contains("YOU ARE DEAD")).Select(m => m.Msg.WrappedMessage));
+        });
+
+        Assert.That(deaths, Is.EqualTo(1), "One death, one message. " + wrapped);
+
+        await world.Pair.CleanReturnAsync();
+    }
+
+    [Test]
+    public async Task TheVoidBeingLostMidDeathDoesNotSendASecondMessage()
+    {
+        var world = await Setup();
+        var server = world.Pair.Server;
+        var entMan = server.EntMan;
+        var session = server.ResolveDependency<IPlayerManager>().Sessions.Single();
+        var chat = world.Pair.Client.ResolveDependency<IUserInterfaceManager>().GetUIController<ChatUIController>();
+        await world.Pair.Client.WaitPost(() => chat.History.Clear());
+
+        await server.WaitPost(() =>
+        {
+            Hurt(server, world.Ivan, world.Boris, "Blunt", 50);
+            entMan.System<MobStateSystem>().ChangeMobState(world.Ivan, MobState.Dead);
+        });
+        await world.Pair.RunTicksSync(2);
+
+        // What a gib does to a player who has just died: the mind is moved through the brain, the void is deleted because the mind
+        // left it, and then the body is deleted and has to find the player a void again
+        await server.WaitPost(() =>
+        {
+            entMan.DeleteEntity(session.AttachedEntity!.Value);
+
+            var mind = entMan.GetComponent<MindComponent>(world.IvanMind);
+            var lost = new Content.Server._ERRORGATE.DeathVoid.MindBodyDeletedEvent(world.IvanMind, mind);
+            entMan.EventBus.RaiseEvent(EventSource.Local, ref lost);
+        });
+        await world.Pair.RunTicksSync(5);
+
+        var deaths = 0;
+        await world.Pair.Client.WaitPost(() => deaths = chat.History.Count(m => m.Msg.WrappedMessage.Contains("YOU ARE DEAD")));
+        Assert.That(deaths, Is.EqualTo(1), "One death, one message, however the void was lost and found again.");
+
+        await server.WaitAssertion(() =>
+        {
+            Assert.That(session.AttachedEntity, Is.Not.Null);
+            Assert.That(entMan.HasComponent<Content.Shared._ERRORGATE.DeathVoid.DeathVoidComponent>(session.AttachedEntity!.Value), Is.True,
+                "The player is still in a void.");
+        });
 
         await world.Pair.CleanReturnAsync();
     }
