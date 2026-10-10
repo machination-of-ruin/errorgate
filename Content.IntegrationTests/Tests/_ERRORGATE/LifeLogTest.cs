@@ -121,8 +121,8 @@ public sealed class LifeLogTest
             var lines = Lines(world);
             var text = string.Join("\n", lines);
 
-            Assert.That(lines[0], Does.Match(@"^> T-\d\d:\d\d\.\d\d \|  SUBJECT INSTANTIATED$"));
-            Assert.That(lines[^1], Is.EqualTo("> T-00:00.00 |  SUBJECT TERMINATED"));
+            Assert.That(lines[0], Does.Match(@"^T-\d\d:\d\d\.\d\d >  SUBJECT INSTANTIATED$"));
+            Assert.That(lines[^1], Is.EqualTo("T-00:00.00 >  SUBJECT TERMINATED"));
             Assert.That(text, Does.Not.Contain("LOG"), "No header line.");
 
             Assert.That(text, Does.Contain("SPEECH      \"stay back\""));
@@ -324,9 +324,9 @@ public sealed class LifeLogTest
         await server.WaitAssertion(() =>
         {
             var lines = Lines(world);
-            var bars = lines.Select(l => l.IndexOf('|')).Distinct().ToList();
+            var bars = lines.Select(l => l.IndexOf('>')).Distinct().ToList();
             Assert.That(bars, Has.Count.EqualTo(1), "Every line should have its bar in the same column:\n" + string.Join("\n", lines));
-            Assert.That(lines.Select(l => l[..l.IndexOf('|')]).Distinct().Count(), Is.GreaterThan(1), "The times differ.");
+            Assert.That(lines.Select(l => l[..l.IndexOf('>')]).Distinct().Count(), Is.GreaterThan(1), "The times differ.");
         });
 
         await world.Pair.CleanReturnAsync();

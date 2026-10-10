@@ -16,6 +16,13 @@ public sealed class StandingStateSystem : EntitySystem
     [Dependency] private readonly ThrowingSystem _throwingSystem = default!;
     [Dependency] private readonly SharedTransformSystem _transformSystem = default!;
 
+    // ERRORGATE: restored. The mob collisions port dropped this subscription, and then nothing let go of held items on going down.
+    public override void Initialize()
+    {
+        base.Initialize();
+        SubscribeLocalEvent<StandingStateComponent, DropHandItemsEvent>(FallOver);
+    }
+
     private void FallOver(EntityUid uid, StandingStateComponent component, DropHandItemsEvent args)
     {
         var direction = EntityManager.TryGetComponent(uid, out PhysicsComponent? comp) ? comp.LinearVelocity / 50 : Vector2.Zero;
