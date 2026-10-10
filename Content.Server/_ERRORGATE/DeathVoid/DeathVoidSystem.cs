@@ -38,6 +38,12 @@ public sealed class DeathVoidSystem : EntitySystem
 
     // The void each mind was sent to, so a corpse that is gibbed or crushed later does not send it there again
     private readonly Dictionary<EntityUid, EntityUid> _voids = new();
+
+    // When each mind was last told it is dead. A death can send the mind through the void more than once within a moment (the void
+    // is deleted whenever the mind leaves it, and a gib moves the mind through the body, the brain and the void), and the message is
+    // only sent once. A real second death is much further away than this.
+    private readonly Dictionary<EntityUid, TimeSpan> _told = new();
+    private static readonly TimeSpan SameDeath = TimeSpan.FromSeconds(3);
     private static readonly EntProtoId RespawnAction = "ActionDeadRespawn";
 
     [Dependency] private readonly IChatManager _chat = default!;
@@ -68,6 +74,7 @@ public sealed class DeathVoidSystem : EntitySystem
         {
             _voidMap = null;
             _voids.Clear();
+            _told.Clear();
         });
 
         SubscribeLocalEvent<DeathVoidComponent, DeadRespawnEvent>(OnRespawn);
@@ -167,6 +174,16 @@ public sealed class DeathVoidSystem : EntitySystem
     ///     The void a mind goes to. A mind that is already in one (it died, and now its corpse is gibbed, deleted or
     ///     crushed) keeps that void: no second void and no second death message.
     /// </summary>
+    private bool AlreadyTold(EntityUid mindId)
+    {
+        var now = _timing.CurTime;
+        if (_told.TryGetValue(mindId, out var last) && now - last < SameDeath)
+            return true;
+
+        _told[mindId] = now;
+        return false;
+    }
+
     private EntityUid VoidFor(EntityUid mindId, MindComponent mind)
     {
         // Remembered, because the mind does not point at the void any more once a brain or another body took it
@@ -189,7 +206,7 @@ public sealed class DeathVoidSystem : EntitySystem
         }
         _actions.AddAction(voidEnt, RespawnAction);
 
-        if (mind.Session is { } session)
+        if (mind.Session is { } session && !AlreadyTold(mindId))
         {
             // One message: the title, the life log, then the subtitle at the bottom. Large text is broken into short
             // lines by hand: a wrapped large font line overlaps the following messages in a narrow chat panel.
