@@ -744,7 +744,9 @@ public sealed class AnomalyFieldSystem : EntitySystem
         List<(Vector2 Position, float Radius, AnomalyPack Pack)> placed)
     {
         var positions = new List<Vector2>();
-        var freeRadius = MathF.Max(field.FreeRadius, radius);
+        // Only the field's own free radius, not the danger radius: faults may stand in alleys and yards, their danger zone
+        // then reaches into the buildings around them
+        var freeRadius = field.FreeRadius;
         var tries = size * 30;
 
         for (var i = 0; i < tries && positions.Count < size && state.Attempts < field.MaxAttempts; i++)
