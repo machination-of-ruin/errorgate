@@ -208,3 +208,4 @@ Found while playing the `port/beyond` build. One line each, newest last.
 - [x] Playtest confirmed: distant gunfire, heat haze and vacuum shaders (seen with the anomalies), mob pathfinding rework (looked fine). Anomalies closed for now. Still unchecked: radio indicator, weather volume.
 - [x] Life log on `ai-god`: the death message is one red block with a technical log of the last 8 events (speech, heard, damage in and out, kills) and the subtitle at the bottom; one message per death even when the corpse is gibbed; the dead no longer see their own death emote. `LifeLogTest` (12). Open: talking to MACHINATION OF RUIN has no channel yet.
 - [x] Life log v2: no header, `T-mm:ss.cc |  KIND` lines with aligned bars, minor environmental damage grouped per cause over 30 s and hidden below 5, starvation named apart from blood loss. `LifeLogTest` (16).
+- [x] Life log v3: lines start with "> ", "KILLED" instead of "DELETED", merged damage shows the total without a counter.

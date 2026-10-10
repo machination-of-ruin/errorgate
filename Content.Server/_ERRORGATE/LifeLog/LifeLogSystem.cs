@@ -321,17 +321,14 @@ public sealed class LifeLogSystem : EntitySystem
     private string Line(LogEntry entry, string time)
     {
         var amount = (int) MathF.Round(entry.Amount);
-        var merged = entry.Count > 1;
 
         return entry.Kind switch
         {
             LogKind.Speech => Loc.GetString("life-log-speech", ("time", time), ("text", entry.Text)),
             LogKind.Whisper => Loc.GetString("life-log-whisper", ("time", time), ("text", entry.Text)),
             LogKind.Heard => Loc.GetString("life-log-heard", ("time", time), ("subject", entry.Subject), ("text", entry.Text)),
-            LogKind.DamageIn => Loc.GetString(merged ? "life-log-damage-in-merged" : "life-log-damage-in",
-                ("time", time), ("subject", entry.Subject), ("amount", amount), ("count", entry.Count)),
-            LogKind.DamageOut => Loc.GetString(merged ? "life-log-damage-out-merged" : "life-log-damage-out",
-                ("time", time), ("subject", entry.Subject), ("amount", amount), ("count", entry.Count)),
+            LogKind.DamageIn => Loc.GetString("life-log-damage-in", ("time", time), ("subject", entry.Subject), ("amount", amount)),
+            LogKind.DamageOut => Loc.GetString("life-log-damage-out", ("time", time), ("subject", entry.Subject), ("amount", amount)),
             _ => Loc.GetString("life-log-deleted", ("time", time), ("subject", entry.Subject)),
         };
     }

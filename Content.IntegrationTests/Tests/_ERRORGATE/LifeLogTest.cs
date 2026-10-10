@@ -121,16 +121,16 @@ public sealed class LifeLogTest
             var lines = Lines(world);
             var text = string.Join("\n", lines);
 
-            Assert.That(lines[0], Does.Match(@"^T-\d\d:\d\d\.\d\d \|  SUBJECT INSTANTIATED$"));
-            Assert.That(lines[^1], Is.EqualTo("T-00:00.00 |  SUBJECT TERMINATED"));
+            Assert.That(lines[0], Does.Match(@"^> T-\d\d:\d\d\.\d\d \|  SUBJECT INSTANTIATED$"));
+            Assert.That(lines[^1], Is.EqualTo("> T-00:00.00 |  SUBJECT TERMINATED"));
             Assert.That(text, Does.Not.Contain("LOG"), "No header line.");
 
             Assert.That(text, Does.Contain("SPEECH      \"stay back\""));
             Assert.That(text, Does.Contain("HEARD       BORIS: \"give me the rifle\""));
-            Assert.That(text, Does.Contain("DAMAGE IN   BORIS: 20 x2"), "Hits in a row from one source are one line.");
+            Assert.That(text, Does.Contain("DAMAGE IN   BORIS: 20"), "Hits in a row from one source are one line.");
             Assert.That(text, Does.Contain("DAMAGE OUT  BORIS: 5"));
             Assert.That(text, Does.Contain("DAMAGE OUT  SEWER RAT: 30"));
-            Assert.That(text, Does.Contain("DELETED     SEWER RAT"));
+            Assert.That(text, Does.Contain("KILLED      SEWER RAT"));
             Assert.That(text, Does.Contain("WHISPER     \"wait\""));
 
             // Impersonal and not a stat block
@@ -141,7 +141,7 @@ public sealed class LifeLogTest
 
             // In the order it happened
             Assert.That(text.IndexOf("SPEECH", StringComparison.Ordinal), Is.LessThan(text.IndexOf("DAMAGE IN", StringComparison.Ordinal)));
-            Assert.That(text.IndexOf("DELETED", StringComparison.Ordinal), Is.LessThan(text.IndexOf("WHISPER", StringComparison.Ordinal)));
+            Assert.That(text.IndexOf("KILLED", StringComparison.Ordinal), Is.LessThan(text.IndexOf("WHISPER", StringComparison.Ordinal)));
         });
 
         await world.Pair.CleanReturnAsync();
@@ -266,7 +266,7 @@ public sealed class LifeLogTest
             }
 
             text = string.Join("\n", Lines(world));
-            Assert.That(text, Does.Contain("DAMAGE IN   BLOOD LOSS: 7 x7"), text);
+            Assert.That(text, Does.Contain("DAMAGE IN   BLOOD LOSS: 7"), text);
             Assert.That(text, Does.Not.Contain("NO AIR"), "Still too little.");
             Assert.That(Regex.Matches(text, "BLOOD LOSS").Count, Is.EqualTo(1), "One line for the cause, not one per tick.");
         });
@@ -293,7 +293,7 @@ public sealed class LifeLogTest
             }
 
             var text = string.Join("\n", Lines(world));
-            Assert.That(text, Does.Contain("DAMAGE IN   STARVATION: 6 x6"), text);
+            Assert.That(text, Does.Contain("DAMAGE IN   STARVATION: 6"), text);
             Assert.That(text, Does.Not.Contain("BLOOD LOSS"));
 
             // A bigger loss of blood than hunger deals is still blood loss
