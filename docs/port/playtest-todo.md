@@ -231,7 +231,7 @@ Mobs:
 
 Server and admin:
 - [x] Set the CVar `ghost.allow_same_character` to True (default changed in `CCVars.GhostRespawn.cs`).
-- [ ] Trash maps load in the release build, like lavaland. Only the ERRORGATE map should.
+- [x] Trash maps load in the release build, like lavaland. Only the ERRORGATE map should. The dev preset switched them off, the release build did not: the C# defaults of `lavaland.enabled`, `procgen.preload` (the Maps/Dungeon atlases), `shuttle.preload_grids` and `gateway.generator_enabled` are false now. Aspects (`aspects.enabled`) are still on in release.
 - [ ] Admin notification when players spawn and die.
 - [ ] Remove the sprite from the observer.
 
