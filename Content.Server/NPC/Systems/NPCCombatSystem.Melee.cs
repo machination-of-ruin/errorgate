@@ -87,8 +87,11 @@ public sealed partial class NPCCombatSystem
             return;
         }
 
+        // ERRORGATE: a held mob cannot walk, so its steering reports "no path" for good. That must not stop it hitting
+        // whoever is already within reach.
         if (TryComp<NPCSteeringComponent>(uid, out var steering) &&
-            steering.Status == SteeringStatus.NoPath)
+            steering.Status == SteeringStatus.NoPath &&
+            distance > weapon.Range * weapon.LightRangeModifier)
         {
             component.Status = CombatStatus.TargetUnreachable;
             return;
