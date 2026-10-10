@@ -105,7 +105,7 @@ public sealed class ErrorgateAnomalySystem : EntitySystem
             anomaly.NextTick = curTime + TimeSpan.FromSeconds(anomaly.DamageInterval);
 
             // Switched off: harmless
-            if (!anomaly.Active)
+            if (!anomaly.Active || !anomaly.Engaged)
                 continue;
 
             _targets.Clear();
@@ -158,6 +158,8 @@ public sealed class ErrorgateAnomalySystem : EntitySystem
         {
             // Starts on, so a freshly spawned fault always bites at first
             anomaly.NextSwitch = curTime + TimeSpan.FromSeconds(_random.NextFloat(1f, anomaly.ActiveSeconds));
+            anomaly.Engaged = !anomaly.TriggerToEngage;
+            Dirty(uid, anomaly);
             SetVolume(uid, anomaly);
             return;
         }
@@ -165,26 +167,9 @@ public sealed class ErrorgateAnomalySystem : EntitySystem
         if (anomaly.NextSwitch > curTime)
             return;
 
-        // idle -> primed -> active -> idle
-        float length;
-        if (anomaly.Active)
-        {
-            anomaly.Active = false;
-            length = anomaly.IdleSeconds;
-        }
-        else if (anomaly.Primed || anomaly.PrimeSeconds <= 0f)
-        {
-            anomaly.Primed = false;
-            anomaly.Active = true;
-            length = anomaly.ActiveSeconds;
-        }
-        else
-        {
-            anomaly.Primed = true;
-            length = anomaly.PrimeSeconds;
-        }
-
-
+        anomaly.Active = !anomaly.Active;
+        anomaly.Engaged = !anomaly.TriggerToEngage;
+        var length = anomaly.Active ? anomaly.ActiveSeconds : anomaly.IdleSeconds;
         anomaly.NextSwitch = curTime + TimeSpan.FromSeconds(length * _random.NextFloat(0.75f, 1.25f));
         Dirty(uid, anomaly);
         SetVolume(uid, anomaly);
@@ -192,10 +177,7 @@ public sealed class ErrorgateAnomalySystem : EntitySystem
 
     private void SetVolume(EntityUid uid, ErrorgateAnomalyComponent anomaly)
     {
-        var volume = anomaly.Active
-            ? anomaly.ActiveVolume
-            : anomaly.Primed ? (anomaly.ActiveVolume + anomaly.IdleVolume) / 2f : anomaly.IdleVolume;
-        _ambient.SetVolume(uid, volume);
+        _ambient.SetVolume(uid, anomaly.Active ? anomaly.ActiveVolume : anomaly.IdleVolume);
     }
 
     /// <summary>

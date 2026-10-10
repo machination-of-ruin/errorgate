@@ -39,4 +39,13 @@ public sealed partial class CollapseFaultComponent : Component
     /// </summary>
     [DataField]
     public float MobMaxSpeed = 4.5f;
+
+    /// <summary>
+    ///     Seconds the fault keeps working after the last thing that set it off was in reach.
+    /// </summary>
+    [DataField]
+    public float HoldSeconds = 2f;
+
+    [ViewVariables]
+    public TimeSpan EngagedUntil;
 }

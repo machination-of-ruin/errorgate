@@ -556,6 +556,37 @@ public sealed class AnomalyFieldTest
     }
 
     [Test]
+    public async Task CollapseWaitsUntilSomethingComesInReach()
+    {
+        await using var pair = await PoolManager.GetServerClient(new PoolSettings { Dirty = true });
+        var server = pair.Server;
+        var entMan = server.EntMan;
+
+        var (_, mapId) = await CreateFloor(pair, 20);
+
+        EntityUid anomaly = default;
+        await server.WaitPost(() => anomaly = entMan.SpawnEntity(CollapseProto, new MapCoordinates(0.5f, 0.5f, mapId)));
+
+        // A new fault is on for at least a second, and waits while it is alone
+        await pair.RunSeconds(0.3f);
+        await server.WaitAssertion(() =>
+        {
+            var comp = entMan.GetComponent<ErrorgateAnomalyComponent>(anomaly);
+            Assert.That(comp.Active, Is.True);
+            Assert.That(comp.Engaged, Is.False, "An empty collapse should only wait.");
+        });
+
+        await server.WaitPost(() => entMan.SpawnEntity("MobHuman", new MapCoordinates(0.5f, 4.5f, mapId)));
+        await pair.RunSeconds(0.3f);
+        await server.WaitAssertion(() =>
+        {
+            Assert.That(entMan.GetComponent<ErrorgateAnomalyComponent>(anomaly).Engaged, Is.True, "Someone walking in should set it off.");
+        });
+
+        await pair.CleanReturnAsync();
+    }
+
+    [Test]
     public async Task ArcIsQuietWhenNobodyIsInReach()
     {
         await using var pair = await PoolManager.GetServerClient(new PoolSettings { Dirty = true });
