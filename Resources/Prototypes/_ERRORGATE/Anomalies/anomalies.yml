@@ -34,7 +34,7 @@
       params:
         volume: 0
     revealSound:
-      path: /Audio/Effects/fire.ogg
+      path: /Audio/Magic/fireball.ogg
       params:
         volume: 4
         maxDistance: 20
