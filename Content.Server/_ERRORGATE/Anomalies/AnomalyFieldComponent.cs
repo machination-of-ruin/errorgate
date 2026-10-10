@@ -78,10 +78,11 @@ public sealed partial class AnomalyFieldComponent : Component
     public float MaxDistanceFromPoi = 40f;
 
     /// <summary>
-    ///     Radius (tiles) around a fault that must be floor with nothing solid on it.
+    ///     Radius (tiles) around a fault that must be floor with nothing solid on it. Small values let faults stand in
+    ///     alleys and between buildings, the danger zone of a fault ignores walls.
     /// </summary>
     [DataField]
-    public float FreeRadius = 3f;
+    public float FreeRadius = 1.5f;
 
     /// <summary>
     ///     Put the packs on the likely routes between points of interest and spawn points.

@@ -3295,7 +3295,7 @@ entities:
       minDistanceFromSpawns: 25
       minDistanceFromPoi: 8
       maxDistanceFromPoi: 40
-      freeRadius: 3
+      freeRadius: 1
       useRoutes: true
       maxAttempts: 20000
     - type: Gravity
