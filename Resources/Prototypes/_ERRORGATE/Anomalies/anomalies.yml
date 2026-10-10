@@ -116,8 +116,8 @@
     sound:
       path: /Audio/Ambience/Objects/emf_buzz.ogg
 
-# COLLAPSE FAULT: a gravity error. It wakes with a faint lens (primed, harmless), then for several seconds everything loose
-# falls toward it, the center crushes and the lens widens to the pull area, then it goes dark and invisible for a while (loot lying next to it can be taken then, at a risk). The world loses its colour near it.
+# COLLAPSE FAULT: a gravity error. Off, it is invisible and harmless. On, it waits behind a faint lens until something walks
+# or flies into reach: then everything loose falls toward it, the center crushes and the lens widens to the pull area (loot lying next to it can be taken then, at a risk). The world loses its colour near it.
 - type: entity
   id: ErrorgateAnomalyCollapse
   parent: ErrorgateAnomalyBase
@@ -129,8 +129,8 @@
     revealRadius: 4
     warningRadius: 9
     damageInterval: 0.5
-    primeSeconds: 3
-    activeSeconds: 10
+    triggerToEngage: true
+    activeSeconds: 12
     idleSeconds: 7
     activeVolume: -3
     idleVolume: -12

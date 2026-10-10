@@ -7,10 +7,12 @@ using Content.Shared.Mobs.Components;
 using Content.Shared.Mobs.Systems;
 using Content.Shared.Movement.Components;
 using Content.Shared.Physics;
+using Content.Shared.Throwing;
 using Robust.Shared.Map.Components;
 using Robust.Shared.Physics;
 using Robust.Shared.Physics.Components;
 using Robust.Shared.Physics.Systems;
+using Robust.Shared.Timing;
 
 namespace Content.Server._ERRORGATE.Anomalies;
 
@@ -19,6 +21,7 @@ namespace Content.Server._ERRORGATE.Anomalies;
 /// </summary>
 public sealed class CollapseFaultSystem : EntitySystem
 {
+    [Dependency] private readonly IGameTiming _timing = default!;
     [Dependency] private readonly EntityLookupSystem _lookup = default!;
     [Dependency] private readonly MobStateSystem _mobState = default!;
     [Dependency] private readonly SharedBodySystem _body = default!;
@@ -30,6 +33,7 @@ public sealed class CollapseFaultSystem : EntitySystem
 
     private EntityQuery<PhysicsComponent> _physicsQuery;
     private EntityQuery<MobStateComponent> _mobQuery;
+    private EntityQuery<ThrownItemComponent> _thrownQuery;
     private EntityQuery<InputMoverComponent> _moverQuery;
     private readonly HashSet<EntityUid> _pulled = new();
 
@@ -39,6 +43,7 @@ public sealed class CollapseFaultSystem : EntitySystem
 
         _physicsQuery = GetEntityQuery<PhysicsComponent>();
         _mobQuery = GetEntityQuery<MobStateComponent>();
+        _thrownQuery = GetEntityQuery<ThrownItemComponent>();
         _moverQuery = GetEntityQuery<InputMoverComponent>();
 
         SubscribeLocalEvent<CollapseFaultComponent, ErrorgateAnomalyTickEvent>(OnTick);
@@ -67,12 +72,18 @@ public sealed class CollapseFaultSystem : EntitySystem
             if (!anomaly.Active)
                 continue;
 
-            Pull(uid, collapse, xform, frameTime);
+            Pull(uid, collapse, anomaly, xform, frameTime);
         }
     }
 
-    private void Pull(EntityUid uid, CollapseFaultComponent collapse, TransformComponent xform, float frameTime)
+    private void Pull(EntityUid uid, CollapseFaultComponent collapse, ErrorgateAnomalyComponent anomaly, TransformComponent xform, float frameTime)
     {
+        // A fault with a cycle only waits until something walks or flies into reach
+        var cycling = anomaly.TriggerToEngage && anomaly.ActiveSeconds > 0f;
+        var engaged = !cycling || anomaly.Engaged;
+        var triggered = false;
+        var now = _timing.CurTime;
+
         var center = _transform.GetMapCoordinates(uid, xform);
 
         _pulled.Clear();
@@ -101,9 +112,18 @@ public sealed class CollapseFaultSystem : EntitySystem
             if (distance < 0.05f || distance > collapse.PullRange)
                 continue;
 
+            var isMob = _mobQuery.HasComp(target) || _moverQuery.HasComp(target);
+
+            // Living things and things that fly set it off, a loose item that lies still does not
+            if (isMob ? !_mobState.IsDead(target) : _thrownQuery.HasComp(target) || body.LinearVelocity.LengthSquared() > 0.09f)
+                triggered = true;
+
+            if (!engaged)
+                continue;
+
             var closeness = 1f - distance / collapse.PullRange;
 
-            if (_mobQuery.HasComp(target) || _moverQuery.HasComp(target))
+            if (isMob)
             {
                 // Move the creature itself. Forces on a mob are eaten by its mover and by friction.
                 var speed = MathHelper.Lerp(collapse.MobMinSpeed, collapse.MobMaxSpeed, closeness);
@@ -124,6 +144,19 @@ public sealed class CollapseFaultSystem : EntitySystem
             // Same acceleration for everything, light or heavy
             var impulse = displacement / distance * acceleration * body.Mass * frameTime;
             _physics.ApplyLinearImpulse(target, impulse, body: body);
+        }
+
+        if (!cycling)
+            return;
+
+        if (triggered)
+            collapse.EngagedUntil = now + TimeSpan.FromSeconds(collapse.HoldSeconds);
+
+        var shouldEngage = collapse.EngagedUntil > now;
+        if (shouldEngage != anomaly.Engaged)
+        {
+            anomaly.Engaged = shouldEngage;
+            Dirty(uid, anomaly);
         }
     }
 }

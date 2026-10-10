@@ -19,9 +19,9 @@ public sealed class AnomalyVisualSystem : EntitySystem
     private const float FadeIn = 0.5f;
     private const float FadeOut = 2f;
 
-    // Lens of a collapse fault: a faint lens while primed, none while off, and a wide one while it pulls (the lens then covers the pull area)
-    private const float PrimedIntensity = 3000f;
-    private const float PrimedFalloff = 2.7f;
+    // Lens of a collapse fault: a faint lens while on and waiting, none while off, and a wide one while it pulls (the lens then covers the pull area)
+    private const float WaitingIntensity = 3000f;
+    private const float WaitingFalloff = 2.7f;
     private const float ActiveIntensity = 8000f;
     private const float ActiveFalloff = 2.2f;
     private const float SwitchSpeed = 2.5f;
@@ -65,23 +65,23 @@ public sealed class AnomalyVisualSystem : EntitySystem
 
             if (anomaly.ActiveSeconds > 0f)
             {
-                // 0 off, 1 primed, 2 pulling
-                var target = anomaly.Active ? 2f : anomaly.Primed ? 1f : 0f;
+                // 0 off, 1 on and waiting, 2 pulling
+                var target = !anomaly.Active ? 0f : anomaly.Engaged ? 2f : 1f;
                 _switched.TryGetValue(uid, out var level);
                 level += (target - level) * MathF.Min(1f, SwitchSpeed * frameTime);
                 _switched[uid] = level;
 
-                // A pulling fault shows more than a primed one
+                // A pulling fault shows more than one that waits
                 reveal = MathF.Max(reveal, 0.2f * level);
 
                 if (TryComp(uid, out SingularityDistortionComponent? lens))
                 {
                     var intensity = level <= 1f
-                        ? PrimedIntensity * level
-                        : MathHelper.Lerp(PrimedIntensity, ActiveIntensity, level - 1f);
+                        ? WaitingIntensity * level
+                        : MathHelper.Lerp(WaitingIntensity, ActiveIntensity, level - 1f);
                     var falloff = level <= 1f
-                        ? PrimedFalloff
-                        : MathHelper.Lerp(PrimedFalloff, ActiveFalloff, level - 1f);
+                        ? WaitingFalloff
+                        : MathHelper.Lerp(WaitingFalloff, ActiveFalloff, level - 1f);
                     _distortion.SetDistortion(uid, intensity, falloff, lens);
                 }
             }

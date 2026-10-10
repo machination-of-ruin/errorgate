@@ -99,18 +99,6 @@ public sealed partial class ErrorgateAnomalyComponent : Component
     public float IdleSeconds;
 
     /// <summary>
-    ///     Seconds the fault is primed before it switches on: awake and faintly visible, but harmless. Zero skips it.
-    /// </summary>
-    [DataField]
-    public float PrimeSeconds;
-
-    /// <summary>
-    ///     Primed, see <see cref="PrimeSeconds"/>. Never true together with <see cref="Active"/>.
-    /// </summary>
-    [DataField, AutoNetworkedField]
-    public bool Primed;
-
-    /// <summary>
     ///     Whether the fault is switched on right now. Always true for faults without a cycle.
     /// </summary>
     [DataField, AutoNetworkedField]
@@ -118,6 +106,19 @@ public sealed partial class ErrorgateAnomalyComponent : Component
 
     [ViewVariables]
     public TimeSpan NextSwitch;
+
+    /// <summary>
+    ///     For faults with a cycle: while switched on they only wait (faint look, harmless) until something walks or flies
+    ///     into reach, and then they engage: damage, pull, full look. Without it, switched on means engaged.
+    /// </summary>
+    [DataField]
+    public bool TriggerToEngage;
+
+    /// <summary>
+    ///     Whether the fault is doing its work right now (see <see cref="TriggerToEngage"/>). Meaningful while <see cref="Active"/>.
+    /// </summary>
+    [DataField, AutoNetworkedField]
+    public bool Engaged = true;
 
     /// <summary>
     ///     Ambient sound volume (dB) while on / off, only used by faults with a cycle.
