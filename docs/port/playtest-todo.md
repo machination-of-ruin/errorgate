@@ -236,7 +236,7 @@ Server and admin:
 - [x] Remove the sprite from the observer (the ghost layer is invisible for every observer, the admin observer keeps its worn bag layer; `ObserverSpriteTest`).
 
 Systems and visuals:
-- [ ] Check that deafness in crit works.
+- [x] Check that deafness in crit works. It does: crit adds `DeafComponent` (chat blocked), healing removes it (`CritDeafTest`).
 - [ ] Water visuals do not always apply: water tiles should cover a character's legs to show they are walking in deep water.
 - [x] Collapse faults stay in the "damaging" visual state with items under them and never go off, so players cannot loot. Cause: items shaking around the center counted as something moving in. Only living things and thrown objects trigger it now (`CollapseFaultLootTest`).
 - [ ] NaN positions: a player got stuck (black screen for everyone who followed them, could not be grabbed, shot or shoved, could not walk after a teleport). Guards and server warnings are in; the cause is unknown. If the log shows a "Non-finite" warning, follow it up.
