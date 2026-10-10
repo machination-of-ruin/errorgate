@@ -25,9 +25,13 @@ Inspirations: DayZ, Rust, Project Zomboid, Cataclysm: DDA.
 | Death | Dead players wait in the death void until they choose to respawn. Respawn as a new character with nothing; the body and gear stay where they died. Respawn cooldown is a server CVar, default 0. Respawn at fixed spawn zones. | [death.md](death.md) |
 | Core loop | Needs, crafting, looting/scavenging, and cooperation forced by shared objectives and scarcity. | [survival-loop.md](survival-loop.md) |
 | Building | Full creative freedom, limited resources. Bases are existing ruins, held physically, raidable anytime. | [survival-loop.md](survival-loop.md) |
-| Loot | Finite per wipe, via an existing DayZ-style system (to be ported). | [survival-loop.md](survival-loop.md) |
+| Loot | Finite per wipe, via the DayZ-style loot manager (ported). | [survival-loop.md](survival-loop.md) |
 | Combat | Lethality, firearms depth, melee depth, dangerous PvE enemies. | [combat.md](combat.md) |
 | AI GOD | Both an event director for the world and a judge of individual players. Whitelisted actions (events, messages, items, bodies), loose strength limits. Pluggable LLM provider. | [ai-god.md](ai-god.md) |
+
+## Implemented so far
+
+Death void and respawn ([death.md](death.md)), loot manager and despawn ([survival-loop.md](survival-loop.md)), EdgeOfEntropy and Kuznetsk ([maps.md](maps.md)), human-only ([humans-only.md](humans-only.md)), hunger death, craftable campfire, distant gunfire ([combat.md](combat.md)).
 
 ## Constraints
 

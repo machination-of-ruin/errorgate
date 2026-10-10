@@ -11,6 +11,13 @@
 
 Not in scope for now: specialised skills that lock actions to certain players, and a trade/currency economy.
 
+### Current state of needs
+
+- Hunger is lethal: decay rate 0.1 (default 0.0167) and starving deals 1 Bloodloss per second (`Hunger` on `BaseMobHuman`). There is no CVar for it, it is set in the prototype.
+- Food: craftable campfire (burns out, cooks meat), butchering humans with a knife, bone helmet from a skull only.
+- Hazards: toxic water, deadly ammonia gas, spike traps.
+- Light: lighters in the light slot, glowsticks in loot, broken floodlights are structures and not items.
+
 ## Building
 
 - Full creative freedom, limited resources. Materials are the bottleneck, not build options.

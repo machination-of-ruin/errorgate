@@ -42,10 +42,10 @@ Four layers, mixed across the map:
 
 ### Dread comes from not knowing
 
-- Strip omniscience: no crew manifest, no global radio by default, no medical/security HUDs, no tracking through PDAs or IDs.
+- Strip omniscience: no crew manifest, no global radio by default, no medical/security HUDs, no tracking through PDAs or IDs. *Partly implemented: no manifest or guidebook button, no role nicknames.*
 - Strangers are unknown: consider hiding names on examine until a face has been seen up close or the person introduces themselves.
-- Darkness is real: nights are dark, light sources reveal the carrier, field of view and occlusion hide what is behind walls.
-- Sound carries: gunfire and footsteps travel far; ambience is mostly quiet, broken by sudden noises.
+- Darkness is real: nights are dark, light sources reveal the carrier, field of view and occlusion hide what is behind walls. *Partly implemented: lighter slot, glowsticks in loot, emergency lights, Kuznetsk day-night cycle.*
+- Sound carries: gunfire and footsteps travel far; ambience is mostly quiet, broken by sudden noises. *Implemented for gunfire (distant shots by caliber, directional); footsteps and ambience are still proposed.*
 
 ### The GOD's whisper
 

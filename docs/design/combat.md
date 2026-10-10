@@ -9,6 +9,15 @@
 
 Combat logs were already improved and extended (port #6).
 
+## Current state
+
+- Guns: SMGs and shotguns are two-handed, a wide crosshair means bad accuracy (stay still to aim well), guns spawn with the bolt closed and no round chambered.
+- Distant gunfire: shots beyond view are heard out to the PVS range, directional, quieter and lower, with a reverb tail and a per-caliber sound.
+- Melee and movement: right-click with an empty hand or a melee weapon shoves, prying by hand takes 1 second, running drains stamina and being tired slows you down.
+- Look far on Space aims and sees up to 12 tiles ahead.
+- Combat log: uniform small font, colors per side, unseen attackers are shown as "Something". Pointing is an interaction without an arrow.
+- Gibbing: the torso is never gibbed and gibbing leaves no limbs or organs.
+
 ## Open
 
 - Which existing fork combat systems to build on (Goobstation, Shitmed, White, etc.).
