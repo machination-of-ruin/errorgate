@@ -220,7 +220,7 @@ public sealed class LifeLogTest
     }
 
     [TestCase("Bloodloss", "BLOOD LOSS")]
-    [TestCase("Heat", "FIRE")]
+    [TestCase("Heat", "HOT AIR")]
     [TestCase("Cold", "COLD")]
     [TestCase("Poison", "POISON")]
     public async Task DamageNobodyDealtNamesItsCause(string type, string cause)
@@ -269,6 +269,57 @@ public sealed class LifeLogTest
             Assert.That(text, Does.Contain("DAMAGE IN   BLOOD LOSS: 7"), text);
             Assert.That(text, Does.Not.Contain("NO AIR"), "Still too little.");
             Assert.That(Regex.Matches(text, "BLOOD LOSS").Count, Is.EqualTo(1), "One line for the cause, not one per tick.");
+        });
+
+        await world.Pair.CleanReturnAsync();
+    }
+
+    [Test]
+    public async Task HitsFromOneFaultAddUpWhateverSmallDamageLandsBetween()
+    {
+        var world = await Setup();
+        var server = world.Pair.Server;
+        var entMan = server.EntMan;
+
+        await server.WaitAssertion(() =>
+        {
+            var heat = entMan.SpawnEntity("ErrorgateAnomalyHeat", new MapCoordinates(30, 30, entMan.GetComponent<TransformComponent>(world.Ivan).MapID));
+
+            // The fault hits, burning ticks in between (too small to show)
+            Hurt(server, world.Ivan, heat, "Heat", 8);
+            Hurt(server, world.Ivan, null, "Heat", 1);
+            Hurt(server, world.Ivan, heat, "Heat", 8);
+            Hurt(server, world.Ivan, null, "Heat", 1);
+            Hurt(server, world.Ivan, heat, "Heat", 10);
+
+            var text = string.Join("\n", Lines(world));
+            Assert.That(Regex.Matches(text, "HEAT FAULT").Count, Is.EqualTo(1), text);
+            Assert.That(text, Does.Contain("DAMAGE IN   HEAT FAULT: 26"), text);
+        });
+
+        await world.Pair.CleanReturnAsync();
+    }
+
+    [Test]
+    public async Task AnEntryCarriesTheTimeOfItsLastHit()
+    {
+        var world = await Setup();
+        var server = world.Pair.Server;
+
+        // Poison first, radiation four seconds later: neither is produced by the airless test floor
+        await server.WaitPost(() => Hurt(server, world.Ivan, null, "Poison", 6));
+        await world.Pair.RunSeconds(4);
+        await server.WaitPost(() => Hurt(server, world.Ivan, null, "Radiation", 6));
+
+        await server.WaitAssertion(() =>
+        {
+            var lines = Lines(world);
+            var poison = lines.Single(l => l.Contains("POISON"));
+            var radiation = lines.Single(l => l.Contains("RADIATION"));
+
+            Assert.That(poison, Does.Match(@"^T-00:0[34]\.\d\d >"), poison);
+            Assert.That(radiation, Does.Match(@"^T-00:00\.\d\d >"), radiation);
+            Assert.That(lines.IndexOf(poison), Is.LessThan(lines.IndexOf(radiation)));
         });
 
         await world.Pair.CleanReturnAsync();
@@ -402,6 +453,28 @@ public sealed class LifeLogTest
         Assert.That(new[] { title, log, end, subtitle }, Is.Ordered.Ascending.And.All.GreaterThanOrEqualTo(0),
             "Title, then the log, then the subtitle at the bottom.");
         Assert.That(wrapped, Does.Contain("SPEECH      \"wait\""));
+
+        await world.Pair.CleanReturnAsync();
+    }
+
+    [TestCase(false)]
+    [TestCase(true)]
+    public async Task TheKillingBlowIsInTheLog(bool selfInflicted)
+    {
+        var world = await Setup();
+        var server = world.Pair.Server;
+        var chat = world.Pair.Client.ResolveDependency<IUserInterfaceManager>().GetUIController<ChatUIController>();
+        await world.Pair.Client.WaitPost(() => chat.History.Clear());
+
+        // One hit that kills outright, like an execution
+        await server.WaitPost(() => Hurt(server, world.Ivan, selfInflicted ? world.Ivan : world.Boris, "Blunt", 900));
+        await world.Pair.RunTicksSync(10);
+
+        var wrapped = "";
+        await world.Pair.Client.WaitPost(() => wrapped = string.Join("\n", chat.History.Select(m => m.Msg.WrappedMessage)));
+
+        Assert.That(wrapped, Does.Contain("YOU ARE DEAD"));
+        Assert.That(wrapped, Does.Contain(selfInflicted ? "DAMAGE IN   SELF: 900" : "DAMAGE IN   BORIS: 900"), "The hit that killed is the last line of the log.");
 
         await world.Pair.CleanReturnAsync();
     }
