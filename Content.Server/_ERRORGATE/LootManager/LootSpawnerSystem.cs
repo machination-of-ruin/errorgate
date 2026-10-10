@@ -70,7 +70,7 @@ public sealed class LootSpawnerSystem : EntitySystem
 
         var coordinates = Transform(uid).Coordinates;
         Spawn(entityProto, coordinates);
-        Spawn("PuddleSparkle", coordinates); // Cool effect
+        Spawn("LootSpawnSparkle", coordinates); // Cool effect
     }
 
     /// <summary>

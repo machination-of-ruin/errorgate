@@ -42,7 +42,7 @@
     damage:
       types:
         Radiation: 7
-        Piercing: 12
+        Piercing: 8 # ERRORGATE: old fork damage
 
 - type: entity
   id: Bullet556x45Shrapnel

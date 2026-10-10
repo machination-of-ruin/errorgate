@@ -12,12 +12,12 @@
   locations: [Military]
 
 - type: lootEntry
-  id: AmmoBox556x45
+  id: AmmoBox556x45Random
   rarityTiers: [2]
   locations: [Military]
 
 - type: lootEntry
-  id: AmmoBox556x45Big
+  id: AmmoBox556x45BigRandom
   rarityTiers: [3]
   locations: [Military]
 

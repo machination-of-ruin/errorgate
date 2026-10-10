@@ -6,11 +6,11 @@
   locations: [Military]
 
 - type: lootEntry
-  id: AmmoBoxSniper
+  id: AmmoBoxSniperRandom
   rarityTiers: [3]
   locations: [Military]
 
 - type: lootEntry
-  id: AmmoBoxSniperBig
+  id: AmmoBoxSniperBigRandom
   rarityTiers: [3]
   locations: [Military]

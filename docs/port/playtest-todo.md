@@ -206,3 +206,38 @@ Found while playing the `port/beyond` build. One line each, newest last.
 - [x] Anomalies v3.7: placement no longer requires the whole danger radius to be clear floor, only `FreeRadius` (Kuznetsk 1, default 1.5), so faults can stand in alleys, yards and between buildings; their danger zone ignores walls and reaches into nearby buildings.
 - [x] Arc fault static radius lowered from 6.5 to 5 tiles.
 - [x] Playtest confirmed: distant gunfire, heat haze and vacuum shaders (seen with the anomalies), mob pathfinding rework (looked fine). Anomalies closed for now. Still unchecked: radio indicator, weather volume.
+- [x] Life log on `ai-god`: the death message is one red block with a technical log of the last 8 events (speech, heard, damage in and out, kills) and the subtitle at the bottom; one message per death even when the corpse is gibbed; the dead no longer see their own death emote. `LifeLogTest` (12). Open: talking to MACHINATION OF RUIN has no channel yet.
+- [x] Life log v2: no header, `T-mm:ss.cc |  KIND` lines with aligned bars, minor environmental damage grouped per cause over 30 s and hidden below 5, starvation named apart from blood loss. `LifeLogTest` (16).
+- [x] Life log v3: lines start with "> ", "KILLED" instead of "DELETED", merged damage shows the total without a counter.
+- [x] Fixed: going into crit (or down at all) no longer keeps the held items, wielded rifles included. The mob collisions port had removed the `DropHandItemsEvent` subscription in the server `StandingStateSystem`; restored. `CritDropTest`. Life log lines are `T-mm:ss.cc >  KIND ...` in a smaller font (no leading `>`).
+- [x] Life log: the hit that kills is now in the log (the log recorder runs before the mob thresholds), hits from one source add up even with small burning or bleeding ticks in between, Heat damage without flames is HOT AIR (burning stays FIRE). Tests `TheKillingBlowIsInTheLog`, `HitsFromOneFaultAddUp...`, `AnEntryCarriesTheTimeOfItsLastHit`.
+- [x] Fixed: succumb and say last words now really kill (they deal the missing damage to the death threshold), a forced Dead state was reverted to crit by the next damage tick. `CritSuccumbTest`.
+- [x] Fixed the double death message when a gib moves the mind through the brain: the void deletes itself when its mind leaves it, so the body-deleted path found no void and made a second one with a second message (found by logging in a real session). The death message is now sent at most once per mind within 3 s. `LifeLogTest` (21).
+
+## Multiplayer playtest, 2026-10-10 (hosted, ~3 h)
+
+Items and gear:
+- [x] Make satchels smaller, like in the old build. Compare backpack and duffel sizes too. Satchel was 8x4 (32 cells, bigger than a backpack), the old one is 6x3 (18) and is back. Backpack (7x4) and duffel (8x5) already match the old build.
+- [x] Ammo boxes can be inserted into guns as a magazine. Cause: the random-magazine loot guns replaced the whole magazine slot of their parent and lost its whitelist, so they took anything. Slots are written out in full now.
+- [x] Examining a gun: the chamber does not show the loaded ammo. Cause: the random-magazine loot guns had no chamber slot at all (a child prototype replaces all slots of its parent); they have it now, loaded like the parent.
+- [x] Bullet damage numbers: compare with the old build. Restored the old values: .357 30 (AP 26), .45 ACP 22 (AP 26), 5.56 uranium 8, .60 Lapua 60 piercing / 30 structural. Left as they are (WWDP): energy and disabler damage types, the PKA kinetic bolt (25 old, 40 now). Old .45 and .60 bullets also dealt stamina damage (15 and 100; .60 is 60 now), not restored.
+- [x] Ammo box fullness is not random; ammo boxes need to be random. Loot tables spawn the `...Random` box variants now; boxes from vendors, crafting and maps stay full.
+- [x] Item spawn "shining" effect. The sparkle was spawned but drawn under the loot (stock `Puddles` depth; the old build used depth 10, above everything). `LootSpawnSparkle` is drawn at `Effects`.
+
+Mobs:
+- [x] Grabbed mobs do not fight back. Cause (from the task data, not seen running: NPC planning does not run in tests): the melee task had a branch "if pulled, try to pull free" that came before attacking, so a held mob only struggled. The branch is gone; check in game.
+- [x] Rat servant is not hostile to humans (no AI at all). Every branch of its task needs an order from a rat king, and the spawner-placed ones have none; it falls back to the plain hostile task now (data test only: NPC planning does not run in the test world, so check in game).
+- [x] Check spider and other mob stats. Only the mobs on the ERRORGATE maps, back to the old build: giant spider 50 (was 90), carp 50 (was 40) and bite Piercing 5 / Slash 10 (was Blunt 5 / Slash 7), shark 200 (was 150) and Slash 12 (was 10), rat king 300 (was 200), watcher walk 5 / sprint 7 (was 4 / 5). Carp walk/sprint speed override removed. Walkers, runners and rat servants already matched.
+
+Server and admin:
+- [x] Set the CVar `ghost.allow_same_character` to True (default changed in `CCVars.GhostRespawn.cs`).
+- [x] Trash maps load in the release build, like lavaland. Only the ERRORGATE map should. The dev preset switched them off, the release build did not: the C# defaults of `lavaland.enabled`, `procgen.preload` (the Maps/Dungeon atlases), `shuttle.preload_grids` and `gateway.generator_enabled` are false now. `aspects.enabled` is false too.
+- [x] Admin notification when players spawn and die ("SPAWN:" and "DEATH:" in the admin chat; deaths from `DeathVoidSystem`, so gibs count).
+- [x] Remove the sprite from the observer (no observer sprite is drawn, worn bag included: `GhostSystem` keeps `Visible` off).
+
+Systems and visuals:
+- [x] Check that deafness in crit works. It does: crit adds `DeafComponent` (chat blocked), healing removes it.
+- [x] (dropped by the owner) Water visuals do not always apply: water tiles should cover a character's legs to show they are walking in deep water.
+- [x] Collapse faults stay in the "damaging" visual state with items under them and never go off, so players cannot loot. Cause: items shaking around the center counted as something moving in. Only living things and thrown objects trigger it now.
+- [x] (owner: will report if it comes back) NaN positions: a player got stuck (black screen for everyone who followed them, could not be grabbed, shot or shoved, could not walk after a teleport). Guards and server warnings are in; the cause is unknown. If the log shows a "Non-finite" warning, follow it up.
+- [x] (dropped by the owner) Jumpsuit storage vanishes about 5 seconds after spawn (no UI, the verb reads "close storage").

@@ -1,8 +1,11 @@
+using System.Linq;
 using System.Numerics;
+using Content.Server._ERRORGATE.LifeLog;
 using Content.Server.Chat.Managers;
 using Content.Server.GameTicking;
 using Content.Server._White.MobThresholdSounds;
 using Content.Server.Ghost;
+using Content.Server.Mobs;
 using Content.Server.Body.Components;
 using Content.Shared._ERRORGATE.DeathVoid;
 using Content.Shared._ERRORGATE.CCVar;
@@ -20,6 +23,7 @@ using Robust.Shared.Map;
 using Robust.Shared.Player;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Timing;
+using Robust.Shared.Utility;
 
 namespace Content.Server._ERRORGATE.DeathVoid;
 
@@ -31,9 +35,19 @@ namespace Content.Server._ERRORGATE.DeathVoid;
 public sealed class DeathVoidSystem : EntitySystem
 {
     private static readonly EntProtoId VoidPrototype = "ErrorgateDeathVoid";
+
+    // The void each mind was sent to, so a corpse that is gibbed or crushed later does not send it there again
+    private readonly Dictionary<EntityUid, EntityUid> _voids = new();
+
+    // When each mind was last told it is dead. A death can send the mind through the void more than once within a moment (the void
+    // is deleted whenever the mind leaves it, and a gib moves the mind through the body, the brain and the void), and the message is
+    // only sent once. A real second death is much further away than this.
+    private readonly Dictionary<EntityUid, TimeSpan> _told = new();
+    private static readonly TimeSpan SameDeath = TimeSpan.FromSeconds(3);
     private static readonly EntProtoId RespawnAction = "ActionDeadRespawn";
 
     [Dependency] private readonly IChatManager _chat = default!;
+    [Dependency] private readonly LifeLogSystem _lifeLog = default!;
     [Dependency] private readonly SharedAudioSystem _audio = default!;
     [Dependency] private readonly GameTicker _ticker = default!;
     [Dependency] private readonly MapSystem _map = default!;
@@ -50,12 +64,18 @@ public sealed class DeathVoidSystem : EntitySystem
     {
         base.Initialize();
 
-        SubscribeLocalEvent<MindContainerComponent, MobStateChangedEvent>(OnMobStateChanged);
+        // Before the death gasp, so the player is already in the void when the emote goes out and does not see their own
+        SubscribeLocalEvent<MindContainerComponent, MobStateChangedEvent>(OnMobStateChanged, before: new[] { typeof(DeathgaspSystem) });
         SubscribeLocalEvent<GhostAttemptHandleEvent>(OnGhostAttempt);
         SubscribeLocalEvent<MindBodyDeletedEvent>(OnMindBodyDeleted);
         SubscribeLocalEvent<MindEvictedEvent>(OnMindEvicted);
         SubscribeLocalEvent<BrainComponent, MindAddedMessage>(OnBrainMindAdded);
-        SubscribeLocalEvent<RoundRestartCleanupEvent>(_ => _voidMap = null);
+        SubscribeLocalEvent<RoundRestartCleanupEvent>(_ =>
+        {
+            _voidMap = null;
+            _voids.Clear();
+            _told.Clear();
+        });
 
         SubscribeLocalEvent<DeathVoidComponent, DeadRespawnEvent>(OnRespawn);
         SubscribeLocalEvent<DeathVoidComponent, MindUnvisitedMessage>(OnUnvisited);
@@ -88,7 +108,7 @@ public sealed class DeathVoidSystem : EntitySystem
     /// </summary>
     private void OnMindBodyDeleted(ref MindBodyDeletedEvent args)
     {
-        var voidEnt = SpawnVoid(args.MindId, args.Mind);
+        var voidEnt = VoidFor(args.MindId, args.Mind);
         _mind.TransferTo(args.MindId, voidEnt, mind: args.Mind);
         args.Handled = true;
     }
@@ -102,7 +122,7 @@ public sealed class DeathVoidSystem : EntitySystem
         if (args.Mind.Comp.UserId == null)
             return;
 
-        var voidEnt = SpawnVoid(args.Mind.Owner, args.Mind.Comp);
+        var voidEnt = VoidFor(args.Mind.Owner, args.Mind.Comp);
         _mind.TransferTo(args.Mind.Owner, voidEnt, mind: args.Mind.Comp);
     }
 
@@ -123,7 +143,7 @@ public sealed class DeathVoidSystem : EntitySystem
             return;
         }
 
-        var voidEnt = SpawnVoid(args.MindId, mind);
+        var voidEnt = VoidFor(args.MindId, mind);
         _mind.TransferTo(args.MindId, voidEnt, mind: mind);
     }
 
@@ -150,9 +170,33 @@ public sealed class DeathVoidSystem : EntitySystem
             _audio.PlayGlobal(sounds.DeathSounds, session);
     }
 
+    /// <summary>
+    ///     The void a mind goes to. A mind that is already in one (it died, and now its corpse is gibbed, deleted or
+    ///     crushed) keeps that void: no second void and no second death message.
+    /// </summary>
+    private bool AlreadyTold(EntityUid mindId)
+    {
+        var now = _timing.CurTime;
+        if (_told.TryGetValue(mindId, out var last) && now - last < SameDeath)
+            return true;
+
+        _told[mindId] = now;
+        return false;
+    }
+
+    private EntityUid VoidFor(EntityUid mindId, MindComponent mind)
+    {
+        // Remembered, because the mind does not point at the void any more once a brain or another body took it
+        if (_voids.TryGetValue(mindId, out var existing) && !TerminatingOrDeleted(existing))
+            return existing;
+
+        return SpawnVoid(mindId, mind);
+    }
+
     private EntityUid SpawnVoid(EntityUid mindId, MindComponent mind)
     {
         var voidEnt = Spawn(VoidPrototype, new MapCoordinates(Vector2.Zero, EnsureVoidMap()));
+        _voids[mindId] = voidEnt;
         var cooldown = _cfg.GetCVar(ErrorgateCVars.RespawnCooldown);
         if (cooldown > 0f)
         {
@@ -162,15 +206,26 @@ public sealed class DeathVoidSystem : EntitySystem
         }
         _actions.AddAction(voidEnt, RespawnAction);
 
-        if (mind.Session is { } session)
+        if (mind.Session is { } session && !AlreadyTold(mindId))
         {
-            // Large text is broken into short lines by hand: a wrapped large font line overlaps the following
-            // messages in a narrow chat panel. Trailing newlines keep later messages offset from it.
+            _chat.SendAdminAnnouncement($"DEATH: {session.Name} as {mind.CharacterName ?? "unknown"} died.");
+
+            // One message: the title, the life log, then the subtitle at the bottom. Large text is broken into short
+            // lines by hand: a wrapped large font line overlaps the following messages in a narrow chat panel.
+            // Trailing newlines keep later messages offset from it.
             var message = Loc.GetString("errorgate-death-void-title");
             var lines = message.Replace(": ", ":\n");
+            var wrapped = $"\n\n[font size=32][bold]{lines}[/bold][/font]\n\n";
+
+            // What happened to this character, as a technical log (ERRORGATE: life log)
+            if (_lifeLog.BuildDeathLog(mindId) is { } log)
+                wrapped += $"[font size=10][bold]{FormattedMessage.EscapeText(string.Join("\n", log))}[/bold][/font]\n\n";
+
+            wrapped += $"[bold]{Loc.GetString("errorgate-death-void-subtitle")}[/bold]\n\n\n";
+
             _chat.ChatMessageToOne(ChatChannel.Server,
                 message,
-                $"\n\n[font size=32][bold]{lines}[/bold][/font]\n[bold]{Loc.GetString("errorgate-death-void-subtitle")}[/bold]\n\n\n",
+                wrapped,
                 EntityUid.Invalid,
                 false,
                 session.Channel,

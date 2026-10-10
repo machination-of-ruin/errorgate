@@ -21,13 +21,8 @@
           operator: !type:UnbuckleOperator
             shutdownState: TaskFinished
 
-    - preconditions:
-        - !type:PulledPrecondition
-          isPulled: true
-      tasks:
-        - !type:HTNPrimitiveTask
-          operator: !type:UnPullOperator
-            shutdownState: TaskFinished
+    # ERRORGATE: no branch for a mob that is being pulled. It used to spend its turn on trying to pull free (grab escape
+    # chances) and never hit back; now it fights whoever holds it.
 
     - preconditions:
         - !type:InContainerPrecondition
@@ -101,6 +96,29 @@
 - type: htnCompound
   id: MeleeAttackTargetCompound
   branches:
+    # ERRORGATE: a mob that is held cannot walk (moving fails, which used to end the whole plan), so it hits whoever holds it
+    # from where it stands.
+    - preconditions:
+      - !type:KeyExistsPrecondition
+        key: Target
+      - !type:PulledPrecondition
+        isPulled: true
+      tasks:
+        - !type:HTNPrimitiveTask
+          operator: !type:MeleeOperator
+            targetKey: Target
+          preconditions:
+            - !type:KeyExistsPrecondition
+              key: Target
+            - !type:TargetInRangePrecondition
+              targetKey: Target
+              rangeKey: MeleeRange
+          services:
+            - !type:UtilityService
+              id: MeleeService
+              proto: NearbyMeleeTargets
+              key: Target
+
     - preconditions:
       - !type:KeyExistsPrecondition
         key: Target

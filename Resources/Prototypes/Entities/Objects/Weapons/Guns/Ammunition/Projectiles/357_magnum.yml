@@ -7,7 +7,7 @@
   - type: Projectile
     damage:
       types:
-        Piercing: 35 #WWDP edit upstream cancer bruh
+        Piercing: 30 # ERRORGATE: old fork damage
 
 - type: entity
   id: Bullet357MagnumPractice
@@ -41,7 +41,7 @@
   - type: Projectile
     damage:
       types:
-        Piercing: 35 #WWDP edit
+        Piercing: 26 # ERRORGATE: old fork damage (20% less than the normal round)
     ignoreResistances: true
 
 - type: entity

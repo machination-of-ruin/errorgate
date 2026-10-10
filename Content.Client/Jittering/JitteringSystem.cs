@@ -58,7 +58,7 @@ namespace Content.Client.Jittering
 
         private Animation GetAnimation(JitteringComponent jittering, SpriteComponent sprite)
         {
-            var amplitude = MathF.Min(4f, jittering.Amplitude / 100f + 1f) / 10f;
+            var amplitude = MathF.Min(4f, jittering.Amplitude / 100f + 1f) / 10f * (jittering.Scale > 0f ? jittering.Scale : 1f);
             var offset = new Vector2(_random.NextFloat(amplitude/4f, amplitude),
                 _random.NextFloat(amplitude / 4f, amplitude / 3f));
 

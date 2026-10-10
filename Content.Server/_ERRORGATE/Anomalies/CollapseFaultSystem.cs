@@ -114,8 +114,9 @@ public sealed class CollapseFaultSystem : EntitySystem
 
             var isMob = _mobQuery.HasComp(target) || _moverQuery.HasComp(target);
 
-            // Living things and things that fly set it off, a loose item that lies still does not
-            if (isMob ? !_mobState.IsDead(target) : _thrownQuery.HasComp(target) || body.LinearVelocity.LengthSquared() > 0.09f)
+            // Living things and thrown things set it off. Loose items do not, however fast they move: the fault itself drags them
+            // and they shake around the center, which used to keep it on forever with the loot lying under it
+            if (isMob ? !_mobState.IsDead(target) : _thrownQuery.HasComp(target))
                 triggered = true;
 
             // Right at the center there is nowhere left to pull to (and whoever lies there still counts as in reach)

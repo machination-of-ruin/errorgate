@@ -156,8 +156,8 @@
       0: Alive
       50: Dead
   - type: MovementSpeedModifier
-    baseWalkSpeed: 4 # Lavaland change
-    baseSprintSpeed: 5 # Lavaland change
+    baseWalkSpeed: 5 # ERRORGATE: old fork stat
+    baseSprintSpeed: 7
   - type: ProjectileBatteryAmmoProvider
     proto: WatcherBolt
     fireCost: 50

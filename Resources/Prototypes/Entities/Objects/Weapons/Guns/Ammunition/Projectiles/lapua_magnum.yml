@@ -7,8 +7,8 @@
   - type: Projectile
     damage:
       types:
-        Piercing: 120 # WD EDIT: 75 -> 120
-        Structural: 150 # WD EDIT: 226 -> 150
+        Piercing: 60 # ERRORGATE: old fork damage
+        Structural: 30 # ERRORGATE: old fork damage
     penetrationThreshold: 360
     penetrationDamageTypeRequirement:
     - Structural

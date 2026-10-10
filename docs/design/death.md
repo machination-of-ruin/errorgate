@@ -9,11 +9,38 @@ Respawn, lose gear. A dead player stays in the death void until they decide to r
 - No ghosts. On death the player's mind moves to an empty entity on an empty map, so they cannot see, hear or read anything around the corpse.
 - They return to the body if revived, or leave the void with the respawn action or the `/respawn` and `/rise` commands. Admins use `forcerespawn`.
 - Anything that destroys the body (gibbing, explosions, chasms, admin delete) also ends in the void. Gibbing never drops organs, so a brain can never carry the mind; a brain that somehow receives a player's mind sends it to the void.
-- "Succumb" and "say last words" kill the player and so end in the void too.
+- "Succumb" and "say last words" kill the player and so end in the void too. They deal the damage missing to the death threshold (blood loss, logged as SELF) instead of only forcing the state: a forced death state is undone by the next damage tick, because humans can be revived (`AllowRevives`), and the player was pulled back out of the void into crit. Test `CritSuccumbTest`.
 - The death message is a server chat message split into short lines (a wrapped large font overlaps later messages in a narrow chat).
 - Code: `Content.Server/_ERRORGATE/DeathVoid/` (`DeathVoidSystem`, `SelfRespawnCommand`, `DeathVoidComponent`), client overlay in `Content.Client/_ERRORGATE/DeathVoid/`, prototype `Resources/Prototypes/_ERRORGATE/Mobs/death_void.yml`, strings `Resources/Locale/en-US/_ERRORGATE/death-void.ftl`, test `Content.IntegrationTests/Tests/_ERRORGATE/DeathVoidTest.cs`.
 
 Bodies follow the 10-minute despawn timer in [survival-loop.md](survival-loop.md), so a body is not lootable forever.
+
+## Life log (what the dead see)
+
+The death message is one red block: the title, a technical log of the last 8 things that happened to the character, and the line "YOU FAILED TO ESCAPE THE MACHINATION OF RUIN. /RISE AND TRY AGAIN." at the bottom. The log is impersonal (no name of the dead, no "you", no "it"), counts time back from death in minutes, seconds and hundredths (the `>` separators line up) in a smaller font, so a line fits a narrow chat, has no header, and never says what to do or why a rule exists.
+
+```
+ERROR:
+YOU ARE DEAD
+
+T-23:10.04 >  SUBJECT INSTANTIATED
+T-04:52.37 >  SPEECH      "stay back"
+T-04:49.11 >  HEARD       URIST MCHANDS: "give me the rifle"
+T-01:15.80 >  DAMAGE OUT  WALKER (601): 30
+T-01:15.80 >  KILLED      WALKER (601)
+T-00:41.02 >  DAMAGE IN   STARVATION: 12
+T-00:03.55 >  DAMAGE IN   COLLAPSE FAULT: 175
+T-00:00.00 >  SUBJECT TERMINATED
+
+YOU FAILED TO ESCAPE THE MACHINATION OF RUIN. /RISE AND TRY AGAIN.
+```
+
+- **Entries:** speech and whispers (cut at 40 characters), speech heard from players in range (voice 10 tiles, whisper 2), harm taken, harm dealt to players and mobs, and kills. A kill is credited to the last player who hurt the victim in the last minute. The "SUBJECT INSTANTIATED" line only appears when the whole life fits in the log.
+- **Harm sources:** the player, mob or object that dealt it, a world fault ("HEAT FAULT"), "SELF", or, when nobody dealt it, the environment (FIRE, COLD, NO AIR, BLOOD LOSS, POISON, RADIATION), plus HOT AIR for Heat damage while not on fire (the air around a heat fault stays hot). Hits from the same source within 5 seconds merge into one line with the total.
+- **Minor damage:** damage nobody dealt (bleeding, no air, starvation) comes in tiny ticks. It is added up per cause over 30 seconds, whatever happened in between, and a cause that adds up to less than 5 does not appear at all. Starvation deals blood loss, so a starving character who takes exactly the damage hunger deals is logged as STARVATION (a wound of the very same size in the same moment would be called starvation too).
+- **One message:** a mind is sent to the void once, and told it is dead once (a gib moves the mind through the body, the brain and the void, and the void deletes itself whenever the mind leaves it, so a second void could be made within the same moment; the message is not repeated within 3 seconds). A corpse that is gibbed or crushed afterwards (a collapse fault does this) does not send the death message again, and the dead do not see their own death emote ("seizes up...") because the void handles the death before the emote goes out.
+- **Not yet:** talking to MACHINATION OF RUIN (no channel exists), more event types (loot, building, food), a final line written by the model.
+- Code: `Content.Server/_ERRORGATE/LifeLog/` (`LifeLogSystem`, `LifeRecord`), the message is built in `DeathVoidSystem.SpawnVoid`, strings `Resources/Locale/en-US/_ERRORGATE/life-log.ftl`, test `LifeLogTest`. The record belongs to the mind, so it survives a gibbed body.
 
 ## Respawn cooldown
 

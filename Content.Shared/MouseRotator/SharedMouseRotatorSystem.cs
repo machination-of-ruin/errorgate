@@ -54,6 +54,13 @@ public abstract class SharedMouseRotatorSystem : EntitySystem
             return;
         }
 
+        // ERRORGATE: a client can send NaN; it would end up as the character's rotation
+        if (!double.IsFinite(msg.Rotation.Theta))
+        {
+            Log.Warning($"Ignored a non-finite mouse rotation ({msg.Rotation}) from {args.SenderSession.Name} controlling {ToPrettyString(ent)}");
+            return;
+        }
+
         rotator.GoalRotation = msg.Rotation;
         Dirty(ent, rotator);
     }
