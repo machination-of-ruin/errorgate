@@ -39,7 +39,6 @@ namespace Content.Client.Singularity
         private readonly float[] _intensities = new float[MaxCount];
         private readonly float[] _falloffPowers = new float[MaxCount];
         private int _count = 0;
-        private readonly List<(Vector2 Position, float Distance, float Intensity, float FalloffPower)> _candidates = new(); // ERRORGATE
 
         protected override bool BeforeDraw(in OverlayDrawArgs args)
         {
@@ -48,14 +47,11 @@ namespace Content.Client.Singularity
             if (_xformSystem is null && !_entMan.TrySystem(out _xformSystem))
                 return false;
 
-            // ERRORGATE: packs of faults put more distortions in range than the shader holds, and idle ones carry no
-            // intensity at all. Skip the idle ones and keep the nearest to the middle of the view.
-            _candidates.Clear();
-            var viewCenter = args.WorldAABB.Center;
+            _count = 0;
             var query = _entMan.EntityQueryEnumerator<SingularityDistortionComponent, TransformComponent>();
             while (query.MoveNext(out var uid, out var distortion, out var xform))
             {
-                if (xform.MapID != args.MapId || MathF.Abs(distortion.Intensity) < 0.01f)
+                if (xform.MapID != args.MapId)
                     continue;
 
                 var mapPos = _xformSystem.GetWorldPosition(uid);
@@ -64,22 +60,14 @@ namespace Content.Client.Singularity
                 if ((mapPos - args.WorldAABB.ClosestPoint(mapPos)).LengthSquared() > MaxDistance * MaxDistance)
                     continue;
 
-                _candidates.Add((mapPos, (mapPos - viewCenter).LengthSquared(), distortion.Intensity, distortion.FalloffPower));
-            }
-
-            _candidates.Sort((x, y) => x.Distance.CompareTo(y.Distance));
-
-            _count = 0;
-            foreach (var (mapPos, _, intensity, falloffPower) in _candidates)
-            {
                 // To be clear, this needs to use "inside-viewport" pixels.
                 // In other words, specifically NOT IViewportControl.WorldToScreen (which uses outer coordinates).
                 var tempCoords = args.Viewport.WorldToLocal(mapPos);
                 tempCoords.Y = args.Viewport.Size.Y - tempCoords.Y; // Local space to fragment space.
 
                 _positions[_count] = tempCoords;
-                _intensities[_count] = intensity;
-                _falloffPowers[_count] = falloffPower;
+                _intensities[_count] = distortion.Intensity;
+                _falloffPowers[_count] = distortion.FalloffPower;
                 _count++;
 
                 if (_count == MaxCount)
