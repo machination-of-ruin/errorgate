@@ -87,7 +87,6 @@ namespace Content.IntegrationTests.Tests
             "EdgeOfEntropy",
             "Kuznetsk",
             "TestTeg",
-            "Lavatest", // Lavaland Change
         };
 
         /// <summary>

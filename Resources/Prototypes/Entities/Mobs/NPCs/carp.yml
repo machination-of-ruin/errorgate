@@ -40,10 +40,7 @@
     - type: MobThresholds
       thresholds:
         0: Alive
-        40: Dead
-    - type: MovementSpeedModifier
-      baseWalkSpeed: 2.5
-      baseSprintSpeed: 3.5
+        50: Dead # ERRORGATE: old fork stat
     - type: Stamina
       critThreshold: 100
     - type: DamageStateVisuals
@@ -69,8 +66,8 @@
         path: /Audio/Effects/bite.ogg
       damage:
         types:
-          Blunt: 5
-          Slash: 7
+          Piercing: 5 # ERRORGATE: old fork stat
+          Slash: 10
     - type: TypingIndicator
       proto: alien
     - type: Tag
@@ -247,7 +244,7 @@
     - type: MobThresholds
       thresholds:
         0: Alive
-        150: Dead
+        200: Dead # ERRORGATE: old fork stat
     - type: Stamina
       critThreshold: 150
     - type: DamageStateVisuals
@@ -271,7 +268,7 @@
     - type: MeleeWeapon
       damage:
         types:
-          Slash: 10
+          Slash: 12 # ERRORGATE: old fork stat
           Bloodloss: 5
     - type: SurgeryTarget
     - type: UserInterface

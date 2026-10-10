@@ -222,22 +222,22 @@ Items and gear:
 - [x] Examining a gun: the chamber does not show the loaded ammo. Cause: the random-magazine loot guns had no chamber slot at all (a child prototype replaces all slots of its parent); they have it now, loaded like the parent (`RandomMagGunsTest`).
 - [x] Bullet damage numbers: compare with the old build. Restored the old values: .357 30 (AP 26), .45 ACP 22 (AP 26), 5.56 uranium 8, .60 Lapua 60 piercing / 30 structural. Left as they are (WWDP): energy and disabler damage types, the PKA kinetic bolt (25 old, 40 now). Old .45 and .60 bullets also dealt stamina damage (15 and 100; .60 is 60 now), not restored.
 - [x] Ammo box fullness is not random; ammo boxes need to be random. Loot tables spawn the `...Random` box variants now (`RandomAmmoBoxTest`); boxes from vendors, crafting and maps stay full.
-- [ ] Item spawn "shining" effect.
+- [x] Item spawn "shining" effect. The sparkle was spawned but drawn under the loot (stock `Puddles` depth; the old build used depth 10, above everything). `LootSpawnSparkle` is drawn at `Effects` (`LootSparkleTest`).
 
 Mobs:
 - [x] Grabbed mobs do not fight back. Cause (from the task data, not seen running: NPC planning does not run in tests): the melee task had a branch "if pulled, try to pull free" that came before attacking, so a held mob only struggled. The branch is gone; check in game.
 - [x] Rat servant is not hostile to humans (no AI at all). Every branch of its task needs an order from a rat king, and the spawner-placed ones have none; it falls back to the plain hostile task now (data test only: NPC planning does not run in the test world, so check in game).
-- [ ] Check spider and other mob stats.
+- [x] Check spider and other mob stats. Only the mobs on the ERRORGATE maps, back to the old build: giant spider 50 (was 90), carp 50 (was 40) and bite Piercing 5 / Slash 10 (was Blunt 5 / Slash 7), shark 200 (was 150) and Slash 12 (was 10), rat king 300 (was 200), watcher walk 5 / sprint 7 (was 4 / 5). Carp walk/sprint speed override removed (`MapMobStatsTest`). Walkers, runners and rat servants already matched.
 
 Server and admin:
 - [x] Set the CVar `ghost.allow_same_character` to True (default changed in `CCVars.GhostRespawn.cs`).
-- [x] Trash maps load in the release build, like lavaland. Only the ERRORGATE map should. The dev preset switched them off, the release build did not: the C# defaults of `lavaland.enabled`, `procgen.preload` (the Maps/Dungeon atlases), `shuttle.preload_grids` and `gateway.generator_enabled` are false now. Aspects (`aspects.enabled`) are still on in release.
+- [x] Trash maps load in the release build, like lavaland. Only the ERRORGATE map should. The dev preset switched them off, the release build did not: the C# defaults of `lavaland.enabled`, `procgen.preload` (the Maps/Dungeon atlases), `shuttle.preload_grids` and `gateway.generator_enabled` are false now. `aspects.enabled` is false too.
 - [x] Admin notification when players spawn and die ("SPAWN:" and "DEATH:" in the admin chat; deaths from `DeathVoidSystem`, so gibs count; `PlayerLifeNoticeTest`).
-- [x] Remove the sprite from the observer (the ghost layer is invisible for every observer, the admin observer keeps its worn bag layer; `ObserverSpriteTest`).
+- [x] Remove the sprite from the observer (no observer sprite is drawn, worn bag included: `GhostSystem` keeps `Visible` off; `ObserverSpriteTest`).
 
 Systems and visuals:
 - [x] Check that deafness in crit works. It does: crit adds `DeafComponent` (chat blocked), healing removes it (`CritDeafTest`).
-- [ ] Water visuals do not always apply: water tiles should cover a character's legs to show they are walking in deep water.
+- [x] (dropped by the owner) Water visuals do not always apply: water tiles should cover a character's legs to show they are walking in deep water.
 - [x] Collapse faults stay in the "damaging" visual state with items under them and never go off, so players cannot loot. Cause: items shaking around the center counted as something moving in. Only living things and thrown objects trigger it now (`CollapseFaultLootTest`).
-- [ ] NaN positions: a player got stuck (black screen for everyone who followed them, could not be grabbed, shot or shoved, could not walk after a teleport). Guards and server warnings are in; the cause is unknown. If the log shows a "Non-finite" warning, follow it up.
-- [ ] Jumpsuit storage vanishes about 5 seconds after spawn (no UI, the verb reads "close storage").
+- [x] (owner: will report if it comes back) NaN positions: a player got stuck (black screen for everyone who followed them, could not be grabbed, shot or shoved, could not walk after a teleport). Guards and server warnings are in; the cause is unknown. If the log shows a "Non-finite" warning, follow it up.
+- [x] (dropped by the owner) Jumpsuit storage vanishes about 5 seconds after spawn (no UI, the verb reads "close storage").

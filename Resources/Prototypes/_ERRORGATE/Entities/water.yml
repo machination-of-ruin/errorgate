@@ -21,3 +21,13 @@
         Quantity: 90
       - ReagentId: ContaminatedWater
         Quantity: 10
+
+# The sparkle that shows where loot appears. The old build drew it above everything (depth 10); the stock puddle sparkle sits
+# under the items, where it cannot be seen.
+- type: entity
+  id: LootSpawnSparkle
+  parent: PuddleSparkle
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: Sprite
+    drawdepth: Effects

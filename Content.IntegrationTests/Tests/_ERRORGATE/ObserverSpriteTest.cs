@@ -25,8 +25,8 @@ public sealed class ObserverSpriteTest
             var cEnt = pair.Client.EntMan;
             Assert.That(cEnt.TryGetEntity(net, out var clientObserver), Is.True);
             var sprite = cEnt.GetComponent<SpriteComponent>(clientObserver!.Value);
-            // Layer 0 is the ghost; later layers are worn items (the admin observer wears a bag)
-            Assert.That(sprite[0].Visible, Is.False, $"{proto} shows the ghost sprite");
+            // The whole sprite is off: the ghost layer and whatever the observer wears (the admin observer has a bag)
+            Assert.That(sprite.Visible, Is.False, $"{proto} is drawn");
         });
 
         await pair.CleanReturnAsync();
