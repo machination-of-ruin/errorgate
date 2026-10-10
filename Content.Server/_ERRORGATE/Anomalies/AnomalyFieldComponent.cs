@@ -30,13 +30,14 @@ public sealed partial class AnomalyFieldComponent : Component
     };
 
     /// <summary>
-    ///     Faults per pack.
+    ///     Faults per pack. Keep the maximum at 5 or less: the singularity shader draws five distortions at most, so in a
+    ///     bigger pack of collapse faults some of the active ones would show only their sprite and no lens.
     /// </summary>
     [DataField]
-    public int PackSizeMin = 6;
+    public int PackSizeMin = 3;
 
     [DataField]
-    public int PackSizeMax = 12;
+    public int PackSizeMax = 5;
 
     /// <summary>
     ///     Smallest radius (tiles) of the blob a pack is scattered in. The blob grows with the number of faults and the
