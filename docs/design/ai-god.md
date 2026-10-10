@@ -11,6 +11,8 @@
 
 The earlier attempt on the `machination` branch was not merged (111 commits behind, station framing, assigned objectives). Only its HTTP client and CVar set were ported, rewritten, and the event buffer idea reused. Bunker door lines ("SUBJECT X: DOOR CLOSED, 3 INSIDE", see [pressure.md](pressure.md)) are parked; the first scripted log is about immediate player interactions instead (PvP, PvE, talk).
 
+See [ai-god-plan.md](ai-god-plan.md) for the agreed implementation plan (layers, context building, valves, three playtest steps).
+
 ## Nature
 
 The AI GOD is MACHINATION OF RUIN, built by humans in their image (see the origin in [VIBE.md](VIBE.md)), the machine that holds the last human consciousnesses and tries to rebuild civilization from them. She cannot understand HUMAN ERROR, yet she wants to remove it. She is erratic, half-mad, a corrupted process. She treats players as test subjects, worshippers, heretics and errors to delete, shifting between these without warning. See the premise in [VIBE.md](VIBE.md).
