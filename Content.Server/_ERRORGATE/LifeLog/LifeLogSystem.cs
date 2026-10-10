@@ -8,32 +8,34 @@ using Content.Shared.Mind;
 using Content.Shared.Mind.Components;
 using Content.Shared.Mobs;
 using Content.Shared.Mobs.Components;
-using Robust.Shared.Player;
 using Robust.Shared.Timing;
 
 namespace Content.Server._ERRORGATE.LifeLog;
 
 /// <summary>
-///     Keeps what happened to every player character (who hurt them, who they hurt, who they talked to) and writes it as a
-///     short cold log when they die, shown with the death message. Plain bookkeeping with fixed wording, no model involved.
-///     The record belongs to the mind, so it survives the body being gibbed.
+///     Keeps the last things that happened to every player character (harm taken and dealt, kills, what was said and
+///     heard) and writes them as a short technical log when they die, shown with the death message. Plain bookkeeping with
+///     fixed wording, no model involved. The record belongs to the mind, so it survives the body being gibbed.
 /// </summary>
 public sealed class LifeLogSystem : EntitySystem
 {
     [Dependency] private readonly IGameTiming _timing = default!;
     [Dependency] private readonly EntityLookupSystem _lookup = default!;
-    [Dependency] private readonly SharedMindSystem _mind = default!;
     [Dependency] private readonly SharedTransformSystem _transform = default!;
 
-    // A hit counts as the cause of a death, or of a kill, for this long
+    /// <summary>How many lines the log shows, not counting the closing line.</summary>
+    public const int ShownLines = 8;
+
+    // Hits from the same source this close together are one line. A kill is credited to the last player who hurt the
+    // victim within the blame window.
+    private static readonly TimeSpan MergeWindow = TimeSpan.FromSeconds(5);
     private static readonly TimeSpan BlameWindow = TimeSpan.FromSeconds(60);
 
-    private const int MaxNames = 4;
-    private const int MaxWordsLength = 80;
+    private const int MaxWordsLength = 40;
 
     private readonly Dictionary<EntityUid, LifeRecord> _records = new();
 
-    // Mobs (and players) hurt by a player recently, so a kill can be credited: victim -> attacker's mind
+    // Mobs (and players) hurt by a player recently: victim -> attacker's mind
     private readonly Dictionary<EntityUid, (EntityUid Mind, TimeSpan Time)> _hurtBy = new();
 
     private readonly HashSet<Entity<MobStateComponent>> _hearers = new();
@@ -74,7 +76,7 @@ public sealed class LifeLogSystem : EntitySystem
         return true;
     }
 
-    private LifeRecord RecordOf(EntityUid mindId, EntityUid body)
+    private LifeRecord RecordOf(EntityUid mindId)
     {
         if (!_records.TryGetValue(mindId, out var record))
         {
@@ -82,8 +84,33 @@ public sealed class LifeLogSystem : EntitySystem
             _records[mindId] = record;
         }
 
-        record.Name = Name(body);
         return record;
+    }
+
+    /// <summary>
+    ///     Adds a line. Damage of the same kind and subject in a row is merged into the previous line.
+    /// </summary>
+    private void Add(LifeRecord record, LogKind kind, string subject, string text = "", float amount = 0f)
+    {
+        var now = _timing.CurTime;
+
+        if (kind is LogKind.DamageIn or LogKind.DamageOut
+            && record.Events.Count > 0
+            && record.Events[^1] is { } last
+            && last.Kind == kind
+            && last.Subject == subject
+            && now - last.Time < MergeWindow)
+        {
+            last.Amount += amount;
+            last.Count++;
+            last.Time = now;
+            return;
+        }
+
+        record.Events.Add(new LogEntry { Time = now, Kind = kind, Subject = subject, Text = text, Amount = amount });
+
+        if (record.Events.Count > LifeRecord.Capacity)
+            record.Events.RemoveRange(0, record.Events.Count - LifeRecord.Capacity);
     }
 
     private void OnSpawned(PlayerSpawnCompleteEvent args)
@@ -92,7 +119,7 @@ public sealed class LifeLogSystem : EntitySystem
         {
             // A new life: the record starts from nothing
             _records.Remove(mindId);
-            RecordOf(mindId, args.Mob);
+            RecordOf(mindId);
         }
     }
 
@@ -115,11 +142,9 @@ public sealed class LifeLogSystem : EntitySystem
             attackerIsPlayer = TryPlayerMind(attacker, out attackerMind);
 
         // The attacker's side: what they did
-        if (attackerIsPlayer && origin is { } hurter)
+        if (attackerIsPlayer)
         {
-            var record = RecordOf(attackerMind, hurter);
-            var table = victimIsPlayer ? record.HurtPlayers : record.HurtMobs;
-            table[Name(ent.Owner)] = table.GetValueOrDefault(Name(ent.Owner)) + total;
+            Add(RecordOf(attackerMind), LogKind.DamageOut, Upper(Name(ent.Owner)), amount: total);
             _hurtBy[ent.Owner] = (attackerMind, now);
         }
 
@@ -127,49 +152,25 @@ public sealed class LifeLogSystem : EntitySystem
         if (!victimIsPlayer)
             return;
 
-        var victim = RecordOf(victimMind, ent.Owner);
+        var victim = RecordOf(victimMind);
+        string source;
 
-        if (origin is not { } source)
-        {
-            NoteEnvironment(victim, args.DamageDelta, now);
-            return;
-        }
-
-        if (source == ent.Owner)
-        {
-            NoteAttack(victim, HarmSource.Self, string.Empty, default, total, now);
-        }
-        else if (TryComp<ErrorgateAnomalyComponent>(source, out var fault))
-        {
-            NoteAttack(victim, HarmSource.Fault, string.Empty, fault.Kind, total, now);
-        }
-        else if (attackerIsPlayer)
-        {
-            NoteAttack(victim, HarmSource.Player, Name(source), default, total, now);
-        }
+        if (origin is not { } from)
+            source = EnvironmentCause(args.DamageDelta);
+        else if (from == ent.Owner)
+            source = Loc.GetString("life-log-source-self");
+        else if (TryComp<ErrorgateAnomalyComponent>(from, out var fault))
+            source = Loc.GetString("life-log-source-fault", ("kind", Loc.GetString("life-log-fault-" + fault.Kind.ToString().ToLowerInvariant())));
         else
-        {
-            NoteAttack(victim, HarmSource.Thing, Name(source), default, total, now);
-        }
+            source = Upper(Name(from));
+
+        Add(victim, LogKind.DamageIn, source, amount: total);
     }
 
-    private static void NoteAttack(LifeRecord record, HarmSource kind, string name, ErrorgateAnomalyKind fault, float damage, TimeSpan now)
-    {
-        // Hits from the same source in a row add up
-        var sameSource = record.LastAttackKind == kind && record.LastAttackName == name && record.LastAttackFault == fault
-                         && now - record.LastAttackTime < BlameWindow;
-
-        record.LastAttackDamage = sameSource ? record.LastAttackDamage + damage : damage;
-        record.LastAttackKind = kind;
-        record.LastAttackName = name;
-        record.LastAttackFault = fault;
-        record.LastAttackTime = now;
-    }
-
-    private static void NoteEnvironment(LifeRecord record, DamageSpecifier delta, TimeSpan now)
+    private string EnvironmentCause(DamageSpecifier delta)
     {
         var biggest = delta.DamageDict.Where(d => d.Value > 0).OrderByDescending(d => (float) d.Value).FirstOrDefault();
-        record.LastEnvironment = biggest.Key switch
+        var cause = biggest.Key switch
         {
             "Heat" or "Caustic" => "fire",
             "Cold" => "cold",
@@ -179,7 +180,8 @@ public sealed class LifeLogSystem : EntitySystem
             "Radiation" => "radiation",
             _ => "unknown",
         };
-        record.LastEnvironmentTime = now;
+
+        return Loc.GetString("life-log-env-" + cause);
     }
 
     private void OnMobStateChanged(MobStateChangedEvent args)
@@ -192,9 +194,7 @@ public sealed class LifeLogSystem : EntitySystem
             && _timing.CurTime - hit.Time < BlameWindow
             && _records.TryGetValue(hit.Mind, out var killer))
         {
-            var name = Name(args.Target);
-            var list = TryPlayerMind(args.Target, out _) ? killer.KilledPlayers : killer.KilledMobs;
-            list.Add(name);
+            Add(killer, LogKind.Deleted, Upper(Name(args.Target)));
         }
     }
 
@@ -203,27 +203,28 @@ public sealed class LifeLogSystem : EntitySystem
         if (!TryPlayerMind(args.Source, out var speakerMind))
             return;
 
-        var speaker = RecordOf(speakerMind, args.Source);
-        speaker.LinesSpoken++;
-        speaker.LastWords = args.Message.Length > MaxWordsLength ? args.Message[..MaxWordsLength] + "..." : args.Message;
+        var words = Trim(args.Message);
+        Add(RecordOf(speakerMind), args.IsWhisper ? LogKind.Whisper : LogKind.Speech, string.Empty, words);
 
         // Who was close enough to hear it
         var range = args.IsWhisper ? SharedChatSystem.WhisperClearRange : SharedChatSystem.VoiceRange;
         _hearers.Clear();
         _lookup.GetEntitiesInRange(_transform.GetMapCoordinates(args.Source), range, _hearers);
 
+        var speakerName = Upper(Name(args.Source));
         foreach (var (hearer, _) in _hearers)
         {
             if (hearer == args.Source || !TryPlayerMind(hearer, out var hearerMind))
                 continue;
 
-            var hearerName = Name(hearer);
-            speaker.SpokeWith[hearerName] = speaker.SpokeWith.GetValueOrDefault(hearerName) + 1;
-
-            var heard = RecordOf(hearerMind, hearer);
-            var speakerName = Name(args.Source);
-            heard.SpokenToBy[speakerName] = heard.SpokenToBy.GetValueOrDefault(speakerName) + 1;
+            Add(RecordOf(hearerMind), LogKind.Heard, speakerName, words);
         }
+    }
+
+    private static string Trim(string message)
+    {
+        message = message.ReplaceLineEndings(" ").Trim();
+        return message.Length > MaxWordsLength ? message[..MaxWordsLength] + "..." : message;
     }
 
     /// <summary>
@@ -237,75 +238,51 @@ public sealed class LifeLogSystem : EntitySystem
 
     public List<string> BuildLines(LifeRecord record, TimeSpan now)
     {
-        var lines = new List<string> { Loc.GetString("life-log-header", ("name", Upper(record.Name))) };
+        var lines = new List<string> { Loc.GetString("life-log-header") };
 
-        var minutes = (int) (now - record.Born).TotalMinutes;
-        lines.Add(minutes < 1
-            ? Loc.GetString("life-log-lifespan-short")
-            : Loc.GetString("life-log-lifespan", ("minutes", minutes)));
+        var shown = record.Events.Skip(Math.Max(0, record.Events.Count - ShownLines)).ToList();
 
-        lines.Add(HarmLine(record, now));
+        // A short life starts at its beginning
+        if (record.Events.Count < ShownLines)
+            lines.Add(Loc.GetString("life-log-born", ("time", Clock(now - record.Born))));
 
-        lines.Add(record.KilledPlayers.Count + record.KilledMobs.Count > 0
-            ? Loc.GetString("life-log-killed", ("names", Names(record.KilledPlayers.Concat(record.KilledMobs))))
-            : record.HurtPlayers.Count + record.HurtMobs.Count > 0
-                ? Loc.GetString("life-log-hurt", ("names", Names(record.HurtPlayers.Keys.Concat(record.HurtMobs.Keys))))
-                : Loc.GetString("life-log-hurt-none"));
-
-        if (record.SpokeWith.Count > 0)
+        foreach (var entry in shown)
         {
-            var closest = record.SpokeWith.OrderByDescending(p => p.Value).Take(MaxNames).ToList();
-            lines.Add(Loc.GetString("life-log-spoke",
-                ("names", Names(closest.Select(p => p.Key))),
-                ("lines", record.LinesSpoken)));
-        }
-        else if (record.SpokenToBy.Count > 0)
-        {
-            lines.Add(Loc.GetString("life-log-spoken-to", ("names", Names(record.SpokenToBy.Keys))));
-        }
-        else
-        {
-            lines.Add(Loc.GetString("life-log-spoke-none"));
+            lines.Add(Line(entry, now));
         }
 
-        lines.Add(record.LastWords != null
-            ? Loc.GetString("life-log-last-words", ("words", record.LastWords))
-            : Loc.GetString("life-log-last-words-none"));
-
-        lines.Add(Loc.GetString("life-log-footer"));
+        lines.Add(Loc.GetString("life-log-end"));
         return lines;
     }
 
-    private string HarmLine(LifeRecord record, TimeSpan now)
+    private string Line(LogEntry entry, TimeSpan now)
     {
-        var recentAttack = record.LastAttackKind != HarmSource.None && now - record.LastAttackTime < BlameWindow;
-        if (recentAttack)
+        var time = Clock(now - entry.Time);
+        var amount = (int) MathF.Round(entry.Amount);
+        var merged = entry.Count > 1;
+
+        return entry.Kind switch
         {
-            var damage = (int) MathF.Round(record.LastAttackDamage);
-            return record.LastAttackKind switch
-            {
-                HarmSource.Player => Loc.GetString("life-log-harmed-player", ("source", Upper(record.LastAttackName)), ("damage", damage)),
-                HarmSource.Fault => Loc.GetString("life-log-harmed-fault",
-                    ("source", Loc.GetString("life-log-fault-" + record.LastAttackFault.ToString().ToLowerInvariant())),
-                    ("damage", damage)),
-                HarmSource.Self => Loc.GetString("life-log-harmed-self", ("damage", damage)),
-                _ => Loc.GetString("life-log-harmed-thing", ("source", Upper(record.LastAttackName)), ("damage", damage)),
-            };
-        }
-
-        if (record.LastEnvironment != string.Empty)
-            return Loc.GetString("life-log-harmed-environment", ("source", Loc.GetString("life-log-env-" + record.LastEnvironment)));
-
-        return Loc.GetString("life-log-harmed-none");
+            LogKind.Speech => Loc.GetString("life-log-speech", ("time", time), ("text", entry.Text)),
+            LogKind.Whisper => Loc.GetString("life-log-whisper", ("time", time), ("text", entry.Text)),
+            LogKind.Heard => Loc.GetString("life-log-heard", ("time", time), ("subject", entry.Subject), ("text", entry.Text)),
+            LogKind.DamageIn => Loc.GetString(merged ? "life-log-damage-in-merged" : "life-log-damage-in",
+                ("time", time), ("subject", entry.Subject), ("amount", amount), ("count", entry.Count)),
+            LogKind.DamageOut => Loc.GetString(merged ? "life-log-damage-out-merged" : "life-log-damage-out",
+                ("time", time), ("subject", entry.Subject), ("amount", amount), ("count", entry.Count)),
+            _ => Loc.GetString("life-log-deleted", ("time", time), ("subject", entry.Subject)),
+        };
     }
 
-    private static string Names(IEnumerable<string> names)
+    /// <summary>
+    ///     Minutes and seconds, 04:52.
+    /// </summary>
+    private static string Clock(TimeSpan span)
     {
-        var list = names.Distinct().Select(Upper).ToList();
-        if (list.Count <= MaxNames)
-            return string.Join(", ", list);
+        if (span < TimeSpan.Zero)
+            span = TimeSpan.Zero;
 
-        return string.Join(", ", list.Take(MaxNames)) + " AND " + (list.Count - MaxNames) + " MORE";
+        return $"{(int) span.TotalMinutes:00}:{span.Seconds:00}";
     }
 
     private static string Upper(string text) => text.ToUpperInvariant();
