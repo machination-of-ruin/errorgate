@@ -9,7 +9,7 @@ Respawn, lose gear. A dead player stays in the death void until they decide to r
 - No ghosts. On death the player's mind moves to an empty entity on an empty map, so they cannot see, hear or read anything around the corpse.
 - They return to the body if revived, or leave the void with the respawn action or the `/respawn` and `/rise` commands. Admins use `forcerespawn`.
 - Anything that destroys the body (gibbing, explosions, chasms, admin delete) also ends in the void. Gibbing never drops organs, so a brain can never carry the mind; a brain that somehow receives a player's mind sends it to the void.
-- "Succumb" and "say last words" kill the player and so end in the void too.
+- "Succumb" and "say last words" kill the player and so end in the void too. They deal the damage missing to the death threshold (blood loss, logged as SELF) instead of only forcing the state: a forced death state is undone by the next damage tick, because humans can be revived (`AllowRevives`), and the player was pulled back out of the void into crit. Test `CritSuccumbTest`.
 - The death message is a server chat message split into short lines (a wrapped large font overlaps later messages in a narrow chat).
 - Code: `Content.Server/_ERRORGATE/DeathVoid/` (`DeathVoidSystem`, `SelfRespawnCommand`, `DeathVoidComponent`), client overlay in `Content.Client/_ERRORGATE/DeathVoid/`, prototype `Resources/Prototypes/_ERRORGATE/Mobs/death_void.yml`, strings `Resources/Locale/en-US/_ERRORGATE/death-void.ftl`, test `Content.IntegrationTests/Tests/_ERRORGATE/DeathVoidTest.cs`.
 
