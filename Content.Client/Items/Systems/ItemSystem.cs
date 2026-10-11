@@ -3,6 +3,7 @@ using System.Linq;
 using Content.Shared.Hands;
 using Content.Shared.Inventory.Events;
 using Content.Shared.Item;
+using Content.Shared.Wieldable.Components;
 using Robust.Client.GameObjects;
 using Robust.Client.Graphics;
 using Robust.Client.ResourceManagement;
@@ -104,7 +105,25 @@ public sealed class ItemSystem : SharedItemSystem
         // Fallback to defaultKey
         if (!rsi.TryGetState(state, out var _))
         {
-            if (rsi.TryGetState(defaultKey, out var _))
+            // ERRORGATE: a wielded item without wielded art shows its one-handed art. The prefix it had is kept by the wieldable,
+            // or comes from the prototype (it may not have arrived yet, or the item may have been wielded when we saw it first).
+            string? oneHanded = null;
+            if (TryComp<WieldableComponent>(uid, out var wieldable) && item.HeldPrefix == wieldable.WieldedInhandPrefix)
+            {
+                oneHanded = wieldable.OldInhandPrefix;
+                if (oneHanded == null
+                    && MetaData(uid).EntityPrototype is { } proto
+                    && proto.TryGetComponent<ItemComponent>(out var protoItem, EntityManager.ComponentFactory))
+                {
+                    oneHanded = protoItem.HeldPrefix;
+                }
+            }
+
+            if (oneHanded != null && rsi.TryGetState($"{oneHanded}-{defaultKey}", out var _))
+            {
+                state = $"{oneHanded}-{defaultKey}";
+            }
+            else if (rsi.TryGetState(defaultKey, out var _))
                 state = defaultKey;
             else
                 return false;
