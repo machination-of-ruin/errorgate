@@ -48,7 +48,7 @@
 # One bullet to bring them all into the darkness and bind them
 - type: entity
   id: BaseBullet
-  name: BaseBullet
+  name: bullet
   description: If you can see this you're probably dead!
   abstract: true
   components:
@@ -119,7 +119,7 @@
 
 - type: entity
   id: BaseBulletPractice
-  name: base bullet practice
+  name: practice bullet
   parent: BaseBullet
   categories: [ HideSpawnMenu ]
   components:
@@ -134,7 +134,7 @@
 
 - type: entity
   id: BaseBulletIncendiary
-  name: base bullet incendiary
+  name: incendiary bullet
   parent: BaseBullet
   categories: [ HideSpawnMenu ]
   components:
@@ -152,7 +152,7 @@
 
 - type: entity
   id: BaseBulletAP
-  name: base bullet armor-piercing
+  name: armor-piercing bullet
   parent: BaseBullet
   categories: [ HideSpawnMenu ]
   components:
@@ -168,7 +168,7 @@
 
 - type: entity
   id: BaseBulletUranium
-  name: base bullet uranium
+  name: uranium bullet
   parent: BaseBullet
   categories: [ HideSpawnMenu ]
   components:
