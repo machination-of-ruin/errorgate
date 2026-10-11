@@ -220,10 +220,16 @@
   - type: RadiationSource
     intensity: 12
     slope: 3
+  # A green glow, so people can tell it is radioactive from afar
+  - type: PointLight
+    enabled: true
+    radius: 4
+    energy: 2
+    color: "#3CDC3C"
 
-# The doors between rooms and corridors. Opened by hand, no power needed.
+# The doors between rooms and corridors: the unpowered airlock of the map, opened by hand.
 - type: entity
-  parent: MetalDoor
+  parent: AirlockTough
   id: BunkerRoomDoor
   suffix: Bunker
   categories: [ HideSpawnMenu ]
@@ -257,3 +263,11 @@
         - FullTileMask
         layer:
         - WallLayer
+  - type: RadiationSource
+    intensity: 16
+    slope: 2.5
+  - type: PointLight
+    enabled: true
+    radius: 7
+    energy: 3
+    color: "#3CDC3C"

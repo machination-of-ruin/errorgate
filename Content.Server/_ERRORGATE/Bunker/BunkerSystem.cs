@@ -181,8 +181,8 @@ public sealed partial class BunkerSystem : EntitySystem
         gas.AdjustMoles(Gas.Nitrogen, Atmospherics.NitrogenMolesStandard);
         _atmos.SetMapAtmosphere(mapUid, false, gas);
 
-        // Dim light so the layout can be read, and gravity (a new map has neither)
-        _map.SetAmbientLight(mapId, Color.FromHex("#2A2A2A"));
+        // No light at all (the emergency lights are the only light), and gravity (a new map has neither)
+        _map.SetAmbientLight(mapId, Color.Black);
 
         var bunkerGrid = _mapManager.CreateGridEntity(mapId);
         _airGrid = bunkerGrid.Owner;

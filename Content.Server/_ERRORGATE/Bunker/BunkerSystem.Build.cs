@@ -20,6 +20,7 @@ public sealed partial class BunkerSystem
     private static readonly EntProtoId BossProto = "MobSpawnerWalkerBoss";
     private static readonly EntProtoId ReactorProto = "BunkerReactor";
     private static readonly EntProtoId CatwalkProto = "Catwalk";
+    private static readonly EntProtoId RubbleProto = "N14WallRockBasalt";
     private static readonly EntProtoId RoomDoorProto = "BunkerRoomDoor";
 
     // What a room holds. Loot spawners are tier 3, drawn from the global loot table (shared with the surface). Middle props stand in
@@ -361,63 +362,86 @@ public sealed partial class BunkerSystem
                 }
             }
 
-            // Line of sight blockers: concrete columns and short wall pieces in the middle of the room
+            // Line of sight blockers: concrete columns in a pattern that mirrors across the room
             if (area >= 40)
             {
-                var columns = area >= 70 ? rng.Next(3, 6) : rng.Next(1, 3);
-                foreach (var t in Tiles(false))
+                var xs = new SortedSet<int>();
+                var ys = new SortedSet<int>();
+                var pattern = area >= 70 ? rng.Next(3) : 1;
+                switch (pattern)
                 {
-                    if (columns == 0)
-                        break;
-
-                    if (!Isolated(t) || !TryBlock(t))
-                        continue;
-
-                    Spawn(RoomWallProto, at(t));
-                    columns--;
-                }
-            }
-
-            if (area >= 80)
-            {
-                var pieces = rng.Next(1, 3);
-                foreach (var t in Tiles(false))
-                {
-                    if (pieces == 0)
-                        break;
-
-                    var along = rng.Next(2) == 0 ? new Vector2i(1, 0) : new Vector2i(0, 1);
-                    var cells = new[] { t, t + along, t + along * 2 };
-                    if (!cells.All(x => Free(x) && !IsEdge(x) && Isolated(x)))
-                        continue;
-
-                    var placed = new List<Vector2i>();
-                    foreach (var cell in cells)
-                    {
-                        if (TryBlock(cell))
+                    // A lattice, a column every third tile
+                    case 0:
+                        for (var x = room.X0 + 2; x <= room.X1 - 2; x += 3)
                         {
-                            placed.Add(cell);
+                            xs.Add(x);
+                            xs.Add(room.X0 + room.X1 - x);
+                        }
+
+                        for (var y = room.Y0 + 2; y <= room.Y1 - 2; y += 3)
+                        {
+                            ys.Add(y);
+                            ys.Add(room.Y0 + room.Y1 - y);
+                        }
+
+                        break;
+
+                    // Four columns near the corners
+                    case 1:
+                        xs.Add(room.X0 + 2);
+                        xs.Add(room.X1 - 2);
+                        ys.Add(room.Y0 + 2);
+                        ys.Add(room.Y1 - 2);
+                        break;
+
+                    // Two colonnades, along the long side
+                    default:
+                        var along = room.X1 - room.X0 >= room.Y1 - room.Y0;
+                        for (var k = 2; k <= (along ? room.X1 - room.X0 : room.Y1 - room.Y0) - 2; k += 2)
+                        {
+                            if (along)
+                                xs.Add(room.X0 + k);
+                            else
+                                ys.Add(room.Y0 + k);
+                        }
+
+                        if (along)
+                        {
+                            ys.Add(room.Y0 + 2);
+                            ys.Add(room.Y1 - 2);
                         }
                         else
                         {
-                            foreach (var undo in placed)
-                            {
-                                occupied.Remove(undo);
-                                used.Remove(undo);
-                            }
-
-                            placed.Clear();
-                            break;
+                            xs.Add(room.X0 + 2);
+                            xs.Add(room.X1 - 2);
                         }
-                    }
 
-                    foreach (var cell in placed)
+                        break;
+                }
+
+                foreach (var x in xs)
+                {
+                    foreach (var y in ys)
                     {
-                        Spawn(RoomWallProto, at(cell));
+                        var t = new Vector2i(x, y);
+                        if (!IsEdge(t) && TryBlock(t))
+                            Spawn(RoomWallProto, at(t));
                     }
+                }
+            }
 
-                    if (placed.Count > 0)
-                        pieces--;
+            // Rubble: loose basalt in clumps, mostly in the corners and along the walls. It can be dug out with a pickaxe.
+            for (var n = area >= 60 ? 4 : 2; n > 0; n--)
+            {
+                var clump = Tiles(true).Concat(Tiles(false)).FirstOrDefault(t => Free(t));
+                if (!Free(clump) || !TryBlock(clump))
+                    continue;
+
+                Spawn(RubbleProto, at(clump));
+                foreach (var d in new[] { new Vector2i(1, 0), new Vector2i(0, 1), new Vector2i(-1, 0), new Vector2i(0, -1) })
+                {
+                    if (rng.Next(3) == 0 && TryBlock(clump + d))
+                        Spawn(RubbleProto, at(clump + d));
                 }
             }
 
@@ -522,6 +546,25 @@ public sealed partial class BunkerSystem
                 }
 
                 break;
+            }
+        }
+
+        // Rubble in the corridors: clumps of basalt that block part of the way, dug out with a pickaxe
+        var rubbleCells = path.Where(t => (t - layout.Entry).LengthSquared > 169 && !NearDoor(t, 4)).ToList();
+        Shuffle(rubbleCells, rng);
+        var rubble = new HashSet<Vector2i>();
+        foreach (var cell in rubbleCells.Take(Math.Max(3, path.Count / 14)))
+        {
+            foreach (var spot in new[] { cell, cell + new Vector2i(1, 0), cell + new Vector2i(0, 1), cell + new Vector2i(-1, 0), cell + new Vector2i(0, -1) })
+            {
+                if (!layout.Tunnel.Contains(spot) || NearDoor(spot, 3) || barrels.Contains(spot) || crates.Contains(spot) || rubble.Contains(spot))
+                    continue;
+
+                if (spot != cell && rng.Next(2) == 0)
+                    continue;
+
+                rubble.Add(spot);
+                Spawn(RubbleProto, at(spot));
             }
         }
 
