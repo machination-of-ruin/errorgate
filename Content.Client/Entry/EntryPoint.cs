@@ -1,4 +1,3 @@
-using Content.Client._ERRORGATE.Windowing;
 using Content.Client._White.ItemSlotRenderer;
 using Content.Client._White.Overlays;
 using Content.Shared._White.CCVar;
@@ -187,7 +186,6 @@ namespace Content.Client.Entry
             _userInterfaceManager.SetActiveTheme(_configManager.GetCVar(CVars.InterfaceTheme));
             _documentParsingManager.Initialize();
             _titleWindowManager.Initialize();
-            DarkTitleBar.Apply(IoCManager.Resolve<IClyde>()); // ERRORGATE
             _joinQueue.Initialize();
             _discordAuth.Initialize();
 
