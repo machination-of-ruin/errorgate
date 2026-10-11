@@ -5,16 +5,17 @@ namespace Content.Shared._ERRORGATE.Bunker;
 [Serializable, NetSerializable]
 public enum BunkerHatchVisuals : byte
 {
-    Open,
+    /// <summary>Red lights while the hatch is locked, blue while it can be used.</summary>
+    Locked,
 }
 
 [Serializable, NetSerializable]
 public enum BunkerHatchVisualLayers : byte
 {
-    Base,
+    Lights,
 }
 
-/// <summary>The hatch inside the vestibule: shown welded shut while it is locked.</summary>
+/// <summary>The hatch inside the vestibule: red lights while it is locked, blue while it can be used.</summary>
 [Serializable, NetSerializable]
 public enum BunkerExitVisuals : byte
 {
@@ -24,5 +25,5 @@ public enum BunkerExitVisuals : byte
 [Serializable, NetSerializable]
 public enum BunkerExitVisualLayers : byte
 {
-    Base,
+    Lights,
 }

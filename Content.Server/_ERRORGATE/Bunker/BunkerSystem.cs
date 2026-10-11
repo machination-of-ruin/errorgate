@@ -41,6 +41,10 @@ public sealed class BunkerSystem : EntitySystem
     private static readonly EntProtoId DoorProto = "BunkerVestibuleDoor";
     private static readonly EntProtoId ControllerProto = "BunkerVestibule";
     private static readonly EntProtoId LightProto = "BunkerWarningLight";
+    private static readonly EntProtoId ConsoleProto = "BunkerConsole";
+
+    // The wall tile of the vestibule that the hatch up stands in
+    private static readonly Vector2i HatchUpTile = new(-1, 1);
     // Indestructible: concrete for the rooms, grey brick for the technical tunnels
     private static readonly EntProtoId RoomWallProto = "BunkerWallConcrete";
     private static readonly EntProtoId TunnelWallProto = "N14WallBrickGraySlantedIndestructible";
@@ -184,10 +188,15 @@ public sealed class BunkerSystem : EntitySystem
         var hatchComp = Comp<BunkerHatchComponent>(hatch);
         hatchComp.Arrival = arrival;
         hatchComp.Vestibule = vestibule;
-        hatchComp.OpenSeconds = _cfg.GetCVar(BunkerCVars.HatchOpenSeconds);
+        _appearance.SetData(hatch, BunkerHatchVisuals.Locked, true);
+
+        var vestibuleComp = Comp<BunkerVestibuleComponent>(vestibule);
+        vestibuleComp.Hatch = hatch;
+
+        // The siren outside, by the hatch
+        vestibuleComp.OutsideSiren = Spawn(LightProto, hatchCoords);
 
         // The way up comes out on the tile south of the hatch
-        var vestibuleComp = Comp<BunkerVestibuleComponent>(vestibule);
         if (vestibuleComp.Ladder is { } ladder)
             Comp<BunkerLadderComponent>(ladder).Surface = _map.GridTileToLocal(surfaceGrid, surface, spot + new Vector2i(0, -1));
 
@@ -420,7 +429,10 @@ public sealed class BunkerSystem : EntitySystem
         foreach (var (pos, nextToRoom) in walls)
         {
             _map.SetTile(gridUid, grid, pos, new Tile(_tileDefs["FloorDark"].TileId));
-            Spawn(nextToRoom ? RoomWallProto : TunnelWallProto, _map.GridTileToLocal(gridUid, grid, pos));
+
+            // The hatch up takes the place of the west wall tile
+            if (pos != HatchUpTile)
+                Spawn(nextToRoom ? RoomWallProto : TunnelWallProto, _map.GridTileToLocal(gridUid, grid, pos));
         }
 
         EntityCoordinates At(int x, int y) => _map.GridTileToLocal(gridUid, grid, new Vector2i(x, y));
@@ -428,17 +440,22 @@ public sealed class BunkerSystem : EntitySystem
         // The vestibule: controller, door, way up and the warning lights
         vestibule = Spawn(ControllerProto, At(2, 1));
         var door = Spawn(DoorProto, At(5, 1));
-        // The hatch up is at the other end of the airlock from the door into the bunker
-        var ladder = Spawn(LadderProto, At(0, 1));
-        Comp<BunkerLadderComponent>(ladder).Vestibule = vestibule;
+        // The hatch up is in the west wall, the other end of the airlock from the door into the bunker
+        var ladder = Spawn(LadderProto, At(HatchUpTile.X, HatchUpTile.Y));
         _appearance.SetData(ladder, BunkerExitVisuals.Locked, true);
+
+        // The console in the middle, by the north wall
+        var console = Spawn(ConsoleProto, At(2, 2));
+        Comp<BunkerConsoleComponent>(console).Vestibule = vestibule;
         var vestibuleComp = Comp<BunkerVestibuleComponent>(vestibule);
         vestibuleComp.Door = door;
         vestibuleComp.Ladder = ladder;
-        vestibuleComp.Room = new Box2(0f, 0f, 5f, 3f);
-        vestibuleComp.Lights.Add(Spawn(LightProto, At(0, 2)));
-        vestibuleComp.Lights.Add(Spawn(LightProto, At(4, 0)));
-        Comp<BunkerVestibuleDoorComponent>(door).Vestibule = vestibule;
+
+        // The turning lights on the north and south walls; the south one faces the other way
+        vestibuleComp.Lights.Add(Spawn(LightProto, At(1, 3)));
+        var southLight = Spawn(LightProto, At(3, -1));
+        _transform.SetLocalRotation(southLight, Angle.FromDegrees(180));
+        vestibuleComp.Lights.Add(southLight);
 
         // Something worth coming for
         Spawn(LootProto, At(11, 6));

@@ -1,35 +1,29 @@
 using Robust.Shared.Map;
-using Robust.Shared.Maths;
 
 namespace Content.Server._ERRORGATE.Bunker;
 
 /// <summary>
-///     The hatch on the surface. The bunker key opens it for a while, then it locks again. Using it while it is open
-///     takes the user (and whatever they pull) to the bunker vestibule.
+///     The hatch on the surface. Locked until the vestibule says otherwise. The key on the user starts the sequence (the vestibule
+///     decides whether that is possible just now). While it is unlocked, using it takes the user (and whatever they pull) down to the
+///     vestibule.
 /// </summary>
 [RegisterComponent]
 public sealed partial class BunkerHatchComponent : Component
 {
-    [DataField]
-    public float OpenSeconds = 15f;
-
     [ViewVariables]
-    public bool Open;
-
-    [ViewVariables]
-    public TimeSpan CloseAt;
+    public bool Locked = true;
 
     /// <summary>Where arrivals appear in the vestibule.</summary>
     [ViewVariables]
     public EntityCoordinates? Arrival;
 
-    /// <summary>The vestibule controller to tell about an arrival.</summary>
+    /// <summary>The vestibule controller.</summary>
     [ViewVariables]
     public EntityUid? Vestibule;
 }
 
 /// <summary>
-///     The way back up, inside the vestibule. Locked until the vestibule has cycled for someone coming out.
+///     The hatch up, in the west wall of the vestibule. Locked until the vestibule says otherwise.
 /// </summary>
 [RegisterComponent]
 public sealed partial class BunkerLadderComponent : Component
@@ -40,22 +34,42 @@ public sealed partial class BunkerLadderComponent : Component
     /// <summary>Where the way up comes out on the surface.</summary>
     [ViewVariables]
     public EntityCoordinates? Surface;
+}
 
-    /// <summary>The vestibule the hatch belongs to: pressing the locked hatch starts the cycle for leaving.</summary>
+/// <summary>
+///     The console in the middle of the vestibule, by the north wall. Pressing it starts the siren inside.
+/// </summary>
+[RegisterComponent]
+public sealed partial class BunkerConsoleComponent : Component
+{
     [ViewVariables]
     public EntityUid? Vestibule;
 }
 
+/// <summary>
+///     Where the sequence is. Every door is locked while a siren sounds.
+/// </summary>
 public enum BunkerVestibuleState : byte
 {
-    Idle,
-    CyclingIn,
-    CyclingOut,
+    /// <summary>Everything is shut. The key on the surface hatch starts the outside siren; the console can start the one inside.</summary>
+    Locked,
+
+    /// <summary>The siren by the surface hatch. Everything stays locked.</summary>
+    SirenOutside,
+
+    /// <summary>The surface hatch and the hatch up are open, people pass freely. The bunker door is shut.</summary>
+    OuterOpen,
+
+    /// <summary>The siren inside the vestibule. Everything stays locked.</summary>
+    SirenInside,
+
+    /// <summary>The door into the bunker is open, the hatches are shut.</summary>
+    InnerOpen,
 }
 
 /// <summary>
-///     The timed airlock between the surface and the bunker. Arriving from the hatch or coming in from the bunker starts a cycle:
-///     both exits are locked, lights turn and a siren sounds. Afterwards the exit on the far side opens.
+///     The controller of the timed airlock between the surface and the bunker. It has no body: it holds the state and the
+///     things it works (the hatches, the bunker door, the sirens). See docs/design/bunker.md for the sequence.
 /// </summary>
 [RegisterComponent]
 public sealed partial class BunkerVestibuleComponent : Component
@@ -63,30 +77,35 @@ public sealed partial class BunkerVestibuleComponent : Component
     [ViewVariables]
     public BunkerVestibuleState State;
 
+    /// <summary>When the current siren, or the open outer hatch, runs out.</summary>
     [ViewVariables]
     public TimeSpan Until;
+
+    /// <summary>Where the inside siren leads: <see cref="BunkerVestibuleState.InnerOpen"/> or <see cref="BunkerVestibuleState.OuterOpen"/>.</summary>
+    [ViewVariables]
+    public BunkerVestibuleState SirenTarget;
 
     /// <summary>The door into the bunker.</summary>
     [ViewVariables]
     public EntityUid? Door;
 
+    /// <summary>Since when the door has not been shut although it should be.</summary>
+    [ViewVariables]
+    public TimeSpan? DoorOpenSince;
+
+    /// <summary>The hatch up, inside.</summary>
     [ViewVariables]
     public EntityUid? Ladder;
 
+    /// <summary>The hatch on the surface.</summary>
+    [ViewVariables]
+    public EntityUid? Hatch;
+
+    /// <summary>The siren by the surface hatch.</summary>
+    [ViewVariables]
+    public EntityUid? OutsideSiren;
+
+    /// <summary>The turning lights inside the vestibule.</summary>
     [ViewVariables]
     public List<EntityUid> Lights = new();
-
-    /// <summary>Floor of the room, in the tile coordinates of its grid. Whoever stands in it takes part in a cycle.</summary>
-    [ViewVariables]
-    public Box2 Room;
-}
-
-/// <summary>
-///     Marks the vestibule door so the system can tell when it closes.
-/// </summary>
-[RegisterComponent]
-public sealed partial class BunkerVestibuleDoorComponent : Component
-{
-    [ViewVariables]
-    public EntityUid Vestibule;
 }

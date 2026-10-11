@@ -18,16 +18,16 @@ public sealed class BunkerCVars
         CVarDef.Create("errorgate.bunker.maps", "Kuznetsk", CVar.SERVERONLY | CVar.ARCHIVE);
 
     /// <summary>
-    ///     Seconds the vestibule takes to cycle, in either direction. Both exits stay locked meanwhile.
+    ///     Seconds each siren sounds, outside or inside. Every door is locked meanwhile.
     /// </summary>
     public static readonly CVarDef<float> CycleSeconds =
         CVarDef.Create("errorgate.bunker.cycle_seconds", 15f, CVar.SERVERONLY | CVar.ARCHIVE);
 
     /// <summary>
-    ///     Seconds the hatch stays open after the key was used on it. It locks again afterwards.
+    ///     Seconds the hatches stay open after the outside siren, when nobody presses the console inside. They lock again afterwards.
     /// </summary>
-    public static readonly CVarDef<float> HatchOpenSeconds =
-        CVarDef.Create("errorgate.bunker.hatch_open_seconds", 15f, CVar.SERVERONLY | CVar.ARCHIVE);
+    public static readonly CVarDef<float> OuterOpenSeconds =
+        CVarDef.Create("errorgate.bunker.outer_open_seconds", 90f, CVar.SERVERONLY | CVar.ARCHIVE);
 
     /// <summary>
     ///     How far the hatch has to be from the nearest loot spawner, tiles. It is its own point of interest.
