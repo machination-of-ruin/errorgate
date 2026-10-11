@@ -114,6 +114,11 @@ public sealed class BunkerHatchSystem : EntitySystem
         if (ent.Comp.Locked || ent.Comp.Surface is not { } surface)
         {
             _audio.PlayPvs(DenySound, ent);
+
+            // Pressing the locked hatch while nothing is going on starts the cycle for leaving
+            if (ent.Comp.Vestibule is { } vestibule)
+                _vestibule.OnLeaveRequested(vestibule);
+
             return;
         }
 

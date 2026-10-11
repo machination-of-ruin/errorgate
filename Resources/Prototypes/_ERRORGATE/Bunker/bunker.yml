@@ -58,9 +58,10 @@
     access: [["Bunker"]]
   - type: BunkerHatch
 
+# The hatch up, at the far end of the vestibule. Welded shut to look at while it is locked.
 - type: entity
   id: BunkerLadder
-  name: ladder
+  name: hatch
   parent: BaseStructure
   categories: [ HideSpawnMenu ]
   components:
@@ -68,14 +69,37 @@
     anchored: true
   - type: Sprite
     sprite: Structures/Doors/Airlocks/Standard/hatch.rsi
-    drawdepth: FloorObjects
+    drawdepth: Mobs
     layers:
-    - state: open
+    - state: welded
+      map: [ "enum.BunkerExitVisualLayers.Base" ]
+  - type: Appearance
+  - type: GenericVisualizer
+    visuals:
+      enum.BunkerExitVisuals.Locked:
+        enum.BunkerExitVisualLayers.Base:
+          True: { state: welded }
+          False: { state: open }
   - type: InteractionOutline
   - type: Physics
     bodyType: Static
     canCollide: false
   - type: BunkerLadder
+
+# Concrete walls of the bunker rooms: the dark concrete look, but they cannot be broken
+- type: entity
+  parent: BaseWallIndestructible
+  id: BunkerWallConcrete
+  name: concrete wall
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: Sprite
+    sprite: _Nuclear14/Structures/Walls/nc14/concretedark.rsi
+  - type: Icon
+    sprite: _Nuclear14/Structures/Walls/nc14/concretedark.rsi
+  - type: IconSmooth
+    key: wallsstore
+    base: store
 
 # The door between the vestibule and the bunker
 - type: entity

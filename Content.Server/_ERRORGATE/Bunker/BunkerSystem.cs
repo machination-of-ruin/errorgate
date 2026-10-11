@@ -1,5 +1,6 @@
 using System.Linq;
 using System.Numerics;
+using Content.Server.Atmos.Components;
 using Content.Server.Atmos.EntitySystems;
 using Content.Server.GameTicking;
 using Content.Server.GameTicking.Events;
@@ -23,6 +24,7 @@ using Robust.Shared.Maths;
 using Robust.Shared.Physics;
 using Robust.Shared.Physics.Components;
 using Robust.Shared.Random;
+using Robust.Shared.Timing;
 using Robust.Server.GameObjects;
 using Robust.Shared.Prototypes;
 
@@ -39,7 +41,9 @@ public sealed class BunkerSystem : EntitySystem
     private static readonly EntProtoId DoorProto = "BunkerVestibuleDoor";
     private static readonly EntProtoId ControllerProto = "BunkerVestibule";
     private static readonly EntProtoId LightProto = "BunkerWarningLight";
-    private static readonly EntProtoId WallProto = "WallReinforced";
+    // Indestructible: concrete for the rooms, grey brick for the technical tunnels
+    private static readonly EntProtoId RoomWallProto = "BunkerWallConcrete";
+    private static readonly EntProtoId TunnelWallProto = "N14WallBrickGraySlantedIndestructible";
     private static readonly EntProtoId LootProto = "LootSpawnerMilitaryTier3";
 
     // Open ground needed around the hatch: a square of this radius is free floor
@@ -52,7 +56,9 @@ public sealed class BunkerSystem : EntitySystem
     [Dependency] private readonly ITileDefinitionManager _tileDefs = default!;
     [Dependency] private readonly AtmosphereSystem _atmos = default!;
     [Dependency] private readonly GameTicker _ticker = default!;
+    [Dependency] private readonly IGameTiming _timing = default!;
     [Dependency] private readonly GravitySystem _gravity = default!;
+    [Dependency] private readonly SharedAppearanceSystem _appearance = default!;
     [Dependency] private readonly SharedMapSystem _map = default!;
     [Dependency] private readonly SharedTransformSystem _transform = default!;
 
@@ -61,6 +67,11 @@ public sealed class BunkerSystem : EntitySystem
 
     /// <summary>The map of the bunker.</summary>
     public EntityUid? BunkerMap { get; private set; }
+
+    // The floor of the new grid has no air until the atmosphere system has made its tiles, then it is filled once
+    private EntityUid? _airGrid;
+    private List<Vector2i> _airTiles = new();
+    private TimeSpan _airGiveUp;
 
     public override void Initialize()
     {
@@ -71,7 +82,41 @@ public sealed class BunkerSystem : EntitySystem
         {
             Hatch = null;
             BunkerMap = null;
+            _airGrid = null;
         });
+    }
+
+    public override void Update(float frameTime)
+    {
+        base.Update(frameTime);
+
+        if (_airGrid is not { } grid)
+            return;
+
+        if (TerminatingOrDeleted(grid) || _timing.CurTime > _airGiveUp)
+        {
+            if (_airTiles.Count > 0)
+                Log.Warning($"The bunker air was not put into {_airTiles.Count} tiles in time");
+
+            _airGrid = null;
+            return;
+        }
+
+        // Fill the tiles that have their atmosphere by now, the rest next frame
+        for (var i = _airTiles.Count - 1; i >= 0; i--)
+        {
+            if (_atmos.GetTileMixture((grid, null, null), null, _airTiles[i]) is not { Immutable: false } air)
+                continue;
+
+            air.Clear();
+            air.Temperature = 293.15f;
+            air.AdjustMoles(Gas.Oxygen, Atmospherics.OxygenMolesStandard);
+            air.AdjustMoles(Gas.Nitrogen, Atmospherics.NitrogenMolesStandard);
+            _airTiles.RemoveAt(i);
+        }
+
+        if (_airTiles.Count == 0)
+            _airGrid = null;
     }
 
     private void OnRoundStarted(RoundStartedEvent ev)
@@ -126,7 +171,10 @@ public sealed class BunkerSystem : EntitySystem
         _map.SetAmbientLight(mapId, Color.FromHex("#2A2A2A"));
 
         var bunkerGrid = _mapManager.CreateGridEntity(mapId);
+        _airGrid = bunkerGrid.Owner;
+        _airGiveUp = _timing.CurTime + TimeSpan.FromSeconds(60);
         EnsureComp<GravityComponent>(bunkerGrid.Owner);
+        EnsureComp<GridAtmosphereComponent>(bunkerGrid.Owner); // the map air only reaches a grid that has an atmosphere
         _gravity.EnableGravity(bunkerGrid.Owner);
         BuildTestBunker(mapId, bunkerGrid.Owner, bunkerGrid.Comp, out var vestibule, out var arrival);
 
@@ -321,26 +369,30 @@ public sealed class BunkerSystem : EntitySystem
     private void BuildTestBunker(MapId mapId, EntityUid gridUid, MapGridComponent grid, out EntityUid vestibule, out EntityCoordinates arrival)
     {
         var floors = new Dictionary<Vector2i, string>();
+        var roomTiles = new HashSet<Vector2i>();
 
-        void Fill(int x0, int y0, int x1, int y1, string tile)
+        void Fill(int x0, int y0, int x1, int y1, string tile, bool room = false)
         {
             for (var x = x0; x <= x1; x++)
             {
                 for (var y = y0; y <= y1; y++)
                 {
-                    floors[new Vector2i(x, y)] = tile;
+                    var pos = new Vector2i(x, y);
+                    floors[pos] = tile;
+                    if (room)
+                        roomTiles.Add(pos);
                 }
             }
         }
 
         // The vestibule is 5 by 3 (0..4, 0..2) and its door into the bunker is on the east wall at (5, 1)
-        Fill(0, 0, 4, 2, "FloorDark");
+        Fill(0, 0, 4, 2, "FloorDark", true);
         Fill(5, 1, 30, 1, "FloorSteel");
-        Fill(8, 3, 14, 9, "FloorSteel");
+        Fill(8, 3, 14, 9, "FloorSteel", true);
         Fill(11, 2, 11, 2, "FloorSteel");
-        Fill(17, -6, 23, -1, "FloorSteel");
+        Fill(17, -6, 23, -1, "FloorSteel", true);
         Fill(20, 0, 20, 0, "FloorSteel");
-        Fill(26, 3, 32, 8, "FloorSteel");
+        Fill(26, 3, 32, 8, "FloorSteel", true);
         Fill(29, 2, 29, 2, "FloorSteel");
 
         foreach (var (pos, tile) in floors)
@@ -348,8 +400,8 @@ public sealed class BunkerSystem : EntitySystem
             _map.SetTile(gridUid, grid, pos, new Tile(_tileDefs[tile].TileId));
         }
 
-        // Walls around every floor tile
-        var walls = new HashSet<Vector2i>();
+        // Walls around every floor tile: concrete next to a room, grey brick along the tunnels
+        var walls = new Dictionary<Vector2i, bool>();
         foreach (var pos in floors.Keys)
         {
             for (var dx = -1; dx <= 1; dx++)
@@ -357,16 +409,18 @@ public sealed class BunkerSystem : EntitySystem
                 for (var dy = -1; dy <= 1; dy++)
                 {
                     var next = new Vector2i(pos.X + dx, pos.Y + dy);
-                    if (!floors.ContainsKey(next))
-                        walls.Add(next);
+                    if (floors.ContainsKey(next))
+                        continue;
+
+                    walls[next] = walls.GetValueOrDefault(next) || roomTiles.Contains(pos);
                 }
             }
         }
 
-        foreach (var pos in walls)
+        foreach (var (pos, nextToRoom) in walls)
         {
             _map.SetTile(gridUid, grid, pos, new Tile(_tileDefs["FloorDark"].TileId));
-            Spawn(WallProto, _map.GridTileToLocal(gridUid, grid, pos));
+            Spawn(nextToRoom ? RoomWallProto : TunnelWallProto, _map.GridTileToLocal(gridUid, grid, pos));
         }
 
         EntityCoordinates At(int x, int y) => _map.GridTileToLocal(gridUid, grid, new Vector2i(x, y));
@@ -374,7 +428,10 @@ public sealed class BunkerSystem : EntitySystem
         // The vestibule: controller, door, way up and the warning lights
         vestibule = Spawn(ControllerProto, At(2, 1));
         var door = Spawn(DoorProto, At(5, 1));
-        var ladder = Spawn(LadderProto, At(3, 2));
+        // The hatch up is at the other end of the airlock from the door into the bunker
+        var ladder = Spawn(LadderProto, At(0, 1));
+        Comp<BunkerLadderComponent>(ladder).Vestibule = vestibule;
+        _appearance.SetData(ladder, BunkerExitVisuals.Locked, true);
         var vestibuleComp = Comp<BunkerVestibuleComponent>(vestibule);
         vestibuleComp.Door = door;
         vestibuleComp.Ladder = ladder;
@@ -388,6 +445,7 @@ public sealed class BunkerSystem : EntitySystem
         Spawn(LootProto, At(20, -4));
         Spawn(LootProto, At(29, 5));
 
+        _airTiles = floors.Keys.ToList();
         arrival = At(1, 1);
     }
 }

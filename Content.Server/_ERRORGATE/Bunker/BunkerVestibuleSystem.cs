@@ -28,6 +28,7 @@ public sealed class BunkerVestibuleSystem : EntitySystem
     [Dependency] private readonly SharedDoorSystem _door = default!;
     [Dependency] private readonly EntityLookupSystem _lookup = default!;
     [Dependency] private readonly SharedPointLightSystem _lights = default!;
+    [Dependency] private readonly SharedAppearanceSystem _appearance = default!;
 
     public override void Initialize()
     {
@@ -98,9 +99,7 @@ public sealed class BunkerVestibuleSystem : EntitySystem
                 _door.TrySetBoltDown((door, bolt), true);
         }
 
-        if (vestibule.Ladder is { } ladder && TryComp<BunkerLadderComponent>(ladder, out var ladderComp))
-            ladderComp.Locked = true;
-
+        SetLadderLocked(vestibule, true);
         SetLights(vestibule, true);
 
         if (!restarted)
@@ -123,13 +122,33 @@ public sealed class BunkerVestibuleSystem : EntitySystem
                 _door.TryOpen(door);
             }
         }
-        else if (vestibule.Ladder is { } ladder && TryComp<BunkerLadderComponent>(ladder, out var ladderComp))
+        else
         {
             // Leaving: the way up is free, the door stays shut
-            ladderComp.Locked = false;
+            SetLadderLocked(vestibule, false);
             if (vestibule.Door is { } door && TryComp<DoorBoltComponent>(door, out var bolt))
                 _door.TrySetBoltDown((door, bolt), false);
         }
+    }
+
+    private void SetLadderLocked(BunkerVestibuleComponent vestibule, bool locked)
+    {
+        if (vestibule.Ladder is not { } ladder || !TryComp<BunkerLadderComponent>(ladder, out var ladderComp))
+            return;
+
+        ladderComp.Locked = locked;
+        _appearance.SetData(ladder, BunkerExitVisuals.Locked, locked);
+    }
+
+    /// <summary>
+    ///     Someone pressed the hatch up while the vestibule is idle: the cycle for leaving starts, the hatch opens after it.
+    /// </summary>
+    public void OnLeaveRequested(EntityUid uid, BunkerVestibuleComponent? vestibule = null)
+    {
+        if (!Resolve(uid, ref vestibule) || vestibule.State != BunkerVestibuleState.Idle)
+            return;
+
+        Start(uid, vestibule, BunkerVestibuleState.CyclingOut);
     }
 
     private void SetLights(BunkerVestibuleComponent vestibule, bool on)

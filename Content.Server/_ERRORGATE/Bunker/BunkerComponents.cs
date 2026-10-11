@@ -40,6 +40,10 @@ public sealed partial class BunkerLadderComponent : Component
     /// <summary>Where the way up comes out on the surface.</summary>
     [ViewVariables]
     public EntityCoordinates? Surface;
+
+    /// <summary>The vestibule the hatch belongs to: pressing the locked hatch starts the cycle for leaving.</summary>
+    [ViewVariables]
+    public EntityUid? Vestibule;
 }
 
 public enum BunkerVestibuleState : byte
