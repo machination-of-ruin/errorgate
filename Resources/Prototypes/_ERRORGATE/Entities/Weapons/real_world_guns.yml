@@ -486,9 +486,9 @@
     sprite: Objects/Weapons/Guns/Shotguns/inhands_64x.rsi
     heldPrefix: enforcer
   - type: Sprite
-    sprite: Objects/Weapons/Guns/Shotguns/enforcer.rsi
+    sprite: Objects/Weapons/Guns/Shotguns/benelli.rsi
   - type: Clothing
-    sprite: Objects/Weapons/Guns/Shotguns/enforcer.rsi
+    sprite: Objects/Weapons/Guns/Shotguns/benelli.rsi
   - type: BallisticAmmoProvider
     autoCycle: true
 
