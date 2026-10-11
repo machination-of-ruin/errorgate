@@ -176,6 +176,10 @@ public sealed class BunkerVestibuleSystem : EntitySystem
             _door.TryClose(lockDoor);
         }
 
+        // The surface entrance unlocks with a sound of its own, so it is heard outside
+        if (hatchesOpen && vestibule.Hatch is { } unlocked)
+            _audio.PlayPvs(DoneSound, unlocked);
+
         _audio.PlayPvs(state is BunkerVestibuleState.SirenOutside or BunkerVestibuleState.SirenInside ? StartSound : DoneSound, uid);
     }
 

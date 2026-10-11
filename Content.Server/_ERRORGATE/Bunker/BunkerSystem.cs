@@ -142,7 +142,18 @@ public sealed partial class BunkerSystem : EntitySystem
     public bool TryBuild(out string error, MapId? surfaceOverride = null, int? seed = null)
     {
         if (Hatch != null && !TerminatingOrDeleted(Hatch.Value))
+        {
+            // The siren by the hatch stands on the surface and is not part of the bunker map
+            if (TryComp<BunkerHatchComponent>(Hatch, out var oldHatch)
+                && oldHatch.Vestibule is { } oldVestibule
+                && TryComp<BunkerVestibuleComponent>(oldVestibule, out var oldComp)
+                && oldComp.OutsideSiren is { } oldSiren)
+            {
+                QueueDel(oldSiren);
+            }
+
             QueueDel(Hatch);
+        }
 
         if (BunkerMap != null && !TerminatingOrDeleted(BunkerMap.Value))
             QueueDel(BunkerMap);

@@ -18,65 +18,82 @@ public sealed partial class BunkerSystem
     private static readonly EntProtoId BarrelProto = "BunkerRadiationBarrel";
     private static readonly EntProtoId EmergencyLightProto = "EmergencyLight";
     private static readonly EntProtoId BossProto = "MobSpawnerWalkerBoss";
+    private static readonly EntProtoId ReactorProto = "BunkerReactor";
+    private static readonly EntProtoId CatwalkProto = "Catwalk";
+    private static readonly EntProtoId RoomDoorProto = "BunkerRoomDoor";
 
-    // What a room holds. Loot spawners are tier 3, drawn from the global loot table (shared with the surface).
+    // What a room holds. Loot spawners are tier 3, drawn from the global loot table (shared with the surface). Middle props stand in
+    // the room, props along the walls.
     private sealed record RoomSpec(
         string[] Props,
+        string[] Middle,
         string[] Loot,
         string[] Mobs,
-        int Barrels,
-        bool Military);
+        bool Military,
+        string Floor);
 
     private static readonly Dictionary<BunkerRoomType, RoomSpec> Specs = new()
     {
         [BunkerRoomType.Decon] = new(
             new[] { "LockerSteel", "LockerSteel" },
+            new[] { "TableReinforced", "TableReinforced" },
             new[] { "LootSpawnerIndustrialTier3", "LootSpawnerIndustrialTier3" },
-            new[] { "MobSpawnerRunner" }, 1, false),
+            new[] { "MobSpawnerRunner" }, false, "FloorShowroom"),
         [BunkerRoomType.Barracks] = new(
-            new[] { "Bed", "Bed", "Bed", "Bed", "LockerSteel", "LockerSteel", "LockerSteel", "TableWood" },
+            new[] { "LockerSteel", "LockerSteel", "LockerSteel", "TableWood" },
+            new[] { "Bed", "Bed", "Bed", "Bed", "Bed", "Bed" },
             new[] { "LootSpawnerMilitaryTier3", "LootSpawnerMilitaryTier3", "LootSpawnerLivingTier3", "LootSpawnerLivingTier3" },
-            new[] { "MobSpawnerWalkerArmoredMilitary" }, 2, true),
+            new[] { "MobSpawnerWalkerArmoredMilitary" }, true, "FloorLino"),
         [BunkerRoomType.Mess] = new(
-            new[] { "TableWood", "TableWood", "TableWood", "ChairWood", "ChairWood", "ChairWood", "ChairWood" },
+            new[] { "TableWood", "TableWood" },
+            new[] { "TableWood", "TableWood", "TableWood", "TableWood", "ChairWood", "ChairWood", "ChairWood", "ChairWood" },
             new[] { "LootSpawnerKitchenTier3", "LootSpawnerKitchenTier3", "LootSpawnerLivingTier3" },
-            new[] { "MobSpawnerWalkerLiving", "MobSpawnerRunner" }, 2, false),
+            new[] { "MobSpawnerWalkerLiving", "MobSpawnerRunner" }, false, "FloorKitchen"),
         [BunkerRoomType.Control] = new(
-            new[] { "ComputerBroken", "ComputerBroken", "ComputerBroken", "ComputerBroken", "TableReinforced", "TableReinforced", "ChairWood" },
+            new[] { "ComputerBroken", "ComputerBroken", "ComputerBroken", "ComputerBroken" },
+            new[] { "TableReinforced", "TableReinforced", "ChairOfficeDark", "ChairOfficeDark" },
             new[] { "LootSpawnerSecurityTier3", "LootSpawnerSecurityTier3", "LootSpawnerIndustrialTier3" },
-            new[] { "MobSpawnerRunner" }, 2, false),
+            new[] { "MobSpawnerRunner" }, false, "FloorGreenCircuit"),
         [BunkerRoomType.Generator] = new(
-            new[] { "GeneratorBasic15kW", "GeneratorBasic15kW", "CrateEngineeringGear", "CrateEngineeringGear" },
+            new[] { "CrateEngineeringGear", "CrateEngineeringGear" },
+            new[] { "GeneratorBasic15kW", "GeneratorBasic15kW", "GeneratorBasic15kW" },
             new[] { "LootSpawnerIndustrialTier3", "LootSpawnerIndustrialTier3", "LootSpawnerIndustrialTier3" },
-            new[] { "MobSpawnerWalkerArmored" }, 2, false),
+            new[] { "MobSpawnerWalkerArmored" }, false, "FloorSteelDirty"),
         [BunkerRoomType.Reactor] = new(
             new[] { "CrateEngineeringGear", "CrateEngineeringGear" },
+            new string[] { },
             new[] { "LootSpawnerIndustrialTier3", "LootSpawnerIndustrialTier3", "LootSpawnerIndustrialTier3", "LootSpawnerMedicalTier3" },
-            new[] { "MobSpawnerWalkerArmoredMilitary", "MobSpawnerWalkerArmoredMilitary" }, 5, false),
+            new[] { "MobSpawnerWalkerArmoredMilitary", "MobSpawnerWalkerArmoredMilitary" }, false, "FloorReinforced"),
         [BunkerRoomType.Medical] = new(
-            new[] { "MedicalBed", "MedicalBed", "MedicalBed", "CrateMedical", "CrateMedical", "LockerSteel" },
+            new[] { "CrateMedical", "CrateMedical", "LockerSteel" },
+            new[] { "MedicalBed", "MedicalBed", "MedicalBed", "MedicalBed" },
             new[] { "LootSpawnerMedicalTier3", "LootSpawnerMedicalTier3", "LootSpawnerMedicalTier3" },
-            new[] { "MobSpawnerRunner" }, 2, false),
+            new[] { "MobSpawnerRunner" }, false, "FloorWhite"),
         [BunkerRoomType.Storage] = new(
-            new[] { "ShelfMetal", "ShelfMetal", "ShelfMetal", "ShelfMetal", "CrateGenericSteel", "CrateGenericSteel", "CrateGenericSteel" },
+            new[] { "ShelfMetal", "ShelfMetal", "ShelfMetal", "ShelfMetal" },
+            new[] { "CrateGenericSteel", "CrateGenericSteel", "CrateGenericSteel", "CrateGenericSteel" },
             new[] { "LootSpawnerIndustrialTier3", "LootSpawnerIndustrialTier3", "LootSpawnerLivingTier3" },
-            new[] { "MobSpawnerRunner", "MobSpawnerWalkerArmored" }, 2, false),
+            new[] { "MobSpawnerRunner", "MobSpawnerWalkerArmored" }, false, "FloorConcrete"),
         [BunkerRoomType.AmmoDepot] = new(
-            new[] { "Rack", "Rack", "Rack", "CrateGenericSteel", "CrateGenericSteel", "CrateGenericSteel" },
+            new[] { "Rack", "Rack", "Rack" },
+            new[] { "CrateGenericSteel", "CrateGenericSteel", "Rack" },
             new[] { "LootSpawnerMilitaryTier3", "LootSpawnerMilitaryTier3", "LootSpawnerMilitaryTier3" },
-            new string[] { }, 2, true),
+            new string[] { }, true, "FloorDarkMono"),
         [BunkerRoomType.Armory] = new(
-            new[] { "GunSafe", "GunSafe", "Rack", "Rack", "Rack" },
+            new[] { "GunSafe", "GunSafe", "Rack" },
+            new[] { "Rack", "Rack" },
             new[] { "LootSpawnerMilitaryTier3", "LootSpawnerMilitaryTier3", "LootSpawnerMilitaryTier3", "LootSpawnerMilitaryTier3", "LootSpawnerSecurityTier3" },
-            new[] { "MobSpawnerWalkerArmoredMilitary" }, 2, true),
+            new[] { "MobSpawnerWalkerArmoredMilitary" }, true, "FloorBlueCircuit"),
         [BunkerRoomType.Archive] = new(
-            new[] { "filingCabinet", "filingCabinet", "filingCabinet", "filingCabinet", "TableWood", "ShelfMetal", "ShelfMetal" },
+            new[] { "filingCabinet", "filingCabinet", "ShelfMetal", "ShelfMetal" },
+            new[] { "filingCabinet", "filingCabinet", "TableWood" },
             new[] { "LootSpawnerSecurityTier3", "LootSpawnerLivingTier3", "LootSpawnerLivingTier3" },
-            new[] { "MobSpawnerRunner" }, 2, false),
+            new[] { "MobSpawnerRunner" }, false, "FloorConcreteSmooth"),
         [BunkerRoomType.Shaft] = new(
             new string[] { },
+            new string[] { },
             new[] { "LootSpawnerIndustrialTier3" },
-            new string[] { }, 1, false),
+            new string[] { }, false, "FloorElevatorShaft"),
     };
 
     private void BuildBunker(EntityUid gridUid, MapGridComponent grid, int seed, out EntityUid vestibule, out EntityCoordinates arrival)
@@ -102,7 +119,19 @@ public sealed partial class BunkerSystem
 
         foreach (var tile in layout.Floor)
         {
-            floors[tile] = layout.Tunnel.Contains(tile) ? "FloorSteel" : "FloorDark";
+            floors[tile] = "FloorSteel";
+        }
+
+        // Every kind of room has a floor of its own, so it can be told apart
+        foreach (var room in layout.Rooms)
+        {
+            for (var x = room.X0; x <= room.X1; x++)
+            {
+                for (var y = room.Y0; y <= room.Y1; y++)
+                {
+                    floors[new Vector2i(x, y)] = Specs[room.Type].Floor;
+                }
+            }
         }
 
         foreach (var (pos, tile) in floors)
@@ -158,6 +187,16 @@ public sealed partial class BunkerSystem
         _transform.SetLocalRotation(southLight, Angle.FromDegrees(180));
         vestibuleComp.Lights.Add(southLight);
 
+        // The second console, inside the bunker by the door, outside the airlock room
+        var innerConsole = Spawn(ConsoleProto, At(6, 2));
+        Comp<BunkerConsoleComponent>(innerConsole).Vestibule = vestibule;
+
+        // The doors of the rooms, opened by hand
+        foreach (var roomDoor in layout.Doors)
+        {
+            Spawn(RoomDoorProto, AtTile(roomDoor.Tile));
+        }
+
         // -- Contents ------------------------------------------------------------------------------------------
         FillRooms(layout, seed, AtTile);
         FillTunnels(layout, seed, AtTile);
@@ -173,104 +212,276 @@ public sealed partial class BunkerSystem
             var room = layout.Rooms[i];
             var spec = Specs[room.Type];
             var rng = new Random(seed * 7919 + i);
+            var doors = layout.Doors.Where(d => d.Room == i).ToList();
 
-            // Tiles next to a tunnel opening stay empty, so nothing blocks a way in
-            bool NearOpening(Vector2i tile)
+            // Never filled: the three tiles in front of every door inside the room
+            var reserved = new HashSet<Vector2i>();
+            foreach (var door in doors)
             {
+                var side = new Vector2i(Math.Abs(door.Dir.Y), Math.Abs(door.Dir.X));
+                for (var k = 1; k <= 3; k++)
+                {
+                    for (var l = -1; l <= 1; l++)
+                    {
+                        reserved.Add(door.Tile - door.Dir * k + side * l);
+                    }
+                }
+            }
+
+            var occupied = new HashSet<Vector2i>(); // blocks walking
+            var used = new HashSet<Vector2i>(); // has something on it
+
+            bool Free(Vector2i t) => room.Contains(t) && !used.Contains(t) && !reserved.Contains(t);
+
+            // Everything still free can be reached from the doors
+            bool Connected()
+            {
+                if (doors.Count == 0)
+                    return true;
+
+                var start = doors[0].Tile - doors[0].Dir;
+                var seen = new HashSet<Vector2i> { start };
+                var stack = new Stack<Vector2i>();
+                stack.Push(start);
+                while (stack.Count > 0)
+                {
+                    var cur = stack.Pop();
+                    foreach (var d in new[] { new Vector2i(1, 0), new Vector2i(-1, 0), new Vector2i(0, 1), new Vector2i(0, -1) })
+                    {
+                        var next = cur + d;
+                        if (room.Contains(next) && !occupied.Contains(next) && seen.Add(next))
+                            stack.Push(next);
+                    }
+                }
+
+                var area = (room.X1 - room.X0 + 1) * (room.Y1 - room.Y0 + 1);
+                return seen.Count == area - occupied.Count;
+            }
+
+            bool TryBlock(Vector2i t)
+            {
+                if (!Free(t))
+                    return false;
+
+                occupied.Add(t);
+                if (!Connected())
+                {
+                    occupied.Remove(t);
+                    return false;
+                }
+
+                used.Add(t);
+                return true;
+            }
+
+            bool IsEdge(Vector2i t) => t.X == room.X0 || t.X == room.X1 || t.Y == room.Y0 || t.Y == room.Y1;
+
+            List<Vector2i> Tiles(bool edge)
+            {
+                var list = new List<Vector2i>();
+                for (var x = room.X0; x <= room.X1; x++)
+                {
+                    for (var y = room.Y0; y <= room.Y1; y++)
+                    {
+                        var t = new Vector2i(x, y);
+                        if (IsEdge(t) == edge && Free(t))
+                            list.Add(t);
+                    }
+                }
+
+                Shuffle(list, rng);
+                return list;
+            }
+
+            bool Isolated(Vector2i t)
+            {
+                for (var dx = -1; dx <= 1; dx++)
+                {
+                    for (var dy = -1; dy <= 1; dy++)
+                    {
+                        if (occupied.Contains(new Vector2i(t.X + dx, t.Y + dy)))
+                            return false;
+                    }
+                }
+
+                return true;
+            }
+
+            var area = (room.X1 - room.X0 + 1) * (room.Y1 - room.Y0 + 1);
+
+            // The reactor in the middle, catwalks around it and from every door
+            if (room.Type == BunkerRoomType.Reactor)
+            {
+                var c = room.Center;
+                Spawn(ReactorProto, at(c));
+                for (var dx = -1; dx <= 1; dx++)
+                {
+                    for (var dy = -1; dy <= 1; dy++)
+                    {
+                        var t = new Vector2i(c.X + dx, c.Y + dy);
+                        occupied.Add(t);
+                        used.Add(t);
+                    }
+                }
+
+                var walk = new HashSet<Vector2i>();
                 for (var dx = -2; dx <= 2; dx++)
                 {
                     for (var dy = -2; dy <= 2; dy++)
                     {
-                        if (layout.Tunnel.Contains(new Vector2i(tile.X + dx, tile.Y + dy)))
-                            return true;
+                        if (Math.Abs(dx) == 2 || Math.Abs(dy) == 2)
+                            walk.Add(new Vector2i(c.X + dx, c.Y + dy));
                     }
                 }
 
-                return false;
-            }
-
-            var edge = new List<Vector2i>();
-            var inner = new List<Vector2i>();
-            for (var x = room.X0; x <= room.X1; x++)
-            {
-                for (var y = room.Y0; y <= room.Y1; y++)
+                foreach (var door in doors)
                 {
-                    var tile = new Vector2i(x, y);
-                    if (NearOpening(tile))
+                    var t = door.Tile - door.Dir;
+                    while (Math.Abs(t.X - c.X) > 2 || Math.Abs(t.Y - c.Y) > 2)
+                    {
+                        walk.Add(t);
+
+                        // In along the door's way until level with the reactor, then across
+                        var rel = t - c;
+                        if (door.Dir.X != 0 ? Math.Abs(rel.X) > 2 : Math.Abs(rel.Y) > 2)
+                            t -= door.Dir;
+                        else
+                            t -= new Vector2i(Math.Sign(rel.X) * (door.Dir.X != 0 ? 0 : 1), Math.Sign(rel.Y) * (door.Dir.Y != 0 ? 0 : 1));
+                    }
+                }
+
+                foreach (var t in walk)
+                {
+                    if (!room.Contains(t))
                         continue;
 
-                    if (x == room.X0 || x == room.X1 || y == room.Y0 || y == room.Y1)
-                        edge.Add(tile);
-                    else
-                        inner.Add(tile);
+                    Spawn(CatwalkProto, at(t));
+                    used.Add(t);
+                    reserved.Add(t);
                 }
             }
 
-            Shuffle(edge, rng);
-            Shuffle(inner, rng);
-
-            Vector2i? Take(List<Vector2i> list)
+            // Line of sight blockers: concrete columns and short wall pieces in the middle of the room
+            if (area >= 40)
             {
-                if (list.Count == 0)
-                    return null;
+                var columns = area >= 70 ? rng.Next(3, 6) : rng.Next(1, 3);
+                foreach (var t in Tiles(false))
+                {
+                    if (columns == 0)
+                        break;
 
-                var tile = list[^1];
-                list.RemoveAt(list.Count - 1);
-                return tile;
+                    if (!Isolated(t) || !TryBlock(t))
+                        continue;
+
+                    Spawn(RoomWallProto, at(t));
+                    columns--;
+                }
             }
 
-            // Furniture along the walls first, the rest in the room; loot and mobs inside
+            if (area >= 80)
+            {
+                var pieces = rng.Next(1, 3);
+                foreach (var t in Tiles(false))
+                {
+                    if (pieces == 0)
+                        break;
+
+                    var along = rng.Next(2) == 0 ? new Vector2i(1, 0) : new Vector2i(0, 1);
+                    var cells = new[] { t, t + along, t + along * 2 };
+                    if (!cells.All(x => Free(x) && !IsEdge(x) && Isolated(x)))
+                        continue;
+
+                    var placed = new List<Vector2i>();
+                    foreach (var cell in cells)
+                    {
+                        if (TryBlock(cell))
+                        {
+                            placed.Add(cell);
+                        }
+                        else
+                        {
+                            foreach (var undo in placed)
+                            {
+                                occupied.Remove(undo);
+                                used.Remove(undo);
+                            }
+
+                            placed.Clear();
+                            break;
+                        }
+                    }
+
+                    foreach (var cell in placed)
+                    {
+                        Spawn(RoomWallProto, at(cell));
+                    }
+
+                    if (placed.Count > 0)
+                        pieces--;
+                }
+            }
+
+            // Cover: crates in the middle
+            for (var n = Math.Min(3, area / 35); n > 0; n--)
+            {
+                foreach (var t in Tiles(false))
+                {
+                    if (TryBlock(t))
+                    {
+                        Spawn("CrateGenericSteel", at(t));
+                        break;
+                    }
+                }
+            }
+
+            // What makes the room what it is: the middle first, then along the walls
+            foreach (var prop in spec.Middle)
+            {
+                foreach (var t in Tiles(false).Concat(Tiles(true)))
+                {
+                    if (TryBlock(t))
+                    {
+                        Spawn(prop, at(t));
+                        break;
+                    }
+                }
+            }
+
             foreach (var prop in spec.Props)
             {
-                if ((Take(edge) ?? Take(inner)) is { } tile)
-                    Spawn(prop, at(tile));
+                foreach (var t in Tiles(true).Concat(Tiles(false)))
+                {
+                    if (TryBlock(t))
+                    {
+                        Spawn(prop, at(t));
+                        break;
+                    }
+                }
+            }
+
+            void Put(string proto)
+            {
+                foreach (var t in Tiles(false).Concat(Tiles(true)))
+                {
+                    used.Add(t);
+                    Spawn(proto, at(t));
+                    return;
+                }
             }
 
             foreach (var loot in spec.Loot)
             {
-                if ((Take(inner) ?? Take(edge)) is { } tile)
-                    Spawn(loot, at(tile));
+                Put(loot);
             }
 
             foreach (var mob in spec.Mobs)
             {
-                if ((Take(inner) ?? Take(edge)) is { } tile)
-                    Spawn(mob, at(tile));
+                Put(mob);
             }
 
             // One boss in every room with military loot
-            if (spec.Military && (Take(inner) ?? Take(edge)) is { } bossTile)
-                Spawn(BossProto, at(bossTile));
-
-            // Radiation, so no part of the bunker is safe
-            for (var b = 0; b < spec.Barrels; b++)
-            {
-                if ((Take(edge) ?? Take(inner)) is { } tile)
-                    Spawn(BarrelProto, at(tile));
-            }
-
-            // Emergency lights on the wall tiles of the room, spread out
-            var lights = new List<Vector2i>();
-            for (var x = room.X0; x <= room.X1; x++)
-            {
-                foreach (var y in new[] { room.Y0, room.Y1 })
-                {
-                    if (!NearOpening(new Vector2i(x, y)))
-                        lights.Add(new Vector2i(x, y));
-                }
-            }
-
-            for (var y = room.Y0; y <= room.Y1; y++)
-            {
-                foreach (var x in new[] { room.X0, room.X1 })
-                {
-                    if (!NearOpening(new Vector2i(x, y)))
-                        lights.Add(new Vector2i(x, y));
-                }
-            }
-
-            Shuffle(lights, rng);
-            PlaceLights(layout, lights, 6, at, 4);
+            if (spec.Military)
+                Put(BossProto);
         }
     }
 
@@ -278,34 +489,49 @@ public sealed partial class BunkerSystem
     {
         var rng = new Random(seed * 104729);
 
-        // Radiation barrels along the middle of the tunnels
         var path = layout.TunnelPath.Distinct().Where(t => layout.Tunnel.Contains(t)).ToList();
-        var placed = new List<Vector2i>();
+        var doorTiles = layout.Doors.Select(d => d.Tile).ToList();
+
+        bool NearDoor(Vector2i t, int range) => doorTiles.Any(d => Math.Max(Math.Abs(d.X - t.X), Math.Abs(d.Y - t.Y)) <= range);
+
+        // Radiation barrels and crates for cover stand at the edge of the corridor, not in the way. The barrels are far apart
+        // (they reach only a few tiles) and never near a door or the way in.
+        var barrels = new List<Vector2i>();
+        var crates = new List<Vector2i>();
         foreach (var tile in path.OrderBy(t => t.X * 1000 + t.Y))
         {
-            // The barrel stands at the edge of the three wide tunnel, not in the way
             foreach (var side in new[] { new Vector2i(0, 1), new Vector2i(1, 0), new Vector2i(0, -1), new Vector2i(-1, 0) })
             {
                 var spot = tile + side;
-                if (!layout.Tunnel.Contains(spot) || !HasWallNeighbour(layout, spot))
+                if (!layout.Tunnel.Contains(spot) || !HasWallNeighbour(layout, spot) || NearDoor(spot, 3))
                     continue;
 
-                if (placed.Any(p => (p - spot).LengthSquared < 36) || (spot - layout.Entry).LengthSquared < 100)
+                if (barrels.Contains(spot) || crates.Contains(spot))
                     break;
 
-                placed.Add(spot);
-                Spawn(BarrelProto, at(spot));
+                var fromEntry = (spot - layout.Entry).LengthSquared;
+                if (fromEntry > 169 && !NearDoor(spot, 6) && barrels.All(p => (p - spot).LengthSquared >= 100))
+                {
+                    barrels.Add(spot);
+                    Spawn(BarrelProto, at(spot));
+                }
+                else if (fromEntry > 100 && crates.All(p => (p - spot).LengthSquared >= 64) && rng.NextDouble() < 0.5)
+                {
+                    crates.Add(spot);
+                    Spawn("CrateGenericSteel", at(spot));
+                }
+
                 break;
             }
         }
 
-        // Emergency lights along the tunnel walls
-        var lightSpots = layout.Tunnel.Where(t => HasWallNeighbour(layout, t)).OrderBy(t => t.X * 1000 + t.Y).ToList();
+        // Emergency lights along the corridor walls, the only light in the bunker
+        var lightSpots = layout.Tunnel.Where(t => HasWallNeighbour(layout, t) && !NearDoor(t, 1)).OrderBy(t => t.X * 1000 + t.Y).ToList();
         Shuffle(lightSpots, rng);
         PlaceLights(layout, lightSpots, 4096, at, 7);
 
-        // A few runners and walkers in the tunnels
-        var mobSpots = path.Where(t => (t - layout.Entry).LengthSquared > 400).ToList();
+        // A few runners and walkers in the corridors
+        var mobSpots = path.Where(t => (t - layout.Entry).LengthSquared > 400 && !NearDoor(t, 3)).ToList();
         Shuffle(mobSpots, rng);
         var mobs = new[] { "MobSpawnerRunner", "MobSpawnerWalkerArmoredMilitary", "MobSpawnerRunner", "MobSpawnerWalkerLiving", "MobSpawnerRunnerSmall" };
         for (var i = 0; i < mobs.Length && i < mobSpots.Count; i++)

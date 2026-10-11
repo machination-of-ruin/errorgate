@@ -21,6 +21,9 @@ public enum BunkerRoomType : byte
     Shaft,
 }
 
+/// <summary>A door in the wall ring of a room: the room, its tile and the way out of the room.</summary>
+public sealed record BunkerDoor(int Room, Vector2i Tile, Vector2i Dir);
+
 /// <summary>A room: its floor is X0..X1 by Y0..Y1 (inclusive), the wall ring is one tile outside.</summary>
 public sealed class BunkerRoom
 {
@@ -39,7 +42,9 @@ public sealed class BunkerRoom
 }
 
 /// <summary>
-///     A generated bunker: rooms joined by tunnels three tiles wide. The same seed gives the same bunker. Pure data, nothing is spawned here.
+///     A generated bunker: rooms with doors, joined by corridors three tiles wide. The entrance room and the small junction rooms
+///     (hubs) are joined to each other, every other room is a dead end with one door (a few have two). The same seed gives the same
+///     bunker. Pure data, nothing is spawned here.
 /// </summary>
 public sealed class BunkerLayout
 {
@@ -55,22 +60,25 @@ public sealed class BunkerLayout
 
     public List<BunkerRoom> Rooms = new();
 
-    /// <summary>Every floor tile: the rooms and the tunnels.</summary>
+    /// <summary>Every floor tile: the rooms, the doors and the corridors.</summary>
     public HashSet<Vector2i> Floor = new();
 
-    /// <summary>The floor tiles that are tunnel and not room.</summary>
+    /// <summary>The floor tiles that are corridor (or door) and not room.</summary>
     public HashSet<Vector2i> Tunnel = new();
 
-    /// <summary>Wall tiles. True when the wall belongs to a room (its ring), false along a tunnel.</summary>
+    /// <summary>Wall tiles. True when the wall belongs to a room (its ring), false along a corridor.</summary>
     public Dictionary<Vector2i, bool> Walls = new();
 
-    /// <summary>The centers of the tunnels, for placing things along them.</summary>
+    /// <summary>The centers of the corridors, for placing things along them.</summary>
     public List<Vector2i> TunnelPath = new();
 
     /// <summary>Pairs of room indexes that are joined.</summary>
     public List<(int A, int B)> Links = new();
 
-    /// <summary>The tile outside the vestibule door where the first tunnel begins.</summary>
+    /// <summary>The doors between rooms and corridors.</summary>
+    public List<BunkerDoor> Doors = new();
+
+    /// <summary>The tile outside the vestibule door where the first corridor begins.</summary>
     public Vector2i Entry;
 
     public static BunkerLayout Generate(int seed, Vector2i entry)
@@ -161,7 +169,7 @@ public sealed class BunkerLayout
         var w = rng.Next(size.MinW, size.MaxW + 1);
         var h = rng.Next(size.MinH, size.MaxH + 1);
 
-        // Three tiles of margin on every side, so the tunnels have room
+        // Three tiles of margin on every side, so the corridors have room
         var left = OriginX + cell.C * CellSize + 3;
         var bottom = OriginY + cell.R * CellSize + 3;
         var x0 = left + rng.Next(0, CellSize - 6 - w + 1);
@@ -170,18 +178,23 @@ public sealed class BunkerLayout
         Rooms.Add(new BunkerRoom { Type = type, X0 = x0, Y0 = y0, X1 = x0 + w - 1, Y1 = y0 + h - 1 });
     }
 
-    // -- Tunnels ------------------------------------------------------------------------------------------------
+    // -- Corridors ----------------------------------------------------------------------------------------------
+
+    private static readonly Vector2i[] Dirs = { new(1, 0), new(0, 1), new(-1, 0), new(0, -1) };
+
+    private static bool IsHub(BunkerRoom room) => room.Type is BunkerRoomType.Decon or BunkerRoomType.Shaft;
 
     private void Connect(Random rng)
     {
-        // The cheapest way to join every room (Prim), then some extra loops
+        // The hubs are joined first: the cheapest way, then some loops
+        var hubs = Enumerable.Range(0, Rooms.Count).Where(i => IsHub(Rooms[i])).ToList();
         var joined = new HashSet<int> { 0 };
-        while (joined.Count < Rooms.Count)
+        while (joined.Count < hubs.Count)
         {
             var best = (A: -1, B: -1, Cost: double.MaxValue);
             foreach (var a in joined)
             {
-                for (var b = 0; b < Rooms.Count; b++)
+                foreach (var b in hubs)
                 {
                     if (joined.Contains(b))
                         continue;
@@ -196,22 +209,33 @@ public sealed class BunkerLayout
             joined.Add(best.B);
         }
 
-        for (var a = 0; a < Rooms.Count; a++)
+        foreach (var a in hubs)
         {
-            for (var b = a + 1; b < Rooms.Count; b++)
+            foreach (var b in hubs)
             {
-                if (Links.Contains((a, b)) || Links.Contains((b, a)))
+                if (b <= a || Links.Contains((a, b)) || Links.Contains((b, a)))
                     continue;
 
-                if ((Rooms[a].Center - Rooms[b].Center).Length < CellSize * 1.3 && rng.NextDouble() < 0.3)
+                if ((Rooms[a].Center - Rooms[b].Center).Length < CellSize * 2 && rng.NextDouble() < 0.3)
                     Links.Add((a, b));
             }
         }
 
-        _horizontalFirst = Links.Select(_ => rng.NextDouble() < 0.5).ToList();
+        // Every other room is a dead end with one door onto the nearest hub, a few with a second one
+        for (var i = 0; i < Rooms.Count; i++)
+        {
+            if (IsHub(Rooms[i]))
+                continue;
+
+            var near = hubs.OrderBy(h => (Rooms[h].Center - Rooms[i].Center).Length).ToList();
+            Links.Add((i, near[0]));
+            if (near.Count > 1 && Rooms[i].Type is not (BunkerRoomType.Armory or BunkerRoomType.Reactor) && rng.NextDouble() < 0.25)
+                Links.Add((i, near[1]));
+        }
     }
 
-    private List<bool> _horizontalFirst = new();
+    /// <summary>Cells a corridor cannot use: the rooms and two tiles around them, and the vestibule.</summary>
+    private readonly HashSet<Vector2i> _blocked = new();
 
     private void Carve()
     {
@@ -224,15 +248,60 @@ public sealed class BunkerLayout
                     Floor.Add(new Vector2i(x, y));
                 }
             }
+
+            for (var x = room.X0 - 2; x <= room.X1 + 2; x++)
+            {
+                for (var y = room.Y0 - 2; y <= room.Y1 + 2; y++)
+                {
+                    _blocked.Add(new Vector2i(x, y));
+                }
+            }
         }
 
-        // The tunnel from the vestibule to the first room
-        CarveTunnel(Entry, Rooms[0].Center, true);
-
-        for (var i = 0; i < Links.Count; i++)
+        for (var x = -3; x <= 6; x++)
         {
-            CarveTunnel(Rooms[Links[i].A].Center, Rooms[Links[i].B].Center, _horizontalFirst[i]);
+            for (var y = -3; y <= 5; y++)
+            {
+                _blocked.Add(new Vector2i(x, y));
+            }
         }
+
+        // From the vestibule door to the west side of the entrance room
+        if (TryAddDoor(0, new Vector2i(-1, 0), out var entryDoor))
+        {
+            var start = new Vector2i(Entry.X + 1, Entry.Y);
+            var path = Route(start, entryDoor.Tile + entryDoor.Dir * 3);
+            if (path != null)
+            {
+                Floor.Add(Entry);
+                Floor.Add(Entry + new Vector2i(0, 1));
+                Floor.Add(Entry + new Vector2i(0, -1));
+                TunnelPath.Add(Entry);
+                Carve(path);
+                Stub(entryDoor);
+            }
+        }
+
+        foreach (var (a, b) in Links)
+        {
+            var d = Rooms[b].Center - Rooms[a].Center;
+            var dirA = Math.Abs(d.X) >= Math.Abs(d.Y) ? new Vector2i(Math.Sign(d.X), 0) : new Vector2i(0, Math.Sign(d.Y));
+            var dirB = new Vector2i(-dirA.X, -dirA.Y);
+
+            if (!TryAddDoor(a, dirA, out var doorA) || !TryAddDoor(b, dirB, out var doorB))
+                continue;
+
+            var path = Route(doorA.Tile + dirA * 3, doorB.Tile + dirB * 3);
+            if (path == null)
+                continue;
+
+            Carve(path);
+            Stub(doorA);
+            Stub(doorB);
+        }
+
+        // Doors that lead nowhere are dropped
+        Doors.RemoveAll(d => !Floor.Contains(d.Tile));
 
         foreach (var tile in Floor)
         {
@@ -241,30 +310,134 @@ public sealed class BunkerLayout
         }
     }
 
-    /// <summary>A tunnel three tiles wide, one leg along x and one along y.</summary>
-    private void CarveTunnel(Vector2i from, Vector2i to, bool horizontalFirst)
+    /// <summary>A door in the wall ring of a room, on the given side: the first free spot from the middle of the side.</summary>
+    private bool TryAddDoor(int room, Vector2i dir, out BunkerDoor door)
     {
-        var corner = horizontalFirst ? new Vector2i(to.X, from.Y) : new Vector2i(from.X, to.Y);
-        Band(from, corner);
-        Band(corner, to);
+        // A side that has a door already uses it
+        var existing = Doors.FirstOrDefault(d => d.Room == room && d.Dir == dir);
+        if (existing != null)
+        {
+            door = existing;
+            return true;
+        }
+
+        var r = Rooms[room];
+        var horizontal = dir.X != 0;
+        var mid = horizontal ? (r.Y0 + r.Y1) / 2 : (r.X0 + r.X1) / 2;
+        var lo = (horizontal ? r.Y0 : r.X0) + 2;
+        var hi = (horizontal ? r.Y1 : r.X1) - 2;
+
+        foreach (var off in new[] { 0, 3, -3, 1, -1 })
+        {
+            var along = mid + off;
+            if (along < lo || along > hi)
+                continue;
+
+            var tile = dir.X > 0 ? new Vector2i(r.X1 + 1, along)
+                : dir.X < 0 ? new Vector2i(r.X0 - 1, along)
+                : dir.Y > 0 ? new Vector2i(along, r.Y1 + 1)
+                : new Vector2i(along, r.Y0 - 1);
+
+            if (Doors.Any(d => d.Room == room && (d.Tile - tile).LengthSquared < 16))
+                continue;
+
+            door = new BunkerDoor(room, tile, dir);
+            Doors.Add(door);
+            return true;
+        }
+
+        door = default!;
+        return false;
     }
 
-    private void Band(Vector2i a, Vector2i b)
+    /// <summary>
+    ///     The door tile and the row of three tiles outside it. Only that row is carved beside the door, so the wall ring stays whole.
+    /// </summary>
+    private void Stub(BunkerDoor door)
     {
-        var horizontal = a.Y == b.Y;
-        for (var x = Math.Min(a.X, b.X); x <= Math.Max(a.X, b.X); x++)
-        {
-            for (var y = Math.Min(a.Y, b.Y); y <= Math.Max(a.Y, b.Y); y++)
-            {
-                for (var side = -1; side <= 1; side++)
-                {
-                    var tile = horizontal ? new Vector2i(x, y + side) : new Vector2i(x + side, y);
-                    Floor.Add(tile);
-                }
+        Floor.Add(door.Tile);
+        var outer = door.Tile + door.Dir;
+        var side = new Vector2i(Math.Abs(door.Dir.Y), Math.Abs(door.Dir.X));
+        Floor.Add(outer);
+        Floor.Add(outer + side);
+        Floor.Add(outer - side);
+        TunnelPath.Add(outer);
+    }
 
-                TunnelPath.Add(new Vector2i(x, y));
+    /// <summary>Carves a corridor three tiles wide along the cells.</summary>
+    private void Carve(List<Vector2i> path)
+    {
+        foreach (var cell in path)
+        {
+            TunnelPath.Add(cell);
+            for (var dx = -1; dx <= 1; dx++)
+            {
+                for (var dy = -1; dy <= 1; dy++)
+                {
+                    Floor.Add(new Vector2i(cell.X + dx, cell.Y + dy));
+                }
             }
         }
+    }
+
+    /// <summary>The cheapest way over free cells, with few turns.</summary>
+    private List<Vector2i>? Route(Vector2i from, Vector2i to)
+    {
+        const int minX = 6, maxX = 112, minY = -32, maxY = 52;
+        var cost = new Dictionary<(Vector2i, int), double>();
+        var prev = new Dictionary<(Vector2i, int), (Vector2i, int)>();
+        var queue = new PriorityQueue<(Vector2i Pos, int Dir), double>();
+
+        for (var d = 0; d < 4; d++)
+        {
+            cost[(from, d)] = 0;
+            queue.Enqueue((from, d), 0);
+        }
+
+        (Vector2i Pos, int Dir)? goal = null;
+        while (queue.TryDequeue(out var cur, out var c))
+        {
+            if (c > cost[cur])
+                continue;
+
+            if (cur.Pos == to)
+            {
+                goal = cur;
+                break;
+            }
+
+            for (var d = 0; d < 4; d++)
+            {
+                var next = cur.Pos + Dirs[d];
+                if (next.X < minX || next.X > maxX || next.Y < minY || next.Y > maxY || _blocked.Contains(next))
+                    continue;
+
+                var nc = c + 1 + (d == cur.Dir ? 0 : 2);
+                var key = (next, d);
+                if (cost.TryGetValue(key, out var old) && old <= nc)
+                    continue;
+
+                cost[key] = nc;
+                prev[key] = cur;
+                queue.Enqueue(key, nc);
+            }
+        }
+
+        if (goal == null)
+            return null;
+
+        var result = new List<Vector2i>();
+        var node = goal.Value;
+        while (true)
+        {
+            result.Add(node.Pos);
+            if (!prev.TryGetValue(node, out var p))
+                break;
+
+            node = p;
+        }
+
+        return result;
     }
 
     // -- Walls --------------------------------------------------------------------------------------------------

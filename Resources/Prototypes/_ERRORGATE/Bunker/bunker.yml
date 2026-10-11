@@ -210,8 +210,7 @@
     sound:
       path: /Audio/Machines/alarm.ogg
 
-# The radiation of the bunker: yellow barrels with glowing goo, strong enough to kill in seconds without a suit. They stand in every
-# room and along every tunnel, so no part of the bunker is safe.
+# The radiation of the bunker: yellow barrels with glowing goo, deadly without a suit but only a few tiles around them.
 - type: entity
   parent: YellowBarrelFull
   id: BunkerRadiationBarrel
@@ -219,5 +218,42 @@
   categories: [ HideSpawnMenu ]
   components:
   - type: RadiationSource
-    intensity: 20
-    slope: 0.5
+    intensity: 12
+    slope: 3
+
+# The doors between rooms and corridors. Opened by hand, no power needed.
+- type: entity
+  parent: MetalDoor
+  id: BunkerRoomDoor
+  suffix: Bunker
+  categories: [ HideSpawnMenu ]
+
+# The reactor: the gravity generator look, a dead machine in the middle of its room
+- type: entity
+  parent: BaseStructure
+  id: BunkerReactor
+  name: reactor
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: Transform
+    anchored: true
+  - type: Sprite
+    sprite: Structures/Machines/gravity_generator.rsi
+    layers:
+    - state: on
+    - sprite: Structures/Machines/gravity_generator_core.rsi
+      state: activated
+      shader: unshaded
+  - type: Physics
+    bodyType: Static
+  - type: Fixtures
+    fixtures:
+      fix1:
+        shape:
+          !type:PhysShapeAabb
+          bounds: "-1.5,-1.5,1.5,1.5"
+        density: 50
+        mask:
+        - FullTileMask
+        layer:
+        - WallLayer

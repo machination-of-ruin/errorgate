@@ -1,3 +1,9 @@
+# Walkers and runners do not feel radiation (the bunker is theirs)
+- type: damageModifierSet
+  id: ErrorgateRadiationImmune
+  coefficients:
+    Radiation: 0
+
 - type: entity
   parent: BaseMobFlesh
   id: MobWalker
@@ -25,6 +31,8 @@
   - type: RotationVisuals
     defaultRotation: 90
     horizontalRotation: 90
+  - type: Damageable
+    damageModifierSet: ErrorgateRadiationImmune
   - type: MobState
     allowedStates:
     - Alive

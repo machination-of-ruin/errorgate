@@ -21,21 +21,27 @@ A hidden Soviet-style nuclear bunker with tier 3 loot. It is a secret: nothing a
 
 ## Layout (generated, `BunkerLayout`)
 
-A seeded generator in plain C# (`bunkergen [seed]` repeats a layout, the seed is in the log), not the SS14 dungeon pack system: it needed fixed room sizes and map-file templates, and the rules here (loot per room, a boss in every military room, barrels, lights) are easier to keep in code.
+A seeded generator in plain C# (`bunkergen [seed]` repeats a layout, the seed is in the log), not the SS14 dungeon pack system: it needed fixed room sizes and map-file templates, and the rules here (loot per room, a boss in every military room, barrels) are easier to keep in code.
 
 - A grid of 5 by 4 cells of 20 tiles; the entrance cell (the first room, `Decon`) is right behind the vestibule. 16 to 20 rooms: Decon, Barracks x2, Mess, Control, Generator, Reactor, Medical, Storage x2, AmmoDepot, Armory, Archive and 3 to 7 small Shaft junction rooms. The reactor and the armory are always deep (the two last columns).
-- Rooms are joined by tunnels **three tiles wide** (cheapest way to join all of them, plus some loops). All walls are indestructible: concrete, and **grey brick on the walls of some rooms only (never along tunnels)**.
-- **Loot:** every room has 2 to 5 tier 3 loot spawners of fitting locations (armory 4 military plus 1 security, medical 3 medical, generator 3 industrial, and so on; shafts have 1). They draw from the same loot manager as the surface.
-- **Bosses:** every room with military loot (barracks, ammo depot, armory) has one `MobWalkerBoss`: the second military tier armored walker scaled up (300 health, double damage, larger) that always drops tier 3 military loot. Other mobs are walkers and runners only, in rooms and tunnels.
-- **Radiation:** `BunkerRadiationBarrel` (a child of `YellowBarrelFull`, intensity 20) in every room and about every 6 tiles along the tunnels: without a suit a person dies in seconds anywhere. The radiation suit (`ClothingOuterSuitRad`, already in the industrial and medical loot, tiers 2 and 3) takes it away.
-- **Light:** only always-on emergency lights (`EmergencyLight`, like on EdgeOfEntropy), facing away from the wall they hang on. The map has a dim ambient light and nothing else.
+- **Doors, not openings.** Every room is sealed by its wall ring and has one `BunkerRoomDoor` (a metal door opened by hand, no power) per link. The entrance room and the shafts are hubs, joined to each other by corridors; every other room is a dead end with one door (a quarter of them have a second one to another hub, never the armory or the reactor). Corridors are **three tiles wide**, routed around rooms (A*, few turns).
+- Walls are indestructible: concrete, and **grey brick on the walls of some rooms only (never along corridors)**.
+- **Each kind of room has a floor of its own** (white in medical, kitchen tiles in the mess, green circuit in control, blue circuit in the armory, and so on).
+- **Interior:** in the middle of the rooms stand concrete columns and short wall pieces (line of sight blockers), steel crates (cover), and the props that make the room what it is (beds, tables, generators, racks, cabinets); more props along the walls. Everything that blocks is placed only if every free tile of the room stays reachable from the doors; three tiles in front of every door stay free.
+- **Reactor:** the gravity generator sprite (`BunkerReactor`) in the middle of its room, catwalks around it and from every door to it.
+- **Loot:** every room has 1 to 5 tier 3 loot spawners of fitting locations. They draw from the same loot manager as the surface.
+- **Bosses:** every room with military loot (barracks, ammo depot, armory) has one `MobWalkerBoss`. Other mobs are walkers and runners only, in rooms and corridors. Walkers and runners are immune to radiation (`ErrorgateRadiationImmune`).
+- **Radiation:** `BunkerRadiationBarrel` (intensity 12, slope 3: deadly without a suit for about four tiles around it) only along the corridors, at least 10 tiles apart, never within 13 tiles of the vestibule or 6 of a door. The radiation suit (`ClothingOuterSuitRad`, in the industrial and medical loot, tiers 2 and 3) takes it away. Rooms and the airlock are safe.
+- **Cover in corridors:** steel crates at the corridor edges.
+- **Light:** only always-on emergency lights in the corridors (`EmergencyLight`). Rooms stay dark. The map has a dim ambient light.
 - **Air:** every floor tile gets breathable air a moment after the build.
-- The surface entrance is never placed on or beside ice tiles.
+- **Consoles:** one in the vestibule, one just inside the bunker by the door: both run the same airlock.
+- The surface entrance is never placed on or beside ice tiles, and unlocking it plays a sound at the entrance.
 
 Admin commands: `bunkergen [seed]` builds a bunker now on any map (replacing this round's), `bunkerinfo` says where the hatch is. The key can be spawned from the entity menu (`BunkerKey`).
 
 ## Next
 
 1. Playtest the layout and tune: room sizes, how much tunnel there is, barrel intensity and count, mob counts, loot density.
-2. Dressing: decals, corpses and props that tell what the bunker was; doors on some rooms.
+2. Dressing: decals, corpses and props that tell what the bunker was.
 3. Sprites and sounds for the hatches, console and sirens.
