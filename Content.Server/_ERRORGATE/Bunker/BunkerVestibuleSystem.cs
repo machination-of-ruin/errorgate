@@ -250,27 +250,15 @@ public sealed class BunkerVestibuleSystem : EntitySystem
         Log.Warning("The bunker door would not shut and was replaced by a shut one");
     }
 
+    /// <summary>
+    ///     Gibs whoever is in the doorway, on the spot. Items are left alone.
+    /// </summary>
     private void ClearDoorway(EntityUid door, PhysicsComponent physics)
     {
-        // Loose things lying on the door tile (a dropped card opens the door by touching it, items block it) go too
-        foreach (var ent in _lookup.GetEntitiesInRange(Transform(door).Coordinates, 0.7f, LookupFlags.Dynamic | LookupFlags.Sundries))
-        {
-            if (HasComp<ItemComponent>(ent) && !Transform(ent).Anchored)
-                QueueDel(ent);
-        }
-
         foreach (var ent in _door.GetColliding(door, physics).ToList())
         {
-            
-            // Anyone in the way is gibbed on the spot, bolted-down things stay
             if (HasComp<MobStateComponent>(ent))
-            {
                 _body.GibBody(ent);
-                continue;
-            }
-
-            if (!Transform(ent).Anchored)
-                QueueDel(ent);
         }
     }
 

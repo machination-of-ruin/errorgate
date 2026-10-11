@@ -113,6 +113,7 @@
 - type: entity
   id: BunkerConsole
   name: console
+  description: A console that runs the airlock.
   parent: BaseStructure
   categories: [ HideSpawnMenu ]
   components:

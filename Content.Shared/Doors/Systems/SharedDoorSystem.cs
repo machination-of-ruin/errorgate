@@ -7,6 +7,7 @@ using Content.Shared.Database;
 using Content.Shared.Doors.Components;
 using Content.Shared.Emag.Systems;
 using Content.Shared.Interaction;
+using Content.Shared.Item;
 using Content.Shared.Physics;
 using Content.Shared.Popups;
 using Content.Shared.Power.EntitySystems;
@@ -632,6 +633,10 @@ public abstract partial class SharedDoorSystem : EntitySystem
             return;
 
         var otherUid = args.OtherEntity;
+
+        // ERRORGATE: a dropped or thrown card (any item) does not open doors by touching them, only creatures do
+        if (HasComp<ItemComponent>(otherUid))
+            return;
 
         if (Tags.HasTag(otherUid, DoorBumpTag))
             TryOpen(uid, door, otherUid, quiet: door.State == DoorState.Denying, predicted: true);

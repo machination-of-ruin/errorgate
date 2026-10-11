@@ -1,3 +1,4 @@
+using Content.Shared._ERRORGATE.Bunker;
 using Content.Shared.Access.Systems;
 using Content.Shared.Administration.Logs;
 using Content.Shared.Database;
@@ -8,6 +9,8 @@ using Content.Shared.Popups;
 using Robust.Server.GameObjects;
 using Robust.Shared.Audio;
 using Robust.Shared.Audio.Systems;
+using Robust.Shared.Configuration;
+using Robust.Shared.Player;
 using Robust.Shared.Map;
 
 namespace Content.Server._ERRORGATE.Bunker;
@@ -23,6 +26,7 @@ public sealed class BunkerHatchSystem : EntitySystem
     private static readonly SoundSpecifier ConsoleSound = new SoundPathSpecifier("/Audio/Machines/button.ogg");
 
     [Dependency] private readonly AccessReaderSystem _access = default!;
+    [Dependency] private readonly IConfigurationManager _cfg = default!;
     [Dependency] private readonly ISharedAdminLogManager _adminLog = default!;
     [Dependency] private readonly SharedAudioSystem _audio = default!;
     [Dependency] private readonly PullingSystem _pulling = default!;
@@ -75,6 +79,7 @@ public sealed class BunkerHatchSystem : EntitySystem
         if (ent.Comp.Vestibule is { } vestibule && _access.IsAllowed(user, ent) && _vestibule.OnKey(vestibule))
         {
             _adminLog.Add(LogType.Action, LogImpact.Low, $"{ToPrettyString(user):user} used a key on the bunker hatch");
+            Say(ent, Loc.GetString("bunker-entrance-key", ("seconds", SirenSeconds())));
             return;
         }
 
@@ -111,10 +116,23 @@ public sealed class BunkerHatchSystem : EntitySystem
         {
             _audio.PlayPvs(ConsoleSound, ent);
             _adminLog.Add(LogType.Action, LogImpact.Low, $"{ToPrettyString(args.User):user} pressed the bunker console");
+
+            // Everyone around sees where the cycle leads
+            var toBunker = Comp<BunkerVestibuleComponent>(vestibule).SirenTarget == BunkerVestibuleState.InnerOpen;
+            Say(ent, Loc.GetString(toBunker ? "bunker-console-to-bunker" : "bunker-console-to-surface", ("seconds", SirenSeconds())));
             return;
         }
 
         _audio.PlayPvs(DenySound, ent);
+        Say(ent, Loc.GetString("bunker-console-busy"));
+    }
+
+    private int SirenSeconds() => (int) MathF.Round(_cfg.GetCVar(BunkerCVars.CycleSeconds));
+
+    /// <summary>A popup everyone around sees.</summary>
+    private void Say(EntityUid source, string message)
+    {
+        _popup.PopupEntity(message, source, Filter.Pvs(source, entityManager: EntityManager), true, PopupType.Medium);
     }
 
     /// <summary>
