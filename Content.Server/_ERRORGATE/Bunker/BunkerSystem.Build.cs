@@ -576,7 +576,7 @@ public sealed partial class BunkerSystem
         // A few runners and walkers in the corridors
         var mobSpots = path.Where(t => (t - layout.Entry).LengthSquared > 400 && !NearDoor(t, 3)).ToList();
         Shuffle(mobSpots, rng);
-        var mobs = new[] { "MobSpawnerRunner", "MobSpawnerWalkerArmoredMilitary", "MobSpawnerRunner", "MobSpawnerWalkerLiving", "MobSpawnerRunnerSmall" };
+        var mobs = new[] { "MobSpawnerRunner", "MobSpawnerWalkerArmoredMilitary", "MobSpawnerRunner", "MobSpawnerWalkerLiving" };
         for (var i = 0; i < mobs.Length && i < mobSpots.Count; i++)
         {
             Spawn(mobs[i], at(mobSpots[i]));

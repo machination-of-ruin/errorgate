@@ -233,6 +233,11 @@
   id: BunkerRoomDoor
   suffix: Bunker
   categories: [ HideSpawnMenu ]
+  components:
+  # Really without power (the parent always counts as powered): pried open by hand
+  - type: ApcPowerReceiver
+    needsPower: true
+    powerLoad: 0
 
 # The reactor: the gravity generator look, a dead machine in the middle of its room
 - type: entity
