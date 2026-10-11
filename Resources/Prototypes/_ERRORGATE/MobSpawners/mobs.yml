@@ -210,3 +210,26 @@
     rarity: 2
     location: Living
     dropChance: 0.7
+
+# The boss of a bunker room with military loot: an armored walker of the second military tier, scaled up (twice the health and
+# the damage, a larger body) that always drops tier 3 military loot.
+- type: entity
+  parent: MobWalkerArmoredMilitary
+  id: MobWalkerBoss
+  suffix: Boss, Military 3
+  components:
+  - type: Sprite
+    scale: 1.4, 1.4
+  - type: MobThresholds
+    thresholds:
+      0: Alive
+      300: Dead
+  - type: MeleeWeapon
+    damage:
+      types:
+        Blunt: 10
+        Slash: 10
+  - type: MobLoot
+    rarity: 3
+    location: Military
+    dropChance: 1.0

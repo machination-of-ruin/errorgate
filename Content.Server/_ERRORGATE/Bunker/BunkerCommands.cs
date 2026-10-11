@@ -16,7 +16,8 @@ public sealed class BunkerGenCommand : LocalizedEntityCommands
 
     public override void Execute(IConsoleShell shell, string argStr, string[] args)
     {
-        shell.WriteLine(_bunker.TryBuild(out var error) ? "Done. bunkerinfo shows where the hatch is." : $"Failed: {error}");
+        int? seed = args.Length > 0 && int.TryParse(args[0], out var parsed) ? parsed : null;
+        shell.WriteLine(_bunker.TryBuild(out var error, seed: seed) ? "Done. bunkerinfo shows where the hatch is, the log has the layout seed." : $"Failed: {error}");
     }
 }
 

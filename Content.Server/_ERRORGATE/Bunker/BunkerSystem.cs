@@ -34,7 +34,7 @@ namespace Content.Server._ERRORGATE.Bunker;
 ///     The hidden bunker. At round start a hatch is placed on the open ground far from everything, and a bunker is built on a
 ///     map of its own. The surface map is never edited: the hatch is spawned at run time.
 /// </summary>
-public sealed class BunkerSystem : EntitySystem
+public sealed partial class BunkerSystem : EntitySystem
 {
     private static readonly EntProtoId HatchProto = "BunkerHatch";
     private static readonly EntProtoId LadderProto = "BunkerLadder";
@@ -48,7 +48,6 @@ public sealed class BunkerSystem : EntitySystem
     // Indestructible: concrete for the rooms, grey brick for the technical tunnels
     private static readonly EntProtoId RoomWallProto = "BunkerWallConcrete";
     private static readonly EntProtoId TunnelWallProto = "N14WallBrickGraySlantedIndestructible";
-    private static readonly EntProtoId LootProto = "LootSpawnerMilitaryTier3";
 
     // Open ground needed around the hatch: a square of this radius is free floor
     private const int OpenRadius = 3;
@@ -140,7 +139,7 @@ public sealed class BunkerSystem : EntitySystem
     /// <summary>
     ///     Builds the bunker and its hatch for this round, replacing the old ones. Also used by the admin command.
     /// </summary>
-    public bool TryBuild(out string error, MapId? surfaceOverride = null)
+    public bool TryBuild(out string error, MapId? surfaceOverride = null, int? seed = null)
     {
         if (Hatch != null && !TerminatingOrDeleted(Hatch.Value))
             QueueDel(Hatch);
@@ -180,7 +179,8 @@ public sealed class BunkerSystem : EntitySystem
         EnsureComp<GravityComponent>(bunkerGrid.Owner);
         EnsureComp<GridAtmosphereComponent>(bunkerGrid.Owner); // the map air only reaches a grid that has an atmosphere
         _gravity.EnableGravity(bunkerGrid.Owner);
-        BuildTestBunker(mapId, bunkerGrid.Owner, bunkerGrid.Comp, out var vestibule, out var arrival);
+        var layoutSeed = seed ?? _random.Next();
+        BuildBunker(bunkerGrid.Owner, bunkerGrid.Comp, layoutSeed, out var vestibule, out var arrival);
 
         // The hatch on the surface: at run time, the map file is left alone
         var hatchCoords = _map.GridTileToLocal(surfaceGrid, surface, spot);
@@ -202,7 +202,7 @@ public sealed class BunkerSystem : EntitySystem
 
         Hatch = hatch;
         BunkerMap = mapUid;
-        Log.Info($"The bunker hatch is at {spot} on {ToPrettyString(surfaceGrid)}, the bunker is on map {mapId}");
+        Log.Info($"The bunker hatch is at {spot} on {ToPrettyString(surfaceGrid)}, the bunker is on map {mapId}, layout seed {layoutSeed}");
 
         error = string.Empty;
         return true;
@@ -234,11 +234,18 @@ public sealed class BunkerSystem : EntitySystem
         spot = default;
 
         var floor = new HashSet<Vector2i>();
+        var ice = new HashSet<Vector2i>();
         var enumerator = _map.GetAllTilesEnumerator(gridUid, grid);
         while (enumerator.MoveNext(out var tile))
         {
-            if (!tile.Value.Tile.IsEmpty)
-                floor.Add(tile.Value.GridIndices);
+            if (tile.Value.Tile.IsEmpty)
+                continue;
+
+            floor.Add(tile.Value.GridIndices);
+
+            // The entrance is not built on ice
+            if (_tileDefs[tile.Value.Tile.TypeId].ID.Contains("Ice", StringComparison.Ordinal))
+                ice.Add(tile.Value.GridIndices);
         }
 
         // Solid things. Doors are solid for the hatch, but a walker can go through them.
@@ -305,7 +312,7 @@ public sealed class BunkerSystem : EntitySystem
         if (reachable.Count == 0)
             reachable = floor;
 
-        var candidates = reachable.Where(t => IsOpenGround(t, floor, solid)).ToList();
+        var candidates = reachable.Where(t => IsOpenGround(t, floor, solid) && !TouchesIce(t, ice)).ToList();
         _random.Shuffle(candidates);
 
         var distance = _cfg.GetCVar(BunkerCVars.MinPoiDistance);
@@ -321,6 +328,24 @@ public sealed class BunkerSystem : EntitySystem
                 spot = tile;
                 Log.Info($"Bunker hatch: {candidates.Count} open tiles, nearest point of interest at least {step:0} tiles away");
                 return true;
+            }
+        }
+
+        return false;
+    }
+
+    /// <summary>The tile or one of its neighbours is ice.</summary>
+    private static bool TouchesIce(Vector2i tile, HashSet<Vector2i> ice)
+    {
+        if (ice.Count == 0)
+            return false;
+
+        for (var dx = -1; dx <= 1; dx++)
+        {
+            for (var dy = -1; dy <= 1; dy++)
+            {
+                if (ice.Contains(new Vector2i(tile.X + dx, tile.Y + dy)))
+                    return true;
             }
         }
 
@@ -368,101 +393,5 @@ public sealed class BunkerSystem : EntitySystem
         }
 
         return reached;
-    }
-
-    // -- The bunker -----------------------------------------------------------------------------------------------
-
-    /// <summary>
-    ///     A small fixed bunker to prove the way in: the vestibule, a corridor and three rooms. The generated layout comes later.
-    /// </summary>
-    private void BuildTestBunker(MapId mapId, EntityUid gridUid, MapGridComponent grid, out EntityUid vestibule, out EntityCoordinates arrival)
-    {
-        var floors = new Dictionary<Vector2i, string>();
-        var roomTiles = new HashSet<Vector2i>();
-
-        void Fill(int x0, int y0, int x1, int y1, string tile, bool room = false)
-        {
-            for (var x = x0; x <= x1; x++)
-            {
-                for (var y = y0; y <= y1; y++)
-                {
-                    var pos = new Vector2i(x, y);
-                    floors[pos] = tile;
-                    if (room)
-                        roomTiles.Add(pos);
-                }
-            }
-        }
-
-        // The vestibule is 5 by 3 (0..4, 0..2) and its door into the bunker is on the east wall at (5, 1)
-        Fill(0, 0, 4, 2, "FloorDark", true);
-        Fill(5, 1, 30, 1, "FloorSteel");
-        Fill(8, 3, 14, 9, "FloorSteel", true);
-        Fill(11, 2, 11, 2, "FloorSteel");
-        Fill(17, -6, 23, -1, "FloorSteel", true);
-        Fill(20, 0, 20, 0, "FloorSteel");
-        Fill(26, 3, 32, 8, "FloorSteel", true);
-        Fill(29, 2, 29, 2, "FloorSteel");
-
-        foreach (var (pos, tile) in floors)
-        {
-            _map.SetTile(gridUid, grid, pos, new Tile(_tileDefs[tile].TileId));
-        }
-
-        // Walls around every floor tile: concrete next to a room, grey brick along the tunnels
-        var walls = new Dictionary<Vector2i, bool>();
-        foreach (var pos in floors.Keys)
-        {
-            for (var dx = -1; dx <= 1; dx++)
-            {
-                for (var dy = -1; dy <= 1; dy++)
-                {
-                    var next = new Vector2i(pos.X + dx, pos.Y + dy);
-                    if (floors.ContainsKey(next))
-                        continue;
-
-                    walls[next] = walls.GetValueOrDefault(next) || roomTiles.Contains(pos);
-                }
-            }
-        }
-
-        foreach (var (pos, nextToRoom) in walls)
-        {
-            _map.SetTile(gridUid, grid, pos, new Tile(_tileDefs["FloorDark"].TileId));
-
-            // The hatch up takes the place of the west wall tile
-            if (pos != HatchUpTile)
-                Spawn(nextToRoom ? RoomWallProto : TunnelWallProto, _map.GridTileToLocal(gridUid, grid, pos));
-        }
-
-        EntityCoordinates At(int x, int y) => _map.GridTileToLocal(gridUid, grid, new Vector2i(x, y));
-
-        // The vestibule: controller, door, way up and the warning lights
-        vestibule = Spawn(ControllerProto, At(2, 1));
-        var door = Spawn(DoorProto, At(5, 1));
-        // The hatch up is in the west wall, the other end of the airlock from the door into the bunker
-        var ladder = Spawn(LadderProto, At(HatchUpTile.X, HatchUpTile.Y));
-        _appearance.SetData(ladder, BunkerExitVisuals.Locked, true);
-
-        // The console in the middle, by the north wall
-        var console = Spawn(ConsoleProto, At(2, 2));
-        Comp<BunkerConsoleComponent>(console).Vestibule = vestibule;
-        var vestibuleComp = Comp<BunkerVestibuleComponent>(vestibule);
-        vestibuleComp.Door = door;
-        vestibuleComp.Ladder = ladder;
-
-        // The turning lights on the tiles inside the north and south walls; the south one faces the other way
-        vestibuleComp.Lights.Add(Spawn(LightProto, At(1, 2)));
-        var southLight = Spawn(LightProto, At(3, 0));
-        _transform.SetLocalRotation(southLight, Angle.FromDegrees(180));
-        vestibuleComp.Lights.Add(southLight);
-
-        // Something worth coming for
-        Spawn(LootProto, At(11, 6));
-        Spawn(LootProto, At(20, -4));
-        Spawn(LootProto, At(29, 5));
-
-        _airTiles = floors.Keys.ToList();
-        arrival = At(0, 1); // the tile next to the hatch
     }
 }

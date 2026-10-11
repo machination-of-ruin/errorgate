@@ -19,14 +19,23 @@ A hidden Soviet-style nuclear bunker with tier 3 loot. It is a secret: nothing a
 - One bunker per round, on a map of its own (own grid, gravity, breathable air, dim light), deleted with the round. Walls are indestructible: dark concrete (`BunkerWallConcrete`) for rooms, grey brick for technical tunnels.
 - Text: only the descriptions of the hatches, two short popups on the locked hatches and the name and description of the key (approved by the project owner). The console and the rest speak through sounds and lights.
 
-## Built (step 1)
+## Layout (generated, `BunkerLayout`)
 
-Key, hatch, vestibule, a fixed small test bunker (vestibule, corridor, three rooms with tier 3 loot spawners). Code in `Content.Server/_ERRORGATE/Bunker/`, prototypes in `Resources/Prototypes/_ERRORGATE/Bunker/`.
+A seeded generator in plain C# (`bunkergen [seed]` repeats a layout, the seed is in the log), not the SS14 dungeon pack system: it needed fixed room sizes and map-file templates, and the rules here (loot per room, a boss in every military room, barrels, lights) are easier to keep in code.
 
-Admin commands: `bunkergen` builds a bunker now on any map (replacing this round's), `bunkerinfo` says where the hatch is. The key can be spawned from the entity menu (`BunkerKey`).
+- A grid of 5 by 4 cells of 20 tiles; the entrance cell (the first room, `Decon`) is right behind the vestibule. 16 to 20 rooms: Decon, Barracks x2, Mess, Control, Generator, Reactor, Medical, Storage x2, AmmoDepot, Armory, Archive and 3 to 7 small Shaft junction rooms. The reactor and the armory are always deep (the two last columns).
+- Rooms are joined by tunnels **three tiles wide** (cheapest way to join all of them, plus some loops). All walls are indestructible: concrete, and **grey brick on the walls of some rooms only (never along tunnels)**.
+- **Loot:** every room has 2 to 5 tier 3 loot spawners of fitting locations (armory 4 military plus 1 security, medical 3 medical, generator 3 industrial, and so on; shafts have 1). They draw from the same loot manager as the surface.
+- **Bosses:** every room with military loot (barracks, ammo depot, armory) has one `MobWalkerBoss`: the second military tier armored walker scaled up (300 health, double damage, larger) that always drops tier 3 military loot. Other mobs are walkers and runners only, in rooms and tunnels.
+- **Radiation:** `BunkerRadiationBarrel` (a child of `YellowBarrelFull`, intensity 20) in every room and about every 6 tiles along the tunnels: without a suit a person dies in seconds anywhere. The radiation suit (`ClothingOuterSuitRad`, already in the industrial and medical loot, tiers 2 and 3) takes it away.
+- **Light:** only always-on emergency lights (`EmergencyLight`, like on EdgeOfEntropy), facing away from the wall they hang on. The map has a dim ambient light and nothing else.
+- **Air:** every floor tile gets breathable air a moment after the build.
+- The surface entrance is never placed on or beside ice tiles.
+
+Admin commands: `bunkergen [seed]` builds a bunker now on any map (replacing this round's), `bunkerinfo` says where the hatch is. The key can be spawned from the entity menu (`BunkerKey`).
 
 ## Next
 
-1. Generated layout: SS14 dungeon generation with bunker room templates (15 to 25 rooms).
-2. Radiation sources, existing dangerous mobs, tier 3 loot caps; radiation suits in the industrial loot areas.
-3. Polish: sprites for the hatch and ladder, sound, lighting.
+1. Playtest the layout and tune: room sizes, how much tunnel there is, barrel intensity and count, mob counts, loot density.
+2. Dressing: decals, corpses and props that tell what the bunker was; doors on some rooms.
+3. Sprites and sounds for the hatches, console and sirens.

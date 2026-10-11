@@ -209,3 +209,15 @@
     volume: 2
     sound:
       path: /Audio/Machines/alarm.ogg
+
+# The radiation of the bunker: yellow barrels with glowing goo, strong enough to kill in seconds without a suit. They stand in every
+# room and along every tunnel, so no part of the bunker is safe.
+- type: entity
+  parent: YellowBarrelFull
+  id: BunkerRadiationBarrel
+  suffix: Bunker
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: RadiationSource
+    intensity: 20
+    slope: 0.5

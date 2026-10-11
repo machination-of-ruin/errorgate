@@ -67,3 +67,17 @@
     - state: red
     - sprite: Mobs/Demons/abomination.rsi
       state: rag
+
+- type: entity
+  name: mob spawner
+  suffix: armored walker, Boss
+  id: MobSpawnerWalkerBoss
+  parent: MobSpawnerBase
+  components:
+  - type: SmartMobSpawner
+    mobPrototype: MobWalkerBoss
+  - type: Sprite
+    layers:
+    - state: red
+    - sprite: Mobs/Demons/abomination.rsi
+      state: armored
