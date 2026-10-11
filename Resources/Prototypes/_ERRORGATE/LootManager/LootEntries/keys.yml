@@ -2,3 +2,8 @@
   id: FactoryCard
   rarityTiers: [1]
   locations: [Living]
+
+- type: lootEntry
+  id: BunkerKey
+  rarityTiers: [1, 2]
+  locations: [Military]

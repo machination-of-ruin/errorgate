@@ -1,3 +1,7 @@
 - type: accessLevel
   id: Factory
   name: Kuznetsk factory entrance
+
+- type: accessLevel
+  id: Bunker
+  name: Hidden bunker

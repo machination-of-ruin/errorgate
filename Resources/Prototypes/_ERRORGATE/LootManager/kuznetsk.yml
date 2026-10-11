@@ -279,3 +279,4 @@
     ClothingOuterPlagueSuit: 1
     # Keys
     FactoryCard: 5
+    BunkerKey: 3 # opens the hidden bunker hatch, only on this map
