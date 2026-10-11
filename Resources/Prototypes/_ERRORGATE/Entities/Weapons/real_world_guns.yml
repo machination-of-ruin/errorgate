@@ -483,12 +483,11 @@
   description: A reliable self-loading shotgun. Uses 12 gauge shells.
   components:
   - type: Item
-    sprite: Objects/Weapons/Guns/Shotguns/inhands_64x.rsi
-    heldPrefix: enforcer
+    sprite: Objects/Weapons/Guns/Shotguns/enforcer_inhands_64x.rsi
   - type: Sprite
-    sprite: Objects/Weapons/Guns/Shotguns/enforcer.rsi
+    sprite: Objects/Weapons/Guns/Shotguns/benelli.rsi
   - type: Clothing
-    sprite: Objects/Weapons/Guns/Shotguns/enforcer.rsi
+    sprite: Objects/Weapons/Guns/Shotguns/benelli.rsi
   - type: BallisticAmmoProvider
     autoCycle: true
 
@@ -500,8 +499,7 @@
   description: A favourite weapon of militia forces. Uses 12 gauge shells.
   components:
   - type: Item
-    sprite: Objects/Weapons/Guns/Shotguns/inhands_64x.rsi
-    heldPrefix: pump
+    sprite: Objects/Weapons/Guns/Shotguns/pump_inhands_64x.rsi
   - type: Sprite
     sprite: Objects/Weapons/Guns/Shotguns/pump.rsi
   - type: Clothing

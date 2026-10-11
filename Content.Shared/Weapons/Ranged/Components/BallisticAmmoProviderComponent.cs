@@ -36,6 +36,12 @@ public sealed partial class BallisticAmmoProviderComponent : Component
     [ViewVariables(VVAccess.ReadWrite), DataField]
     public float RandomizeAmmoBias = 5f;
 
+    /// <summary>
+    ///     ERRORGATE: the random load is never below this many rounds (capped by the capacity).
+    /// </summary>
+    [ViewVariables(VVAccess.ReadWrite), DataField]
+    public int RandomizeAmmoMin;
+
     [ViewVariables(VVAccess.ReadWrite), DataField, AutoNetworkedField]
     public int UnspawnedCount;
 

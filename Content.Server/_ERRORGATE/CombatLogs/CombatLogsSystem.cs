@@ -87,7 +87,12 @@ public sealed class CombatLogsSystem : EntitySystem
         if (!HasComp<CombatLogsComponent>(args.Target))
             return;
 
-        Pending(args.Target).SetContext(HitKind.Projectile, args.Shooter, projectile);
+        var pending = Pending(args.Target);
+        pending.SetContext(HitKind.Projectile, args.Shooter, projectile);
+
+        // The projectile is gone by the time the message is built, so its name is kept now
+        if (pending.Kind == HitKind.Projectile)
+            pending.WeaponName = Name(projectile);
     }
 
     private void OnHitscan(Entity<CombatLogsComponent> victim, ref HitScanReflectAttemptEvent args)
@@ -186,7 +191,7 @@ public sealed class CombatLogsSystem : EntitySystem
         var where = WherePhrase(hit.Part);
         var attacker = AttackerName(victim, hit.Attacker, hit.Kind is HitKind.Melee or HitKind.Shove ? null : VisibleRange);
         var self = hit.Attacker == victim;
-        var weapon = hit.Weapon is { } w && !TerminatingOrDeleted(w) ? Name(w) : null;
+        var weapon = hit.WeaponName ?? (hit.Weapon is { } w && !TerminatingOrDeleted(w) ? Name(w) : null);
 
         string message;
         switch (hit.Kind)
@@ -361,6 +366,7 @@ public sealed class CombatLogsSystem : EntitySystem
         public HitKind Kind;
         public EntityUid? Attacker;
         public EntityUid? Weapon;
+        public string? WeaponName;
         public float Damage;
         public TargetBodyPart? Part;
 

@@ -42,6 +42,7 @@ public sealed partial class WieldableComponent : Component
     [DataField("wieldedInhandPrefix")]
     public string? WieldedInhandPrefix = "wielded";
 
+    [AutoNetworkedField] // ERRORGATE: the clients need it to fall back to the one-handed in-hand sprite
     public string? OldInhandPrefix = null;
     // WD EDIT START
     /// <summary>

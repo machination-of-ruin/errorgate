@@ -1071,6 +1071,7 @@
   footstepSounds:
     collection: FootstepTile
   itemDrop: FloorTileItemGrayConcreteSmooth
+  weather: true
   heatCapacity: 10000
 
 - type: tile

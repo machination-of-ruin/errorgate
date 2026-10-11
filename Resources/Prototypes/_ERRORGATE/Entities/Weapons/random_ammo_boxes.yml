@@ -8,6 +8,7 @@
   - type: BallisticAmmoProvider
     randomizeAmmo: true
     randomizeAmmoBias: 1 # old fork: even spread from empty to full (the default 5 gives mostly a few rounds)
+    randomizeAmmoMin: 3 # a box never rolls less than 3 rounds
 
 - type: entity
   id: AmmoBox9x19BigRandom
@@ -17,6 +18,7 @@
   - type: BallisticAmmoProvider
     randomizeAmmo: true
     randomizeAmmoBias: 1 # old fork: even spread from empty to full (the default 5 gives mostly a few rounds)
+    randomizeAmmoMin: 3 # a box never rolls less than 3 rounds
 
 - type: entity
   id: AmmoBox45ACPRandom
@@ -26,6 +28,7 @@
   - type: BallisticAmmoProvider
     randomizeAmmo: true
     randomizeAmmoBias: 1 # old fork: even spread from empty to full (the default 5 gives mostly a few rounds)
+    randomizeAmmoMin: 3 # a box never rolls less than 3 rounds
 
 - type: entity
   id: AmmoBox45ACPBigRandom
@@ -35,6 +38,7 @@
   - type: BallisticAmmoProvider
     randomizeAmmo: true
     randomizeAmmoBias: 1 # old fork: even spread from empty to full (the default 5 gives mostly a few rounds)
+    randomizeAmmoMin: 3 # a box never rolls less than 3 rounds
 
 - type: entity
   id: AmmoBox357MagnumRandom
@@ -44,6 +48,7 @@
   - type: BallisticAmmoProvider
     randomizeAmmo: true
     randomizeAmmoBias: 1 # old fork: even spread from empty to full (the default 5 gives mostly a few rounds)
+    randomizeAmmoMin: 3 # a box never rolls less than 3 rounds
 
 - type: entity
   id: AmmoBox556x45Random
@@ -53,6 +58,7 @@
   - type: BallisticAmmoProvider
     randomizeAmmo: true
     randomizeAmmoBias: 1 # old fork: even spread from empty to full (the default 5 gives mostly a few rounds)
+    randomizeAmmoMin: 3 # a box never rolls less than 3 rounds
 
 - type: entity
   id: AmmoBox556x45BigRandom
@@ -62,6 +68,7 @@
   - type: BallisticAmmoProvider
     randomizeAmmo: true
     randomizeAmmoBias: 1 # old fork: even spread from empty to full (the default 5 gives mostly a few rounds)
+    randomizeAmmoMin: 3 # a box never rolls less than 3 rounds
 
 - type: entity
   id: AmmoBox762x39Random
@@ -71,6 +78,7 @@
   - type: BallisticAmmoProvider
     randomizeAmmo: true
     randomizeAmmoBias: 1 # old fork: even spread from empty to full (the default 5 gives mostly a few rounds)
+    randomizeAmmoMin: 3 # a box never rolls less than 3 rounds
 
 - type: entity
   id: AmmoBox762x39BigRandom
@@ -80,6 +88,7 @@
   - type: BallisticAmmoProvider
     randomizeAmmo: true
     randomizeAmmoBias: 1 # old fork: even spread from empty to full (the default 5 gives mostly a few rounds)
+    randomizeAmmoMin: 3 # a box never rolls less than 3 rounds
 
 - type: entity
   id: AmmoBoxSniperRandom
@@ -89,6 +98,7 @@
   - type: BallisticAmmoProvider
     randomizeAmmo: true
     randomizeAmmoBias: 1 # old fork: even spread from empty to full (the default 5 gives mostly a few rounds)
+    randomizeAmmoMin: 3 # a box never rolls less than 3 rounds
 
 - type: entity
   id: AmmoBoxSniperBigRandom
@@ -98,6 +108,7 @@
   - type: BallisticAmmoProvider
     randomizeAmmo: true
     randomizeAmmoBias: 1 # old fork: even spread from empty to full (the default 5 gives mostly a few rounds)
+    randomizeAmmoMin: 3 # a box never rolls less than 3 rounds
 
 - type: entity
   id: BoxShotgun00BuckshotRandom
@@ -107,6 +118,7 @@
   - type: BallisticAmmoProvider
     randomizeAmmo: true
     randomizeAmmoBias: 1 # old fork: even spread from empty to full (the default 5 gives mostly a few rounds)
+    randomizeAmmoMin: 3 # a box never rolls less than 3 rounds
 
 - type: entity
   id: BoxShotgunSlugRandom
@@ -116,3 +128,4 @@
   - type: BallisticAmmoProvider
     randomizeAmmo: true
     randomizeAmmoBias: 1 # old fork: even spread from empty to full (the default 5 gives mostly a few rounds)
+    randomizeAmmoMin: 3 # a box never rolls less than 3 rounds
