@@ -40,6 +40,7 @@ public sealed class BunkerVestibuleSystem : EntitySystem
     [Dependency] private readonly SharedAmbientSoundSystem _ambient = default!;
     [Dependency] private readonly SharedAudioSystem _audio = default!;
     [Dependency] private readonly BodySystem _body = default!;
+    [Dependency] private readonly SharedAirlockSystem _airlock = default!;
     [Dependency] private readonly SharedDoorSystem _door = default!;
     [Dependency] private readonly EntityLookupSystem _lookup = default!;
     [Dependency] private readonly MobStateSystem _mobState = default!;
@@ -156,7 +157,23 @@ public sealed class BunkerVestibuleSystem : EntitySystem
         if (state == BunkerVestibuleState.InnerOpen && vestibule.Door is { } door && TryComp<DoorBoltComponent>(door, out var bolt))
         {
             _door.TrySetBoltDown((door, bolt), false);
+            if (TryComp<AirlockComponent>(door, out var openAirlock))
+                _airlock.SetSafety(openAirlock, true);
+
             _door.TryOpen(door);
+        }
+        else if (state != BunkerVestibuleState.InnerOpen
+                 && vestibule.Door is { } lockDoor
+                 && TryComp<DoorComponent>(lockDoor, out var lockDoorComp)
+                 && lockDoorComp.State != DoorState.Closed
+                 && TryComp<PhysicsComponent>(lockDoor, out var lockPhysics))
+        {
+            // The state change that shuts the door: whoever stands in it is gibbed now, and it closes
+            ClearDoorway(lockDoor, lockPhysics);
+            if (TryComp<AirlockComponent>(lockDoor, out var lockAirlock))
+                _airlock.SetSafety(lockAirlock, false);
+
+            _door.TryClose(lockDoor);
         }
 
         _audio.PlayPvs(state is BunkerVestibuleState.SirenOutside or BunkerVestibuleState.SirenInside ? StartSound : DoneSound, uid);
@@ -176,6 +193,8 @@ public sealed class BunkerVestibuleSystem : EntitySystem
             return;
         }
 
+        // Closing for the lock is forced: it clears the doorway (people are gibbed, loose things removed) and shuts once, for
+        // certain. Otherwise the door is a normal airlock that never closes on anyone.
         // Whatever went wrong, a door that will not shut for this long is replaced by a new one that is shut
         if (doorComp.State == DoorState.Closed)
         {
@@ -191,10 +210,11 @@ public sealed class BunkerVestibuleSystem : EntitySystem
             }
         }
 
-        // A door crushes what stands in it and then opens again so nobody stays trapped, which would keep it open for good.
-        // Here whatever is left in the way (loose things, bodies) is removed so it can shut.
         if (doorComp.State != DoorState.Closed && TryComp<PhysicsComponent>(door, out var physics))
             ClearDoorway(door, physics);
+
+        if (TryComp<AirlockComponent>(door, out var airlock))
+            _airlock.SetSafety(airlock, doorComp.State == DoorState.Closed);
 
         switch (doorComp.State)
         {
@@ -242,12 +262,10 @@ public sealed class BunkerVestibuleSystem : EntitySystem
         foreach (var ent in _door.GetColliding(door, physics).ToList())
         {
             
-            // Living people are crushed by the door itself, bolted-down things stay
-            if (TryComp<MobStateComponent>(ent, out var mob))
+            // Anyone in the way is gibbed on the spot, bolted-down things stay
+            if (HasComp<MobStateComponent>(ent))
             {
-                if (_mobState.IsDead(ent, mob))
-                    _body.GibBody(ent);
-
+                _body.GibBody(ent);
                 continue;
             }
 

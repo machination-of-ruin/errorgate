@@ -24,7 +24,7 @@
 # The hatch on the surface. The door sprite is always shut: red lights while it is locked, blue while it can be used.
 - type: entity
   id: BunkerHatch
-  name: hatch
+  name: bunker entrance
   description: A heavy steel hatch set into the ground. A card reader is bolted to its frame.
   parent: BaseStructure
   categories: [ HideSpawnMenu ]
@@ -60,6 +60,8 @@
         - FullTileMask
         layer:
         - AirlockLayer
+  - type: Occluder
+  - type: Airtight
   - type: AccessReader
     access: [["Bunker"]]
   - type: BunkerHatch
@@ -103,6 +105,8 @@
         - FullTileMask
         layer:
         - AirlockLayer
+  - type: Occluder
+  - type: Airtight
   - type: BunkerLadder
 
 # The console in the middle of the vestibule, by the north wall. It cannot be broken (a structure with no damage).
@@ -153,8 +157,8 @@
     key: wallsstore
     base: store
 
-# The door between the vestibule and the bunker. It is shut and bolted by the vestibule system, never closes by itself, and has no
-# safety: it crushes whatever is in the way.
+# The door between the vestibule and the bunker. A normal airlock with its safety on (it never closes on anyone), except that
+# it never closes by itself: the vestibule system shuts it on a state change, gibbing whoever stands in it, and bolts it.
 - type: entity
   id: BunkerVestibuleDoor
   parent: AirlockTough
@@ -162,12 +166,7 @@
   categories: [ HideSpawnMenu ]
   components:
   - type: Airlock
-    safety: false
     autoClose: false
-  - type: Door
-    crushDamage:
-      types:
-        Blunt: 40
 
 - type: entity
   id: BunkerVestibule

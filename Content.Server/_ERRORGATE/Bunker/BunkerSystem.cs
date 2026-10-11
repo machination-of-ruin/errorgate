@@ -451,9 +451,9 @@ public sealed class BunkerSystem : EntitySystem
         vestibuleComp.Door = door;
         vestibuleComp.Ladder = ladder;
 
-        // The turning lights on the north and south walls; the south one faces the other way
-        vestibuleComp.Lights.Add(Spawn(LightProto, At(1, 3)));
-        var southLight = Spawn(LightProto, At(3, -1));
+        // The turning lights on the tiles inside the north and south walls; the south one faces the other way
+        vestibuleComp.Lights.Add(Spawn(LightProto, At(1, 2)));
+        var southLight = Spawn(LightProto, At(3, 0));
         _transform.SetLocalRotation(southLight, Angle.FromDegrees(180));
         vestibuleComp.Lights.Add(southLight);
 
@@ -463,6 +463,6 @@ public sealed class BunkerSystem : EntitySystem
         Spawn(LootProto, At(29, 5));
 
         _airTiles = floors.Keys.ToList();
-        arrival = At(1, 1);
+        arrival = At(0, 1); // the tile next to the hatch
     }
 }
