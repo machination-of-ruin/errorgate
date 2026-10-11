@@ -1,0 +1,278 @@
+# The hidden bunker: a hatch somewhere remote on the map (placed at run time, the map file is not edited) leads to a bunker on a
+# map of its own, through a timed vestibule. See docs/design/bunker.md for the sequence.
+
+# The key. Only a few exist per round, see the Kuznetsk loot table.
+- type: entity
+  parent: AccessCardBase
+  id: BunkerKey
+  name: bunker key
+  description: A grey card with a worn stripe.
+  suffix: ERRORGATE
+  components:
+  - type: Sprite
+    layers:
+    - state: default
+    - state: department
+      color: "#5C5C5C"
+    - state: subdepartment
+      color: "#5C5C5C"
+    - state: cargotechnician
+  - type: Access
+    tags:
+    - Bunker
+
+# The hatch on the surface. The door sprite is always shut: red lights while it is locked, blue while it can be used.
+- type: entity
+  id: BunkerHatch
+  name: bunker entrance
+  description: A heavy steel hatch set into the ground. A card reader is bolted to its frame.
+  parent: BaseStructure
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: Transform
+    anchored: true
+  - type: Sprite
+    sprite: Structures/Doors/Airlocks/Standard/hatch.rsi
+    drawdepth: Mobs
+    layers:
+    - state: closed
+    - state: bolted_unlit
+      shader: unshaded
+      map: [ "enum.BunkerHatchVisualLayers.Lights" ]
+  - type: Appearance
+  - type: GenericVisualizer
+    visuals:
+      enum.BunkerHatchVisuals.Locked:
+        enum.BunkerHatchVisualLayers.Lights:
+          True: { state: bolted_unlit }
+          False: { state: closed_unlit }
+  - type: InteractionOutline
+  - type: Physics
+    bodyType: Static
+  - type: Fixtures
+    fixtures:
+      fix1:
+        shape:
+          !type:PhysShapeAabb
+          bounds: "-0.49,-0.49,0.49,0.49"
+        density: 1000
+        mask:
+        - FullTileMask
+        layer:
+        - AirlockLayer
+  - type: Occluder
+  - type: Airtight
+  - type: AccessReader
+    access: [["Bunker"]]
+  - type: BunkerHatch
+
+# The hatch up, in the west wall of the vestibule. Same look and lights as the one outside.
+- type: entity
+  id: BunkerLadder
+  name: hatch
+  description: A hatch leading outside.
+  parent: BaseStructure
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: Transform
+    anchored: true
+  - type: Sprite
+    sprite: Structures/Doors/Airlocks/Standard/hatch.rsi
+    drawdepth: Mobs
+    layers:
+    - state: closed
+    - state: bolted_unlit
+      shader: unshaded
+      map: [ "enum.BunkerExitVisualLayers.Lights" ]
+  - type: Appearance
+  - type: GenericVisualizer
+    visuals:
+      enum.BunkerExitVisuals.Locked:
+        enum.BunkerExitVisualLayers.Lights:
+          True: { state: bolted_unlit }
+          False: { state: closed_unlit }
+  - type: InteractionOutline
+  - type: Physics
+    bodyType: Static
+  - type: Fixtures
+    fixtures:
+      fix1:
+        shape:
+          !type:PhysShapeAabb
+          bounds: "-0.49,-0.49,0.49,0.49"
+        density: 1000
+        mask:
+        - FullTileMask
+        layer:
+        - AirlockLayer
+  - type: Occluder
+  - type: Airtight
+  - type: BunkerLadder
+
+# The console in the middle of the vestibule, by the north wall. It cannot be broken (a structure with no damage).
+- type: entity
+  id: BunkerConsole
+  name: console
+  description: A console that runs the airlock.
+  parent: BaseStructure
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: Transform
+    anchored: true
+  - type: Sprite
+    sprite: Structures/Machines/computers.rsi
+    drawdepth: Objects
+    layers:
+    - state: computer
+    - state: generic
+      shader: unshaded
+    - state: generic_keys
+  - type: InteractionOutline
+  - type: Physics
+    bodyType: Static
+  - type: Fixtures
+    fixtures:
+      fix1:
+        shape:
+          !type:PhysShapeAabb
+          bounds: "-0.45,-0.45,0.45,0.45"
+        density: 1000
+        mask:
+        - MachineMask
+        layer:
+        - MachineLayer
+  - type: BunkerConsole
+
+# Concrete walls of the bunker rooms: the dark concrete look, but they cannot be broken
+- type: entity
+  parent: BaseWallIndestructible
+  id: BunkerWallConcrete
+  name: concrete wall
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: Sprite
+    sprite: _Nuclear14/Structures/Walls/nc14/concretedark.rsi
+  - type: Icon
+    sprite: _Nuclear14/Structures/Walls/nc14/concretedark.rsi
+  - type: IconSmooth
+    key: wallsstore
+    base: store
+
+# The door between the vestibule and the bunker. A normal airlock with its safety on (it never closes on anyone), except that
+# it never closes by itself: the vestibule system shuts it on a state change, gibbing whoever stands in it, and bolts it.
+- type: entity
+  id: BunkerVestibuleDoor
+  parent: AirlockTough
+  suffix: Bunker vestibule
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: Airlock
+    autoClose: false
+
+- type: entity
+  id: BunkerVestibule
+  name: vestibule controller
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: Transform
+    anchored: true
+  - type: BunkerVestibule
+
+# Turns while a siren sounds. One of these is by the hatch outside, two are on the walls of the vestibule.
+- type: entity
+  id: BunkerWarningLight
+  name: warning light
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: Transform
+    anchored: true
+  - type: Sprite
+    sprite: Structures/Wallmounts/Lighting/emergency_light.rsi
+    drawdepth: WallMountedItems
+    layers:
+    - state: base
+    - state: emergency_light_on
+      color: "#D41E1E"
+      shader: unshaded
+  - type: PointLight
+    enabled: false
+    radius: 6
+    energy: 3
+    color: "#D41E1E"
+    offset: "0, 0.4"
+    mask: /Textures/Effects/LightMasks/double_cone.png
+  - type: RotatingLight
+    speed: 150
+  - type: AmbientSound
+    enabled: false
+    range: 12
+    volume: 2
+    sound:
+      path: /Audio/Machines/alarm.ogg
+
+# The radiation of the bunker: yellow barrels with glowing goo, deadly without a suit but only a few tiles around them.
+- type: entity
+  parent: YellowBarrelFull
+  id: BunkerRadiationBarrel
+  suffix: Bunker
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: RadiationSource
+    intensity: 12
+    slope: 3
+  # A green glow, so people can tell it is radioactive from afar
+  - type: PointLight
+    enabled: true
+    radius: 4
+    energy: 2
+    color: "#3CDC3C"
+
+# The doors between rooms and corridors: the unpowered airlock of the map, opened by hand.
+- type: entity
+  parent: AirlockTough
+  id: BunkerRoomDoor
+  suffix: Bunker
+  categories: [ HideSpawnMenu ]
+  components:
+  # Really without power (the parent always counts as powered): pried open by hand
+  - type: ApcPowerReceiver
+    needsPower: true
+    powerLoad: 0
+
+# The reactor: the gravity generator look, a dead machine in the middle of its room
+- type: entity
+  parent: BaseStructure
+  id: BunkerReactor
+  name: reactor
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: Transform
+    anchored: true
+  - type: Sprite
+    sprite: Structures/Machines/gravity_generator.rsi
+    layers:
+    - state: on
+    - sprite: Structures/Machines/gravity_generator_core.rsi
+      state: activated
+      shader: unshaded
+  - type: Physics
+    bodyType: Static
+  - type: Fixtures
+    fixtures:
+      fix1:
+        shape:
+          !type:PhysShapeAabb
+          bounds: "-1.5,-1.5,1.5,1.5"
+        density: 50
+        mask:
+        - FullTileMask
+        layer:
+        - WallLayer
+  - type: RadiationSource
+    intensity: 16
+    slope: 2.5
+  - type: PointLight
+    enabled: true
+    radius: 7
+    energy: 3
+    color: "#3CDC3C"
