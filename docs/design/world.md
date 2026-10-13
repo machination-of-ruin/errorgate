@@ -67,6 +67,27 @@ A disconnected body stays where it is for 3 minutes (vulnerable), then is taken 
 
 A transition is a pair of entities (one in each location) that move players, and what they pull, like the bunker hatch does. Mobs do not follow. Arrival spots are generated with the location, so a reset moves them. A transition is blocked while its destination is resetting or its source is in the warning.
 
+## Dressing: what is in a location besides buildings (Proposed)
+
+First pass, in the generator now: **trees** in clumps and alone (never closer than two tiles apart), and **rock formations**, indestructible blobs and ridges of 4 to 45 tiles that break up sight lines. Both stay clear of structures (two tiles) and roads (one tile). Counts and tree kinds are per location prototype (`rocks`, `treeClumps`, `treeSingles`, `trees`).
+
+Ideas to add, in the order I would take them, each with a theme that shows where it fits:
+
+| Idea | Where | What it does |
+|---|---|---|
+| Boulders and scree (destructible) | all | Small cover that a pickaxe can clear, unlike the formations. |
+| Fences, hedges, low walls | village, city | Yards around houses, ways that funnel people to a gate. |
+| Wrecks (cars, a bus, a boat on the shore) | all | Cover on roads, loot containers, a sign of what happened. |
+| Ponds, shore, reeds | village | Water is slow terrain and a sight-line breaker of a different kind. |
+| Snowdrifts, fallen trees | city | Partial cover, slow tiles. |
+| Graveyard, burnt houses, a mass grave | village, city | Mood, hostile mobs, rare loot. |
+| Power lines, poles, billboards | city | Landmarks that help people find their way without a map. |
+| Roadblocks and checkpoints | city | A reason for squads to hold a place. |
+| Lamp posts, fires, camps | all | Light in the dark, a place where people may meet. |
+| Faults (see [anomalies.md](anomalies.md)) | all | Danger zones with a reward behind them. |
+
+Open: should trees block bullets, how thick are the forests, are rock formations ever passable through a gap, and does every location need the same density?
+
 ## Technical limits and risks
 
 - **Leaks over a week.** About 40 teardown and rebuild cycles per week. Every cycle must free entities, atmosphere, pathfinding data and maps. The first spike is a soak test that resets a location dozens of times in a row and watches memory, entity count and tick time.

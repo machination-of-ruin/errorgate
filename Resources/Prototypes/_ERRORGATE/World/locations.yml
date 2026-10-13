@@ -9,6 +9,14 @@
   ground: FloorPlanetGrass
   road: FloorPlanetDirt
   density: 1
+  rocks: 12
+  treeClumps: 14
+  treeSingles: 50
+  trees:
+  - FloraTree
+  - FloraTreeLarge
+  - FloraTreeConifer
+  - FloraTreeStump
   ambientLight: "#7A7A7A"
 
 - type: worldLocation
@@ -20,6 +28,13 @@
   ground: FloorSnow
   road: FloorAsphalt
   density: 1
+  rocks: 10
+  treeClumps: 8
+  treeSingles: 30
+  trees:
+  - FloraTreeSnow
+  - FloraTreeConifer
+  - FloraTreeStumpConifer
   ambientLight: "#6A6E78"
 
 # The border of a location: rock that cannot be dug out.

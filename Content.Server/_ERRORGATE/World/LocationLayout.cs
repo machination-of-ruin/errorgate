@@ -30,7 +30,13 @@ public sealed class LocationLayout
     /// <summary>Road tiles, three wide.</summary>
     public HashSet<Vector2i> Roads = new();
 
-    public static LocationLayout Generate(int seed, Vector2i size, IReadOnlyList<StructureInfo> pool, float density)
+    /// <summary>Tiles of indestructible rock, in formations.</summary>
+    public HashSet<Vector2i> Rocks = new();
+
+    /// <summary>Where trees stand.</summary>
+    public List<Vector2i> Trees = new();
+
+    public static LocationLayout Generate(int seed, Vector2i size, IReadOnlyList<StructureInfo> pool, float density, int rockCount = 0, int treeClumps = 0, int treeSingles = 0)
     {
         var rng = new Random(seed);
         var layout = new LocationLayout();
@@ -81,7 +87,127 @@ public sealed class LocationLayout
         }
 
         layout.BuildRoads(rng, size);
+        layout.Scatter(rng, size, rockCount, treeClumps, treeSingles);
         return layout;
+    }
+
+    /// <summary>
+    ///     Rock formations and trees in the free ground: away from the structures and the roads, and not on top of each other.
+    ///     Formations grow tile by tile from a random one, so they are uneven blobs and ridges, not squares.
+    /// </summary>
+    private void Scatter(Random rng, Vector2i size, int rockCount, int treeClumps, int treeSingles)
+    {
+        var blocked = new HashSet<Vector2i>();
+        foreach (var s in Structures)
+        {
+            for (var x = s.Min.X - 2; x <= s.Max.X + 2; x++)
+            {
+                for (var y = s.Min.Y - 2; y <= s.Max.Y + 2; y++)
+                {
+                    blocked.Add(new Vector2i(x, y));
+                }
+            }
+        }
+
+        foreach (var road in Roads)
+        {
+            for (var dx = -1; dx <= 1; dx++)
+            {
+                for (var dy = -1; dy <= 1; dy++)
+                {
+                    blocked.Add(new Vector2i(road.X + dx, road.Y + dy));
+                }
+            }
+        }
+
+        bool Free(Vector2i t) => t.X >= Margin && t.Y >= Margin && t.X < size.X - Margin && t.Y < size.Y - Margin && !blocked.Contains(t);
+        var dirs = new[] { new Vector2i(1, 0), new Vector2i(-1, 0), new Vector2i(0, 1), new Vector2i(0, -1) };
+
+        // Rock formations: a blob or a ridge, a few tiles to a few dozen, with a free tile around it
+        for (var i = 0; i < rockCount; i++)
+        {
+            for (var attempt = 0; attempt < 30; attempt++)
+            {
+                var start = new Vector2i(rng.Next(Margin, size.X - Margin), rng.Next(Margin, size.Y - Margin));
+                if (!Free(start))
+                    continue;
+
+                var want = rng.Next(4, 46);
+                var ridge = rng.Next(3) == 0; // a ridge keeps growing the same way, a blob in any way
+                var heading = dirs[rng.Next(4)];
+                var tiles = new HashSet<Vector2i> { start };
+                var tip = start;
+                for (var step = 0; step < want * 6 && tiles.Count < want; step++)
+                {
+                    var from = ridge && rng.Next(3) != 0 ? tip : tiles.ElementAt(rng.Next(tiles.Count));
+                    var next = from + (ridge && rng.Next(4) != 0 ? heading : dirs[rng.Next(4)]);
+                    if (!Free(next) || tiles.Contains(next))
+                        continue;
+
+                    tiles.Add(next);
+                    tip = next;
+                }
+
+                if (tiles.Count < 3)
+                    continue;
+
+                foreach (var t in tiles)
+                {
+                    Rocks.Add(t);
+                    for (var dx = -1; dx <= 1; dx++)
+                    {
+                        for (var dy = -1; dy <= 1; dy++)
+                        {
+                            blocked.Add(new Vector2i(t.X + dx, t.Y + dy));
+                        }
+                    }
+                }
+
+                break;
+            }
+        }
+
+        // Trees in clumps, and a few alone; never closer than two tiles to another tree
+        var treeSet = new HashSet<Vector2i>();
+        bool TryTree(Vector2i t)
+        {
+            if (!Free(t))
+                return false;
+
+            for (var dx = -1; dx <= 1; dx++)
+            {
+                for (var dy = -1; dy <= 1; dy++)
+                {
+                    if (treeSet.Contains(new Vector2i(t.X + dx, t.Y + dy)))
+                        return false;
+                }
+            }
+
+            treeSet.Add(t);
+            Trees.Add(t);
+            return true;
+        }
+
+        for (var c = 0; c < treeClumps; c++)
+        {
+            var center = new Vector2i(rng.Next(Margin, size.X - Margin), rng.Next(Margin, size.Y - Margin));
+            var radius = rng.Next(4, 11);
+            for (var dx = -radius; dx <= radius; dx++)
+            {
+                for (var dy = -radius; dy <= radius; dy++)
+                {
+                    if (dx * dx + dy * dy > radius * radius || rng.NextDouble() > 0.28)
+                        continue;
+
+                    TryTree(new Vector2i(center.X + dx, center.Y + dy));
+                }
+            }
+        }
+
+        for (var i = 0; i < treeSingles; i++)
+        {
+            TryTree(new Vector2i(rng.Next(Margin, size.X - Margin), rng.Next(Margin, size.Y - Margin)));
+        }
     }
 
     private static bool Overlaps(StructurePlacement a, StructurePlacement b)

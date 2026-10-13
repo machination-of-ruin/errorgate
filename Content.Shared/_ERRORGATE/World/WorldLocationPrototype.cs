@@ -44,6 +44,20 @@ public sealed partial class WorldLocationPrototype : IPrototype
     [DataField]
     public float Density = 1f;
 
+    /// <summary>Trees: the prototypes picked from, how many clumps of them, and how many single ones.</summary>
+    [DataField]
+    public List<EntProtoId> Trees = new();
+
+    [DataField]
+    public int TreeClumps = 10;
+
+    [DataField]
+    public int TreeSingles = 40;
+
+    /// <summary>How many indestructible rock formations break up the sight lines.</summary>
+    [DataField]
+    public int Rocks = 12;
+
     [DataField]
     public Color AmbientLight = Color.FromHex("#6A6A6A");
 }

@@ -85,7 +85,7 @@ public sealed class WorldSystem : EntitySystem
         var watch = System.Diagnostics.Stopwatch.StartNew();
         var entitiesBefore = EntityManager.EntityCount;
         var useSeed = seed ?? _random.Next();
-        var layout = LocationLayout.Generate(useSeed, proto.Size, pool, proto.Density);
+        var layout = LocationLayout.Generate(useSeed, proto.Size, pool, proto.Density, proto.Rocks, proto.TreeClumps, proto.TreeSingles);
 
         var mapUid = _map.CreateMap(out var mapId, runMapInit: true);
         _map.SetAmbientLight(mapId, proto.AmbientLight);
@@ -140,13 +140,15 @@ public sealed class WorldSystem : EntitySystem
                 continue;
             }
 
-            // Where the grid origin goes so that the turned footprint starts at p.Min
-            var rotation = Angle.FromDegrees(90 * p.Turns);
+            // The grid itself stays upright, so a camera aligned with the grid matches the ground. A turned structure has its content
+            // turned: tiles, positions and the way every entity faces. This is where the grid origin goes so that the turned
+            // footprint starts at p.Min.
+            RotateContent(grid.Value, p.Turns);
             var a = Rotate(p.Info.LocalMin, p.Turns);
             var b = Rotate(p.Info.LocalMin + new Vector2i(p.Info.Width, p.Info.Height), p.Turns);
             var rotatedMin = new Vector2(Math.Min(a.X, b.X), Math.Min(a.Y, b.Y));
             var origin = new Vector2(p.Min.X, p.Min.Y) - rotatedMin;
-            _transform.SetWorldPositionRotation(grid.Value.Owner, origin, rotation);
+            _transform.SetWorldPositionRotation(grid.Value.Owner, origin, Angle.Zero);
 
             // A grid is a dynamic body by default and would be pushed around by the ground grid and the others it overlaps
             _physics.SetBodyType(grid.Value.Owner, BodyType.Static);
@@ -157,7 +159,7 @@ public sealed class WorldSystem : EntitySystem
             foreach (var t in _map.GetAllTiles(grid.Value.Owner, grid.Value.Comp))
             {
                 structureTiles.Add(t.GridIndices);
-                var worldCentre = RotateVector(new Vector2(t.GridIndices.X + 0.5f, t.GridIndices.Y + 0.5f), p.Turns) + origin;
+                var worldCentre = new Vector2(t.GridIndices.X + 0.5f, t.GridIndices.Y + 0.5f) + origin;
                 holes.Add((new Vector2i((int) MathF.Floor(worldCentre.X), (int) MathF.Floor(worldCentre.Y)), Tile.Empty));
             }
 
@@ -165,6 +167,22 @@ public sealed class WorldSystem : EntitySystem
             EnsureComp<GridAtmosphereComponent>(grid.Value.Owner);
             _pendingAir.Add(new PendingAir(grid.Value.Owner, structureTiles, _timing.CurTime + TimeSpan.FromSeconds(120)));
             placed++;
+        }
+
+        // Rock formations and trees in the free ground
+        foreach (var rock in layout.Rocks)
+        {
+            Spawn(proto.Border, _map.GridTileToLocal(ground.Owner, ground.Comp, rock));
+        }
+
+        if (proto.Trees.Count > 0)
+        {
+            var treeRng = new Random(useSeed ^ 0x5EED);
+            foreach (var tree in layout.Trees)
+            {
+                var spot = _map.GridTileToLocal(ground.Owner, ground.Comp, tree);
+                Spawn(proto.Trees[treeRng.Next(proto.Trees.Count)], spot);
+            }
         }
 
         var groundTiles = _map.GetAllTiles(ground.Owner, ground.Comp).Select(t => t.GridIndices).ToList();
@@ -193,6 +211,67 @@ public sealed class WorldSystem : EntitySystem
 
         if (!TerminatingOrDeleted(loc.Map))
             QueueDel(loc.Map);
+    }
+
+    /// <summary>
+    ///     Turns what is on a grid by quarter turns around its origin, leaving the grid as it is: the tiles move, and every entity
+    ///     moves and faces the new way. Anchored things are let go and anchored again once the tiles are in place.
+    /// </summary>
+    private void RotateContent(Entity<MapGridComponent> grid, int turns)
+    {
+        if (turns % 4 == 0)
+            return;
+
+        var angle = Angle.FromDegrees(90 * turns);
+        var old = _map.GetAllTiles(grid.Owner, grid.Comp).ToList();
+
+        var children = new List<(EntityUid Uid, bool Anchored, Vector2 Pos, Angle Rot)>();
+        var lost = new Dictionary<EntityUid, string>();
+        var xform = Transform(grid.Owner);
+        var enumerator = xform.ChildEnumerator;
+        while (enumerator.MoveNext(out var child))
+        {
+            var childXform = Transform(child);
+            children.Add((child, childXform.Anchored, childXform.LocalPosition, childXform.LocalRotation));
+            lost[child] = MetaData(child).EntityPrototype?.ID ?? "?";
+        }
+
+        // Taking the tiles away must not take the things on them with it, so they wait on the map meanwhile
+        var mapUid = xform.MapUid!.Value;
+        foreach (var (child, anchored, _, _) in children)
+        {
+            var childXform = Transform(child);
+            if (anchored)
+                _transform.Unanchor(child, childXform);
+
+            _transform.SetParent(child, childXform, mapUid);
+        }
+
+        // One change for all the tiles: a grid without any tile is deleted
+        var moved = old.Select(t =>
+        {
+            var c = RotateVector(new Vector2(t.GridIndices.X + 0.5f, t.GridIndices.Y + 0.5f), turns);
+            return (Index: new Vector2i((int) MathF.Floor(c.X), (int) MathF.Floor(c.Y)), t.Tile);
+        }).ToList();
+
+        var taken = moved.Select(m => m.Index).ToHashSet();
+        var change = old.Where(t => !taken.Contains(t.GridIndices)).Select(t => (t.GridIndices, Tile.Empty)).ToList();
+        change.AddRange(moved.Select(m => (m.Index, m.Tile)));
+        _map.SetTiles(grid.Owner, grid.Comp, change);
+
+        foreach (var (uid, anchored, pos, rot) in children)
+        {
+            if (!Exists(uid))
+            {
+                Log.Warning($"World: an entity was lost while turning a structure ({lost.GetValueOrDefault(uid)})");
+                continue;
+            }
+
+            var childXform = Transform(uid);
+            _transform.SetCoordinates(uid, childXform, new EntityCoordinates(grid.Owner, RotateVector(pos, turns)), rot + angle);
+            if (anchored)
+                _transform.AnchorEntity(uid, childXform);
+        }
     }
 
     private static Vector2 Rotate(Vector2i v, int turns) => RotateVector(new Vector2(v.X, v.Y), turns);
