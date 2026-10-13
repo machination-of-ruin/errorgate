@@ -4,8 +4,8 @@ meta:
   engineVersion: 260.2.0
   forkId: ""
   forkVersion: ""
-  time: 10/13/2026 20:53:40
-  entityCount: 39
+  time: 10/13/2026 21:15:39
+  entityCount: 61
 maps: []
 grids:
 - 1
@@ -14,7 +14,7 @@ orphans:
 nullspace: []
 tilemap:
   1: Space
-  0: FloorOldConcreteSmooth
+  0: FloorConcrete
 entities:
 - proto: ""
   entities:
@@ -23,13 +23,13 @@ entities:
     - type: MetaData
       name: grid
     - type: Transform
-      pos: 21800,0
+      pos: 21900,0
       parent: invalid
     - type: MapGrid
       chunks:
         0,0:
           ind: 0,0
-          tiles: AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAAAAAQAAAAAAAAEAAAAAAAABAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAEAAAAAAAABAAAAAAAAAQAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAABAAAAAAAAAQAAAAAAAAEAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAAAAAQAAAAAAAAEAAAAAAAABAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAEAAAAAAAABAAAAAAAAAQAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAABAAAAAAAAAQAAAAAAAAEAAAAAAAABAAAAAAAAAQAAAAAAAAEAAAAAAAABAAAAAAAAAQAAAAAAAAEAAAAAAAABAAAAAAAAAQAAAAAAAAEAAAAAAAABAAAAAAAAAQAAAAAAAAEAAAAAAAABAAAAAAAAAQAAAAAAAAEAAAAAAAABAAAAAAAAAQAAAAAAAAEAAAAAAAABAAAAAAAAAQAAAAAAAAEAAAAAAAABAAAAAAAAAQAAAAAAAAEAAAAAAAABAAAAAAAAAQAAAAAAAAEAAAAAAAABAAAAAAAAAQAAAAAAAAEAAAAAAAABAAAAAAAAAQAAAAAAAAEAAAAAAAABAAAAAAAAAQAAAAAAAAEAAAAAAAABAAAAAAAAAQAAAAAAAAEAAAAAAAABAAAAAAAAAQAAAAAAAAEAAAAAAAABAAAAAAAAAQAAAAAAAAEAAAAAAAABAAAAAAAAAQAAAAAAAAEAAAAAAAABAAAAAAAAAQAAAAAAAAEAAAAAAAABAAAAAAAAAQAAAAAAAAEAAAAAAAABAAAAAAAAAQAAAAAAAAEAAAAAAAABAAAAAAAAAQAAAAAAAAEAAAAAAAABAAAAAAAAAQAAAAAAAAEAAAAAAAABAAAAAAAAAQAAAAAAAAEAAAAAAAABAAAAAAAAAQAAAAAAAAEAAAAAAAABAAAAAAAAAQAAAAAAAAEAAAAAAAABAAAAAAAAAQAAAAAAAAEAAAAAAAABAAAAAAAAAQAAAAAAAAEAAAAAAAABAAAAAAAAAQAAAAAAAAEAAAAAAAABAAAAAAAAAQAAAAAAAAEAAAAAAAABAAAAAAAAAQAAAAAAAAEAAAAAAAABAAAAAAAAAQAAAAAAAAEAAAAAAAABAAAAAAAAAQAAAAAAAAEAAAAAAAABAAAAAAAAAQAAAAAAAAEAAAAAAAABAAAAAAAAAQAAAAAAAAEAAAAAAAABAAAAAAAAAQAAAAAAAAEAAAAAAAABAAAAAAAAAQAAAAAAAAEAAAAAAAABAAAAAAAAAQAAAAAAAAEAAAAAAAABAAAAAAAAAQAAAAAAAAEAAAAAAAABAAAAAAAAAQAAAAAAAAEAAAAAAAABAAAAAAAAAQAAAAAAAAEAAAAAAAABAAAAAAAAAQAAAAAAAAEAAAAAAAABAAAAAAAAAQAAAAAAAAEAAAAAAAABAAAAAAAAAQAAAAAAAAEAAAAAAAABAAAAAAAAAQAAAAAAAAEAAAAAAAABAAAAAAAAAQAAAAAAAAEAAAAAAAABAAAAAAAAAQAAAAAAAAEAAAAAAAABAAAAAAAAAQAAAAAAAAEAAAAAAAABAAAAAAAAAQAAAAAAAAEAAAAAAAABAAAAAAAAAQAAAAAAAAEAAAAAAAABAAAAAAAAAQAAAAAAAAEAAAAAAAABAAAAAAAAAQAAAAAAAAEAAAAAAAABAAAAAAAAAQAAAAAAAAEAAAAAAAABAAAAAAAAAQAAAAAAAAEAAAAAAAABAAAAAAAAAQAAAAAAAAEAAAAAAAABAAAAAAAAAQAAAAAAAA==
+          tiles: AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAEAAAAAAAABAAAAAAAAAQAAAAAAAAEAAAAAAAABAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAABAAAAAAAAAQAAAAAAAAEAAAAAAAABAAAAAAAAAQAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAAAAAQAAAAAAAAEAAAAAAAABAAAAAAAAAQAAAAAAAAEAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAEAAAAAAAABAAAAAAAAAQAAAAAAAAEAAAAAAAABAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAABAAAAAAAAAQAAAAAAAAEAAAAAAAABAAAAAAAAAQAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAAAAAQAAAAAAAAEAAAAAAAABAAAAAAAAAQAAAAAAAAEAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAEAAAAAAAABAAAAAAAAAQAAAAAAAAEAAAAAAAABAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAABAAAAAAAAAQAAAAAAAAEAAAAAAAABAAAAAAAAAQAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAAAAAQAAAAAAAAEAAAAAAAABAAAAAAAAAQAAAAAAAAEAAAAAAAABAAAAAAAAAQAAAAAAAAEAAAAAAAABAAAAAAAAAQAAAAAAAAEAAAAAAAABAAAAAAAAAQAAAAAAAAEAAAAAAAABAAAAAAAAAQAAAAAAAAEAAAAAAAABAAAAAAAAAQAAAAAAAAEAAAAAAAABAAAAAAAAAQAAAAAAAAEAAAAAAAABAAAAAAAAAQAAAAAAAAEAAAAAAAABAAAAAAAAAQAAAAAAAAEAAAAAAAABAAAAAAAAAQAAAAAAAAEAAAAAAAABAAAAAAAAAQAAAAAAAAEAAAAAAAABAAAAAAAAAQAAAAAAAAEAAAAAAAABAAAAAAAAAQAAAAAAAAEAAAAAAAABAAAAAAAAAQAAAAAAAAEAAAAAAAABAAAAAAAAAQAAAAAAAAEAAAAAAAABAAAAAAAAAQAAAAAAAAEAAAAAAAABAAAAAAAAAQAAAAAAAAEAAAAAAAABAAAAAAAAAQAAAAAAAAEAAAAAAAABAAAAAAAAAQAAAAAAAAEAAAAAAAABAAAAAAAAAQAAAAAAAAEAAAAAAAABAAAAAAAAAQAAAAAAAAEAAAAAAAABAAAAAAAAAQAAAAAAAAEAAAAAAAABAAAAAAAAAQAAAAAAAAEAAAAAAAABAAAAAAAAAQAAAAAAAAEAAAAAAAABAAAAAAAAAQAAAAAAAAEAAAAAAAABAAAAAAAAAQAAAAAAAAEAAAAAAAABAAAAAAAAAQAAAAAAAAEAAAAAAAABAAAAAAAAAQAAAAAAAAEAAAAAAAABAAAAAAAAAQAAAAAAAAEAAAAAAAABAAAAAAAAAQAAAAAAAAEAAAAAAAABAAAAAAAAAQAAAAAAAAEAAAAAAAABAAAAAAAAAQAAAAAAAAEAAAAAAAABAAAAAAAAAQAAAAAAAAEAAAAAAAABAAAAAAAAAQAAAAAAAAEAAAAAAAABAAAAAAAAAQAAAAAAAAEAAAAAAAABAAAAAAAAAQAAAAAAAAEAAAAAAAABAAAAAAAAAQAAAAAAAAEAAAAAAAABAAAAAAAAAQAAAAAAAAEAAAAAAAABAAAAAAAAAQAAAAAAAA==
           version: 7
     - type: Broadphase
     - type: Physics
@@ -59,34 +59,191 @@ entities:
     - type: GasTileOverlay
 - proto: LootSpawnerIndustrialTier1
   entities:
+  - uid: 13
+    components:
+    - type: Transform
+      pos: 1.5,1.5
+      parent: 1
+  - uid: 15
+    components:
+    - type: Transform
+      pos: 1.5,2.5
+      parent: 1
+  - uid: 18
+    components:
+    - type: Transform
+      pos: 1.5,4.5
+      parent: 1
   - uid: 21
     components:
     - type: Transform
-      pos: 7.5,4.5
+      pos: 1.5,6.5
       parent: 1
-  - uid: 27
+  - uid: 48
     components:
     - type: Transform
-      pos: 8.5,4.5
+      pos: 7.5,1.5
       parent: 1
-- proto: LootSpawnerLivingTier1
+  - uid: 50
+    components:
+    - type: Transform
+      pos: 7.5,2.5
+      parent: 1
+- proto: LootSpawnerPrisonTier1
   entities:
-  - uid: 25
+  - uid: 34
     components:
     - type: Transform
-      pos: 8.5,1.5
+      pos: 4.5,7.5
       parent: 1
-  - uid: 31
+  - uid: 39
     components:
     - type: Transform
-      pos: 9.5,1.5
+      pos: 5.5,7.5
       parent: 1
+  - uid: 44
+    components:
+    - type: Transform
+      pos: 6.5,7.5
+      parent: 1
+- proto: MachineFrameDestroyed
+  entities:
+  - uid: 17
+    components:
+    - type: Transform
+      pos: 1.5,4.5
+      parent: 1
+    - type: Physics
+      angularDamping: 0
+      linearDamping: 0
+  - uid: 19
+    components:
+    - type: Transform
+      pos: 1.5,5.5
+      parent: 1
+    - type: Physics
+      angularDamping: 0
+      linearDamping: 0
+  - uid: 20
+    components:
+    - type: Transform
+      pos: 1.5,6.5
+      parent: 1
+    - type: Physics
+      angularDamping: 0
+      linearDamping: 0
+  - uid: 22
+    components:
+    - type: Transform
+      pos: 1.5,7.5
+      parent: 1
+    - type: Physics
+      angularDamping: 0
+      linearDamping: 0
 - proto: MetalDoor
   entities:
+  - uid: 24
+    components:
+    - type: Transform
+      pos: 2.5,0.5
+      parent: 1
+    - type: Physics
+      angularDamping: 0
+      linearDamping: 0
+  - uid: 41
+    components:
+    - type: Transform
+      pos: 6.5,0.5
+      parent: 1
+    - type: Physics
+      angularDamping: 0
+      linearDamping: 0
+  - uid: 42
+    components:
+    - type: Transform
+      pos: 6.5,3.5
+      parent: 1
+    - type: Physics
+      angularDamping: 0
+      linearDamping: 0
+- proto: Rack
+  entities:
+  - uid: 12
+    components:
+    - type: Transform
+      pos: 1.5,1.5
+      parent: 1
+    - type: Physics
+      angularDamping: 0
+      linearDamping: 0
+  - uid: 14
+    components:
+    - type: Transform
+      pos: 1.5,2.5
+      parent: 1
+    - type: Physics
+      angularDamping: 0
+      linearDamping: 0
+  - uid: 33
+    components:
+    - type: Transform
+      pos: 4.5,7.5
+      parent: 1
+    - type: Physics
+      angularDamping: 0
+      linearDamping: 0
+  - uid: 38
+    components:
+    - type: Transform
+      pos: 5.5,7.5
+      parent: 1
+    - type: Physics
+      angularDamping: 0
+      linearDamping: 0
+  - uid: 43
+    components:
+    - type: Transform
+      pos: 6.5,7.5
+      parent: 1
+    - type: Physics
+      angularDamping: 0
+      linearDamping: 0
+  - uid: 47
+    components:
+    - type: Transform
+      pos: 7.5,1.5
+      parent: 1
+    - type: Physics
+      angularDamping: 0
+      linearDamping: 0
+  - uid: 49
+    components:
+    - type: Transform
+      pos: 7.5,2.5
+      parent: 1
+    - type: Physics
+      angularDamping: 0
+      linearDamping: 0
+- proto: SignElectricalMed
+  entities:
+  - uid: 30
+    components:
+    - type: Transform
+      pos: 4.5,0.5
+      parent: 1
+- proto: WallSolidRust
+  entities:
+  - uid: 2
+    components:
+    - type: Transform
+      pos: 0.5,0.5
+      parent: 1
+    - type: Physics
+      angularDamping: 0
+      linearDamping: 0
   - uid: 3
     components:
     - type: Transform
-      rot: 1.5707963267948966 rad
       pos: 0.5,1.5
       parent: 1
     - type: Physics
@@ -95,7 +252,6 @@ entities:
   - uid: 4
     components:
     - type: Transform
-      rot: 1.5707963267948966 rad
       pos: 0.5,2.5
       parent: 1
     - type: Physics
@@ -104,7 +260,6 @@ entities:
   - uid: 5
     components:
     - type: Transform
-      rot: 1.5707963267948966 rad
       pos: 0.5,3.5
       parent: 1
     - type: Physics
@@ -113,53 +268,7 @@ entities:
   - uid: 6
     components:
     - type: Transform
-      rot: 1.5707963267948966 rad
       pos: 0.5,4.5
-      parent: 1
-    - type: Physics
-      angularDamping: 0
-      linearDamping: 0
-- proto: Rack
-  entities:
-  - uid: 22
-    components:
-    - type: Transform
-      pos: 7.5,4.5
-      parent: 1
-    - type: Physics
-      angularDamping: 0
-      linearDamping: 0
-  - uid: 26
-    components:
-    - type: Transform
-      pos: 8.5,1.5
-      parent: 1
-    - type: Physics
-      angularDamping: 0
-      linearDamping: 0
-  - uid: 28
-    components:
-    - type: Transform
-      pos: 8.5,4.5
-      parent: 1
-    - type: Physics
-      angularDamping: 0
-      linearDamping: 0
-  - uid: 32
-    components:
-    - type: Transform
-      pos: 9.5,1.5
-      parent: 1
-    - type: Physics
-      angularDamping: 0
-      linearDamping: 0
-- proto: WallSolidRust
-  entities:
-  - uid: 2
-    components:
-    - type: Transform
-      rot: 1.5707963267948966 rad
-      pos: 0.5,0.5
       parent: 1
     - type: Physics
       angularDamping: 0
@@ -167,7 +276,6 @@ entities:
   - uid: 7
     components:
     - type: Transform
-      rot: 1.5707963267948966 rad
       pos: 0.5,5.5
       parent: 1
     - type: Physics
@@ -176,8 +284,7 @@ entities:
   - uid: 8
     components:
     - type: Transform
-      rot: 1.5707963267948966 rad
-      pos: 1.5,0.5
+      pos: 0.5,6.5
       parent: 1
     - type: Physics
       angularDamping: 0
@@ -185,8 +292,7 @@ entities:
   - uid: 9
     components:
     - type: Transform
-      rot: 1.5707963267948966 rad
-      pos: 1.5,5.5
+      pos: 0.5,7.5
       parent: 1
     - type: Physics
       angularDamping: 0
@@ -194,8 +300,7 @@ entities:
   - uid: 10
     components:
     - type: Transform
-      rot: 1.5707963267948966 rad
-      pos: 2.5,0.5
+      pos: 0.5,8.5
       parent: 1
     - type: Physics
       angularDamping: 0
@@ -203,44 +308,7 @@ entities:
   - uid: 11
     components:
     - type: Transform
-      rot: 1.5707963267948966 rad
-      pos: 2.5,5.5
-      parent: 1
-    - type: Physics
-      angularDamping: 0
-      linearDamping: 0
-  - uid: 12
-    components:
-    - type: Transform
-      rot: 1.5707963267948966 rad
-      pos: 3.5,0.5
-      parent: 1
-    - type: Physics
-      angularDamping: 0
-      linearDamping: 0
-  - uid: 13
-    components:
-    - type: Transform
-      rot: 1.5707963267948966 rad
-      pos: 3.5,5.5
-      parent: 1
-    - type: Physics
-      angularDamping: 0
-      linearDamping: 0
-  - uid: 14
-    components:
-    - type: Transform
-      rot: 1.5707963267948966 rad
-      pos: 4.5,0.5
-      parent: 1
-    - type: Physics
-      angularDamping: 0
-      linearDamping: 0
-  - uid: 15
-    components:
-    - type: Transform
-      rot: 1.5707963267948966 rad
-      pos: 4.5,5.5
+      pos: 1.5,0.5
       parent: 1
     - type: Physics
       angularDamping: 0
@@ -248,44 +316,7 @@ entities:
   - uid: 16
     components:
     - type: Transform
-      rot: 1.5707963267948966 rad
-      pos: 5.5,0.5
-      parent: 1
-    - type: Physics
-      angularDamping: 0
-      linearDamping: 0
-  - uid: 17
-    components:
-    - type: Transform
-      rot: 1.5707963267948966 rad
-      pos: 5.5,5.5
-      parent: 1
-    - type: Physics
-      angularDamping: 0
-      linearDamping: 0
-  - uid: 18
-    components:
-    - type: Transform
-      rot: 1.5707963267948966 rad
-      pos: 6.5,0.5
-      parent: 1
-    - type: Physics
-      angularDamping: 0
-      linearDamping: 0
-  - uid: 19
-    components:
-    - type: Transform
-      rot: 1.5707963267948966 rad
-      pos: 6.5,5.5
-      parent: 1
-    - type: Physics
-      angularDamping: 0
-      linearDamping: 0
-  - uid: 20
-    components:
-    - type: Transform
-      rot: 1.5707963267948966 rad
-      pos: 7.5,0.5
+      pos: 1.5,3.5
       parent: 1
     - type: Physics
       angularDamping: 0
@@ -293,17 +324,39 @@ entities:
   - uid: 23
     components:
     - type: Transform
-      rot: 1.5707963267948966 rad
-      pos: 7.5,5.5
+      pos: 1.5,8.5
       parent: 1
     - type: Physics
       angularDamping: 0
       linearDamping: 0
-  - uid: 24
+  - uid: 25
     components:
     - type: Transform
-      rot: 1.5707963267948966 rad
-      pos: 8.5,0.5
+      pos: 2.5,3.5
+      parent: 1
+    - type: Physics
+      angularDamping: 0
+      linearDamping: 0
+  - uid: 26
+    components:
+    - type: Transform
+      pos: 2.5,8.5
+      parent: 1
+    - type: Physics
+      angularDamping: 0
+      linearDamping: 0
+  - uid: 27
+    components:
+    - type: Transform
+      pos: 3.5,0.5
+      parent: 1
+    - type: Physics
+      angularDamping: 0
+      linearDamping: 0
+  - uid: 28
+    components:
+    - type: Transform
+      pos: 3.5,3.5
       parent: 1
     - type: Physics
       angularDamping: 0
@@ -311,35 +364,23 @@ entities:
   - uid: 29
     components:
     - type: Transform
-      rot: 1.5707963267948966 rad
-      pos: 8.5,5.5
+      pos: 3.5,8.5
       parent: 1
     - type: Physics
       angularDamping: 0
       linearDamping: 0
-  - uid: 30
+  - uid: 31
     components:
     - type: Transform
-      rot: 1.5707963267948966 rad
-      pos: 9.5,0.5
+      pos: 4.5,0.5
       parent: 1
     - type: Physics
       angularDamping: 0
       linearDamping: 0
-  - uid: 33
+  - uid: 32
     components:
     - type: Transform
-      rot: 1.5707963267948966 rad
-      pos: 9.5,5.5
-      parent: 1
-    - type: Physics
-      angularDamping: 0
-      linearDamping: 0
-  - uid: 34
-    components:
-    - type: Transform
-      rot: 1.5707963267948966 rad
-      pos: 10.5,0.5
+      pos: 4.5,3.5
       parent: 1
     - type: Physics
       angularDamping: 0
@@ -347,8 +388,7 @@ entities:
   - uid: 35
     components:
     - type: Transform
-      rot: 1.5707963267948966 rad
-      pos: 10.5,1.5
+      pos: 4.5,8.5
       parent: 1
     - type: Physics
       angularDamping: 0
@@ -356,8 +396,7 @@ entities:
   - uid: 36
     components:
     - type: Transform
-      rot: 1.5707963267948966 rad
-      pos: 10.5,2.5
+      pos: 5.5,0.5
       parent: 1
     - type: Physics
       angularDamping: 0
@@ -365,26 +404,119 @@ entities:
   - uid: 37
     components:
     - type: Transform
-      rot: 1.5707963267948966 rad
-      pos: 10.5,3.5
+      pos: 5.5,3.5
       parent: 1
     - type: Physics
       angularDamping: 0
       linearDamping: 0
-  - uid: 38
+  - uid: 40
     components:
     - type: Transform
-      rot: 1.5707963267948966 rad
-      pos: 10.5,4.5
+      pos: 5.5,8.5
       parent: 1
     - type: Physics
       angularDamping: 0
       linearDamping: 0
-  - uid: 39
+  - uid: 45
     components:
     - type: Transform
-      rot: 1.5707963267948966 rad
-      pos: 10.5,5.5
+      pos: 6.5,8.5
+      parent: 1
+    - type: Physics
+      angularDamping: 0
+      linearDamping: 0
+  - uid: 46
+    components:
+    - type: Transform
+      pos: 7.5,0.5
+      parent: 1
+    - type: Physics
+      angularDamping: 0
+      linearDamping: 0
+  - uid: 51
+    components:
+    - type: Transform
+      pos: 7.5,3.5
+      parent: 1
+    - type: Physics
+      angularDamping: 0
+      linearDamping: 0
+  - uid: 52
+    components:
+    - type: Transform
+      pos: 7.5,8.5
+      parent: 1
+    - type: Physics
+      angularDamping: 0
+      linearDamping: 0
+  - uid: 53
+    components:
+    - type: Transform
+      pos: 8.5,0.5
+      parent: 1
+    - type: Physics
+      angularDamping: 0
+      linearDamping: 0
+  - uid: 54
+    components:
+    - type: Transform
+      pos: 8.5,1.5
+      parent: 1
+    - type: Physics
+      angularDamping: 0
+      linearDamping: 0
+  - uid: 55
+    components:
+    - type: Transform
+      pos: 8.5,2.5
+      parent: 1
+    - type: Physics
+      angularDamping: 0
+      linearDamping: 0
+  - uid: 56
+    components:
+    - type: Transform
+      pos: 8.5,3.5
+      parent: 1
+    - type: Physics
+      angularDamping: 0
+      linearDamping: 0
+  - uid: 57
+    components:
+    - type: Transform
+      pos: 8.5,4.5
+      parent: 1
+    - type: Physics
+      angularDamping: 0
+      linearDamping: 0
+  - uid: 58
+    components:
+    - type: Transform
+      pos: 8.5,5.5
+      parent: 1
+    - type: Physics
+      angularDamping: 0
+      linearDamping: 0
+  - uid: 59
+    components:
+    - type: Transform
+      pos: 8.5,6.5
+      parent: 1
+    - type: Physics
+      angularDamping: 0
+      linearDamping: 0
+  - uid: 60
+    components:
+    - type: Transform
+      pos: 8.5,7.5
+      parent: 1
+    - type: Physics
+      angularDamping: 0
+      linearDamping: 0
+  - uid: 61
+    components:
+    - type: Transform
+      pos: 8.5,8.5
       parent: 1
     - type: Physics
       angularDamping: 0

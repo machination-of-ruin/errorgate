@@ -8,6 +8,7 @@ using Content.Server.Gravity;
 using Content.Shared._ERRORGATE.World;
 using Content.Shared.Atmos;
 using Content.Shared.Buckle.Components;
+using Content.Shared.Doors.Components;
 using Content.Shared.Gravity;
 using Content.Shared.Light.Components;
 using Content.Shared.Wall;
@@ -65,6 +66,9 @@ public sealed class WorldSystem : EntitySystem
         public int Structures;
         public double BuildMilliseconds;
         public int Entities;
+
+        /// <summary>Every structure built and its grid, for the tools and tests.</summary>
+        public List<(EntityUid Grid, StructurePlacement Placement)> Built = new();
     }
 
     private readonly Dictionary<string, Location> _locations = new();
@@ -95,7 +99,7 @@ public sealed class WorldSystem : EntitySystem
         var watch = System.Diagnostics.Stopwatch.StartNew();
         var entitiesBefore = EntityManager.EntityCount;
         var useSeed = seed ?? _random.Next();
-        var options = new LocationLayout.Options(proto.Rocks, proto.TreeClumps, proto.TreeSingles, proto.Shore,
+        var options = new LocationLayout.Options(proto.Style, proto.Rocks, proto.TreeClumps, proto.TreeSingles, proto.Shore,
             proto.Props.Select(e => (e.Count, e.Clump)).ToList(), proto.Decals.Select(e => (e.Count, e.Clump)).ToList());
         var layout = LocationLayout.Generate(useSeed, proto.Size, pool, proto.Density, options);
 
@@ -130,6 +134,7 @@ public sealed class WorldSystem : EntitySystem
         var roadDef = (ContentTileDefinition) _tileDefs[proto.Road];
         var sandDef = (ContentTileDefinition) _tileDefs[proto.Sand];
         var iceDef = (ContentTileDefinition) _tileDefs[proto.IceTile];
+        var walkDef = (ContentTileDefinition) _tileDefs[proto.Walkway];
         var tiles = new List<(Vector2i, Tile)>(proto.Size.X * proto.Size.Y);
         for (var x = 0; x < proto.Size.X; x++)
         {
@@ -139,7 +144,7 @@ public sealed class WorldSystem : EntitySystem
                 var pos = new Vector2i(x, y);
                 var def = layout.Terrain.TryGetValue(pos, out var shore)
                     ? (shore == LocationLayout.ShoreTile.Ice ? iceDef : sandDef)
-                    : layout.Roads.Contains(pos) ? roadDef : groundDef;
+                    : layout.Roads.Contains(pos) ? roadDef : layout.Walks.Contains(pos) ? walkDef : groundDef;
                 tiles.Add((pos, new Tile(def.TileId, 0, _tile.PickVariant(def))));
             }
         }
@@ -161,6 +166,7 @@ public sealed class WorldSystem : EntitySystem
 
         // The structures, each on a grid of its own
         var placed = 0;
+        var built = new List<(EntityUid, StructurePlacement)>();
         foreach (var p in layout.Structures)
         {
             if (!_loader.TryLoadGrid(mapId, new ResPath(p.Info.Path), out var grid))
@@ -170,13 +176,9 @@ public sealed class WorldSystem : EntitySystem
             }
 
             // The grid itself stays upright, so a camera aligned with the grid matches the ground. A turned structure has its content
-            // turned: tiles, positions and the way every entity faces. This is where the grid origin goes so that the turned
-            // footprint starts at p.Min.
+            // turned: tiles, positions and the way entities face. The layout says where the grid origin goes.
             RotateContent(grid.Value, p.Turns);
-            var a = Rotate(p.Info.LocalMin, p.Turns);
-            var b = Rotate(p.Info.LocalMin + new Vector2i(p.Info.Width, p.Info.Height), p.Turns);
-            var rotatedMin = new Vector2(Math.Min(a.X, b.X), Math.Min(a.Y, b.Y));
-            var origin = new Vector2(p.Min.X, p.Min.Y) - rotatedMin;
+            var origin = p.Origin;
             _transform.SetWorldPositionRotation(grid.Value.Owner, origin, Angle.Zero);
 
             // A grid is a dynamic body by default and would be pushed around by the ground grid and the others it overlaps
@@ -196,6 +198,7 @@ public sealed class WorldSystem : EntitySystem
             EnsureComp<GridAtmosphereComponent>(grid.Value.Owner);
             _pendingAir.Add(new PendingAir(grid.Value.Owner, structureTiles, _timing.CurTime + TimeSpan.FromSeconds(120)));
             placed++;
+            built.Add((grid.Value.Owner, p));
         }
 
         // The water lies on the shallow part of the shore
@@ -203,6 +206,21 @@ public sealed class WorldSystem : EntitySystem
         {
             if (kind == LocationLayout.ShoreTile.Water)
                 Spawn(proto.Water, _map.GridTileToLocal(ground.Owner, ground.Comp, pos));
+        }
+
+        // The fences around the lots; the rotation says which way each piece connects (see LocationLayout.AddFence)
+        foreach (var piece in layout.Fences)
+        {
+            var fenceProto = piece.Kind switch
+            {
+                FenceKind.Corner => proto.FenceCorner,
+                FenceKind.Gate => proto.FenceGate,
+                _ => proto.FenceStraight,
+            };
+
+            var fence = Spawn(fenceProto, _map.GridTileToLocal(ground.Owner, ground.Comp, piece.Tile));
+            if (piece.Quarter != 0)
+                _transform.SetLocalRotation(fence, Angle.FromDegrees(90 * piece.Quarter));
         }
 
         // Rock formations and trees in the free ground
@@ -251,6 +269,7 @@ public sealed class WorldSystem : EntitySystem
             MapId = mapId,
             Seed = useSeed,
             Structures = placed,
+            Built = built,
             BuildMilliseconds = watch.Elapsed.TotalMilliseconds,
             Entities = EntityManager.EntityCount - entitiesBefore,
         };
@@ -392,6 +411,85 @@ public sealed class WorldSystem : EntitySystem
     }
 
     /// <summary>The structure files of a theme with their measured footprints. Measured once, then kept.</summary>
+    /// <summary>
+    ///     The front of a structure is the side with the most doors on its outer edge (the south side on a tie, which is the way
+    ///     structures are built); its front door is the one nearest the middle of that side. The role comes from the structure's
+    ///     prototype, or from its size.
+    /// </summary>
+    private StructureInfo Measure(string theme, ResPath path, Entity<MapGridComponent> grid, Vector2i min, Vector2i max)
+    {
+        var width = max.X - min.X + 1;
+        var height = max.Y - min.Y + 1;
+        var doors = new List<Vector2i>[4] { new(), new(), new(), new() };
+        var allDoors = new List<Vector2i>();
+        var enumerator = Transform(grid.Owner).ChildEnumerator;
+        while (enumerator.MoveNext(out var child))
+        {
+            if (!HasComp<DoorComponent>(child) || !Transform(child).Anchored)
+                continue;
+
+            var tile = _map.TileIndicesFor(grid.Owner, grid.Comp, Transform(child).Coordinates);
+            allDoors.Add(tile);
+            if (tile.Y == min.Y)
+                doors[0].Add(tile);
+
+            if (tile.X == max.X)
+                doors[1].Add(tile);
+
+            if (tile.Y == max.Y)
+                doors[2].Add(tile);
+
+            if (tile.X == min.X)
+                doors[3].Add(tile);
+        }
+
+        var front = 0;
+        for (var side = 1; side < 4; side++)
+        {
+            if (doors[side].Count > doors[front].Count)
+                front = side;
+        }
+
+        // A building that is not a plain box has no door on the edge of its footprint: then the front is the side that the nearest
+        // door is closest to
+        if (doors[front].Count == 0 && allDoors.Count > 0)
+        {
+            var best = (Distance: int.MaxValue, Side: 0, Door: allDoors[0]);
+            foreach (var d in allDoors)
+            {
+                var distances = new[] { d.Y - min.Y, max.X - d.X, max.Y - d.Y, d.X - min.X };
+                for (var side = 0; side < 4; side++)
+                {
+                    if (distances[side] < best.Distance)
+                        best = (distances[side], side, d);
+                }
+            }
+
+            front = best.Side;
+            doors[front].Add(best.Door);
+        }
+
+        // The door nearest the middle of the side; without any door, the middle of the south side
+        var middle = front % 2 == 0 ? min.X + width / 2 : min.Y + height / 2;
+        Vector2i door;
+        if (doors[front].Count > 0)
+            door = doors[front].OrderBy(d => Math.Abs((front % 2 == 0 ? d.X : d.Y) - middle)).First();
+        else
+            door = new Vector2i(min.X + width / 2, min.Y);
+
+        var fileName = path.Filename;
+        var id = $"{theme}-{(fileName.EndsWith(".yml") ? fileName[..^4] : fileName)}";
+        var role = width * height <= 48 ? "outbuilding" : "house";
+        var weight = 1f;
+        if (_proto.TryIndex<WorldStructurePrototype>(id, out var structure))
+        {
+            role = structure.Role;
+            weight = structure.Weight;
+        }
+
+        return new StructureInfo(path.ToString(), width, height, min, front, door, role, weight);
+    }
+
     private List<StructureInfo> GetPool(string theme)
     {
         if (_pools.TryGetValue(theme, out var cached))
@@ -416,7 +514,10 @@ public sealed class WorldSystem : EntitySystem
             }
 
             if (min.X <= max.X)
-                list.Add(new StructureInfo(path.ToString(), max.X - min.X + 1, max.Y - min.Y + 1, min));
+            {
+                var info = Measure(theme, path, grid.Value, min, max);
+                list.Add(info);
+            }
 
             QueueDel(grid.Value.Owner);
         }

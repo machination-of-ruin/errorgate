@@ -1,0 +1,214 @@
+# What each structure of the pool is for (see WorldStructurePrototype). The id is the theme and the file name. Roles come from the
+# furniture of the Kuznetsk building they were cut from: check them and change what is wrong. house, outbuilding, civic, shop, industrial.
+
+- type: worldStructure
+  id: city-kuz-concrete-XS-1
+  role: outbuilding
+
+- type: worldStructure
+  id: village-kuz-concrete-XS-1
+  role: outbuilding
+
+- type: worldStructure
+  id: city-kuz-concrete-S-1
+  role: outbuilding
+
+- type: worldStructure
+  id: village-kuz-concrete-S-1
+  role: outbuilding
+
+- type: worldStructure
+  id: city-kuz-concrete-S-2
+  role: outbuilding
+
+- type: worldStructure
+  id: village-kuz-concrete-S-2
+  role: outbuilding
+
+- type: worldStructure
+  id: city-kuz-concrete-S-3
+  role: outbuilding
+
+- type: worldStructure
+  id: village-kuz-concrete-S-3
+  role: outbuilding
+
+- type: worldStructure
+  id: city-kuz-concrete-M-1
+  role: house
+
+- type: worldStructure
+  id: village-kuz-concrete-M-1
+  role: house
+
+- type: worldStructure
+  id: city-kuz-concrete-M-2
+  role: house
+
+- type: worldStructure
+  id: village-kuz-concrete-M-2
+  role: house
+
+- type: worldStructure
+  id: city-kuz-concrete-M-3
+  role: house
+
+- type: worldStructure
+  id: village-kuz-concrete-M-3
+  role: house
+
+- type: worldStructure
+  id: city-kuz-concrete-M-4
+  role: shop
+
+- type: worldStructure
+  id: village-kuz-concrete-M-4
+  role: shop
+
+- type: worldStructure
+  id: city-kuz-concrete-L-1
+  role: shop
+
+- type: worldStructure
+  id: city-kuz-concrete-L-2
+  role: house
+
+- type: worldStructure
+  id: city-kuz-concrete-L-3
+  role: house
+
+- type: worldStructure
+  id: city-kuz-concrete-L-4
+  role: house
+
+- type: worldStructure
+  id: city-kuz-concrete-L-5
+  role: civic
+
+- type: worldStructure
+  id: city-kuz-concrete-L-6
+  role: house
+
+- type: worldStructure
+  id: city-kuz-concrete-L-7
+  role: house
+
+- type: worldStructure
+  id: city-kuz-concrete-L-8
+  role: house
+
+- type: worldStructure
+  id: city-kuz-concrete-L-9
+  role: house
+
+- type: worldStructure
+  id: city-kuz-concrete-L-10
+  role: house
+
+- type: worldStructure
+  id: city-kuz-concrete-L-11
+  role: house
+
+- type: worldStructure
+  id: city-kuz-concrete-L-12
+  role: civic
+
+- type: worldStructure
+  id: city-kuz-concrete-L-13
+  role: house
+
+- type: worldStructure
+  id: city-kuz-concrete-XXL-1
+  role: civic
+
+- type: worldStructure
+  id: city-kuz-concrete-XXL-2
+  role: shop
+
+- type: worldStructure
+  id: city-kuz-concrete-XXL-3
+  role: industrial
+
+- type: worldStructure
+  id: city-kuz-concrete-XXL-4
+  role: industrial
+
+- type: worldStructure
+  id: city-kuz-concrete-XXXL-1
+  role: civic
+
+- type: worldStructure
+  id: city-kuz-concrete-XXXL-2
+  role: civic
+
+- type: worldStructure
+  id: village-kuz-concrete-XXXL-2
+  role: civic
+
+- type: worldStructure
+  id: city-kuz-concrete-XXXL-3
+  role: civic
+
+- type: worldStructure
+  id: village-kuz-concrete-XXXL-3
+  role: civic
+
+- type: worldStructure
+  id: city-kuz-concrete-XXXL-4
+  role: industrial
+
+- type: worldStructure
+  id: city-kuz-other-XL-1
+  role: civic
+
+- type: worldStructure
+  id: village-kuz-other-XL-1
+  role: civic
+
+- type: worldStructure
+  id: village-kuz-wood-XS-1
+  role: outbuilding
+
+- type: worldStructure
+  id: village-kuz-wood-XS-2
+  role: outbuilding
+
+- type: worldStructure
+  id: village-kuz-wood-S-1
+  role: outbuilding
+
+- type: worldStructure
+  id: village-kuz-wood-S-2
+  role: outbuilding
+
+- type: worldStructure
+  id: village-kuz-wood-L-1
+  role: house
+
+- type: worldStructure
+  id: village-kuz-wood-L-2
+  role: house
+
+- type: worldStructure
+  id: village-kuz-wood-XL-1
+  role: house
+
+- type: worldStructure
+  id: village-kuz-wood-XL-2
+  role: house
+
+- type: worldStructure
+  id: village-kuz-wood-XL-3
+  role: civic
+
+- type: worldStructure
+  id: village-kuz-wood-XL-4
+  role: house
+
+- type: worldStructure
+  id: village-kuz-wood-XL-5
+  role: house
+
+- type: worldStructure
+  id: village-kuz-wood-XXXL-1
+  role: shop

@@ -5,6 +5,11 @@
   name: village and shore resort
   tier: 1
   theme: village
+  style: village
+  walkway: FloorLowDesert
+  fenceStraight: FenceWoodHighStraight
+  fenceCorner: FenceWoodHighCorner
+  fenceGate: FenceWoodHighGate
   size: "160,160"
   ground: FloorPlanetGrass
   road: FloorPlanetDirt
@@ -22,13 +27,7 @@
   - protos: [ FloraRockSolid ]
     count: 30
     clump: 0
-  - protos: [ Barricade, BarricadeBlock ]
-    count: 10
-    clump: 2
   decals:
-  - decals: [ FloraTallGrass1, FloraTallGrass2, FloraTallGrass3, FloraTallGrass4, FloraTallGrass5, FloraTallGrass6, FloraTallGrass7, FloraTallGrass8 ]
-    count: 220
-    clump: 5
   - decals: [ FloraBranchBrushwood, FloraBranchBrushwoodAlt ]
     count: 70
     clump: 3
@@ -39,6 +38,11 @@
   name: snow city
   tier: 2
   theme: city
+  style: city
+  walkway: FloorGrayConcreteSmooth
+  fenceStraight: FenceMetalStraight
+  fenceCorner: FenceMetalCorner
+  fenceGate: FenceMetalGate
   size: "180,180"
   ground: FloorSnow
   road: FloorAsphalt

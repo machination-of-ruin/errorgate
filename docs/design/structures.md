@@ -28,6 +28,35 @@ Everything in this file is **Proposed** except the themes, which are **Decided**
 - **Do not place:** loot items, ground items, mobs, power, atmos devices. Only **markers** (below), furniture, walls, doors and decals. The generator and the loot manager fill the rest.
 - **Light and air** follow the location (bunker-laboratory: dark, air filled by the generator). Do not rely on structure lights unless the theme asks for them.
 
+## How to make a structure (procedure)
+
+1. **Pick one** from the lists below (the *role* says what it is for, the *class* how big it may be). A house, a shed and a sauna are separate structures: the generator puts a house and up to two sheds in a fenced yard by itself, so **do not build yards or fences**.
+2. **Get the rectangle:** `structureoutline` once builds the outline map (`mapping` takes you to it): one grid per structure of the list, the right size, with the origin tile (0, 0) in green. Or build on a new grid of your own and keep inside the class size.
+3. **Build it facing south.** Walls on the very edge of the rectangle (**no bare floor around the walls**), the **front door in the south wall**, in the middle of it if you can. The generator turns the structure so the door faces the street. Inside, doors, furniture, a fireplace, wall lights, seats: as you like. Things that must face a way (beds, chairs, wall mounts) turn with the building, everything else keeps the way you built it.
+4. **Put in the markers only:** loot spawners of fitting **location** and tier 1 (`LootSpawnerLivingTier1`, `LootSpawnerKitchenTier1`, ...), and nothing that lies about: no items, no mobs, no mob spawners, no snow in a village, no fence pieces, no vehicles.
+5. **Save the grid alone:** `savegrid <grid> /Maps/_ERRORGATE/Structures/<theme>/<name>-<n>.yml` (for example `village/farmhouse-1.yml`), and copy the file from the server's data folder to `Resources/Maps/_ERRORGATE/Structures/<theme>/`.
+6. **Check it:** `structurecheck <theme>/<name>-<n>` says what is wrong, in plain lines: the size and class, a bare side (an apron), no door on the edge, mobs or items left, a spawner of another tier, fences, things hanging over missing floor, snow in the village. Fix every PROBLEM line and check again.
+7. **Tell the generator what it is:** add an entry to `Resources/Prototypes/_ERRORGATE/World/structures.yml`:
+
+```yaml
+- type: worldStructure
+  id: village-farmhouse-1   # theme and file name
+  role: house               # house, outbuilding, civic, shop, industrial
+  weight: 1                 # more is picked more often
+```
+
+8. **See it:** `structureview <theme>/<name>-<n>` shows it alone, `worldgen Village` or `worldgen SnowCity` builds a whole location with it (add a seed to see the same one again).
+
+What the first slice wants (the Kuznetsk placeholders already cover some of it):
+
+| Role | Village | City |
+|---|---|---|
+| house | 6 to 8 (S and M classes: cottages) | 8 (apartment blocks, row houses) |
+| outbuilding | 6 (shed, sauna, outhouse, workshop; XS and S) | 4 (garage, kiosk) |
+| civic | church, school, clinic | police, school, hospital, town hall |
+| shop | 2 | 6 |
+| industrial | 2 (barn, mill) | 6 (warehouse, factory, depot) |
+
 ## Markers (to be created)
 
 | Marker | Meaning | Notes |
@@ -158,59 +187,59 @@ Tunnels are generated, not built, from short pieces. The pool is small:
 
 ## Harvested placeholders (Kuznetsk)
 
-So there is something to see and improve on, the closed buildings of the old Kuznetsk map were cut out into the structure format; the cutting script was a throwaway and is not kept, the result is the files under `Resources/Maps/_ERRORGATE/Structures/`. A building is a group of rooms closed by walls: rooms joined by a door, or separated by a single wall, are one building (so a block of rooms is one structure, not many). The **fence around a building belongs to it** (a fence tile within five tiles of the walls goes to the nearest building, the house yards of the village and the wire fences of the city), so the footprint reaches the fence and nothing beyond it. Every mob, mob spawner and loose item is removed, and loot spawners are set to tier 1. Wood-floor buildings went to `village`, concrete ones to `city`; the small plain concrete ones and the schools (marked `also village`) are copied into `village` as well, with the snow floor replaced by dirt (snow does not lie in a village). The `LANDMARK` ones are more than 40 x 30 and sit in `Structures/review/` so the generator does not use them yet; see *How to review* below. Names are guesses from the furniture: **please confirm or rename them.**
+So there is something to see and improve on, the closed buildings of the old Kuznetsk map were cut out into the structure format; the cutting script was a throwaway and is not kept, the result is the files under `Resources/Maps/_ERRORGATE/Structures/`. A building is a group of rooms closed by walls: rooms joined by a door, or separated by a single wall, are one building (so a block of rooms is one structure, not many). It is cut exactly at its outer wall, with no tile outside it, and **without fences**: the generator builds the fences itself (see [world.md](world.md)). Every mob, mob spawner and loose item is removed, and loot spawners are set to tier 1. Wood-floor buildings went to `village`, concrete ones to `city`; the small plain concrete ones and the schools (marked `also village`) are copied into `village` as well, with the snow floor replaced by dirt (snow does not lie in a village), and the snow trees of the yards are gone. The `LANDMARK` ones are more than 40 x 30 and sit in `Structures/review/` so the generator does not use them yet; see *How to review* below. Names and roles are guesses from the furniture: **please confirm or rename them** (roles live in `Resources/Prototypes/_ERRORGATE/World/structures.yml`).
 
-| File | Floor | Class | Size | Floor tiles | Fence tiles | Entities | Guess | Notable |
+| File | Floor | Class | Size | Floor tiles | Entities | Guess | Role | Notable |
 |---|---|---|---|---|---|---|---|---|
-| `city/kuz-concrete-XS-1.yml` (also village) | concrete | XS | 5x5 | 9 | 0 | 21 | workshop | MachineFrameDestroyedx3 LootSpawnerIndustrialTier1x2 MetalDoorx1 |
-| `city/kuz-concrete-S-1.yml` (also village) | concrete | S | 5x8 | 15 | 0 | 38 | lockup | LootSpawnerIndustrialTier1x5 Rackx5 Grillex3 MetalDoorx3 |
-| `city/kuz-concrete-S-2.yml` (also village) | concrete | S | 5x6 | 12 | 0 | 25 | lockup | Rackx3 Grillex2 LootSpawnerIndustrialTier1x2 MetalDoorx2 |
-| `city/kuz-concrete-M-1.yml` (also village) | concrete | M | 8x10 | 48 | 0 | 44 | warehouse / store room | Rackx7 LootSpawnerIndustrialTier1x4 MetalDoorx4 LootSpawnerLivingTier1x1 |
-| `city/kuz-concrete-M-2.yml` (also village) | concrete | M | 8x9 | 42 | 0 | 40 | warehouse / store room | Rackx5 MetalDoorx4 LootSpawnerIndustrialTier1x3 LootSpawnerLivingTier1x2 |
-| `city/kuz-concrete-M-3.yml` (also village) | concrete | M | 7x9 | 35 | 0 | 34 | warehouse / store room | Rackx3 MetalDoorx3 LootSpawnerIndustrialTier1x2 LootSpawnerLivingTier1x1 |
-| `city/kuz-concrete-M-4.yml` (also village) | concrete | M | 9x6 | 28 | 0 | 49 | shop / canteen / market | LootSpawnerKitchenTier1x8 Rackx7 Grillex4 TableCounterMetalx3 MetalDoorx3 Chairx1 |
-| `city/kuz-concrete-L-1.yml` | concrete | L | 10x12 | 71 | 0 | 82 | shop / canteen / market | Rackx14 LootSpawnerKitchenTier1x10 TableCounterMetalx7 MetalDoorx5 GunSafex1 LootSpawnerSecurityTier1x1 |
-| `city/kuz-concrete-L-2.yml` | concrete | L | 13x7 | 55 | 0 | 48 | warehouse / store room | Rackx7 LootSpawnerLivingTier1x3 MetalDoorx3 LootSpawnerIndustrialTier1x2 |
-| `city/kuz-concrete-L-3.yml` | concrete | L | 13x7 | 55 | 0 | 45 | warehouse / store room | Rackx5 MetalDoorx3 LootSpawnerLivingTier1x2 LootSpawnerIndustrialTier1x2 |
-| `city/kuz-concrete-L-4.yml` | concrete | L | 11x8 | 54 | 0 | 48 | warehouse / store room | Rackx7 MetalDoorx4 LootSpawnerLivingTier1x4 LootSpawnerIndustrialTier1x3 |
-| `city/kuz-concrete-L-5.yml` | concrete | L | 11x9 | 51 | 0 | 92 | pharmacy / clinic | Rackx16 Grillex13 LootSpawnerMedicalTier1x10 MetalDoorx3 ChairGreyscalex2 TableReinforcedx2 |
-| `city/kuz-concrete-L-6.yml` | concrete | L | 12x7 | 50 | 0 | 45 | warehouse / store room | Rackx6 MetalDoorx3 LootSpawnerIndustrialTier1x3 LootSpawnerLivingTier1x2 |
-| `city/kuz-concrete-L-7.yml` | concrete | L | 12x7 | 50 | 0 | 46 | warehouse / store room | Rackx6 LootSpawnerIndustrialTier1x4 MetalDoorx3 LootSpawnerLivingTier1x2 |
-| `city/kuz-concrete-L-8.yml` | concrete | L | 12x7 | 50 | 0 | 45 | warehouse / store room | Rackx6 LootSpawnerIndustrialTier1x3 MetalDoorx3 LootSpawnerLivingTier1x2 |
-| `city/kuz-concrete-L-9.yml` | concrete | L | 11x7 | 45 | 0 | 46 | warehouse / store room | Rackx7 LootSpawnerIndustrialTier1x4 MetalDoorx3 LootSpawnerLivingTier1x3 |
-| `city/kuz-concrete-L-10.yml` | concrete | L | 11x7 | 45 | 0 | 42 | warehouse / store room | Rackx5 MetalDoorx3 LootSpawnerLivingTier1x3 LootSpawnerIndustrialTier1x2 |
-| `city/kuz-concrete-L-11.yml` | concrete | L | 11x7 | 45 | 0 | 44 | warehouse / store room | Rackx6 LootSpawnerIndustrialTier1x4 MetalDoorx3 LootSpawnerLivingTier1x2 |
-| `city/kuz-concrete-L-12.yml` | concrete | L | 11x6 | 36 | 0 | 38 | warehouse / store room | MetalDoorx4 Rackx4 LootSpawnerIndustrialTier1x2 LootSpawnerLivingTier1x2 |
-| `city/kuz-concrete-XL-1.yml` | concrete | XL | 14x14 | 42 | 10 | 70 | cell block | Rackx7 LootSpawnerIndustrialTier1x6 MachineFrameDestroyedx4 MetalDoorx3 LootSpawnerPrisonTier1x3 SignElectricalMedx1 |
-| `city/kuz-concrete-XL-2.yml` | concrete | XL | 12x16 | 20 | 16 | 67 | warehouse / store room | Rackx5 Grillex4 LootSpawnerIndustrialTier1x3 Chairx2 LootSpawnerMilitaryTier1x1 Tablex1 |
-| `city/kuz-concrete-XXL-1.yml` | concrete | XXL | 16x21 | 192 | 2 | 235 | police station / barracks | LootSpawnerSecurityTier1x19 TableWoodReinforcedx11 Rackx10 SteelBenchx8 ChairWoodx7 MetalDoorx7 |
-| `city/kuz-concrete-XXL-2.yml` | concrete | XXL | 17x16 | 190 | 0 | 147 | shop / canteen / market | LootSpawnerKitchenTier1x19 TableCounterMetalx17 ClockworkGrillex13 Rackx8 TableWoodx7 MetalDoorx5 |
-| `city/kuz-concrete-XXL-3.yml` | concrete | XXL | 10x24 | 148 | 0 | 136 | warehouse / store room | TableWoodx10 Grillex7 Rackx7 ClosetSteelBasex6 LootSpawnerIndustrialTier1x6 MetalDoorx4 |
-| `city/kuz-concrete-XXL-4.yml` | concrete | XXL | 9x19 | 105 | 0 | 90 | warehouse / store room | Rackx14 MetalDoorx11 LootSpawnerIndustrialTier1x7 StairDarkx3 |
-| `city/kuz-concrete-XXXL-1.yml` (also village) | concrete | XXXL | 30x28 | 346 | 0 | 503 | school | TableReinforcedx46 TableWoodx41 SteelBenchx30 LootSpawnerSchoolTier1x28 ChairWoodx27 Bookshelfx21 |
-| `city/kuz-concrete-XXXL-2.yml` (also village) | concrete | XXXL | 38x11 | 297 | 0 | 247 | school | TableWoodx58 ChairWoodx39 LootSpawnerSchoolTier1x29 WoodDoorx4 |
-| `city/kuz-concrete-XXXL-3.yml` | concrete | XXXL | 19x37 | 297 | 37 | 304 | store room | Rackx17 Tablex12 MetalDoorx10 ClosetSteelBasex10 AirlockFactoryEntrancex7 AtmosDeviceFanTinyInvisiblex7 |
-| `review/city/kuz-concrete-LANDMARK-1.yml` (also village) | concrete | LANDMARK | 44x60 | 1600 | 0 | 1239 | store room | OreBoxx76 MetalDoorx51 Rackx36 Tablex35 MachineFrameDestroyedx32 TableWoodx31 |
-| `review/city/kuz-concrete-LANDMARK-2.yml` | concrete | LANDMARK | 37x31 | 433 | 132 | 560 | police station / barracks | MetalDoorx25 LootSpawnerSecurityTier1x22 LootSpawnerPrisonTier1x19 LockerSyndicatex15 Bedx14 Tablex11 |
-| `review/city/kuz-concrete-LANDMARK-3.yml` | concrete | LANDMARK | 47x15 | 430 | 0 | 471 | hut / house | Grillex55 LootSpawnerLivingTier1x52 Bedx28 TableWoodx28 WoodDoorx19 LootSpawnerKitchenTier1x9 |
-| `city/kuz-other-XL-1.yml` (also village) | other | XL | 11x11 | 81 | 4 | 54 | hall (benches) | SteelBenchx7 LootSpawnerSchoolTier1x3 MetalDoorx1 WoodDoorx1 |
-| `review/city/kuz-other-LANDMARK-1.yml` (also village) | other | LANDMARK | 72x36 | 1187 | 36 | 958 | workshop | OreBoxx97 ConveyorBeltx94 MachineFrameDestroyedx58 LootSpawnerIndustrialTier1x22 TableCounterMetalx16 LootSpawnerMilitaryTier1x15 |
-| `village/kuz-wood-XL-1.yml` | wood | XL | 14x15 | 10 | 28 | 75 | cell block | WoodenBenchx4 FloraTreeSnowx3 WoodDoorx2 Fireplacex1 LootSpawnerPrisonTier1x1 |
-| `village/kuz-wood-XL-2.yml` | wood | XL | 10x15 | 9 | 15 | 34 | cell block | WoodDoorx1 Fireplacex1 Bedx1 LootSpawnerPrisonTier1x1 |
-| `village/kuz-wood-XL-3.yml` | wood | XL | 14x13 | 6 | 26 | 45 | warehouse / store room | LootSpawnerIndustrialTier1x2 Rackx2 FloraTreeSnowx1 WoodDoorx1 |
-| `village/kuz-wood-XXL-1.yml` | wood | XXL | 16x20 | 83 | 13 | 87 | church | WoodenBenchx16 LootSpawnerChurchTier1x5 BarricadeBlockx3 Barricadex3 StairWoodx2 AltarConvertBurdenx1 |
-| `village/kuz-wood-XXL-2.yml` | wood | XXL | 17x22 | 75 | 22 | 141 | pharmacy / clinic | Barricadex10 BarricadeBlockx8 TableWoodx5 WoodDoorx5 LootSpawnerMedicalTier1x4 Dresserx4 |
-| `village/kuz-wood-XXL-3.yml` | wood | XXL | 19x15 | 55 | 33 | 107 | hut / house | TableWoodx9 LootSpawnerLivingTier1x4 LootSpawnerKitchenTier1x3 Bedx2 WoodDoorx2 FloraTreeSnowx1 |
-| `village/kuz-wood-XXL-4.yml` | wood | XXL | 20x13 | 49 | 20 | 94 | house with a yard | LootSpawnerLivingTier1x5 FloraTreeSnowx4 TableWoodx4 WoodDoorx4 Dresserx3 Bedx2 |
-| `village/kuz-wood-XXL-5.yml` | wood | XXL | 15x17 | 15 | 31 | 62 | pharmacy / clinic | OreBoxx4 LootSpawnerIndustrialTier1x2 Rackx2 LootSpawnerMedicalTier1x2 FloraTreeSnowx1 WoodDoorx1 |
-| `village/kuz-wood-XXXL-1.yml` | wood | XXXL | 33x16 | 258 | 0 | 446 | shop / canteen / market | LootSpawnerLivingTier1x37 LootSpawnerKitchenTier1x25 ClockworkGrillex22 WoodDoorx22 Dresserx20 TableCounterWoodx17 |
-| `village/kuz-wood-XXXL-2.yml` | wood | XXXL | 24x19 | 116 | 22 | 164 | building | Grillex13 CarpetBlackx8 WoodDoorx7 Bookshelfx4 LootSpawnerLivingTier1x3 ShuttersNormalx3 |
-| `village/kuz-wood-XXXL-3.yml` | wood | XXXL | 26x20 | 93 | 48 | 164 | hut / house | TableWoodx8 WoodDoorx7 LootSpawnerLivingTier1x5 Rackx4 Bedx3 LootSpawnerKitchenTier1x3 |
-| `village/kuz-wood-XXXL-4.yml` | wood | XXXL | 21x23 | 73 | 49 | 154 | workshop | LootSpawnerLivingTier1x7 WoodDoorx6 Dresserx4 TableWoodx4 LootSpawnerKitchenTier1x4 LootSpawnerIndustrialTier1x2 |
-| `review/village/kuz-wood-LANDMARK-1.yml` | wood | LANDMARK | 19x67 | 653 | 0 | 1006 | shop / canteen / market | LootSpawnerLivingTier1x99 Grillex60 WoodDoorx58 TableCounterWoodx46 LootSpawnerKitchenTier1x41 Bedx26 |
-| `review/village/kuz-wood-LANDMARK-2.yml` | wood | LANDMARK | 17x41 | 364 | 0 | 555 | shop / canteen / market | LootSpawnerKitchenTier1x41 ClockworkGrillex38 LootSpawnerLivingTier1x36 WoodDoorx26 TableCounterWoodx22 Dresserx18 |
-| `review/village/kuz-wood-LANDMARK-3.yml` | wood | LANDMARK | 15x49 | 349 | 0 | 618 | shop / canteen / market | Grillex45 LootSpawnerKitchenTier1x41 WoodDoorx36 LootSpawnerLivingTier1x31 TableCounterWoodx24 MetalDoorx15 |
-| `review/village/kuz-wood-LANDMARK-4.yml` | wood | LANDMARK | 45x16 | 334 | 0 | 616 | house | LootSpawnerLivingTier1x55 ClockworkGrillex42 WoodDoorx42 LootSpawnerKitchenTier1x27 Bedx24 Dresserx23 |
+| `city/kuz-concrete-XS-1.yml` (also village) | concrete | XS | 5x5 | 9 | 21 | shed | outbuilding | MachineFrameDestroyedx3 LootSpawnerIndustrialTier1x2 MetalDoorx1 |
+| `city/kuz-concrete-S-1.yml` (also village) | concrete | S | 7x6 | 20 | 34 | shed / lockup | outbuilding | Rackx5 Grillex4 LootSpawnerIndustrialTier1x3 MetalDoorx1 |
+| `city/kuz-concrete-S-2.yml` (also village) | concrete | S | 5x8 | 15 | 38 | shed / lockup | outbuilding | LootSpawnerIndustrialTier1x5 Rackx5 Grillex3 MetalDoorx3 |
+| `city/kuz-concrete-S-3.yml` (also village) | concrete | S | 5x6 | 12 | 25 | shed / lockup | outbuilding | Rackx3 Grillex2 LootSpawnerIndustrialTier1x2 MetalDoorx2 |
+| `city/kuz-concrete-M-1.yml` (also village) | concrete | M | 8x10 | 48 | 44 | apartment / garage row | house | Rackx7 LootSpawnerIndustrialTier1x4 MetalDoorx4 LootSpawnerLivingTier1x1 |
+| `city/kuz-concrete-M-2.yml` (also village) | concrete | M | 8x9 | 42 | 40 | apartment / garage row | house | Rackx5 MetalDoorx4 LootSpawnerIndustrialTier1x3 LootSpawnerLivingTier1x2 |
+| `city/kuz-concrete-M-3.yml` (also village) | concrete | M | 7x9 | 35 | 34 | apartment / garage row | house | Rackx3 MetalDoorx3 LootSpawnerIndustrialTier1x2 LootSpawnerLivingTier1x1 |
+| `city/kuz-concrete-M-4.yml` (also village) | concrete | M | 9x6 | 28 | 49 | shop / canteen / market | shop | LootSpawnerKitchenTier1x8 Rackx7 Grillex4 TableCounterMetalx3 MetalDoorx3 Chairx1 |
+| `city/kuz-concrete-L-1.yml` | concrete | L | 10x12 | 71 | 82 | shop / canteen / market | shop | Rackx14 LootSpawnerKitchenTier1x10 TableCounterMetalx7 MetalDoorx5 GunSafex1 LootSpawnerSecurityTier1x1 |
+| `city/kuz-concrete-L-2.yml` | concrete | L | 13x7 | 55 | 48 | apartment / garage row | house | Rackx7 LootSpawnerLivingTier1x3 MetalDoorx3 LootSpawnerIndustrialTier1x2 |
+| `city/kuz-concrete-L-3.yml` | concrete | L | 13x7 | 55 | 45 | apartment / garage row | house | Rackx5 MetalDoorx3 LootSpawnerLivingTier1x2 LootSpawnerIndustrialTier1x2 |
+| `city/kuz-concrete-L-4.yml` | concrete | L | 11x8 | 54 | 48 | apartment / garage row | house | Rackx7 MetalDoorx4 LootSpawnerLivingTier1x4 LootSpawnerIndustrialTier1x3 |
+| `city/kuz-concrete-L-5.yml` | concrete | L | 11x9 | 51 | 92 | pharmacy / clinic | civic | Rackx16 Grillex13 LootSpawnerMedicalTier1x10 MetalDoorx3 ChairGreyscalex2 TableReinforcedx2 |
+| `city/kuz-concrete-L-6.yml` | concrete | L | 12x7 | 50 | 45 | apartment / garage row | house | Rackx6 MetalDoorx3 LootSpawnerIndustrialTier1x3 LootSpawnerLivingTier1x2 |
+| `city/kuz-concrete-L-7.yml` | concrete | L | 12x7 | 50 | 46 | apartment / garage row | house | Rackx6 LootSpawnerIndustrialTier1x4 MetalDoorx3 LootSpawnerLivingTier1x2 |
+| `city/kuz-concrete-L-8.yml` | concrete | L | 12x7 | 50 | 45 | apartment / garage row | house | Rackx6 LootSpawnerIndustrialTier1x3 MetalDoorx3 LootSpawnerLivingTier1x2 |
+| `city/kuz-concrete-L-9.yml` | concrete | L | 11x7 | 45 | 46 | apartment / garage row | house | Rackx7 LootSpawnerIndustrialTier1x4 MetalDoorx3 LootSpawnerLivingTier1x3 |
+| `city/kuz-concrete-L-10.yml` | concrete | L | 11x7 | 45 | 42 | apartment / garage row | house | Rackx5 MetalDoorx3 LootSpawnerLivingTier1x3 LootSpawnerIndustrialTier1x2 |
+| `city/kuz-concrete-L-11.yml` | concrete | L | 11x7 | 45 | 44 | apartment / garage row | house | Rackx6 LootSpawnerIndustrialTier1x4 MetalDoorx3 LootSpawnerLivingTier1x2 |
+| `city/kuz-concrete-L-12.yml` | concrete | L | 9x9 | 42 | 60 | cell block | civic | Rackx7 LootSpawnerIndustrialTier1x6 MachineFrameDestroyedx4 MetalDoorx3 LootSpawnerPrisonTier1x3 SignElectricalMedx1 |
+| `city/kuz-concrete-L-13.yml` | concrete | L | 11x6 | 36 | 38 | apartment / garage row | house | MetalDoorx4 Rackx4 LootSpawnerIndustrialTier1x2 LootSpawnerLivingTier1x2 |
+| `city/kuz-concrete-XXL-1.yml` | concrete | XXL | 16x21 | 192 | 233 | police station / barracks | civic | LootSpawnerSecurityTier1x19 TableWoodReinforcedx11 Rackx10 SteelBenchx8 ChairWoodx7 MetalDoorx7 |
+| `city/kuz-concrete-XXL-2.yml` | concrete | XXL | 17x16 | 190 | 147 | shop / canteen / market | shop | LootSpawnerKitchenTier1x19 TableCounterMetalx17 ClockworkGrillex13 Rackx8 TableWoodx7 MetalDoorx5 |
+| `city/kuz-concrete-XXL-3.yml` | concrete | XXL | 10x24 | 148 | 136 | warehouse / store room | industrial | TableWoodx10 Grillex7 Rackx7 ClosetSteelBasex6 LootSpawnerIndustrialTier1x6 MetalDoorx4 |
+| `city/kuz-concrete-XXL-4.yml` | concrete | XXL | 9x19 | 105 | 90 | warehouse / store room | industrial | Rackx14 MetalDoorx11 LootSpawnerIndustrialTier1x7 StairDarkx3 |
+| `city/kuz-concrete-XXXL-1.yml` | concrete | XXXL | 31x23 | 433 | 423 | police station / barracks | civic | MetalDoorx25 LootSpawnerSecurityTier1x22 LootSpawnerPrisonTier1x19 LockerSyndicatex15 Bedx14 Tablex11 |
+| `city/kuz-concrete-XXXL-2.yml` (also village) | concrete | XXXL | 30x28 | 346 | 503 | school | civic | TableReinforcedx46 TableWoodx41 SteelBenchx30 LootSpawnerSchoolTier1x28 ChairWoodx27 Bookshelfx21 |
+| `city/kuz-concrete-XXXL-3.yml` (also village) | concrete | XXXL | 38x11 | 297 | 247 | school | civic | TableWoodx58 ChairWoodx39 LootSpawnerSchoolTier1x29 WoodDoorx4 |
+| `city/kuz-concrete-XXXL-4.yml` | concrete | XXXL | 16x31 | 297 | 265 | warehouse / store room | industrial | Rackx17 Tablex12 MetalDoorx10 ClosetSteelBasex10 AirlockFactoryEntrancex7 AtmosDeviceFanTinyInvisiblex7 |
+| `review/city/kuz-concrete-LANDMARK-1.yml` (also village) | concrete | LANDMARK | 44x60 | 1600 | 1239 | warehouse / store room | - | OreBoxx76 MetalDoorx51 Rackx36 Tablex35 MachineFrameDestroyedx32 TableWoodx31 |
+| `review/city/kuz-concrete-LANDMARK-2.yml` | concrete | LANDMARK | 47x15 | 430 | 471 | house | - | Grillex55 LootSpawnerLivingTier1x52 Bedx28 TableWoodx28 WoodDoorx19 LootSpawnerKitchenTier1x9 |
+| `city/kuz-other-XL-1.yml` (also village) | other | XL | 11x11 | 81 | 50 | school | civic | SteelBenchx7 LootSpawnerSchoolTier1x3 MetalDoorx1 WoodDoorx1 |
+| `review/city/kuz-other-LANDMARK-1.yml` (also village) | other | LANDMARK | 68x27 | 1187 | 834 | workshop | - | ConveyorBeltx94 OreBoxx76 MachineFrameDestroyedx58 LootSpawnerIndustrialTier1x19 TableCounterMetalx16 LootSpawnerMilitaryTier1x14 |
+| `village/kuz-wood-XS-1.yml` | wood | XS | 5x5 | 9 | 19 | hut / sauna / shed | outbuilding | WoodDoorx1 Fireplacex1 Bedx1 LootSpawnerPrisonTier1x1 |
+| `village/kuz-wood-XS-2.yml` | wood | XS | 5x4 | 6 | 18 | hut / sauna / shed | outbuilding | LootSpawnerIndustrialTier1x2 Rackx2 WoodDoorx1 |
+| `village/kuz-wood-S-1.yml` | wood | S | 5x7 | 15 | 30 | hut / sauna / shed | outbuilding | OreBoxx4 LootSpawnerIndustrialTier1x2 Rackx2 LootSpawnerMedicalTier1x2 WoodDoorx1 |
+| `village/kuz-wood-S-2.yml` | wood | S | 4x8 | 10 | 28 | hut / sauna / shed | outbuilding | WoodenBenchx4 WoodDoorx2 Fireplacex1 LootSpawnerPrisonTier1x1 |
+| `village/kuz-wood-L-1.yml` | wood | L | 9x12 | 55 | 73 | house | house | TableWoodx9 LootSpawnerLivingTier1x4 LootSpawnerKitchenTier1x3 Bedx2 WoodDoorx2 Dresserx1 |
+| `village/kuz-wood-L-2.yml` | wood | L | 10x10 | 49 | 69 | house | house | LootSpawnerLivingTier1x5 TableWoodx4 WoodDoorx4 Dresserx3 Bedx2 LootSpawnerKitchenTier1x2 |
+| `village/kuz-wood-XL-1.yml` | wood | XL | 14x15 | 116 | 142 | building | house | Grillex13 CarpetBlackx8 WoodDoorx7 Bookshelfx4 LootSpawnerLivingTier1x3 ShuttersNormalx3 |
+| `village/kuz-wood-XL-2.yml` | wood | XL | 16x12 | 93 | 123 | house | house | TableWoodx8 WoodDoorx6 LootSpawnerLivingTier1x5 Rackx4 Bedx3 LootSpawnerKitchenTier1x3 |
+| `village/kuz-wood-XL-3.yml` | wood | XL | 9x15 | 83 | 74 | church | civic | WoodenBenchx16 LootSpawnerChurchTier1x5 BarricadeBlockx3 Barricadex3 StairWoodx2 AltarConvertBurdenx1 |
+| `village/kuz-wood-XL-4.yml` | wood | XL | 13x12 | 75 | 119 | house | house | Barricadex10 BarricadeBlockx8 TableWoodx5 WoodDoorx5 LootSpawnerMedicalTier1x4 Dresserx4 |
+| `village/kuz-wood-XL-5.yml` | wood | XL | 11x15 | 73 | 98 | house | house | LootSpawnerLivingTier1x7 WoodDoorx5 Dresserx4 TableWoodx4 LootSpawnerKitchenTier1x4 LootSpawnerIndustrialTier1x2 |
+| `village/kuz-wood-XXXL-1.yml` | wood | XXXL | 33x16 | 258 | 446 | shop / canteen / market | shop | LootSpawnerLivingTier1x37 LootSpawnerKitchenTier1x25 ClockworkGrillex22 WoodDoorx22 Dresserx20 TableCounterWoodx17 |
+| `review/village/kuz-wood-LANDMARK-1.yml` | wood | LANDMARK | 19x67 | 653 | 1006 | shop / canteen / market | - | LootSpawnerLivingTier1x99 Grillex60 WoodDoorx58 TableCounterWoodx46 LootSpawnerKitchenTier1x41 Bedx26 |
+| `review/village/kuz-wood-LANDMARK-2.yml` | wood | LANDMARK | 17x41 | 364 | 555 | house | - | LootSpawnerKitchenTier1x41 ClockworkGrillex38 LootSpawnerLivingTier1x36 WoodDoorx26 TableCounterWoodx22 Dresserx18 |
+| `review/village/kuz-wood-LANDMARK-3.yml` | wood | LANDMARK | 15x49 | 349 | 618 | shop / canteen / market | - | Grillex45 LootSpawnerKitchenTier1x41 WoodDoorx36 LootSpawnerLivingTier1x31 TableCounterWoodx24 MetalDoorx15 |
+| `review/village/kuz-wood-LANDMARK-4.yml` | wood | LANDMARK | 45x16 | 334 | 616 | house | - | LootSpawnerLivingTier1x55 ClockworkGrillex42 WoodDoorx42 LootSpawnerKitchenTier1x27 Bedx24 Dresserx23 |
 
 Not found by the cut: buildings with a gap in their walls, open yards and the warehouses with open fronts. They stay in the old map.
 

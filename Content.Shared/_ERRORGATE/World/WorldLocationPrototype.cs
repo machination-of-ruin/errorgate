@@ -33,6 +33,24 @@ public sealed partial class WorldLocationPrototype : IPrototype
     [DataField]
     public string Ground = "FloorDirt";
 
+    /// <summary>How the streets and lots are laid out: <c>village</c> (a main street with lanes, homesteads with fences) or <c>city</c> (a grid of streets with sidewalks).</summary>
+    [DataField]
+    public string Style = "village";
+
+    /// <summary>The tile of the sidewalks and of the paths from a door to the street.</summary>
+    [DataField]
+    public string Walkway = "FloorLowDesert";
+
+    /// <summary>The pieces of the fences around the lots.</summary>
+    [DataField]
+    public EntProtoId FenceStraight = "FenceWoodHighStraight";
+
+    [DataField]
+    public EntProtoId FenceCorner = "FenceWoodHighCorner";
+
+    [DataField]
+    public EntProtoId FenceGate = "FenceWoodHighGate";
+
     /// <summary>The tile of roads between the structures.</summary>
     [DataField]
     public string Road = "FloorAsphalt";
@@ -117,4 +135,24 @@ public sealed partial class WorldDecalEntry
 
     [DataField]
     public int Clump = 4;
+}
+
+/// <summary>
+///     What one structure of the pool is for, so the generator puts it where it belongs: a <c>house</c> in a homestead or along a street,
+///     an <c>outbuilding</c> (a shed, a sauna) beside a house, a <c>civic</c> building (a church, a school, a clinic), a <c>shop</c> or an
+///     <c>industrial</c> building. The id is the theme and the file name, for example <c>village-kuz-wood-XL-3</c>. A structure without a
+///     prototype is an outbuilding if it is small and a house if it is not.
+/// </summary>
+[Prototype("worldStructure")]
+public sealed partial class WorldStructurePrototype : IPrototype
+{
+    [IdDataField]
+    public string ID { get; private set; } = default!;
+
+    [DataField(required: true)]
+    public string Role = "house";
+
+    /// <summary>How often it is picked compared to the others of its role.</summary>
+    [DataField]
+    public float Weight = 1f;
 }

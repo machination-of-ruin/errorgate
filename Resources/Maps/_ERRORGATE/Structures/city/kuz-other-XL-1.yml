@@ -4,8 +4,8 @@ meta:
   engineVersion: 260.2.0
   forkId: ""
   forkVersion: ""
-  time: 10/13/2026 20:53:43
-  entityCount: 55
+  time: 10/13/2026 21:15:41
+  entityCount: 51
 maps: []
 grids:
 - 1
@@ -59,64 +59,26 @@ entities:
       data:
         chunkSize: 4
     - type: GasTileOverlay
-- proto: FenceMetalCorner
-  entities:
-  - uid: 18
-    components:
-    - type: Transform
-      rot: -1.5707963267948966 rad
-      pos: 3.5,1.5
-      parent: 1
-    - type: Physics
-      angularDamping: 0
-      linearDamping: 0
-  - uid: 19
-    components:
-    - type: Transform
-      rot: -1.5707963267948966 rad
-      pos: 3.5,9.5
-      parent: 1
-    - type: Physics
-      angularDamping: 0
-      linearDamping: 0
-  - uid: 22
-    components:
-    - type: Transform
-      rot: 1.5707963267948966 rad
-      pos: 4.5,1.5
-      parent: 1
-    - type: Physics
-      angularDamping: 0
-      linearDamping: 0
-  - uid: 23
-    components:
-    - type: Transform
-      rot: 1.5707963267948966 rad
-      pos: 4.5,9.5
-      parent: 1
-    - type: Physics
-      angularDamping: 0
-      linearDamping: 0
 - proto: LootSpawnerSchoolTier1
   entities:
-  - uid: 35
+  - uid: 31
     components:
     - type: Transform
       pos: 9.5,3.5
       parent: 1
-  - uid: 38
+  - uid: 34
     components:
     - type: Transform
       pos: 9.5,5.5
       parent: 1
-  - uid: 42
+  - uid: 38
     components:
     - type: Transform
       pos: 9.5,8.5
       parent: 1
 - proto: MetalDoor
   entities:
-  - uid: 29
+  - uid: 25
     components:
     - type: Transform
       pos: 7.5,0.5
@@ -126,7 +88,7 @@ entities:
       linearDamping: 0
 - proto: SteelBench
   entities:
-  - uid: 34
+  - uid: 30
     components:
     - type: Transform
       rot: -1.5707963267948966 rad
@@ -135,7 +97,7 @@ entities:
     - type: Physics
       angularDamping: 0
       linearDamping: 0
-  - uid: 36
+  - uid: 32
     components:
     - type: Transform
       rot: -1.5707963267948966 rad
@@ -144,7 +106,7 @@ entities:
     - type: Physics
       angularDamping: 0
       linearDamping: 0
-  - uid: 37
+  - uid: 33
     components:
     - type: Transform
       rot: -1.5707963267948966 rad
@@ -153,7 +115,7 @@ entities:
     - type: Physics
       angularDamping: 0
       linearDamping: 0
-  - uid: 39
+  - uid: 35
     components:
     - type: Transform
       rot: -1.5707963267948966 rad
@@ -162,7 +124,7 @@ entities:
     - type: Physics
       angularDamping: 0
       linearDamping: 0
-  - uid: 40
+  - uid: 36
     components:
     - type: Transform
       rot: -1.5707963267948966 rad
@@ -171,7 +133,7 @@ entities:
     - type: Physics
       angularDamping: 0
       linearDamping: 0
-  - uid: 41
+  - uid: 37
     components:
     - type: Transform
       rot: -1.5707963267948966 rad
@@ -180,7 +142,7 @@ entities:
     - type: Physics
       angularDamping: 0
       linearDamping: 0
-  - uid: 43
+  - uid: 39
     components:
     - type: Transform
       rot: -1.5707963267948966 rad
@@ -333,7 +295,7 @@ entities:
     - type: Physics
       angularDamping: 0
       linearDamping: 0
-  - uid: 20
+  - uid: 18
     components:
     - type: Transform
       pos: 3.5,10.5
@@ -341,7 +303,7 @@ entities:
     - type: Physics
       angularDamping: 0
       linearDamping: 0
-  - uid: 21
+  - uid: 19
     components:
     - type: Transform
       rot: -1.5707963267948966 rad
@@ -350,7 +312,7 @@ entities:
     - type: Physics
       angularDamping: 0
       linearDamping: 0
-  - uid: 24
+  - uid: 20
     components:
     - type: Transform
       pos: 4.5,10.5
@@ -358,7 +320,7 @@ entities:
     - type: Physics
       angularDamping: 0
       linearDamping: 0
-  - uid: 25
+  - uid: 21
     components:
     - type: Transform
       rot: -1.5707963267948966 rad
@@ -367,7 +329,7 @@ entities:
     - type: Physics
       angularDamping: 0
       linearDamping: 0
-  - uid: 26
+  - uid: 22
     components:
     - type: Transform
       pos: 5.5,10.5
@@ -375,7 +337,7 @@ entities:
     - type: Physics
       angularDamping: 0
       linearDamping: 0
-  - uid: 27
+  - uid: 23
     components:
     - type: Transform
       rot: -1.5707963267948966 rad
@@ -384,7 +346,7 @@ entities:
     - type: Physics
       angularDamping: 0
       linearDamping: 0
-  - uid: 28
+  - uid: 24
     components:
     - type: Transform
       pos: 6.5,10.5
@@ -392,7 +354,7 @@ entities:
     - type: Physics
       angularDamping: 0
       linearDamping: 0
-  - uid: 31
+  - uid: 27
     components:
     - type: Transform
       rot: -1.5707963267948966 rad
@@ -401,7 +363,7 @@ entities:
     - type: Physics
       angularDamping: 0
       linearDamping: 0
-  - uid: 32
+  - uid: 28
     components:
     - type: Transform
       pos: 8.5,10.5
@@ -409,7 +371,7 @@ entities:
     - type: Physics
       angularDamping: 0
       linearDamping: 0
-  - uid: 33
+  - uid: 29
     components:
     - type: Transform
       rot: -1.5707963267948966 rad
@@ -418,7 +380,7 @@ entities:
     - type: Physics
       angularDamping: 0
       linearDamping: 0
-  - uid: 44
+  - uid: 40
     components:
     - type: Transform
       pos: 9.5,10.5
@@ -426,7 +388,7 @@ entities:
     - type: Physics
       angularDamping: 0
       linearDamping: 0
-  - uid: 45
+  - uid: 41
     components:
     - type: Transform
       rot: -1.5707963267948966 rad
@@ -435,7 +397,7 @@ entities:
     - type: Physics
       angularDamping: 0
       linearDamping: 0
-  - uid: 46
+  - uid: 42
     components:
     - type: Transform
       rot: -1.5707963267948966 rad
@@ -444,7 +406,7 @@ entities:
     - type: Physics
       angularDamping: 0
       linearDamping: 0
-  - uid: 49
+  - uid: 45
     components:
     - type: Transform
       rot: -1.5707963267948966 rad
@@ -453,7 +415,7 @@ entities:
     - type: Physics
       angularDamping: 0
       linearDamping: 0
-  - uid: 50
+  - uid: 46
     components:
     - type: Transform
       rot: -1.5707963267948966 rad
@@ -462,7 +424,7 @@ entities:
     - type: Physics
       angularDamping: 0
       linearDamping: 0
-  - uid: 51
+  - uid: 47
     components:
     - type: Transform
       rot: -1.5707963267948966 rad
@@ -471,7 +433,7 @@ entities:
     - type: Physics
       angularDamping: 0
       linearDamping: 0
-  - uid: 54
+  - uid: 50
     components:
     - type: Transform
       rot: -1.5707963267948966 rad
@@ -480,7 +442,7 @@ entities:
     - type: Physics
       angularDamping: 0
       linearDamping: 0
-  - uid: 55
+  - uid: 51
     components:
     - type: Transform
       rot: -1.5707963267948966 rad
@@ -491,7 +453,7 @@ entities:
       linearDamping: 0
 - proto: Window
   entities:
-  - uid: 47
+  - uid: 43
     components:
     - type: Transform
       rot: -1.5707963267948966 rad
@@ -500,7 +462,7 @@ entities:
     - type: Physics
       angularDamping: 0
       linearDamping: 0
-  - uid: 48
+  - uid: 44
     components:
     - type: Transform
       rot: -1.5707963267948966 rad
@@ -509,7 +471,7 @@ entities:
     - type: Physics
       angularDamping: 0
       linearDamping: 0
-  - uid: 52
+  - uid: 48
     components:
     - type: Transform
       rot: -1.5707963267948966 rad
@@ -518,7 +480,7 @@ entities:
     - type: Physics
       angularDamping: 0
       linearDamping: 0
-  - uid: 53
+  - uid: 49
     components:
     - type: Transform
       rot: -1.5707963267948966 rad
@@ -529,7 +491,7 @@ entities:
       linearDamping: 0
 - proto: WoodDoor
   entities:
-  - uid: 30
+  - uid: 26
     components:
     - type: Transform
       pos: 7.5,10.5

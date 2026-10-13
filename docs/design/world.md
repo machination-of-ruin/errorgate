@@ -57,7 +57,13 @@ A disconnected body stays where it is for 3 minutes (vulnerable), then is taken 
 ## Generation (Proposed)
 
 - A **seeded generator in plain C#**, like [bunker.md](bunker.md): the same seed gives the same location, and a probe can check thousands of seeds for connectivity.
-- The terrain, roads and the open spaces between buildings are generated. The **buildings come from a pool of hand-made structures** (see [structures.md](structures.md)): the generator picks structures by footprint and theme, places them with rotation, then connects them.
+- **Streets first, then lots.** The generator lays the streets, then walks along both sides of every street and puts a lot at each stop, so buildings line streets and never float between them. The **buildings come from a pool of hand-made structures** (see [structures.md](structures.md)), picked by role.
+  - **Village** (`style: village`): one main street across the map (as near the middle as the shore allows) and lanes branching off it, one side or both, 28 to 64 tiles long. Roads are three wide dirt.
+  - **City** (`style: city`): a grid of three or four streets each way, the middle ones five wide (avenues), all with a sidewalk on both sides.
+  - **Lots:** a lot faces the street: every structure is turned so that its **front door faces the street** (the front is the side of the structure with the most outer doors, south on a tie, measured when the pool is loaded). A path joins every front door to the street.
+  - **Homestead** (village): a house plus up to two small buildings (a shed, a sauna, a workshop: the `outbuilding` role) inside a **fence** with a gate in line with the front door. The fence is built from the fence pieces of the location (`fenceStraight`, `fenceCorner`, `fenceGate`), each turned to connect: corners by quarter turns, straight pieces north to south or east to west, the gate across the line. A few industrial lots in the city get a wire fence the same way.
+  - **Roles** (see `Resources/Prototypes/_ERRORGATE/World/structures.yml`): `house`, `outbuilding`, `civic` (church, school, clinic), `shop`, `industrial`. The main street of the village gets homesteads, civic buildings and shops; the lanes get homesteads and houses. The city avenues get shops, civic and industrial buildings; the other streets houses, shops and industry.
+  - **Dressing** fills what is left: trees, rocks, grass and boulders stay clear of lots, streets and paths.
 - Each location has: a theme, a structure pool, a loot pool, mob and NPC rosters, and weather/light settings.
 - Every location must be built **off the main thread or sliced over ticks** if it is large. A rebuild must not hitch the server for seconds while players are elsewhere.
 - Locations have a finite border (a wall of terrain, deep snow, a cliff, the sea).
