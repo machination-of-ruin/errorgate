@@ -3,10 +3,15 @@ using System.Linq;
 using System.Numerics;
 using Content.Server.Atmos.Components;
 using Content.Server.Atmos.EntitySystems;
+using Content.Server.Decals;
 using Content.Server.Gravity;
 using Content.Shared._ERRORGATE.World;
 using Content.Shared.Atmos;
+using Content.Shared.Buckle.Components;
 using Content.Shared.Gravity;
+using Content.Shared.Light.Components;
+using Content.Shared.Wall;
+using Content.Shared.Weather;
 using Content.Shared.Maps;
 using Robust.Shared.ContentPack;
 using Robust.Shared.EntitySerialization.Systems;
@@ -31,6 +36,9 @@ public sealed class WorldSystem : EntitySystem
 {
     private const string StructureRoot = "/Maps/_ERRORGATE/Structures/";
 
+    /// <summary>One day, in seconds, the same in every location (Kuznetsk used 1200).</summary>
+    public const int DayCycleSeconds = 1200;
+
     [Dependency] private readonly IPrototypeManager _proto = default!;
     [Dependency] private readonly IResourceManager _res = default!;
     [Dependency] private readonly IMapManager _mapManager = default!;
@@ -43,6 +51,8 @@ public sealed class WorldSystem : EntitySystem
     [Dependency] private readonly GravitySystem _gravity = default!;
     [Dependency] private readonly SharedPhysicsSystem _physics = default!;
     [Dependency] private readonly TileSystem _tile = default!;
+    [Dependency] private readonly DecalSystem _decals = default!;
+    [Dependency] private readonly SharedWeatherSystem _weather = default!;
     [Dependency] private readonly IGameTiming _timing = default!;
 
     /// <summary>A built location and what it cost.</summary>
@@ -85,10 +95,25 @@ public sealed class WorldSystem : EntitySystem
         var watch = System.Diagnostics.Stopwatch.StartNew();
         var entitiesBefore = EntityManager.EntityCount;
         var useSeed = seed ?? _random.Next();
-        var layout = LocationLayout.Generate(useSeed, proto.Size, pool, proto.Density, proto.Rocks, proto.TreeClumps, proto.TreeSingles);
+        var options = new LocationLayout.Options(proto.Rocks, proto.TreeClumps, proto.TreeSingles, proto.Shore,
+            proto.Props.Select(e => (e.Count, e.Clump)).ToList(), proto.Decals.Select(e => (e.Count, e.Clump)).ToList());
+        var layout = LocationLayout.Generate(useSeed, proto.Size, pool, proto.Density, options);
 
         var mapUid = _map.CreateMap(out var mapId, runMapInit: true);
         _map.SetAmbientLight(mapId, proto.AmbientLight);
+
+        // The day and the night follow the same clock in every location (no random start, the clock is the server's), and the
+        // snow, if the location has it, never stops
+        var cycle = EnsureComp<LightCycleComponent>(mapUid);
+        cycle.OriginalColor = proto.AmbientLight;
+        cycle.Duration = TimeSpan.FromSeconds(DayCycleSeconds);
+        cycle.InitialOffset = false;
+        cycle.Offset = TimeSpan.Zero;
+        cycle.MinLightLevel = 0f;
+        cycle.MaxLightLevel = 1f;
+        Dirty(mapUid, cycle);
+        if (proto.Weather is { } weather && _proto.TryIndex(weather, out var weatherProto))
+            _weather.SetWeather(mapId, weatherProto, null);
 
         // The air of the map reaches every grid on it that has no air of its own, like on a planet
         var gas = new GasMixture(Atmospherics.CellVolume) { Temperature = 293.15f };
@@ -103,6 +128,8 @@ public sealed class WorldSystem : EntitySystem
         EnsureComp<GridAtmosphereComponent>(ground.Owner); // the map air only reaches a grid that has an atmosphere
         var groundDef = (ContentTileDefinition) _tileDefs[proto.Ground];
         var roadDef = (ContentTileDefinition) _tileDefs[proto.Road];
+        var sandDef = (ContentTileDefinition) _tileDefs[proto.Sand];
+        var iceDef = (ContentTileDefinition) _tileDefs[proto.IceTile];
         var tiles = new List<(Vector2i, Tile)>(proto.Size.X * proto.Size.Y);
         for (var x = 0; x < proto.Size.X; x++)
         {
@@ -110,7 +137,9 @@ public sealed class WorldSystem : EntitySystem
             {
                 // Every tile picks its own variant, so the ground does not look like a pattern
                 var pos = new Vector2i(x, y);
-                var def = layout.Roads.Contains(pos) ? roadDef : groundDef;
+                var def = layout.Terrain.TryGetValue(pos, out var shore)
+                    ? (shore == LocationLayout.ShoreTile.Ice ? iceDef : sandDef)
+                    : layout.Roads.Contains(pos) ? roadDef : groundDef;
                 tiles.Add((pos, new Tile(def.TileId, 0, _tile.PickVariant(def))));
             }
         }
@@ -169,6 +198,13 @@ public sealed class WorldSystem : EntitySystem
             placed++;
         }
 
+        // The water lies on the shallow part of the shore
+        foreach (var (pos, kind) in layout.Terrain)
+        {
+            if (kind == LocationLayout.ShoreTile.Water)
+                Spawn(proto.Water, _map.GridTileToLocal(ground.Owner, ground.Comp, pos));
+        }
+
         // Rock formations and trees in the free ground
         foreach (var rock in layout.Rocks)
         {
@@ -182,6 +218,25 @@ public sealed class WorldSystem : EntitySystem
             {
                 var spot = _map.GridTileToLocal(ground.Owner, ground.Comp, tree);
                 Spawn(proto.Trees[treeRng.Next(proto.Trees.Count)], spot);
+            }
+        }
+
+        // Boulders, barricades and the like, and decals of grass and brushwood
+        var propRng = new Random(useSeed ^ 0x9209);
+        for (var i = 0; i < proto.Props.Count && i < layout.PropTiles.Count; i++)
+        {
+            foreach (var pos in layout.PropTiles[i])
+            {
+                Spawn(proto.Props[i].Protos[propRng.Next(proto.Props[i].Protos.Count)], _map.GridTileToLocal(ground.Owner, ground.Comp, pos));
+            }
+        }
+
+        for (var i = 0; i < proto.Decals.Count && i < layout.DecalTiles.Count; i++)
+        {
+            foreach (var pos in layout.DecalTiles[i])
+            {
+                var coords = _map.GridTileToLocal(ground.Owner, ground.Comp, pos);
+                _decals.TryAddDecal(proto.Decals[i].Decals[propRng.Next(proto.Decals[i].Decals.Count)], coords, out _);
             }
         }
 
@@ -268,7 +323,10 @@ public sealed class WorldSystem : EntitySystem
             }
 
             var childXform = Transform(uid);
-            _transform.SetCoordinates(uid, childXform, new EntityCoordinates(grid.Owner, RotateVector(pos, turns)), rot + angle);
+            // Things whose sprite or use depends on the way they face keep their place in the room (seats, wall mounts). Everything else
+            // keeps the way it was built, so its sprite stays upright on screen (a fireplace, a spawner, a table).
+            var faces = HasComp<StrapComponent>(uid) || HasComp<WallMountComponent>(uid);
+            _transform.SetCoordinates(uid, childXform, new EntityCoordinates(grid.Owner, RotateVector(pos, turns)), faces ? rot + angle : rot);
             if (anchored)
                 _transform.AnchorEntity(uid, childXform);
         }

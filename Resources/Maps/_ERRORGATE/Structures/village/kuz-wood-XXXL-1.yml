@@ -4,7 +4,7 @@ meta:
   engineVersion: 260.2.0
   forkId: ""
   forkVersion: ""
-  time: 10/13/2026 20:22:11
+  time: 10/13/2026 20:53:43
   entityCount: 447
 maps: []
 grids:
@@ -28,7 +28,7 @@ entities:
     - type: MetaData
       name: grid
     - type: Transform
-      pos: 24400,0
+      pos: 24100,0
       parent: invalid
     - type: MapGrid
       chunks:

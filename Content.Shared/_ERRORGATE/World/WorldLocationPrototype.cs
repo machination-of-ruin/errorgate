@@ -1,3 +1,4 @@
+using Content.Shared.Weather;
 using Robust.Shared.Prototypes;
 
 namespace Content.Shared._ERRORGATE.World;
@@ -58,6 +59,62 @@ public sealed partial class WorldLocationPrototype : IPrototype
     [DataField]
     public int Rocks = 12;
 
+    /// <summary>Things scattered on free ground, besides trees and rocks: boulders, barricades, wrecks.</summary>
+    [DataField]
+    public List<WorldScatterEntry> Props = new();
+
+    /// <summary>Decals scattered on free ground: grass, brushwood.</summary>
+    [DataField]
+    public List<WorldDecalEntry> Decals = new();
+
+    /// <summary>The edge of the map on one side: <c>water</c> (sand, then shallow water), <c>ice</c>, or <c>none</c>.</summary>
+    [DataField]
+    public string Shore = "none";
+
+    /// <summary>The tile of a sandy shore.</summary>
+    [DataField]
+    public string Sand = "FloorDesert";
+
+    /// <summary>The tile of an icy shore.</summary>
+    [DataField]
+    public string IceTile = "FloorIce";
+
+    /// <summary>The water that lies on the shallow part of a shore.</summary>
+    [DataField]
+    public EntProtoId Water = "FloorWaterEntity";
+
+    /// <summary>A weather that never ends in this location.</summary>
+    [DataField]
+    public ProtoId<WeatherPrototype>? Weather;
+
     [DataField]
     public Color AmbientLight = Color.FromHex("#6A6A6A");
+}
+
+/// <summary>A kind of entity scattered on the ground: one of the prototypes, <see cref="Count"/> places, in clumps of radius <see cref="Clump"/> (0 is single ones).</summary>
+[DataDefinition]
+public sealed partial class WorldScatterEntry
+{
+    [DataField(required: true)]
+    public List<EntProtoId> Protos = new();
+
+    [DataField]
+    public int Count = 10;
+
+    [DataField]
+    public int Clump;
+}
+
+/// <summary>A kind of decal scattered on the ground, in the same way.</summary>
+[DataDefinition]
+public sealed partial class WorldDecalEntry
+{
+    [DataField(required: true)]
+    public List<string> Decals = new();
+
+    [DataField]
+    public int Count = 100;
+
+    [DataField]
+    public int Clump = 4;
 }

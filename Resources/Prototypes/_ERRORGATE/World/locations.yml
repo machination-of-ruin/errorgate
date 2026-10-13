@@ -12,11 +12,26 @@
   rocks: 12
   treeClumps: 14
   treeSingles: 50
+  shore: water
   trees:
   - FloraTree
   - FloraTreeLarge
-  - FloraTreeConifer
-  - FloraTreeStump
+  - N14FloraTreePine
+  - N14FloraTreeBald
+  props:
+  - protos: [ FloraRockSolid ]
+    count: 30
+    clump: 0
+  - protos: [ Barricade, BarricadeBlock ]
+    count: 10
+    clump: 2
+  decals:
+  - decals: [ FloraTallGrass1, FloraTallGrass2, FloraTallGrass3, FloraTallGrass4, FloraTallGrass5, FloraTallGrass6, FloraTallGrass7, FloraTallGrass8 ]
+    count: 220
+    clump: 5
+  - decals: [ FloraBranchBrushwood, FloraBranchBrushwoodAlt ]
+    count: 70
+    clump: 3
   ambientLight: "#7A7A7A"
 
 - type: worldLocation
@@ -31,10 +46,23 @@
   rocks: 10
   treeClumps: 8
   treeSingles: 30
+  shore: ice
+  weather: SnowfallLight
   trees:
   - FloraTreeSnow
   - FloraTreeConifer
   - FloraTreeStumpConifer
+  props:
+  - protos: [ FloraRockSolid ]
+    count: 24
+    clump: 0
+  - protos: [ Barricade, BarricadeBlock ]
+    count: 16
+    clump: 2
+  decals:
+  - decals: [ FloraBranchBrushwood, FloraBranchBrushwoodAlt ]
+    count: 40
+    clump: 3
   ambientLight: "#6A6E78"
 
 # The border of a location: rock that cannot be dug out.
