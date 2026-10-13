@@ -11,6 +11,8 @@ using Robust.Shared.EntitySerialization.Systems;
 using Robust.Shared.Map;
 using Robust.Shared.Map.Components;
 using Robust.Shared.Maths;
+using Robust.Shared.Physics;
+using Robust.Shared.Physics.Systems;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Random;
 using Robust.Shared.Utility;
@@ -36,6 +38,7 @@ public sealed class WorldSystem : EntitySystem
     [Dependency] private readonly SharedTransformSystem _transform = default!;
     [Dependency] private readonly AtmosphereSystem _atmos = default!;
     [Dependency] private readonly GravitySystem _gravity = default!;
+    [Dependency] private readonly SharedPhysicsSystem _physics = default!;
 
     /// <summary>A built location and what it cost.</summary>
     public sealed class Location
@@ -105,6 +108,7 @@ public sealed class WorldSystem : EntitySystem
         }
 
         _map.SetTiles(ground.Owner, ground.Comp, tiles);
+        _physics.SetBodyType(ground.Owner, BodyType.Static);
 
         const int borderWidth = 2;
         for (var x = 0; x < proto.Size.X; x++)
@@ -135,6 +139,9 @@ public sealed class WorldSystem : EntitySystem
             var rotatedMin = new Vector2(Math.Min(a.X, b.X), Math.Min(a.Y, b.Y));
             var origin = new Vector2(p.Min.X, p.Min.Y) - rotatedMin;
             _transform.SetWorldPositionRotation(grid.Value.Owner, origin, rotation);
+
+            // A grid is a dynamic body by default and would be pushed around by the ground grid and the others it overlaps
+            _physics.SetBodyType(grid.Value.Owner, BodyType.Static);
             placed++;
         }
 

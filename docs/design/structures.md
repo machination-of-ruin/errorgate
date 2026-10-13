@@ -7,7 +7,7 @@ Everything in this file is **Proposed** except the themes, which are **Decided**
 ## How a structure is built
 
 - **One structure is one small grid**, saved as its own file under `Resources/Maps/_ERRORGATE/Structures/<theme>/<name>.yml`. The generator loads it with `TryLoadGrid` at a chosen spot (rotated in steps of 90 degrees), the same way the existing ruins and dungeon rooms load. The base is **not** a structure: it is a whole hand-built map.
-- **Footprint classes** (width x height in tiles, **including** the outer wall, not the apron):
+- **Footprint classes** (width x height in tiles, **including** the outer wall; nothing outside the walls):
 
 | Class | Size | Typical use |
 |---|---|---|
@@ -19,7 +19,7 @@ Everything in this file is **Proposed** except the themes, which are **Decided**
 | XXL | 24 x 18 | factory |
 
   Variants of one class may differ in shape (L-shapes are fine), but the structure must fit **inside its class rectangle**. The generator never overlaps two rectangles.
-- **Apron:** one tile of plain floor all around the rectangle (the builder draws it and the generator keeps it free), so a door never opens into a wall.
+- **No apron.** The grid holds the building exactly, walls included, with no extra tile of floor around it. The generator keeps a gap of its own between structures and lays the roads to the doors.
 - **Doors on the edge** of the rectangle are the entrances. The generator joins roads and corridors to them. Mark at least one entrance per structure and put it in the **middle of a side** where you can. Structures are rotated by the generator, so do not depend on a compass direction.
 - **No absolute positions.** The grid's bottom-left tile is (0, 0). Nothing outside the rectangle.
 - **Do not place:** loot items, ground items, mobs, power, atmos devices. Only **markers** (below), furniture, walls, doors and decals. The generator and the loot manager fill the rest.
@@ -155,7 +155,7 @@ Tunnels are generated, not built, from short pieces. The pool is small:
 
 ## Harvested placeholders (Kuznetsk)
 
-So there is something to see and improve on, the closed buildings of the old Kuznetsk map were cut out into the structure format: the cutting script was a throwaway and is not kept, the result is the files under `Resources/Maps/_ERRORGATE/Structures/`. A building is a group of rooms closed by walls (joined by doors), at most 24 x 18; every mob, mob spawner and loose item is removed, and loot spawners are set to tier 1. Wood-floor buildings went to `village`, concrete ones to `city`; the plain small concrete ones (marked `also village`) are copied into `village` as well. Names are guesses from the furniture: **please confirm or rename them.**
+So there is something to see and improve on, the closed buildings of the old Kuznetsk map were cut out into the structure format: the cutting script was a throwaway and is not kept, the result is the files under `Resources/Maps/_ERRORGATE/Structures/`. A building is a group of rooms closed by walls (joined by doors), at most 24 x 18, cut exactly at its outer wall; every mob, mob spawner and loose item is removed, and loot spawners are set to tier 1. Wood-floor buildings went to `village`, concrete ones to `city`; the plain small concrete ones (marked `also village`) are copied into `village` as well. Names are guesses from the furniture: **please confirm or rename them.**
 
 | File | Floor | Class | Size | Floor tiles | Entities | Guess | Notable |
 |---|---|---|---|---|---|---|---|

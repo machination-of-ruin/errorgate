@@ -10,7 +10,7 @@ namespace Content.Server._ERRORGATE.World;
 
 /// <summary>
 ///     Builds the outline map for the structure pool (docs/design/structures.md): one small grid per structure variant, floor tiles
-///     in the size of its footprint class, a ring of apron around it, the origin tile (0, 0) in green, and a paper label beside it.
+///     in the size of its footprint class (walls included, no apron), the origin tile (0, 0) in green, and a paper label beside it.
 ///     Each structure is built on its own grid and saved with <c>savegrid</c>, so the saved file holds exactly that structure.
 ///     Keep the list in sync with the tables in the doc.
 /// </summary>
@@ -113,7 +113,6 @@ public sealed class StructureOutlineCommand : LocalizedEntityCommands
         meta.SetEntityName(mapUid, "structure outline");
 
         var floor = new Tile(_tileDefs["FloorDark"].TileId);
-        var apron = new Tile(_tileDefs["FloorSteel"].TileId);
         var origin = new Tile(_tileDefs["FloorGreenCircuit"].TileId);
 
         // Rows by theme, wrapped at a fixed width; the bottom of each row leaves room for the labels
@@ -148,12 +147,11 @@ public sealed class StructureOutlineCommand : LocalizedEntityCommands
                 var label = $"{theme}/{name}-{v}{star} | {className} {size.X}x{size.Y} | loot: {loot}";
                 meta.SetEntityName(grid.Owner, $"{theme}/{name}-{v}");
 
-                for (var x = -1; x <= size.X; x++)
+                for (var x = 0; x < size.X; x++)
                 {
-                    for (var y = -1; y <= size.Y; y++)
+                    for (var y = 0; y < size.Y; y++)
                     {
-                        var inside = x >= 0 && x < size.X && y >= 0 && y < size.Y;
-                        mapSystem.SetTile(grid.Owner, grid.Comp, new Vector2i(x, y), inside ? floor : apron);
+                        mapSystem.SetTile(grid.Owner, grid.Comp, new Vector2i(x, y), floor);
                     }
                 }
 

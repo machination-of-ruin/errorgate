@@ -3,7 +3,7 @@ using Robust.Shared.Maths;
 
 namespace Content.Server._ERRORGATE.World;
 
-/// <summary>A structure file, the size of its footprint (the apron included) and the corner of the footprint in the grid's own tiles, measured once.</summary>
+/// <summary>A structure file, the size of its footprint (walls to walls) and the corner of the footprint in the grid's own tiles, measured once.</summary>
 public sealed record StructureInfo(string Path, int Width, int Height, Vector2i LocalMin);
 
 /// <summary>A structure placed in a location: its footprint rectangle (after rotation) and how many quarter turns it was turned.</summary>

@@ -4,8 +4,8 @@ meta:
   engineVersion: 260.2.0
   forkId: ""
   forkVersion: ""
-  time: 10/13/2026 19:35:22
-  entityCount: 85
+  time: 10/13/2026 19:58:10
+  entityCount: 62
 maps: []
 grids:
 - 1
@@ -19,6 +19,7 @@ entities:
 - proto: ""
   entities:
   - uid: 1
+    mapInit: true
     components:
     - type: MetaData
       name: grid
@@ -27,21 +28,9 @@ entities:
       parent: invalid
     - type: MapGrid
       chunks:
-        -1,-1:
-          ind: -1,-1
-          tiles: AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAA==
-          version: 7
-        -1,0:
-          ind: -1,0
-          tiles: AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==
-          version: 7
-        0,-1:
-          ind: 0,-1
-          tiles: AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAEAAAAAAAABAAAAAAAAAQAAAAAAAAEAAAAAAAABAAAAAAAAAQAAAAAAAAEAAAAAAAABAAAAAAAAAQAAAAAAAAEAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==
-          version: 7
         0,0:
           ind: 0,0
-          tiles: AQAAAAAAAAEAAAAAAAABAAAAAAAAAQAAAAAAAAEAAAAAAAABAAAAAAAAAQAAAAAAAAEAAAAAAAABAAAAAAAAAQAAAAAAAAEAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAABAAAAAAAAAQAAAAAAAAEAAAAAAAABAAAAAAAAAQAAAAAAAAEAAAAAAAABAAAAAAAAAQAAAAAAAAEAAAAAAAABAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAAAAAQAAAAAAAAEAAAAAAAABAAAAAAAAAQAAAAAAAAEAAAAAAAABAAAAAAAAAQAAAAAAAAEAAAAAAAABAAAAAAAAAQAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAEAAAAAAAABAAAAAAAAAQAAAAAAAAEAAAAAAAABAAAAAAAAAQAAAAAAAAEAAAAAAAABAAAAAAAAAQAAAAAAAAEAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAABAAAAAAAAAQAAAAAAAAEAAAAAAAABAAAAAAAAAQAAAAAAAAEAAAAAAAABAAAAAAAAAQAAAAAAAAEAAAAAAAABAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAAAAAQAAAAAAAAEAAAAAAAABAAAAAAAAAQAAAAAAAAEAAAAAAAABAAAAAAAAAQAAAAAAAAEAAAAAAAABAAAAAAAAAQAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAEAAAAAAAABAAAAAAAAAQAAAAAAAAEAAAAAAAABAAAAAAAAAQAAAAAAAAEAAAAAAAABAAAAAAAAAQAAAAAAAAEAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAABAAAAAAAAAQAAAAAAAAEAAAAAAAABAAAAAAAAAQAAAAAAAAEAAAAAAAABAAAAAAAAAQAAAAAAAAEAAAAAAAABAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==
+          tiles: AQAAAAAAAAEAAAAAAAABAAAAAAAAAQAAAAAAAAEAAAAAAAABAAAAAAAAAQAAAAAAAAEAAAAAAAABAAAAAAAAAQAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAABAAAAAAAAAQAAAAAAAAEAAAAAAAABAAAAAAAAAQAAAAAAAAEAAAAAAAABAAAAAAAAAQAAAAAAAAEAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAAAAAQAAAAAAAAEAAAAAAAABAAAAAAAAAQAAAAAAAAEAAAAAAAABAAAAAAAAAQAAAAAAAAEAAAAAAAABAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAEAAAAAAAABAAAAAAAAAQAAAAAAAAEAAAAAAAABAAAAAAAAAQAAAAAAAAEAAAAAAAABAAAAAAAAAQAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAABAAAAAAAAAQAAAAAAAAEAAAAAAAABAAAAAAAAAQAAAAAAAAEAAAAAAAABAAAAAAAAAQAAAAAAAAEAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAAAAAQAAAAAAAAEAAAAAAAABAAAAAAAAAQAAAAAAAAEAAAAAAAABAAAAAAAAAQAAAAAAAAEAAAAAAAABAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAEAAAAAAAABAAAAAAAAAQAAAAAAAAEAAAAAAAABAAAAAAAAAQAAAAAAAAEAAAAAAAABAAAAAAAAAQAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==
           version: 7
     - type: Broadphase
     - type: Physics
@@ -71,43 +60,22 @@ entities:
     - type: RadiationGridResistance
 - proto: ChairWood
   entities:
-  - uid: 21
+  - uid: 2
+    mapInit: true
     components:
     - type: Transform
       pos: 2.3076553,5.5472717
       parent: 1
-  - uid: 23
-    components:
-    - type: Transform
-      rot: 1.5707963267948966 rad
-      pos: 2.5,7.5
-      parent: 1
-  - uid: 27
-    components:
-    - type: Transform
-      rot: 1.5707963267948966 rad
-      pos: 3.5,7.5
-      parent: 1
-  - uid: 37
-    components:
-    - type: Transform
-      rot: 1.5707963267948966 rad
-      pos: 4.5,7.5
-      parent: 1
-  - uid: 43
-    components:
-    - type: Transform
-      rot: 1.5707963267948966 rad
-      pos: 5.5,7.5
-      parent: 1
-  - uid: 61
+  - uid: 3
+    mapInit: true
     components:
     - type: Transform
       pos: 8.464569,5.5169525
       parent: 1
 - proto: HospitalCurtains
   entities:
-  - uid: 33
+  - uid: 4
+    mapInit: true
     components:
     - type: Transform
       pos: 4.5,3.5
@@ -115,7 +83,8 @@ entities:
     - type: Physics
       angularDamping: 0
       linearDamping: 0
-  - uid: 34
+  - uid: 5
+    mapInit: true
     components:
     - type: Transform
       pos: 4.5,4.5
@@ -123,7 +92,8 @@ entities:
     - type: Physics
       angularDamping: 0
       linearDamping: 0
-  - uid: 41
+  - uid: 6
+    mapInit: true
     components:
     - type: Transform
       pos: 5.5,2.5
@@ -131,7 +101,8 @@ entities:
     - type: Physics
       angularDamping: 0
       linearDamping: 0
-  - uid: 46
+  - uid: 7
+    mapInit: true
     components:
     - type: Transform
       pos: 6.5,2.5
@@ -139,7 +110,8 @@ entities:
     - type: Physics
       angularDamping: 0
       linearDamping: 0
-  - uid: 59
+  - uid: 8
+    mapInit: true
     components:
     - type: Transform
       pos: 8.5,2.5
@@ -147,7 +119,8 @@ entities:
     - type: Physics
       angularDamping: 0
       linearDamping: 0
-  - uid: 65
+  - uid: 9
+    mapInit: true
     components:
     - type: Transform
       pos: 9.5,2.5
@@ -155,55 +128,50 @@ entities:
     - type: Physics
       angularDamping: 0
       linearDamping: 0
-- proto: LootSpawnerKitchenTier1
-  entities:
-  - uid: 84
-    components:
-    - type: Transform
-      pos: 11.5,7.5
-      parent: 1
 - proto: LootSpawnerMedicalTier1
   entities:
-  - uid: 39
+  - uid: 10
+    mapInit: true
     components:
     - type: Transform
       pos: 5.5,1.5
       parent: 1
-  - uid: 52
+  - uid: 11
+    mapInit: true
     components:
     - type: Transform
       pos: 7.5,5.5
       parent: 1
-  - uid: 57
+  - uid: 12
+    mapInit: true
     components:
     - type: Transform
       pos: 8.5,1.5
       parent: 1
 - proto: LootSpawnerSchoolTier1
   entities:
-  - uid: 12
+  - uid: 13
+    mapInit: true
     components:
     - type: Transform
       pos: 1.5,1.5
       parent: 1
-  - uid: 17
+  - uid: 14
+    mapInit: true
     components:
     - type: Transform
       pos: 2.5,1.5
       parent: 1
-  - uid: 19
+  - uid: 15
+    mapInit: true
     components:
     - type: Transform
       pos: 2.5,4.5
       parent: 1
-  - uid: 28
-    components:
-    - type: Transform
-      pos: 3.5,7.5
-      parent: 1
 - proto: MedicalBed
   entities:
-  - uid: 40
+  - uid: 16
+    mapInit: true
     components:
     - type: Transform
       pos: 5.5,1.5
@@ -211,7 +179,8 @@ entities:
     - type: Physics
       angularDamping: 0
       linearDamping: 0
-  - uid: 58
+  - uid: 17
+    mapInit: true
     components:
     - type: Transform
       pos: 8.5,1.5
@@ -219,107 +188,10 @@ entities:
     - type: Physics
       angularDamping: 0
       linearDamping: 0
-- proto: SinkStemless
-  entities:
-  - uid: 44
-    components:
-    - type: Transform
-      pos: 6.5,-0.5
-      parent: 1
-  - uid: 55
-    components:
-    - type: Transform
-      pos: 8.5,-0.5
-      parent: 1
-- proto: SteelBench
-  entities:
-  - uid: 77
-    components:
-    - type: Transform
-      pos: 11.5,0.5
-      parent: 1
-    - type: Physics
-      angularDamping: 0
-      linearDamping: 0
-  - uid: 79
-    components:
-    - type: Transform
-      pos: 11.5,2.5
-      parent: 1
-    - type: Physics
-      angularDamping: 0
-      linearDamping: 0
-  - uid: 80
-    components:
-    - type: Transform
-      pos: 11.5,3.5
-      parent: 1
-    - type: Physics
-      angularDamping: 0
-      linearDamping: 0
-  - uid: 82
-    components:
-    - type: Transform
-      pos: 11.5,5.5
-      parent: 1
-    - type: Physics
-      angularDamping: 0
-      linearDamping: 0
-  - uid: 83
-    components:
-    - type: Transform
-      pos: 11.5,6.5
-      parent: 1
-    - type: Physics
-      angularDamping: 0
-      linearDamping: 0
-- proto: Table
-  entities:
-  - uid: 78
-    components:
-    - type: Transform
-      pos: 11.5,1.5
-      parent: 1
-    - type: Physics
-      angularDamping: 0
-      linearDamping: 0
-  - uid: 81
-    components:
-    - type: Transform
-      pos: 11.5,4.5
-      parent: 1
-    - type: Physics
-      angularDamping: 0
-      linearDamping: 0
-  - uid: 85
-    components:
-    - type: Transform
-      pos: 11.5,7.5
-      parent: 1
-    - type: Physics
-      angularDamping: 0
-      linearDamping: 0
-- proto: TableCounterWood
-  entities:
-  - uid: 63
-    components:
-    - type: Transform
-      pos: 8.5,7.5
-      parent: 1
-    - type: Physics
-      angularDamping: 0
-      linearDamping: 0
-  - uid: 67
-    components:
-    - type: Transform
-      pos: 9.5,7.5
-      parent: 1
-    - type: Physics
-      angularDamping: 0
-      linearDamping: 0
 - proto: TableWood
   entities:
-  - uid: 13
+  - uid: 18
+    mapInit: true
     components:
     - type: Transform
       pos: 1.5,1.5
@@ -327,7 +199,8 @@ entities:
     - type: Physics
       angularDamping: 0
       linearDamping: 0
-  - uid: 14
+  - uid: 19
+    mapInit: true
     components:
     - type: Transform
       pos: 1.5,4.5
@@ -335,7 +208,8 @@ entities:
     - type: Physics
       angularDamping: 0
       linearDamping: 0
-  - uid: 18
+  - uid: 20
+    mapInit: true
     components:
     - type: Transform
       pos: 2.5,1.5
@@ -343,7 +217,8 @@ entities:
     - type: Physics
       angularDamping: 0
       linearDamping: 0
-  - uid: 20
+  - uid: 21
+    mapInit: true
     components:
     - type: Transform
       pos: 2.5,4.5
@@ -351,7 +226,8 @@ entities:
     - type: Physics
       angularDamping: 0
       linearDamping: 0
-  - uid: 25
+  - uid: 22
+    mapInit: true
     components:
     - type: Transform
       pos: 3.5,1.5
@@ -359,7 +235,8 @@ entities:
     - type: Physics
       angularDamping: 0
       linearDamping: 0
-  - uid: 51
+  - uid: 23
+    mapInit: true
     components:
     - type: Transform
       pos: 7.5,4.5
@@ -367,7 +244,8 @@ entities:
     - type: Physics
       angularDamping: 0
       linearDamping: 0
-  - uid: 53
+  - uid: 24
+    mapInit: true
     components:
     - type: Transform
       pos: 7.5,5.5
@@ -375,7 +253,8 @@ entities:
     - type: Physics
       angularDamping: 0
       linearDamping: 0
-  - uid: 60
+  - uid: 25
+    mapInit: true
     components:
     - type: Transform
       pos: 8.5,4.5
@@ -385,15 +264,8 @@ entities:
       linearDamping: 0
 - proto: WallBasaltCobblebrick
   entities:
-  - uid: 2
-    components:
-    - type: Transform
-      pos: 0.5,-0.5
-      parent: 1
-    - type: Physics
-      angularDamping: 0
-      linearDamping: 0
-  - uid: 3
+  - uid: 26
+    mapInit: true
     components:
     - type: Transform
       pos: 0.5,0.5
@@ -401,7 +273,8 @@ entities:
     - type: Physics
       angularDamping: 0
       linearDamping: 0
-  - uid: 4
+  - uid: 27
+    mapInit: true
     components:
     - type: Transform
       pos: 0.5,1.5
@@ -409,7 +282,8 @@ entities:
     - type: Physics
       angularDamping: 0
       linearDamping: 0
-  - uid: 5
+  - uid: 28
+    mapInit: true
     components:
     - type: Transform
       pos: 0.5,2.5
@@ -417,7 +291,8 @@ entities:
     - type: Physics
       angularDamping: 0
       linearDamping: 0
-  - uid: 7
+  - uid: 29
+    mapInit: true
     components:
     - type: Transform
       pos: 0.5,4.5
@@ -425,7 +300,8 @@ entities:
     - type: Physics
       angularDamping: 0
       linearDamping: 0
-  - uid: 8
+  - uid: 30
+    mapInit: true
     components:
     - type: Transform
       pos: 0.5,5.5
@@ -433,7 +309,8 @@ entities:
     - type: Physics
       angularDamping: 0
       linearDamping: 0
-  - uid: 9
+  - uid: 31
+    mapInit: true
     components:
     - type: Transform
       pos: 0.5,6.5
@@ -441,15 +318,8 @@ entities:
     - type: Physics
       angularDamping: 0
       linearDamping: 0
-  - uid: 10
-    components:
-    - type: Transform
-      pos: 0.5,7.5
-      parent: 1
-    - type: Physics
-      angularDamping: 0
-      linearDamping: 0
-  - uid: 11
+  - uid: 32
+    mapInit: true
     components:
     - type: Transform
       rot: 3.141592653589793 rad
@@ -458,7 +328,8 @@ entities:
     - type: Physics
       angularDamping: 0
       linearDamping: 0
-  - uid: 15
+  - uid: 33
+    mapInit: true
     components:
     - type: Transform
       pos: 1.5,6.5
@@ -466,7 +337,8 @@ entities:
     - type: Physics
       angularDamping: 0
       linearDamping: 0
-  - uid: 16
+  - uid: 34
+    mapInit: true
     components:
     - type: Transform
       rot: 3.141592653589793 rad
@@ -475,7 +347,8 @@ entities:
     - type: Physics
       angularDamping: 0
       linearDamping: 0
-  - uid: 22
+  - uid: 35
+    mapInit: true
     components:
     - type: Transform
       pos: 2.5,6.5
@@ -483,7 +356,8 @@ entities:
     - type: Physics
       angularDamping: 0
       linearDamping: 0
-  - uid: 24
+  - uid: 36
+    mapInit: true
     components:
     - type: Transform
       rot: 3.141592653589793 rad
@@ -492,7 +366,8 @@ entities:
     - type: Physics
       angularDamping: 0
       linearDamping: 0
-  - uid: 26
+  - uid: 37
+    mapInit: true
     components:
     - type: Transform
       pos: 3.5,6.5
@@ -500,15 +375,8 @@ entities:
     - type: Physics
       angularDamping: 0
       linearDamping: 0
-  - uid: 29
-    components:
-    - type: Transform
-      pos: 4.5,-0.5
-      parent: 1
-    - type: Physics
-      angularDamping: 0
-      linearDamping: 0
-  - uid: 30
+  - uid: 38
+    mapInit: true
     components:
     - type: Transform
       rot: 3.141592653589793 rad
@@ -517,7 +385,8 @@ entities:
     - type: Physics
       angularDamping: 0
       linearDamping: 0
-  - uid: 31
+  - uid: 39
+    mapInit: true
     components:
     - type: Transform
       pos: 4.5,1.5
@@ -525,7 +394,8 @@ entities:
     - type: Physics
       angularDamping: 0
       linearDamping: 0
-  - uid: 32
+  - uid: 40
+    mapInit: true
     components:
     - type: Transform
       pos: 4.5,2.5
@@ -533,7 +403,8 @@ entities:
     - type: Physics
       angularDamping: 0
       linearDamping: 0
-  - uid: 35
+  - uid: 41
+    mapInit: true
     components:
     - type: Transform
       pos: 4.5,5.5
@@ -541,7 +412,8 @@ entities:
     - type: Physics
       angularDamping: 0
       linearDamping: 0
-  - uid: 36
+  - uid: 42
+    mapInit: true
     components:
     - type: Transform
       pos: 4.5,6.5
@@ -549,7 +421,8 @@ entities:
     - type: Physics
       angularDamping: 0
       linearDamping: 0
-  - uid: 38
+  - uid: 43
+    mapInit: true
     components:
     - type: Transform
       rot: 3.141592653589793 rad
@@ -558,7 +431,8 @@ entities:
     - type: Physics
       angularDamping: 0
       linearDamping: 0
-  - uid: 42
+  - uid: 44
+    mapInit: true
     components:
     - type: Transform
       pos: 5.5,6.5
@@ -567,6 +441,7 @@ entities:
       angularDamping: 0
       linearDamping: 0
   - uid: 45
+    mapInit: true
     components:
     - type: Transform
       rot: 3.141592653589793 rad
@@ -575,7 +450,8 @@ entities:
     - type: Physics
       angularDamping: 0
       linearDamping: 0
-  - uid: 47
+  - uid: 46
+    mapInit: true
     components:
     - type: Transform
       pos: 6.5,6.5
@@ -583,7 +459,8 @@ entities:
     - type: Physics
       angularDamping: 0
       linearDamping: 0
-  - uid: 48
+  - uid: 47
+    mapInit: true
     components:
     - type: Transform
       rot: 3.141592653589793 rad
@@ -592,7 +469,8 @@ entities:
     - type: Physics
       angularDamping: 0
       linearDamping: 0
-  - uid: 49
+  - uid: 48
+    mapInit: true
     components:
     - type: Transform
       pos: 7.5,1.5
@@ -600,7 +478,8 @@ entities:
     - type: Physics
       angularDamping: 0
       linearDamping: 0
-  - uid: 50
+  - uid: 49
+    mapInit: true
     components:
     - type: Transform
       pos: 7.5,2.5
@@ -608,7 +487,8 @@ entities:
     - type: Physics
       angularDamping: 0
       linearDamping: 0
-  - uid: 54
+  - uid: 50
+    mapInit: true
     components:
     - type: Transform
       pos: 7.5,6.5
@@ -616,7 +496,8 @@ entities:
     - type: Physics
       angularDamping: 0
       linearDamping: 0
-  - uid: 56
+  - uid: 51
+    mapInit: true
     components:
     - type: Transform
       rot: 3.141592653589793 rad
@@ -625,7 +506,8 @@ entities:
     - type: Physics
       angularDamping: 0
       linearDamping: 0
-  - uid: 62
+  - uid: 52
+    mapInit: true
     components:
     - type: Transform
       pos: 8.5,6.5
@@ -633,7 +515,8 @@ entities:
     - type: Physics
       angularDamping: 0
       linearDamping: 0
-  - uid: 64
+  - uid: 53
+    mapInit: true
     components:
     - type: Transform
       rot: 3.141592653589793 rad
@@ -642,7 +525,8 @@ entities:
     - type: Physics
       angularDamping: 0
       linearDamping: 0
-  - uid: 66
+  - uid: 54
+    mapInit: true
     components:
     - type: Transform
       pos: 9.5,6.5
@@ -650,15 +534,8 @@ entities:
     - type: Physics
       angularDamping: 0
       linearDamping: 0
-  - uid: 68
-    components:
-    - type: Transform
-      pos: 10.5,-0.5
-      parent: 1
-    - type: Physics
-      angularDamping: 0
-      linearDamping: 0
-  - uid: 69
+  - uid: 55
+    mapInit: true
     components:
     - type: Transform
       pos: 10.5,0.5
@@ -666,7 +543,8 @@ entities:
     - type: Physics
       angularDamping: 0
       linearDamping: 0
-  - uid: 70
+  - uid: 56
+    mapInit: true
     components:
     - type: Transform
       pos: 10.5,1.5
@@ -674,7 +552,8 @@ entities:
     - type: Physics
       angularDamping: 0
       linearDamping: 0
-  - uid: 71
+  - uid: 57
+    mapInit: true
     components:
     - type: Transform
       pos: 10.5,2.5
@@ -682,7 +561,8 @@ entities:
     - type: Physics
       angularDamping: 0
       linearDamping: 0
-  - uid: 72
+  - uid: 58
+    mapInit: true
     components:
     - type: Transform
       pos: 10.5,3.5
@@ -690,7 +570,8 @@ entities:
     - type: Physics
       angularDamping: 0
       linearDamping: 0
-  - uid: 73
+  - uid: 59
+    mapInit: true
     components:
     - type: Transform
       pos: 10.5,4.5
@@ -698,7 +579,8 @@ entities:
     - type: Physics
       angularDamping: 0
       linearDamping: 0
-  - uid: 74
+  - uid: 60
+    mapInit: true
     components:
     - type: Transform
       pos: 10.5,5.5
@@ -706,7 +588,8 @@ entities:
     - type: Physics
       angularDamping: 0
       linearDamping: 0
-  - uid: 75
+  - uid: 61
+    mapInit: true
     components:
     - type: Transform
       pos: 10.5,6.5
@@ -714,17 +597,10 @@ entities:
     - type: Physics
       angularDamping: 0
       linearDamping: 0
-  - uid: 76
-    components:
-    - type: Transform
-      pos: 10.5,7.5
-      parent: 1
-    - type: Physics
-      angularDamping: 0
-      linearDamping: 0
 - proto: WoodDoor
   entities:
-  - uid: 6
+  - uid: 62
+    mapInit: true
     components:
     - type: Transform
       pos: 0.5,3.5
