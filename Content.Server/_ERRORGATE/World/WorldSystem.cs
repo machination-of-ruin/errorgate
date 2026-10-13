@@ -1,11 +1,13 @@
 using System.Diagnostics;
 using System.Linq;
 using System.Numerics;
+using Content.Server.Atmos.Components;
 using Content.Server.Atmos.EntitySystems;
 using Content.Server.Gravity;
 using Content.Shared._ERRORGATE.World;
 using Content.Shared.Atmos;
 using Content.Shared.Gravity;
+using Content.Shared.Maps;
 using Robust.Shared.ContentPack;
 using Robust.Shared.EntitySerialization.Systems;
 using Robust.Shared.Map;
@@ -15,6 +17,7 @@ using Robust.Shared.Physics;
 using Robust.Shared.Physics.Systems;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Random;
+using Robust.Shared.Timing;
 using Robust.Shared.Utility;
 
 namespace Content.Server._ERRORGATE.World;
@@ -39,6 +42,8 @@ public sealed class WorldSystem : EntitySystem
     [Dependency] private readonly AtmosphereSystem _atmos = default!;
     [Dependency] private readonly GravitySystem _gravity = default!;
     [Dependency] private readonly SharedPhysicsSystem _physics = default!;
+    [Dependency] private readonly TileSystem _tile = default!;
+    [Dependency] private readonly IGameTiming _timing = default!;
 
     /// <summary>A built location and what it cost.</summary>
     public sealed class Location
@@ -77,7 +82,7 @@ public sealed class WorldSystem : EntitySystem
             return false;
         }
 
-        var watch = Stopwatch.StartNew();
+        var watch = System.Diagnostics.Stopwatch.StartNew();
         var entitiesBefore = EntityManager.EntityCount;
         var useSeed = seed ?? _random.Next();
         var layout = LocationLayout.Generate(useSeed, proto.Size, pool, proto.Density);
@@ -95,15 +100,18 @@ public sealed class WorldSystem : EntitySystem
 
         // The ground: terrain, roads and the border
         var ground = _mapManager.CreateGridEntity(mapId);
-        var groundTile = new Tile(_tileDefs[proto.Ground].TileId);
-        var roadTile = new Tile(_tileDefs[proto.Road].TileId);
+        EnsureComp<GridAtmosphereComponent>(ground.Owner); // the map air only reaches a grid that has an atmosphere
+        var groundDef = (ContentTileDefinition) _tileDefs[proto.Ground];
+        var roadDef = (ContentTileDefinition) _tileDefs[proto.Road];
         var tiles = new List<(Vector2i, Tile)>(proto.Size.X * proto.Size.Y);
         for (var x = 0; x < proto.Size.X; x++)
         {
             for (var y = 0; y < proto.Size.Y; y++)
             {
+                // Every tile picks its own variant, so the ground does not look like a pattern
                 var pos = new Vector2i(x, y);
-                tiles.Add((pos, layout.Roads.Contains(pos) ? roadTile : groundTile));
+                var def = layout.Roads.Contains(pos) ? roadDef : groundDef;
+                tiles.Add((pos, new Tile(def.TileId, 0, _tile.PickVariant(def))));
             }
         }
 
@@ -142,8 +150,25 @@ public sealed class WorldSystem : EntitySystem
 
             // A grid is a dynamic body by default and would be pushed around by the ground grid and the others it overlaps
             _physics.SetBodyType(grid.Value.Owner, BodyType.Static);
+
+            // The ground under the building is cut away, so the two grids never overlap
+            var structureTiles = new List<Vector2i>();
+            var holes = new List<(Vector2i, Tile)>();
+            foreach (var t in _map.GetAllTiles(grid.Value.Owner, grid.Value.Comp))
+            {
+                structureTiles.Add(t.GridIndices);
+                var worldCentre = RotateVector(new Vector2(t.GridIndices.X + 0.5f, t.GridIndices.Y + 0.5f), p.Turns) + origin;
+                holes.Add((new Vector2i((int) MathF.Floor(worldCentre.X), (int) MathF.Floor(worldCentre.Y)), Tile.Empty));
+            }
+
+            _map.SetTiles(ground.Owner, ground.Comp, holes);
+            EnsureComp<GridAtmosphereComponent>(grid.Value.Owner);
+            _pendingAir.Add(new PendingAir(grid.Value.Owner, structureTiles, _timing.CurTime + TimeSpan.FromSeconds(120)));
             placed++;
         }
+
+        var groundTiles = _map.GetAllTiles(ground.Owner, ground.Comp).Select(t => t.GridIndices).ToList();
+        _pendingAir.Add(new PendingAir(ground.Owner, groundTiles, _timing.CurTime + TimeSpan.FromSeconds(120)));
 
         watch.Stop();
         _locations[id] = new Location
@@ -170,15 +195,63 @@ public sealed class WorldSystem : EntitySystem
             QueueDel(loc.Map);
     }
 
-    private static Vector2 Rotate(Vector2i v, int turns)
+    private static Vector2 Rotate(Vector2i v, int turns) => RotateVector(new Vector2(v.X, v.Y), turns);
+
+    private static Vector2 RotateVector(Vector2 v, int turns)
     {
         return (turns % 4) switch
         {
             1 => new Vector2(-v.Y, v.X),
             2 => new Vector2(-v.X, -v.Y),
             3 => new Vector2(v.Y, -v.X),
-            _ => new Vector2(v.X, v.Y),
+            _ => v,
         };
+    }
+
+    // -- Air ------------------------------------------------------------------------------------------------------
+
+    private sealed record PendingAir(EntityUid Grid, List<Vector2i> Tiles, TimeSpan GiveUp);
+
+    private readonly List<PendingAir> _pendingAir = new();
+
+    /// <summary>
+    ///     A new grid's tiles get their air from the atmosphere system a little after the grid exists, so the breathable air is put
+    ///     into them as they appear, a few thousand tiles a tick at most.
+    /// </summary>
+    public override void Update(float frameTime)
+    {
+        if (_pendingAir.Count == 0)
+            return;
+
+        var budget = 6000;
+        for (var g = _pendingAir.Count - 1; g >= 0 && budget > 0; g--)
+        {
+            var pending = _pendingAir[g];
+            if (TerminatingOrDeleted(pending.Grid) || _timing.CurTime > pending.GiveUp)
+            {
+                if (!TerminatingOrDeleted(pending.Grid) && pending.Tiles.Count > 0)
+                    Log.Warning($"World: the air was not put into {pending.Tiles.Count} tiles of {ToPrettyString(pending.Grid)} in time");
+
+                _pendingAir.RemoveAt(g);
+                continue;
+            }
+
+            for (var i = pending.Tiles.Count - 1; i >= 0 && budget > 0; i--)
+            {
+                budget--;
+                if (_atmos.GetTileMixture((pending.Grid, null, null), null, pending.Tiles[i]) is not { Immutable: false } air)
+                    continue;
+
+                air.Clear();
+                air.Temperature = 293.15f;
+                air.AdjustMoles(Gas.Oxygen, Atmospherics.OxygenMolesStandard);
+                air.AdjustMoles(Gas.Nitrogen, Atmospherics.NitrogenMolesStandard);
+                pending.Tiles.RemoveAt(i);
+            }
+
+            if (pending.Tiles.Count == 0)
+                _pendingAir.RemoveAt(g);
+        }
     }
 
     /// <summary>The structure files of a theme with their measured footprints. Measured once, then kept.</summary>

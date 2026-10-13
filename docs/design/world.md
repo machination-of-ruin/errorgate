@@ -91,7 +91,7 @@ Measured with a throwaway soak test (80 build and teardown cycles per location, 
 | Entities left after teardown | 0 | 0 |
 | Managed memory over 80 cycles | flat (1495 to 1499 MB) | flat (1495 to 1499 MB) |
 
-No structure leaves its location or overlaps another. A rebuild is fast enough to run on the game thread; it will be sliced once the real structures make locations heavier (the placeholders are far lighter than a finished tier 2 city). This is measured on empty locations: no NPC squads, no players, no atmos or lighting load yet.
+Every ground tile picks its own variant (like the `variantize` command), so the terrain does not look like a pattern. The ground under a building is cut away, so a tile belongs to exactly one grid. Every grid has an atmosphere of its own and gets breathable air a few ticks after it is built (the map's air does not reach a grid without one); the tiles under walls have none, as usual. No structure leaves its location or overlaps another. A rebuild is fast enough to run on the game thread; it will be sliced once the real structures make locations heavier (the placeholders are far lighter than a finished tier 2 city). This is measured on empty locations: no NPC squads, no players, no atmos or lighting load yet.
 
 ## Order of work
 
