@@ -95,7 +95,7 @@ No structure leaves its location or overlaps another. A rebuild is fast enough t
 
 ## Order of work
 
-1. **Spikes, one at a time:** (a) build, tear down and reset a location with timings and the soak test (done, see below); (b) the reputation table with migrations on both database kinds; (c) opening a storage UI on a remote container for the safe stash.
+1. **Spikes, one at a time:** (a) build, tear down and reset a location with timings and the soak test (done, see above); (b) the reputation table with migrations on both database kinds; (c) opening a storage UI on a remote container for the safe stash.
 2. **First slice:** the three locations, tunnels and transitions, the storm timer and `worldreset`, loot by tier, spawn zones.
 3. **The base:** the Military base map, one trader, one task giver, the stash terminal, reputation gating.
 4. **Squads and roles.** Then more factions, locations and structures.
