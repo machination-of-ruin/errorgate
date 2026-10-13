@@ -114,6 +114,9 @@ public sealed partial class LocationLayout
         if (pool.Count > 0)
             layout.FillFrontage(rng, size, pool, density, options.Style);
 
+        if (options.SpawnZone)
+            layout.PlaceSpawnZone(rng);
+
         layout.DressStreets(rng, options.Style);
         layout.Scatter(rng, size, options);
         return layout;
@@ -293,6 +296,72 @@ public sealed partial class LocationLayout
                     AddRoad(At(horizontal, run.Lo + 2, across), At(horizontal, run.Hi - 2, across), avenue ? 5 : 3, true, avenue);
                 }
             }
+        }
+    }
+
+    // -- The spawn zone -------------------------------------------------------------------------------------------
+
+    /// <summary>
+    ///     A clearing of nine by nine tiles near the middle of the map, beside a street, with eight spawn points in a ring. Nothing is
+    ///     built or planted there.
+    /// </summary>
+    private void PlaceSpawnZone(Random rng)
+    {
+        var center = new Vector2i(Bounds.X / 2, Bounds.Y / 2);
+        bool Clear(Vector2i c)
+        {
+            for (var dx = -5; dx <= 5; dx++)
+            {
+                for (var dy = -5; dy <= 5; dy++)
+                {
+                    var t = new Vector2i(c.X + dx, c.Y + dy);
+                    if (Dist(t) < Margin || Terrain.ContainsKey(t) || _occupied.Contains(t) || Roads.Contains(t) || Walks.Contains(t))
+                        return false;
+                }
+            }
+
+            return true;
+        }
+
+        // The nearest clearing to the middle, in rings
+        for (var radius = 0; radius < Math.Max(Bounds.X, Bounds.Y) / 2; radius += 2)
+        {
+            var best = (Vector2i?) null;
+            var bestDistance = double.MaxValue;
+            for (var dx = -radius; dx <= radius; dx += 2)
+            {
+                for (var dy = -radius; dy <= radius; dy += 2)
+                {
+                    if (Math.Max(Math.Abs(dx), Math.Abs(dy)) != radius)
+                        continue;
+
+                    var c = new Vector2i(center.X + dx, center.Y + dy);
+                    var distance = (c - center).LengthSquared + rng.NextDouble();
+                    if (distance < bestDistance && Clear(c))
+                    {
+                        best = c;
+                        bestDistance = distance;
+                    }
+                }
+            }
+
+            if (best is not { } at)
+                continue;
+
+            for (var dx = -4; dx <= 4; dx++)
+            {
+                for (var dy = -4; dy <= 4; dy++)
+                {
+                    _occupied.Add(new Vector2i(at.X + dx, at.Y + dy));
+                }
+            }
+
+            foreach (var d in new[] { new Vector2i(-2, -2), new Vector2i(0, -2), new Vector2i(2, -2), new Vector2i(-2, 0), new Vector2i(2, 0), new Vector2i(-2, 2), new Vector2i(0, 2), new Vector2i(2, 2) })
+            {
+                SpawnTiles.Add(at + d);
+            }
+
+            return;
         }
     }
 

@@ -8,6 +8,9 @@
   resetMaxMinutes: 720
   theme: village
   style: village
+  spawnZone: true
+  mobs: [ MobSpawnerRunner, MobSpawnerWalkerLiving ]
+  mobCount: 8
   walkway: FloorLowDesert
   fenceStraight: FenceWoodHighStraight
   fenceCorner: FenceWoodHighCorner
@@ -43,6 +46,8 @@
   resetMaxMinutes: 720
   theme: city
   style: city
+  mobs: [ MobSpawnerWalkerArmored, MobSpawnerRunner, MobSpawnerWalkerArmoredMilitary ]
+  mobCount: 14
   walkway: FloorGrayConcreteSmooth
   post: LightPostSmall
   fenceStraight: FenceMetalStraight

@@ -109,6 +109,10 @@ public sealed partial class WorldLocationPrototype : IPrototype
     [DataField]
     public EntProtoId Water = "FloorWaterEntity";
 
+    /// <summary>Players without a faction come into the world here: a clearing with spawn points.</summary>
+    [DataField]
+    public bool SpawnZone;
+
     /// <summary>Underground: no sun, no weather, no day and night.</summary>
     [DataField]
     public bool Underground;

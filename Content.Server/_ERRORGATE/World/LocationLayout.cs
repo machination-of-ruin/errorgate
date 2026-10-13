@@ -37,7 +37,13 @@ public sealed partial class LocationLayout
 
     public List<List<Vector2i>> DecalTiles = new();
 
-    public sealed record Options(string Style, string Shape, int Rocks, int TreeClumps, int TreeSingles, string Shore, IReadOnlyList<(int Count, int Clump)> Props, IReadOnlyList<(int Count, int Clump)> Decals, IReadOnlyList<string> Gates);
+    /// <summary>Places for mob spawners on open ground.</summary>
+    public List<Vector2i> MobTiles = new();
+
+    /// <summary>Spawn points of the clearing where players come into the world.</summary>
+    public List<Vector2i> SpawnTiles = new();
+
+    public sealed record Options(string Style, string Shape, int Rocks, int TreeClumps, int TreeSingles, string Shore, IReadOnlyList<(int Count, int Clump)> Props, IReadOnlyList<(int Count, int Clump)> Decals, IReadOnlyList<string> Gates, int MobCount, bool SpawnZone);
 
     /// <summary>
     ///     Rock formations and trees in the free ground: away from the structures and the roads, and not on top of each other.
@@ -175,6 +181,9 @@ public sealed partial class LocationLayout
         {
             DecalTiles.Add(PlaceMany(rng, count, clump, 0, Free));
         }
+
+        // Mobs stand apart on the open ground
+        MobTiles = PlaceMany(rng, options.MobCount, 0, 14, Free);
     }
 
     private List<Vector2i> PlaceMany(Random rng, int count, int clump, int spacing, Func<Vector2i, bool> free)
@@ -203,6 +212,12 @@ public sealed partial class LocationLayout
             var center = RandomTile(rng);
             if (clump <= 0)
             {
+                // A single one: a few tries, the ground is not all free
+                for (var attempt = 0; attempt < 40 && !Clear(center); attempt++)
+                {
+                    center = RandomTile(rng);
+                }
+
                 if (Clear(center))
                 {
                     taken.Add(center);

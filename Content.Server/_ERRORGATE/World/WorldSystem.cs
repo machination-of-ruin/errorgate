@@ -3,6 +3,7 @@ using System.Linq;
 using System.Numerics;
 using Content.Server.Atmos.Components;
 using Content.Server.Atmos.EntitySystems;
+using Content.Server._ERRORGATE.LootManager;
 using Content.Server.Decals;
 using Content.Server.Gravity;
 using Content.Shared._ERRORGATE.World;
@@ -111,7 +112,7 @@ public sealed partial class WorldSystem : EntitySystem
         var entitiesBefore = EntityManager.EntityCount;
         var useSeed = seed ?? _random.Next();
         var options = new LocationLayout.Options(proto.Style, proto.Shape, proto.Rocks, proto.TreeClumps, proto.TreeSingles, proto.Shore,
-            proto.Props.Select(e => (e.Count, e.Clump)).ToList(), proto.Decals.Select(e => (e.Count, e.Clump)).ToList(), gates);
+            proto.Props.Select(e => (e.Count, e.Clump)).ToList(), proto.Decals.Select(e => (e.Count, e.Clump)).ToList(), gates, proto.Mobs.Count > 0 ? proto.MobCount : 0, proto.SpawnZone);
         var layout = LocationLayout.Generate(useSeed, proto.Size, pool, proto.Density, options);
 
         var mapUid = CreateLocationMap(proto, out var mapId);
@@ -158,6 +159,7 @@ public sealed partial class WorldSystem : EntitySystem
             // The grid itself stays upright, so a camera aligned with the grid matches the ground. A turned structure has its content
             // turned: tiles, positions and the way entities face. The layout says where the grid origin goes.
             RotateContent(grid.Value, p.Turns);
+            RetierLoot(grid.Value, proto.Tier);
             var origin = p.Origin;
             _transform.SetWorldPositionRotation(grid.Value.Owner, origin, Angle.Zero);
 
@@ -246,6 +248,18 @@ public sealed partial class WorldSystem : EntitySystem
             }
         }
 
+        // Mobs on the open ground, and the spawn points of the clearing where players come into the world
+        var mobRng = new Random(useSeed ^ 0x3B0B);
+        foreach (var tile in layout.MobTiles)
+        {
+            Spawn(proto.Mobs[mobRng.Next(proto.Mobs.Count)], _map.GridTileToLocal(ground.Owner, ground.Comp, tile));
+        }
+
+        for (var i = 0; i < layout.SpawnTiles.Count; i++)
+        {
+            Spawn(i < 6 ? "SpawnPointHumanError" : "SpawnPointLatejoin", _map.GridTileToLocal(ground.Owner, ground.Comp, layout.SpawnTiles[i]));
+        }
+
         // The gates, and the air
         foreach (var (gateId, place) in layout.GatePlaces)
         {
@@ -281,6 +295,20 @@ public sealed partial class WorldSystem : EntitySystem
 
         if (!TerminatingOrDeleted(loc.Map))
             QueueDel(loc.Map);
+    }
+
+    /// <summary>The loot spawners of a structure are tier 1 in the file; here they take the tier of the location.</summary>
+    private void RetierLoot(Entity<MapGridComponent> grid, int tier)
+    {
+        if (tier <= 1)
+            return;
+
+        var enumerator = Transform(grid.Owner).ChildEnumerator;
+        while (enumerator.MoveNext(out var child))
+        {
+            if (TryComp<LootSpawnerComponent>(child, out var spawner))
+                spawner.Rarity = tier;
+        }
     }
 
     /// <summary>
