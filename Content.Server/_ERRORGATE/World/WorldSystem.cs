@@ -97,6 +97,9 @@ public sealed partial class WorldSystem : EntitySystem
         if (proto.Style == "tunnel")
             return BuildTunnel(proto, seed, gates, out error);
 
+        if (proto.Style == "laboratory")
+            return BuildLaboratory(proto, seed, gates, out error);
+
         var pool = GetPool(proto.Theme);
         if (pool.Count == 0)
         {

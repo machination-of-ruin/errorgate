@@ -37,6 +37,8 @@ public sealed partial class WorldSystem
     [Dependency] private readonly PullingSystem _pulling = default!;
     [Dependency] private readonly ISharedPlayerManager _players = default!;
 
+    [Dependency] private readonly Bunker.BunkerSystem _bunker = default!;
+
     private WorldGraphPrototype? _graph;
     private readonly Dictionary<(string Location, string Gate), (EntityUid Gate, EntityCoordinates Arrival)> _gates = new();
 
@@ -310,6 +312,40 @@ public sealed partial class WorldSystem
         };
 
         Log.Info($"World: built {proto.ID} (seed {useSeed}): tunnel of {layout.Path.Count} tiles, {_locations[proto.ID].Entities} entities, {watch.Elapsed.TotalMilliseconds:0} ms");
+        return true;
+    }
+
+    /// <summary>The tier 3 laboratory: the generated bunker, entered by a gate (see <see cref="Bunker.BunkerSystem.BuildLaboratory"/>).</summary>
+    private bool BuildLaboratory(WorldLocationPrototype proto, int? seed, List<string> gates, out string error)
+    {
+        error = string.Empty;
+        var watch = Stopwatch.StartNew();
+        var entitiesBefore = EntityManager.EntityCount;
+        var useSeed = seed ?? _random.Next();
+
+        var mapUid = CreateLocationMap(proto, out var mapId);
+        var ground = _mapManager.CreateGridEntity(mapId);
+        EnsureComp<GridAtmosphereComponent>(ground.Owner);
+        var floor = _bunker.BuildLaboratory(ground.Owner, ground.Comp, useSeed);
+        _physics.SetBodyType(ground.Owner, BodyType.Static);
+
+        if (gates.Count > 0)
+            PlaceGate(proto.ID, gates[0], ground, Bunker.BunkerSystem.LaboratoryGate, Bunker.BunkerSystem.LaboratoryArrival, 3);
+
+        _pendingAir.Add(new PendingAir(ground.Owner, floor, _timing.CurTime + TimeSpan.FromSeconds(120)));
+
+        watch.Stop();
+        _locations[proto.ID] = new Location
+        {
+            Proto = proto,
+            Map = mapUid,
+            MapId = mapId,
+            Seed = useSeed,
+            BuildMilliseconds = watch.Elapsed.TotalMilliseconds,
+            Entities = EntityManager.EntityCount - entitiesBefore,
+        };
+
+        Log.Info($"World: built {proto.ID} (seed {useSeed}): laboratory of {floor.Count} floor tiles, {_locations[proto.ID].Entities} entities, {watch.Elapsed.TotalMilliseconds:0} ms");
         return true;
     }
 

@@ -136,6 +136,33 @@
   ambientLight: "#141414"
   resetWith: SnowCity
 
+# The tier 3 laboratory: the generated bunker (rooms, corridors, doors, loot, bosses, radiation), entered by a gate. Pitch black.
+- type: worldLocation
+  id: Laboratory
+  name: laboratory
+  tier: 3
+  style: laboratory
+  underground: true
+  size: "108,80"
+  ambientLight: "#000000"
+  resetMinMinutes: 360
+  resetMaxMinutes: 720
+
+# A tunnel between the city and the laboratory. It is wiped with the laboratory.
+- type: worldLocation
+  id: TunnelCityLab
+  name: tunnel
+  tier: 2
+  style: tunnel
+  underground: true
+  size: "120,44"
+  ground: FloorCave
+  post: LightPostSmall
+  mobs: [ MobSpawnerRunner, MobSpawnerWalkerArmored ]
+  mobCount: 5
+  ambientLight: "#101010"
+  resetWith: Laboratory
+
 # The web: which locations exist and which gates lead to which.
 - type: worldGraph
   id: Default
@@ -143,8 +170,14 @@
   - Village
   - TunnelVillageCity
   - SnowCity
+  - TunnelCityLab
+  - Laboratory
   links:
   - a: Village.east
     b: TunnelVillageCity.west
   - a: TunnelVillageCity.east
     b: SnowCity.west
+  - a: SnowCity.east
+    b: TunnelCityLab.west
+  - a: TunnelCityLab.east
+    b: Laboratory.up
