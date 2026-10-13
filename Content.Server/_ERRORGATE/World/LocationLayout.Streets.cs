@@ -394,7 +394,7 @@ public sealed partial class LocationLayout
                 for (var dy = -2; dy <= 2; dy++)
                 {
                     var t = new Vector2i(gate.X + dx, gate.Y + dy);
-                    if (Dist(t) < 4 || Terrain.ContainsKey(t) || _occupied.Contains(t))
+                    if (Dist(t) < 3 || Terrain.ContainsKey(t) || _occupied.Contains(t))
                         return false;
                 }
             }

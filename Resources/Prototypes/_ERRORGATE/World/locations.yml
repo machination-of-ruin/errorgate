@@ -141,6 +141,31 @@
   ambientLight: "#141414"
   resetWith: SnowCity
 
+# The Military base: a hand-built map that never resets and is raidable (walls and doors can be broken). Build it, put WorldGate entities with
+# the gate name `gate` in it, and save it with savegrid as /Maps/_ERRORGATE/Locations/MilitaryBase.yml. Until then a walled compound of
+# city buildings stands in.
+- type: worldLocation
+  id: MilitaryBase
+  name: military base
+  tier: 2
+  theme: city
+  style: city
+  shape: rect
+  size: "96,72"
+  mapPath: /Maps/_ERRORGATE/Locations/MilitaryBase.yml
+  ground: FloorSnow
+  road: FloorGrayConcrete
+  walkway: FloorGrayConcreteSmooth
+  border: WallSolid
+  weather: SnowfallLight
+  density: 0.5
+  mobs: [ MobSpawnerWalkerArmoredMilitary ]
+  mobCount: 6
+  rocks: 0
+  treeClumps: 0
+  treeSingles: 0
+  ambientLight: "#6A6E78"
+
 # The tier 3 laboratory: the generated bunker (rooms, corridors, doors, loot, bosses, radiation), entered by a gate. Pitch black.
 - type: worldLocation
   id: Laboratory
@@ -173,6 +198,7 @@
   id: Default
   locations:
   - Village
+  - MilitaryBase
   - TunnelVillageCity
   - SnowCity
   - TunnelCityLab
@@ -182,6 +208,8 @@
     b: TunnelVillageCity.west
   - a: TunnelVillageCity.east
     b: SnowCity.west
+  - a: SnowCity.base
+    b: MilitaryBase.gate
   - a: SnowCity.east
     b: TunnelCityLab.west
   - a: TunnelCityLab.east

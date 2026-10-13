@@ -109,6 +109,14 @@ public sealed partial class WorldLocationPrototype : IPrototype
     [DataField]
     public EntProtoId Water = "FloorWaterEntity";
 
+    /// <summary>
+    ///     A hand-built grid to load instead of generating the location, for example <c>/Maps/_ERRORGATE/Locations/MilitaryBase.yml</c>.
+    ///     Its gates are <c>WorldGate</c> entities with the gate name set; people arrive on the tile in front of the gate (the way
+    ///     the entity faces, south by default). If the file is not there yet, the location is generated as its style says.
+    /// </summary>
+    [DataField]
+    public string? MapPath;
+
     /// <summary>Players without a faction come into the world here: a clearing with spawn points.</summary>
     [DataField]
     public bool SpawnZone;

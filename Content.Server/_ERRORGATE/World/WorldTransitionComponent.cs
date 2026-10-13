@@ -11,7 +11,7 @@ public sealed partial class WorldTransitionComponent : Component
     [ViewVariables]
     public string Location = string.Empty;
 
-    /// <summary>The name of this gate in its location.</summary>
-    [ViewVariables]
+    /// <summary>The name of this gate in its location. A gate placed by hand in a map file sets it there.</summary>
+    [DataField, ViewVariables]
     public string Gate = string.Empty;
 }

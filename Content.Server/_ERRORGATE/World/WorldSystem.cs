@@ -95,6 +95,9 @@ public sealed partial class WorldSystem : EntitySystem
         Teardown(id);
 
         var gates = GatesOf(id);
+        if (proto.MapPath is { } mapPath && _res.ContentFileExists(new ResPath(mapPath)))
+            return BuildFromMap(proto, seed, new ResPath(mapPath), out error);
+
         if (proto.Style == "tunnel")
             return BuildTunnel(proto, seed, gates, out error);
 

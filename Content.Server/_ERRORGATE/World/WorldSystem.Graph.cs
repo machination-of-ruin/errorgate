@@ -18,6 +18,7 @@ using Robust.Shared.Maths;
 using Robust.Shared.Physics;
 using Robust.Shared.Player;
 using Robust.Shared.Prototypes;
+using Robust.Shared.Utility;
 
 namespace Content.Server._ERRORGATE.World;
 
@@ -346,6 +347,63 @@ public sealed partial class WorldSystem
         };
 
         Log.Info($"World: built {proto.ID} (seed {useSeed}): laboratory of {floor.Count} floor tiles, {_locations[proto.ID].Entities} entities, {watch.Elapsed.TotalMilliseconds:0} ms");
+        return true;
+    }
+
+    /// <summary>A hand-built location: the grid of a map file, with gates it names itself.</summary>
+    private bool BuildFromMap(WorldLocationPrototype proto, int? seed, ResPath path, out string error)
+    {
+        error = string.Empty;
+        var watch = Stopwatch.StartNew();
+        var entitiesBefore = EntityManager.EntityCount;
+
+        var mapUid = CreateLocationMap(proto, out var mapId);
+        if (!_loader.TryLoadGrid(mapId, path, out var grid))
+        {
+            _map.DeleteMap(mapId);
+            error = $"could not load {path}";
+            return false;
+        }
+
+        EnsureComp<GridAtmosphereComponent>(grid.Value.Owner);
+        _physics.SetBodyType(grid.Value.Owner, BodyType.Static);
+        RetierLoot(grid.Value, proto.Tier);
+
+        // The gates the map names: people arrive on the tile in front of them
+        var enumerator = Transform(grid.Value.Owner).ChildEnumerator;
+        while (enumerator.MoveNext(out var child))
+        {
+            if (!TryComp<WorldTransitionComponent>(child, out var gate) || gate.Gate == string.Empty)
+                continue;
+
+            gate.Location = proto.ID;
+            var facing = Transform(child).LocalRotation.GetCardinalDir();
+            var step = facing switch
+            {
+                Direction.North => new Vector2i(0, 1),
+                Direction.East => new Vector2i(1, 0),
+                Direction.West => new Vector2i(-1, 0),
+                _ => new Vector2i(0, -1),
+            };
+
+            var tile = _map.TileIndicesFor(grid.Value.Owner, grid.Value.Comp, Transform(child).Coordinates);
+            _gates[(proto.ID, gate.Gate)] = (child, _map.GridTileToLocal(grid.Value.Owner, grid.Value.Comp, tile + step));
+        }
+
+        _pendingAir.Add(new PendingAir(grid.Value.Owner, _map.GetAllTiles(grid.Value.Owner, grid.Value.Comp).Select(t => t.GridIndices).ToList(), _timing.CurTime + TimeSpan.FromSeconds(120)));
+
+        watch.Stop();
+        _locations[proto.ID] = new Location
+        {
+            Proto = proto,
+            Map = mapUid,
+            MapId = mapId,
+            Seed = seed ?? 0,
+            BuildMilliseconds = watch.Elapsed.TotalMilliseconds,
+            Entities = EntityManager.EntityCount - entitiesBefore,
+        };
+
+        Log.Info($"World: built {proto.ID} from {path}: {_locations[proto.ID].Entities} entities, {watch.Elapsed.TotalMilliseconds:0} ms");
         return true;
     }
 
