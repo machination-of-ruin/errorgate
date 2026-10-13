@@ -37,7 +37,7 @@ public sealed partial class LocationLayout
 
     public List<List<Vector2i>> DecalTiles = new();
 
-    public sealed record Options(string Style, string Shape, int Rocks, int TreeClumps, int TreeSingles, string Shore, IReadOnlyList<(int Count, int Clump)> Props, IReadOnlyList<(int Count, int Clump)> Decals);
+    public sealed record Options(string Style, string Shape, int Rocks, int TreeClumps, int TreeSingles, string Shore, IReadOnlyList<(int Count, int Clump)> Props, IReadOnlyList<(int Count, int Clump)> Decals, IReadOnlyList<string> Gates);
 
     /// <summary>
     ///     Rock formations and trees in the free ground: away from the structures and the roads, and not on top of each other.

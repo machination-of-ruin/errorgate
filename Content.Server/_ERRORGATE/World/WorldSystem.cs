@@ -33,7 +33,7 @@ namespace Content.Server._ERRORGATE.World;
 ///     the terrain, roads and border, and one grid per structure of the theme's pool, placed by <see cref="LocationLayout"/>.
 ///     This is the first slice: build, tear down and measure. The storm timer, transitions and reputation come later.
 /// </summary>
-public sealed class WorldSystem : EntitySystem
+public sealed partial class WorldSystem : EntitySystem
 {
     private const string StructureRoot = "/Maps/_ERRORGATE/Structures/";
 
@@ -70,7 +70,9 @@ public sealed class WorldSystem : EntitySystem
         /// <summary>Every structure built and its grid, for the tools and tests.</summary>
         public List<(EntityUid Grid, StructurePlacement Placement)> Built = new();
 
-        public LocationLayout Layout = default!;
+        public LocationLayout? Layout;
+
+        public TunnelLayout? Tunnel;
     }
 
     private readonly Dictionary<string, Location> _locations = new();
@@ -91,6 +93,10 @@ public sealed class WorldSystem : EntitySystem
 
         Teardown(id);
 
+        var gates = GatesOf(id);
+        if (proto.Style == "tunnel")
+            return BuildTunnel(proto, seed, gates, out error);
+
         var pool = GetPool(proto.Theme);
         if (pool.Count == 0)
         {
@@ -102,32 +108,10 @@ public sealed class WorldSystem : EntitySystem
         var entitiesBefore = EntityManager.EntityCount;
         var useSeed = seed ?? _random.Next();
         var options = new LocationLayout.Options(proto.Style, proto.Shape, proto.Rocks, proto.TreeClumps, proto.TreeSingles, proto.Shore,
-            proto.Props.Select(e => (e.Count, e.Clump)).ToList(), proto.Decals.Select(e => (e.Count, e.Clump)).ToList());
+            proto.Props.Select(e => (e.Count, e.Clump)).ToList(), proto.Decals.Select(e => (e.Count, e.Clump)).ToList(), gates);
         var layout = LocationLayout.Generate(useSeed, proto.Size, pool, proto.Density, options);
 
-        var mapUid = _map.CreateMap(out var mapId, runMapInit: true);
-        _map.SetAmbientLight(mapId, proto.AmbientLight);
-
-        // The day and the night follow the same clock in every location (no random start, the clock is the server's), and the
-        // snow, if the location has it, never stops
-        var cycle = EnsureComp<LightCycleComponent>(mapUid);
-        cycle.OriginalColor = proto.AmbientLight;
-        cycle.Duration = TimeSpan.FromSeconds(DayCycleSeconds);
-        cycle.InitialOffset = false;
-        cycle.Offset = TimeSpan.Zero;
-        cycle.MinLightLevel = 0f;
-        cycle.MaxLightLevel = 1f;
-        Dirty(mapUid, cycle);
-        if (proto.Weather is { } weather && _proto.TryIndex(weather, out var weatherProto))
-            _weather.SetWeather(mapId, weatherProto, null);
-
-        // The air of the map reaches every grid on it that has no air of its own, like on a planet
-        var gas = new GasMixture(Atmospherics.CellVolume) { Temperature = 293.15f };
-        gas.AdjustMoles(Gas.Oxygen, Atmospherics.OxygenMolesStandard);
-        gas.AdjustMoles(Gas.Nitrogen, Atmospherics.NitrogenMolesStandard);
-        _atmos.SetMapAtmosphere(mapUid, false, gas);
-        EnsureComp<GravityComponent>(mapUid);
-        _gravity.EnableGravity(mapUid);
+        var mapUid = CreateLocationMap(proto, out var mapId);
 
         // The ground: terrain, roads and the border
         var ground = _mapManager.CreateGridEntity(mapId);
@@ -259,6 +243,12 @@ public sealed class WorldSystem : EntitySystem
             }
         }
 
+        // The gates, and the air
+        foreach (var (gateId, place) in layout.GatePlaces)
+        {
+            PlaceGate(id, gateId, ground, place.Tile, place.Arrival, place.Facing);
+        }
+
         var groundTiles = _map.GetAllTiles(ground.Owner, ground.Comp).Select(t => t.GridIndices).ToList();
         _pendingAir.Add(new PendingAir(ground.Owner, groundTiles, _timing.CurTime + TimeSpan.FromSeconds(120)));
 
@@ -282,6 +272,7 @@ public sealed class WorldSystem : EntitySystem
 
     public void Teardown(string id)
     {
+        ForgetGates(id);
         if (!_locations.Remove(id, out var loc))
             return;
 
@@ -378,6 +369,8 @@ public sealed class WorldSystem : EntitySystem
     /// </summary>
     public override void Update(float frameTime)
     {
+        UpdateStorm();
+
         if (_pendingAir.Count == 0)
             return;
 

@@ -109,6 +109,34 @@ public sealed partial class WorldLocationPrototype : IPrototype
     [DataField]
     public EntProtoId Water = "FloorWaterEntity";
 
+    /// <summary>Underground: no sun, no weather, no day and night.</summary>
+    [DataField]
+    public bool Underground;
+
+    /// <summary>
+    ///     The storm wipes this location every so many minutes, a random time between the two (0 for never). A location that has
+    ///     <see cref="ResetWith"/> goes with that one instead.
+    /// </summary>
+    [DataField]
+    public int ResetMinMinutes;
+
+    [DataField]
+    public int ResetMaxMinutes;
+
+    [DataField]
+    public string? ResetWith;
+
+    /// <summary>The gate entity of this location's gates.</summary>
+    [DataField]
+    public EntProtoId Gate = "WorldGate";
+
+    /// <summary>Mob spawners placed in tunnels, and how many.</summary>
+    [DataField]
+    public List<EntProtoId> Mobs = new();
+
+    [DataField]
+    public int MobCount = 4;
+
     /// <summary>A weather that never ends in this location.</summary>
     [DataField]
     public ProtoId<WeatherPrototype>? Weather;

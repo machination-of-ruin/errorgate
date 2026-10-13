@@ -37,6 +37,9 @@ public sealed record StructurePlacement(StructureInfo Info, int Turns, Vector2i 
     }
 }
 
+/// <summary>A gate: where it stands, the tile people arrive on when they come through from the other side, and the side it faces.</summary>
+public sealed record GatePlacement(Vector2i Tile, Vector2i Arrival, int Facing);
+
 public enum FenceKind : byte
 {
     Straight,
@@ -106,6 +109,7 @@ public sealed partial class LocationLayout
         else
             layout.BuildVillageStreets(rng, size);
 
+        layout.PlaceGates(rng, options.Gates);
         layout.Walks.ExceptWith(layout.Roads);
         if (pool.Count > 0)
             layout.FillFrontage(rng, size, pool, density, options.Style);
@@ -289,6 +293,74 @@ public sealed partial class LocationLayout
                     AddRoad(At(horizontal, run.Lo + 2, across), At(horizontal, run.Hi - 2, across), avenue ? 5 : 3, true, avenue);
                 }
             }
+        }
+    }
+
+    // -- Gates ----------------------------------------------------------------------------------------------------
+
+    /// <summary>Where each gate stands, and the road tile people arrive on.</summary>
+    public Dictionary<string, GatePlacement> GatePlaces = new();
+
+    /// <summary>
+    ///     Puts the gates at the ends of the roads, far from each other, the main streets first. A gate stands five tiles beyond the end of
+    ///     its road (the road is made longer to reach it) and keeps a clear square around it.
+    /// </summary>
+    private void PlaceGates(Random rng, IReadOnlyList<string> ids)
+    {
+        if (ids.Count == 0)
+            return;
+
+        var candidates = new List<(Vector2i End, int Dir, bool Main, Segment Seg)>();
+        foreach (var seg in _segments)
+        {
+            candidates.Add((seg.A, seg.Horizontal ? 3 : 0, seg.Main, seg));
+            candidates.Add((seg.B, seg.Horizontal ? 1 : 2, seg.Main, seg));
+        }
+
+        bool Fits((Vector2i End, int Dir, bool Main, Segment Seg) c)
+        {
+            var gate = c.End + Dir(c.Dir) * 5;
+            for (var dx = -2; dx <= 2; dx++)
+            {
+                for (var dy = -2; dy <= 2; dy++)
+                {
+                    var t = new Vector2i(gate.X + dx, gate.Y + dy);
+                    if (Dist(t) < 4 || Terrain.ContainsKey(t) || _occupied.Contains(t))
+                        return false;
+                }
+            }
+
+            return true;
+        }
+
+        var placed = new List<Vector2i>();
+        foreach (var id in ids)
+        {
+            var options = candidates.Where(Fits).ToList();
+            if (options.Count == 0)
+                break;
+
+            // The first gate at a main street end; the others as far from the gates already placed as the roads allow
+            var best = options
+                .OrderByDescending(c => (c.Main ? 1000 : 0) + (placed.Count == 0 ? rng.Next(0, 100) : placed.Min(p => (p - c.End).Length)))
+                .First();
+
+            var tile = best.End + Dir(best.Dir) * 5;
+            var arrival = best.End + Dir(best.Dir) * 2;
+            AddRoad(best.End, best.End + Dir(best.Dir) * 4, best.Seg.Width, best.Seg.Walk, false);
+            _segments.RemoveAt(_segments.Count - 1); // no lots along the stub
+
+            for (var dx = -2; dx <= 2; dx++)
+            {
+                for (var dy = -2; dy <= 2; dy++)
+                {
+                    _occupied.Add(new Vector2i(tile.X + dx, tile.Y + dy));
+                }
+            }
+
+            GatePlaces[id] = new GatePlacement(tile, arrival, best.Dir);
+            placed.Add(best.End);
+            candidates.Remove(best);
         }
     }
 

@@ -4,6 +4,8 @@
   id: Village
   name: village and shore resort
   tier: 1
+  resetMinMinutes: 360
+  resetMaxMinutes: 720
   theme: village
   style: village
   walkway: FloorLowDesert
@@ -37,6 +39,8 @@
   id: SnowCity
   name: snow city
   tier: 2
+  resetMinMinutes: 360
+  resetMaxMinutes: 720
   theme: city
   style: city
   walkway: FloorGrayConcreteSmooth
@@ -86,3 +90,61 @@
     state: rock_wall
   - type: IconSmooth
     mode: NoSprite
+
+# The two ends of a tunnel are gates; people use them to go to the other side. Looks like the hatch of the bunker until it has art of its own.
+- type: entity
+  id: WorldGate
+  parent: BaseStructure
+  name: hatch
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: Transform
+    anchored: true
+  - type: Sprite
+    sprite: Structures/Doors/Airlocks/Standard/hatch.rsi
+    drawdepth: Mobs
+    layers:
+    - state: closed
+  - type: InteractionOutline
+  - type: Physics
+    bodyType: Static
+  - type: Fixtures
+    fixtures:
+      fix1:
+        shape:
+          !type:PhysShapeAabb
+          bounds: "-0.49,-0.49,0.49,0.49"
+        density: 1000
+        mask:
+        - FullTileMask
+        layer:
+        - AirlockLayer
+  - type: WorldTransition
+
+# A tunnel between the village and the city. It is wiped with the city.
+- type: worldLocation
+  id: TunnelVillageCity
+  name: tunnel
+  tier: 1
+  style: tunnel
+  underground: true
+  size: "140,48"
+  ground: FloorCave
+  post: LightPostSmall
+  mobs: [ MobSpawnerRunner, MobSpawnerWalkerLiving ]
+  mobCount: 4
+  ambientLight: "#141414"
+  resetWith: SnowCity
+
+# The web: which locations exist and which gates lead to which.
+- type: worldGraph
+  id: Default
+  locations:
+  - Village
+  - TunnelVillageCity
+  - SnowCity
+  links:
+  - a: Village.east
+    b: TunnelVillageCity.west
+  - a: TunnelVillageCity.east
+    b: SnowCity.west
