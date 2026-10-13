@@ -4,7 +4,7 @@
 
 - **Only knowledge survives death.** A respawned player has nothing: gear, keys and implants stay on the body. What carries over is what the player knows (routes, which doors open what, who holds what, where a stash is).
 - **Players make their own persistence.** Nothing stops them from hiding excess loot in crates and drawers where others rarely look, or holding a ruin as a base. A stash is how a dead player gets back in: to recover the body or take revenge. No system is built for this, the world already allows it.
-- **One round only.** Nothing carries between rounds (wipes).
+- **One wipe only.** Nothing carries between wipes (a wipe is a week, see [world.md](world.md)), except **reputation with the factions**, which belongs to the account and survives death and changing characters (see [factions.md](factions.md)). Items, money and structures never do.
 - **Implants start with the SS14 internal implants.** They are invisible on the body, so the rule in [humans-only.md](humans-only.md) (no cyborg look) holds. Psionics and spells are possible later and must be added carefully so the game stays grounded; psionics are not implemented now (see [ROADMAP.md](ROADMAP.md)).
 
 Progression is read against the premise in [VIBE.md](VIBE.md): she never guides, so nothing here comes with a quest, a marker or a "next step".
@@ -22,7 +22,9 @@ Every upgrade has a cost, so no tier is strictly better. Inspiration: Stalker An
 | Access | Keys and keycards from loot rooms | Unique items: only one exists, so the holder can be robbed. |
 | Body | Internal implants, rejecting humanity | See below. |
 
-## Location progression (Proposed)
+## Location progression
+
+**Superseded by [world.md](world.md):** three tiered locations (village and shore, snow city, bunker-laboratory) in a line; the location tier is the loot tier, and the faction base sells faction gear for reputation and currency. The older notes below remain for reference.
 
 - **Depth in EDGE OF ENTROPY.** Keycards from loot rooms open deeper levels, which are harder and pay better. Nobody tells players to go. The final bunker doors are the model (see [pressure.md](pressure.md)).
 - **Kuznetsk.** The factory with limited access holds the military loot. Danger and loot climb together.

@@ -2,6 +2,8 @@
 
 ## Status
 
+**On hold until the world and factions rework ([world.md](world.md), [factions.md](factions.md)) is implemented.** The `ai-god` branch holds step 1 and is not merged. Its sectors, subject ledger and prompts were written for the retired maps and will need to be reworked for the location graph and the factions.
+
 **Not implemented. No code exists for MACHINATION OF RUIN yet**: no gamerule, no event director, no error logging, no LLM provider, no whisper layer. Everything here is design. When implementation starts, a good first slice that works without the LLM is a scripted log: lines such as "SUBJECT X: DOOR CLOSED, 3 INSIDE" written when players use the final bunker doors on EDGE OF ENTROPY (see [pressure.md](pressure.md)).
 
 ## Nature

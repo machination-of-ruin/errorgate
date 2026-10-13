@@ -12,6 +12,7 @@ Inspirations: DayZ, Rust, Project Zomboid, Cataclysm: DDA.
 
 ## Direction
 
+0. **World and factions rework (next).** A fixed web of procedurally generated locations that reset on a storm timer, and three factions with reputation, bases, traders and NPC squads. See [world.md](world.md), [factions.md](factions.md), [structures.md](structures.md). The AI GOD waits until this is implemented.
 1. **Strip the space station.** Remove most station-specific content (departments, shuttles, round flow, roles that only make sense on a station) and reshape the game into a gritty multiplayer survival simulator.
 2. **Enhance combat.** Deeper, more lethal combat mechanics to support PvP and PvE fights.
 3. **AI "GOD".** An in-game gamerule with a system that tracks player behaviour and uses an LLM to formulate responses, build conditions, and punish or reward players. It never gives goals or orders.
@@ -20,8 +21,9 @@ Inspirations: DayZ, Rust, Project Zomboid, Cataclysm: DDA.
 
 | Area | Decision | Doc |
 |---|---|---|
-| Server model | Long rounds that end in a map wipe. Wipe length is open. | this file |
-| Setting | A ruined planet surface (Lavaland-style terrain) with ruins of old stations and facilities. | [maps.md](maps.md) |
+| Server model | One-week wipe, no restarts. Locations reset every 6 to 12 hours with a deadly storm. | [world.md](world.md) |
+| Setting | A fixed web of finite, themed, procedurally generated locations with transitions (tier 1 village and shore, tier 2 snow city and a Military base, tier 3 bunker-laboratory). EDGE OF ENTROPY and Kuznetsk are retired. | [world.md](world.md), [maps.md](maps.md) |
+| Factions | Three: Military, Knights, Cultists. Reputation per account, bases, traders, own currency, roles to spawn as. Military first. | [factions.md](factions.md) |
 | Death | Dead players wait in the death void until they choose to respawn. Respawn as a new character with nothing; the body and gear stay where they died. Respawn cooldown is a server CVar, default 0. Respawn at fixed spawn zones. | [death.md](death.md) |
 | Core loop | Needs, crafting, looting/scavenging, and cooperation forced by shared objectives and scarcity. | [survival-loop.md](survival-loop.md) |
 | Building | Full creative freedom, limited resources. Bases are existing ruins, held physically, raidable anytime. | [survival-loop.md](survival-loop.md) |
@@ -30,7 +32,7 @@ Inspirations: DayZ, Rust, Project Zomboid, Cataclysm: DDA.
 | Pressure | She builds situations that need several people and logs the result. Never instructions. | [pressure.md](pressure.md) |
 | World hazards | STALKER-style faults (heat, arc, collapse) in packs near points of interest, nearly invisible, warned by screen effects and sound. | [anomalies.md](anomalies.md) |
 | Combat | Lethality, firearms depth, melee depth, dangerous PvE enemies. | [combat.md](combat.md) |
-| AI GOD | Both an event director for the world and a judge of individual players. Whitelisted actions (events, messages, items, bodies), loose strength limits. Pluggable LLM provider. | [ai-god.md](ai-god.md) |
+| AI GOD | (After the world and factions rework.) Both an event director for the world and a judge of individual players. Whitelisted actions (events, messages, items, bodies), loose strength limits. Pluggable LLM provider. | [ai-god.md](ai-god.md) |
 
 ## Implemented so far
 
@@ -45,5 +47,5 @@ Death void and respawn ([death.md](death.md)), loot manager and despawn ([surviv
 
 ## Open questions
 
-- Wipe length (hours, days, weekly) and whether world state must survive server restarts within one wipe.
+- Whether reputation survives the weekly wipe (Proposed: yes, with a reset command).
 - Per-feature open questions are listed in each feature doc.

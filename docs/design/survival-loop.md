@@ -9,7 +9,7 @@
    - **Shared objectives:** world events and AI GOD conditions (never goals or orders) that need several players to resolve.
    - **Scarcity:** resources and zones too scarce or dangerous to handle solo, which encourages groups.
 
-Not in scope for now: specialised skills that lock actions to certain players, and a trade/currency economy.
+Not in scope for now: specialised skills that lock actions to certain players. The trade and currency economy is now in scope, per faction (see [factions.md](factions.md)); a faction base trader sells gear for the faction's currency.
 
 ### Current state of needs
 
@@ -28,7 +28,7 @@ Not in scope for now: specialised skills that lock actions to certain players, a
 
 ## Loot
 
-- Finite per wipe. The DayZ-style system is ported: `Content.Server/_ERRORGATE/LootManager/` (`LootManagerSystem`) with the global table `LootTableGlobal` and per-map tables (`Resources/Prototypes/_ERRORGATE/LootManager/`). Floor spawners and mob drops draw from the same shared pool (`MaxCount - Count` weights); an item deleted or despawned refunds its slot, the pool resets on round restart.
+- Finite per wipe (and per location, once the world rework lands: caps become per location, see [world.md](world.md)). The DayZ-style system is ported: `Content.Server/_ERRORGATE/LootManager/` (`LootManagerSystem`) with the global table `LootTableGlobal` and per-map tables (`Resources/Prototypes/_ERRORGATE/LootManager/`). Floor spawners and mob drops draw from the same shared pool (`MaxCount - Count` weights); an item deleted or despawned refunds its slot, the pool resets on round restart.
 - Items lying on the ground despawn after 20 minutes (and refund), dead bodies are gibbed after 10 minutes (`Content.Server/_ERRORGATE/Despawn/`).
 - Guns found in loot spawn with a random amount of ammo (`*RandomMag` prototypes).
 - AI GOD events and rewards are an additional source of items.
