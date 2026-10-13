@@ -73,6 +73,9 @@ public sealed partial class WorldSystem : EntitySystem
 
         public LocationLayout? Layout;
 
+        /// <summary>The ground grid (the one that holds the terrain), for the round system.</summary>
+        public EntityUid Ground;
+
         public TunnelLayout? Tunnel;
     }
 
@@ -282,6 +285,7 @@ public sealed partial class WorldSystem : EntitySystem
             Structures = placed,
             Built = built,
             Layout = layout,
+            Ground = ground.Owner,
             BuildMilliseconds = watch.Elapsed.TotalMilliseconds,
             Entities = EntityManager.EntityCount - entitiesBefore,
         };

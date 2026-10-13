@@ -1,0 +1,17 @@
+# The world of generated locations (docs/design/world.md). The map file is empty: the world system builds the locations when the round
+# starts (errorgate.world.enabled) and adds the ground of the village, with the spawn zone, to the station. Select it with the game.map CVar.
+- type: gameMap
+  id: World
+  mapName: World
+  mapPath: /Maps/Test/empty.yml
+  minPlayers: 0
+  randomRotation: false
+  stations:
+    Empty: # the key of the (empty) station grid in the map file
+      stationProto: TestStation
+      components:
+      - type: StationNameSetup
+        mapNameTemplate: "World"
+      - type: StationJobs
+        availableJobs:
+          HumanError: [ -1, -1 ]

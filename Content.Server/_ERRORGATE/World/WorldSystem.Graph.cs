@@ -54,6 +54,28 @@ public sealed partial class WorldSystem
 
     public WorldGraphPrototype? Graph => _graph;
 
+    /// <summary>The ground grid of the location with the spawn zone, if there is one.</summary>
+    public EntityUid? SpawnGrid()
+    {
+        foreach (var loc in _locations.Values)
+        {
+            if (loc.Layout is { SpawnTiles.Count: > 0 } && !TerminatingOrDeleted(loc.Ground))
+                return loc.Ground;
+        }
+
+        return null;
+    }
+
+    /// <summary>Forgets everything built (the round ended and its maps are gone).</summary>
+    public void Forget()
+    {
+        _locations.Clear();
+        _gates.Clear();
+        _storm.Clear();
+        _pendingAir.Clear();
+        _graph = null;
+    }
+
     public override void Initialize()
     {
         base.Initialize();

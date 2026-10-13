@@ -96,6 +96,16 @@ Ideas to add, in the order I would take them, each with a theme that shows where
 
 Open: should trees block bullets, how thick are the forests, are rock formations ever passable through a gap, and does every location need the same density?
 
+## Running the world
+
+Everything below is built; the world is off by default so the old maps play as before.
+
+- **A round in the world:** set the CVars `game.map` to `World` and `errorgate.world.enabled` to `true` (the graph is `errorgate.world.graph`, `Default`). At the start of the round the web is built (village, tunnel, snow city, the military base, a tunnel, the laboratory), the ground of the village joins the station, and players spawn at the spawn zone of the village (eight spawn points in a clearing near the middle). When the round ends the world is forgotten.
+- **Gates:** `Village.east` and `TunnelVillageCity.west` lead to each other, and so on along the links in `locations.yml`. Using a gate moves you, and what you pull, to the other one. Mobs do not use them. A gate does not work while the location behind it has a storm coming.
+- **The storm:** each location that resets (the village, the city, the laboratory; the tunnels follow the location they lead to; the base never resets) has a timer of 6 to 12 hours, picked so two locations are an hour apart if the range allows. `errorgate.world.warning_seconds` (300) before it hits, a siren sounds on the map and entry is closed; when it hits, the map is deleted (everything and everyone in it) and built again with a new layout.
+- **Admin commands:** `worldbuild [graph] [seed]` builds the whole web without a round, `worldreset <location> [now]` starts the storm now (with the warning, or at once), `worldstatus` lists the locations, their storms and the gates, `worldgo <location> <gate>` takes you to a gate, `worldgen`/`worldclear`/`worldinfo` work on one location, `structureview`, `structurecheck` and `structureoutline` are for the structure pool.
+- **The Military base** is a placeholder walled compound until the hand-built map is saved as `/Maps/_ERRORGATE/Locations/MilitaryBase.yml` (put `WorldGate` entities in it with the gate name `gate`; people arrive on the tile in front of the gate).
+
 ## Technical limits and risks
 
 - **Leaks over a week.** About 40 teardown and rebuild cycles per week. Every cycle must free entities, atmosphere, pathfinding data and maps. The first spike is a soak test that resets a location dozens of times in a row and watches memory, entity count and tick time.
