@@ -1,0 +1,40 @@
+# The locations of the world, see docs/design/world.md. First slice: tier 1 and tier 2; tier 3 (the bunker-laboratory) comes with its generator.
+
+- type: worldLocation
+  id: Village
+  name: village and shore resort
+  tier: 1
+  theme: village
+  size: "160,160"
+  ground: FloorPlanetGrass
+  road: FloorPlanetDirt
+  density: 1
+  ambientLight: "#7A7A7A"
+
+- type: worldLocation
+  id: SnowCity
+  name: snow city
+  tier: 2
+  theme: city
+  size: "180,180"
+  ground: FloorSnow
+  road: FloorAsphalt
+  density: 1
+  ambientLight: "#6A6E78"
+
+# The border of a location: rock that cannot be dug out.
+- type: entity
+  parent: BaseWallIndestructible
+  id: WorldBorderWall
+  name: rock
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: Sprite
+    sprite: Structures/Walls/rock.rsi
+    layers:
+    - state: rock_wall
+  - type: Icon
+    sprite: Structures/Walls/rock.rsi
+    state: rock_wall
+  - type: IconSmooth
+    mode: NoSprite

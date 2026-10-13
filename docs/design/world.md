@@ -76,9 +76,26 @@ A transition is a pair of entities (one in each location) that move players, and
 - **Dilution.** With 10 to 40 players spread over a web, most of the world is empty. That is wanted, but check that the funnel (spawn, transitions, the base) still produces meetings.
 - **Content volume.** The generator is cheap, the structure pool is the real cost. See [structures.md](structures.md).
 
+## Spike 1: build, tear down, soak (done)
+
+`WorldSystem` (`Content.Server/_ERRORGATE/World/`) builds a location from a `worldLocation` prototype (`Resources/Prototypes/_ERRORGATE/World/locations.yml`): a map with air, gravity and light, a ground grid with terrain, 3-wide roads and an indestructible rock border, and one grid per structure placed by the seeded `LocationLayout` (random free spots with a gap, random quarter turns, roads joining the structures by the cheapest tree). Structure files are measured once. Admin commands: `worldgen <Village|SnowCity> [seed]`, `worldclear <location|all>`, `worldinfo`.
+
+Measured with a throwaway soak test (80 build and teardown cycles per location, on the placeholder structures cut from Kuznetsk, no gameplay running):
+
+| | Village (160 x 160) | Snow City (180 x 180) |
+|---|---|---|
+| Structures placed | 36 | 46 |
+| Entities | 2,300 to 4,900 | 3,400 to 5,900 |
+| Build time | 240 ms average, 1.2 s cold | 420 ms average, 1.05 s cold |
+| Teardown | about 50 to 150 ms | about 70 to 160 ms |
+| Entities left after teardown | 0 | 0 |
+| Managed memory over 80 cycles | flat (1495 to 1499 MB) | flat (1495 to 1499 MB) |
+
+No structure leaves its location or overlaps another. A rebuild is fast enough to run on the game thread; it will be sliced once the real structures make locations heavier (the placeholders are far lighter than a finished tier 2 city). This is measured on empty locations: no NPC squads, no players, no atmos or lighting load yet.
+
 ## Order of work
 
-1. **Spikes, one at a time:** (a) build, tear down and reset a location with timings and the soak test; (b) the reputation table with migrations on both database kinds; (c) opening a storage UI on a remote container for the safe stash.
+1. **Spikes, one at a time:** (a) build, tear down and reset a location with timings and the soak test (done, see below); (b) the reputation table with migrations on both database kinds; (c) opening a storage UI on a remote container for the safe stash.
 2. **First slice:** the three locations, tunnels and transitions, the storm timer and `worldreset`, loot by tier, spawn zones.
 3. **The base:** the Military base map, one trader, one task giver, the stash terminal, reputation gating.
 4. **Squads and roles.** Then more factions, locations and structures.
