@@ -69,6 +69,8 @@ public sealed class WorldSystem : EntitySystem
 
         /// <summary>Every structure built and its grid, for the tools and tests.</summary>
         public List<(EntityUid Grid, StructurePlacement Placement)> Built = new();
+
+        public LocationLayout Layout = default!;
     }
 
     private readonly Dictionary<string, Location> _locations = new();
@@ -99,7 +101,7 @@ public sealed class WorldSystem : EntitySystem
         var watch = System.Diagnostics.Stopwatch.StartNew();
         var entitiesBefore = EntityManager.EntityCount;
         var useSeed = seed ?? _random.Next();
-        var options = new LocationLayout.Options(proto.Style, proto.Rocks, proto.TreeClumps, proto.TreeSingles, proto.Shore,
+        var options = new LocationLayout.Options(proto.Style, proto.Shape, proto.Rocks, proto.TreeClumps, proto.TreeSingles, proto.Shore,
             proto.Props.Select(e => (e.Count, e.Clump)).ToList(), proto.Decals.Select(e => (e.Count, e.Clump)).ToList());
         var layout = LocationLayout.Generate(useSeed, proto.Size, pool, proto.Density, options);
 
@@ -136,32 +138,23 @@ public sealed class WorldSystem : EntitySystem
         var iceDef = (ContentTileDefinition) _tileDefs[proto.IceTile];
         var walkDef = (ContentTileDefinition) _tileDefs[proto.Walkway];
         var tiles = new List<(Vector2i, Tile)>(proto.Size.X * proto.Size.Y);
-        for (var x = 0; x < proto.Size.X; x++)
+        foreach (var pos in layout.ShapeTiles())
         {
-            for (var y = 0; y < proto.Size.Y; y++)
-            {
-                // Every tile picks its own variant, so the ground does not look like a pattern
-                var pos = new Vector2i(x, y);
-                var def = layout.Terrain.TryGetValue(pos, out var shore)
-                    ? (shore == LocationLayout.ShoreTile.Ice ? iceDef : sandDef)
-                    : layout.Roads.Contains(pos) ? roadDef : layout.Walks.Contains(pos) ? walkDef : groundDef;
-                tiles.Add((pos, new Tile(def.TileId, 0, _tile.PickVariant(def))));
-            }
+            // Every tile picks its own variant, so the ground does not look like a pattern
+            var def = layout.Terrain.TryGetValue(pos, out var shore)
+                ? (shore == LocationLayout.ShoreTile.Ice ? iceDef : sandDef)
+                : layout.Roads.Contains(pos) ? roadDef : layout.Walks.Contains(pos) ? walkDef : groundDef;
+            tiles.Add((pos, new Tile(def.TileId, 0, _tile.PickVariant(def))));
         }
 
         _map.SetTiles(ground.Owner, ground.Comp, tiles);
         _physics.SetBodyType(ground.Owner, BodyType.Static);
 
-        const int borderWidth = 2;
-        for (var x = 0; x < proto.Size.X; x++)
+        // The border is the two outermost tiles of the shape
+        foreach (var pos in layout.ShapeTiles())
         {
-            for (var y = 0; y < proto.Size.Y; y++)
-            {
-                if (x >= borderWidth && y >= borderWidth && x < proto.Size.X - borderWidth && y < proto.Size.Y - borderWidth)
-                    continue;
-
-                Spawn(proto.Border, _map.GridTileToLocal(ground.Owner, ground.Comp, new Vector2i(x, y)));
-            }
+            if (layout.Dist(pos) <= 2)
+                Spawn(proto.Border, _map.GridTileToLocal(ground.Owner, ground.Comp, pos));
         }
 
         // The structures, each on a grid of its own
@@ -232,10 +225,18 @@ public sealed class WorldSystem : EntitySystem
         if (proto.Trees.Count > 0)
         {
             var treeRng = new Random(useSeed ^ 0x5EED);
-            foreach (var tree in layout.Trees)
+            foreach (var tree in layout.Trees.Concat(layout.StreetTrees))
             {
                 var spot = _map.GridTileToLocal(ground.Owner, ground.Comp, tree);
                 Spawn(proto.Trees[treeRng.Next(proto.Trees.Count)], spot);
+            }
+        }
+
+        if (proto.Post is { } post)
+        {
+            foreach (var tile in layout.Posts)
+            {
+                Spawn(post, _map.GridTileToLocal(ground.Owner, ground.Comp, tile));
             }
         }
 
@@ -270,6 +271,7 @@ public sealed class WorldSystem : EntitySystem
             Seed = useSeed,
             Structures = placed,
             Built = built,
+            Layout = layout,
             BuildMilliseconds = watch.Elapsed.TotalMilliseconds,
             Entities = EntityManager.EntityCount - entitiesBefore,
         };

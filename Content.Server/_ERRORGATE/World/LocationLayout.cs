@@ -37,7 +37,7 @@ public sealed partial class LocationLayout
 
     public List<List<Vector2i>> DecalTiles = new();
 
-    public sealed record Options(string Style, int Rocks, int TreeClumps, int TreeSingles, string Shore, IReadOnlyList<(int Count, int Clump)> Props, IReadOnlyList<(int Count, int Clump)> Decals);
+    public sealed record Options(string Style, string Shape, int Rocks, int TreeClumps, int TreeSingles, string Shore, IReadOnlyList<(int Count, int Clump)> Props, IReadOnlyList<(int Count, int Clump)> Decals);
 
     /// <summary>
     ///     Rock formations and trees in the free ground: away from the structures and the roads, and not on top of each other.
@@ -71,7 +71,7 @@ public sealed partial class LocationLayout
             }
         }
 
-        bool Free(Vector2i t) => t.X >= Margin && t.Y >= Margin && t.X < size.X - Margin && t.Y < size.Y - Margin && !blocked.Contains(t) && !Terrain.ContainsKey(t);
+        bool Free(Vector2i t) => Dist(t) >= Margin && !blocked.Contains(t) && !Terrain.ContainsKey(t);
         var dirs = new[] { new Vector2i(1, 0), new Vector2i(-1, 0), new Vector2i(0, 1), new Vector2i(0, -1) };
 
         // Rock formations: a blob or a ridge, a few tiles to a few dozen, with a free tile around it
@@ -79,7 +79,7 @@ public sealed partial class LocationLayout
         {
             for (var attempt = 0; attempt < 30; attempt++)
             {
-                var start = new Vector2i(rng.Next(Margin, size.X - Margin), rng.Next(Margin, size.Y - Margin));
+                var start = RandomTile(rng);
                 if (!Free(start))
                     continue;
 
@@ -141,7 +141,7 @@ public sealed partial class LocationLayout
 
         for (var c = 0; c < treeClumps; c++)
         {
-            var center = new Vector2i(rng.Next(Margin, size.X - Margin), rng.Next(Margin, size.Y - Margin));
+            var center = RandomTile(rng);
             var radius = rng.Next(4, 11);
             for (var dx = -radius; dx <= radius; dx++)
             {
@@ -157,7 +157,7 @@ public sealed partial class LocationLayout
 
         for (var i = 0; i < treeSingles; i++)
         {
-            TryTree(new Vector2i(rng.Next(Margin, size.X - Margin), rng.Next(Margin, size.Y - Margin)));
+            TryTree(RandomTile(rng));
         }
 
         // Props keep clear of trees and rocks and of each other; decals may lie close together
@@ -168,16 +168,16 @@ public sealed partial class LocationLayout
 
         foreach (var (count, clump) in options.Props)
         {
-            PropTiles.Add(PlaceMany(rng, size, count, clump, 2, Free, blocked));
+            PropTiles.Add(PlaceMany(rng, count, clump, 2, Free));
         }
 
         foreach (var (count, clump) in options.Decals)
         {
-            DecalTiles.Add(PlaceMany(rng, size, count, clump, 0, Free, null));
+            DecalTiles.Add(PlaceMany(rng, count, clump, 0, Free));
         }
     }
 
-    private static List<Vector2i> PlaceMany(Random rng, Vector2i size, int count, int clump, int spacing, Func<Vector2i, bool> free, HashSet<Vector2i>? blocked)
+    private List<Vector2i> PlaceMany(Random rng, int count, int clump, int spacing, Func<Vector2i, bool> free)
     {
         var result = new List<Vector2i>();
         var taken = new HashSet<Vector2i>();
@@ -200,7 +200,7 @@ public sealed partial class LocationLayout
 
         for (var i = 0; i < count; i++)
         {
-            var center = new Vector2i(rng.Next(Margin, size.X - Margin), rng.Next(Margin, size.Y - Margin));
+            var center = RandomTile(rng);
             if (clump <= 0)
             {
                 if (Clear(center))
@@ -238,14 +238,14 @@ public sealed partial class LocationLayout
         Ice,
     }
 
-    /// <summary>One side of the map is a shore, with a wavy edge: sand and shallow water, or ice.</summary>
-    private void BuildShore(Random rng, Vector2i size, string kind)
+    /// <summary>One side of the map is a shore, with a wavy edge: sand and shallow water, or ice. It follows the edge of the shape.</summary>
+    private void BuildShore(Random rng, string kind)
     {
         if (kind is not ("water" or "ice"))
             return;
 
         var side = rng.Next(4);
-        var length = side % 2 == 0 ? size.X : size.Y;
+        var length = side % 2 == 0 ? Bounds.X : Bounds.Y;
         var depthBase = kind == "ice" ? 16.0 : 15.0;
         var p1 = rng.NextDouble() * 6.28;
         var p2 = rng.NextDouble() * 6.28;
@@ -253,17 +253,38 @@ public sealed partial class LocationLayout
 
         for (var t = 0; t < length; t++)
         {
+            // The outermost playable tile of this column or row on the shore side
+            var start = -1;
+            var steps = side % 2 == 0 ? Bounds.Y : Bounds.X;
+            for (var k = 0; k < steps; k++)
+            {
+                var from = side == 0 || side == 2 ? k : steps - 1 - k;
+                var probe = side % 2 == 0 ? new Vector2i(t, from) : new Vector2i(from, t);
+                if (InShape(probe))
+                {
+                    start = from;
+                    break;
+                }
+            }
+
+            if (start < 0)
+                continue;
+
             var depth = depthBase + 4.0 * Math.Sin(t * 0.06 + p1) + 2.0 * Math.Sin(t * 0.19 + p2);
             var sandWidth = 4.0 + 1.5 * Math.Sin(t * 0.11 + p3);
             for (var d = 0; d < depth; d++)
             {
+                // side 0 is the low y edge, 1 the high y edge, 2 the low x edge, 3 the high x edge
                 var tile = side switch
                 {
-                    0 => new Vector2i(t, d),
-                    1 => new Vector2i(t, size.Y - 1 - d),
-                    2 => new Vector2i(d, t),
-                    _ => new Vector2i(size.X - 1 - d, t),
+                    0 => new Vector2i(t, start + d),
+                    1 => new Vector2i(t, start - d),
+                    2 => new Vector2i(start + d, t),
+                    _ => new Vector2i(start - d, t),
                 };
+
+                if (!InShape(tile))
+                    continue;
 
                 if (kind == "ice")
                     Terrain[tile] = ShoreTile.Ice;

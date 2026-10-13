@@ -33,6 +33,10 @@ public sealed partial class WorldLocationPrototype : IPrototype
     [DataField]
     public string Ground = "FloorDirt";
 
+    /// <summary>The shape of the playable ground: <c>organic</c> (a blob of the same area as the size, different every time) or <c>rect</c>.</summary>
+    [DataField]
+    public string Shape = "organic";
+
     /// <summary>How the streets and lots are laid out: <c>village</c> (a main street with lanes, homesteads with fences) or <c>city</c> (a grid of streets with sidewalks).</summary>
     [DataField]
     public string Style = "village";
@@ -40,6 +44,10 @@ public sealed partial class WorldLocationPrototype : IPrototype
     /// <summary>The tile of the sidewalks and of the paths from a door to the street.</summary>
     [DataField]
     public string Walkway = "FloorLowDesert";
+
+    /// <summary>A street light along the sidewalks (the city). Empty for none.</summary>
+    [DataField]
+    public EntProtoId? Post;
 
     /// <summary>The pieces of the fences around the lots.</summary>
     [DataField]

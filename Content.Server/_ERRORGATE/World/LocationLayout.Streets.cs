@@ -50,6 +50,11 @@ public sealed record FencePiece(Vector2i Tile, FenceKind Kind, int Quarter);
 public sealed partial class LocationLayout
 {
     private Vector2i _size;
+
+    /// <summary>Street lights (city) and the trees along the roads (village).</summary>
+    public List<Vector2i> Posts = new();
+
+    public List<Vector2i> StreetTrees = new();
     private readonly HashSet<Vector2i> _occupied = new();
     private readonly List<Segment> _segments = new();
     private readonly List<(Vector2i Door, int Front)> _doorPaths = new();
@@ -90,8 +95,11 @@ public sealed partial class LocationLayout
     public static LocationLayout Generate(int seed, Vector2i size, IReadOnlyList<StructureInfo> pool, float density, Options options)
     {
         var rng = new Random(seed);
-        var layout = new LocationLayout { _size = size };
-        layout.BuildShore(rng, size, options.Shore);
+        var layout = new LocationLayout();
+        layout.BuildShape(rng, size, options.Shape);
+        layout._size = layout.Bounds;
+        layout.BuildShore(rng, options.Shore);
+        layout.MarkNearShore();
 
         if (options.Style == "city")
             layout.BuildCityStreets(rng, size);
@@ -102,13 +110,14 @@ public sealed partial class LocationLayout
         if (pool.Count > 0)
             layout.FillFrontage(rng, size, pool, density, options.Style);
 
+        layout.DressStreets(rng, options.Style);
         layout.Scatter(rng, size, options);
         return layout;
     }
 
     // -- Streets --------------------------------------------------------------------------------------------------
 
-    private bool Placeable(Vector2i t) => t.X >= 3 && t.Y >= 3 && t.X < _size.X - 3 && t.Y < _size.Y - 3 && !Terrain.ContainsKey(t);
+    private bool Placeable(Vector2i t) => Dist(t) >= 3 && !Terrain.ContainsKey(t);
 
     /// <summary>A straight road from one point to another along an axis, with sidewalks if asked for. Width is odd.</summary>
     private void AddRoad(Vector2i a, Vector2i b, int width, bool walk, bool main)
@@ -142,85 +151,188 @@ public sealed partial class LocationLayout
         _segments.Add(new Segment(horizontal ? new Vector2i(lo, c) : new Vector2i(c, lo), horizontal ? new Vector2i(hi, c) : new Vector2i(c, hi), horizontal, width, walk, main));
     }
 
-    /// <summary>Whether the band along a line, <paramref name="clear"/> tiles to either side, has no shore in it.</summary>
-    private bool LineFree(bool horizontal, int c, int clear)
+    private readonly HashSet<Vector2i> _nearShore = new();
+
+    /// <summary>The tiles within eight of the shore, which streets keep away from.</summary>
+    private void MarkNearShore()
     {
-        var length = horizontal ? _size.X : _size.Y;
-        for (var t = 0; t < length; t++)
+        foreach (var t in Terrain.Keys)
         {
-            for (var o = -clear; o <= clear; o++)
+            for (var dx = -8; dx <= 8; dx++)
             {
-                var tile = horizontal ? new Vector2i(t, c + o) : new Vector2i(c + o, t);
-                if (Terrain.ContainsKey(tile))
-                    return false;
+                for (var dy = -8; dy <= 8; dy++)
+                {
+                    _nearShore.Add(new Vector2i(t.X + dx, t.Y + dy));
+                }
+            }
+        }
+    }
+
+    private static Vector2i At(bool horizontal, int along, int across) => horizontal ? new Vector2i(along, across) : new Vector2i(across, along);
+
+    /// <summary>The stretches of a line (a row if horizontal, a column if not) that lie well inside the shape and clear of the shore.</summary>
+    private List<(int Lo, int Hi)> Runs(bool horizontal, int across, int minLength)
+    {
+        var runs = new List<(int, int)>();
+        var length = horizontal ? Bounds.X : Bounds.Y;
+        var start = -1;
+        for (var t = 0; t <= length; t++)
+        {
+            var ok = false;
+            if (t < length)
+            {
+                var tile = At(horizontal, t, across);
+                ok = Dist(tile) >= Margin + 2 && !_nearShore.Contains(tile);
+            }
+
+            if (ok && start < 0)
+            {
+                start = t;
+            }
+            else if (!ok && start >= 0)
+            {
+                if (t - start >= minLength)
+                    runs.Add((start, t - 1));
+
+                start = -1;
             }
         }
 
-        return true;
+        return runs;
     }
 
     /// <summary>A main street across the village, with lanes branching off it on one side or both.</summary>
     private void BuildVillageStreets(Random rng, Vector2i size)
     {
         var horizontal = rng.Next(2) == 0;
-        var length = horizontal ? size.X : size.Y;
-        var cross = horizontal ? size.Y : size.X;
+        var cross = horizontal ? Bounds.Y : Bounds.X;
 
-        // As near the middle as the shore allows
-        var start = cross / 2 + rng.Next(-cross / 6, cross / 6 + 1);
-        var pos = start;
-        for (var step = 0; step < cross; step++)
+        // The line near the middle with the longest free stretch
+        var best = (Across: cross / 2, Run: (Lo: 0, Hi: -1));
+        var window = cross / 5;
+        for (var c = cross / 2 - window; c <= cross / 2 + window; c++)
         {
-            var candidate = start + (step % 2 == 0 ? step / 2 : -(step + 1) / 2);
-            if (candidate < Margin + 12 || candidate > cross - Margin - 12)
-                continue;
-
-            if (LineFree(horizontal, candidate, 12))
+            foreach (var run in Runs(horizontal, c, 30))
             {
-                pos = candidate;
-                break;
+                if (run.Hi - run.Lo > best.Run.Hi - best.Run.Lo)
+                    best = (c, run);
             }
         }
 
-        var lo = Margin + 2;
-        var hi = length - Margin - 3;
-        Vector2i P(int along, int across) => horizontal ? new Vector2i(along, across) : new Vector2i(across, along);
-        AddRoad(P(lo, pos), P(hi, pos), 3, false, true);
+        if (best.Run.Hi <= best.Run.Lo)
+            return;
 
-        var t = lo + 16 + rng.Next(0, 12);
+        var pos = best.Across;
+        var lo = best.Run.Lo + 2;
+        var hi = best.Run.Hi - 2;
+        AddRoad(At(horizontal, lo, pos), At(horizontal, hi, pos), 3, false, true);
+
+        var t = lo + 14 + rng.Next(0, 12);
         var up = rng.Next(2) == 0;
-        while (t < hi - 14)
+        var lanes = new List<(int T, int Dir, int End)>();
+        while (t < hi - 12)
         {
             var len = rng.Next(28, 64);
             var both = rng.NextDouble() < 0.3;
             foreach (var dir in both ? new[] { 1, -1 } : new[] { up ? 1 : -1 })
             {
-                var end = Math.Clamp(pos + dir * len, Margin + 2, cross - Margin - 3);
-                AddRoad(P(t, pos), P(t, end), 3, false, false);
+                // As far as the lane can go before it leaves the shape or meets the shore
+                var end = pos;
+                for (var k = 1; k <= len; k++)
+                {
+                    var tile = At(horizontal, t, pos + dir * k);
+                    if (Dist(tile) < Margin + 1 || _nearShore.Contains(tile))
+                        break;
+
+                    end = pos + dir * k;
+                }
+
+                if (Math.Abs(end - pos) < 12)
+                    continue;
+
+                AddRoad(At(horizontal, t, pos), At(horizontal, t, end), 3, false, false);
+                lanes.Add((t, dir, end));
             }
 
             up = !up;
-            t += rng.Next(30, 52);
+            t += rng.Next(24, 38);
+        }
+
+        // A back lane runs beside the main street and joins the lanes that reach it, so the village has loops, not only dead ends
+        foreach (var dir in new[] { 1, -1 })
+        {
+            if (rng.NextDouble() < 0.35)
+                continue;
+
+            var offset = rng.Next(28, 40);
+            var reaching = lanes.Where(l => l.Dir == dir && Math.Abs(l.End - pos) >= offset + 2).ToList();
+            if (reaching.Count < 2)
+                continue;
+
+            AddRoad(At(horizontal, reaching.Min(l => l.T), pos + dir * offset), At(horizontal, reaching.Max(l => l.T), pos + dir * offset), 3, false, false);
         }
     }
 
-    /// <summary>A grid of streets with sidewalks; the middle ones are avenues.</summary>
+    /// <summary>A grid of streets with sidewalks; the middle ones are avenues. Streets exist only where the shape is.</summary>
     private void BuildCityStreets(Random rng, Vector2i size)
     {
-        var columns = 3 + rng.Next(2);
-        var rows = 3 + rng.Next(2);
-        for (var i = 1; i <= columns; i++)
+        foreach (var horizontal in new[] { false, true })
         {
-            var x = Margin + (size.X - 2 * Margin) * i / (columns + 1) + rng.Next(-3, 4);
-            var avenue = i == (columns + 1) / 2;
-            AddRoad(new Vector2i(x, Margin + 2), new Vector2i(x, size.Y - Margin - 3), avenue ? 5 : 3, true, avenue);
+            var length = horizontal ? Bounds.Y : Bounds.X;
+            var count = Math.Max(3, length / 44 - 1);
+            for (var i = 1; i <= count; i++)
+            {
+                var across = length * i / (count + 1) + rng.Next(-3, 4);
+                var avenue = i == (count + 1) / 2;
+                foreach (var run in Runs(horizontal, across, 24))
+                {
+                    AddRoad(At(horizontal, run.Lo + 2, across), At(horizontal, run.Hi - 2, across), avenue ? 5 : 3, true, avenue);
+                }
+            }
         }
+    }
 
-        for (var i = 1; i <= rows; i++)
+    // -- Dressing of the streets ------------------------------------------------------------------------------------
+
+    private bool FreeGround(Vector2i t) => Placeable(t) && !_occupied.Contains(t) && !Roads.Contains(t) && !Walks.Contains(t);
+
+    /// <summary>Street lights along the sidewalks of the city, and trees along the roads of the village, where nothing else stands.</summary>
+    private void DressStreets(Random rng, string style)
+    {
+        foreach (var seg in _segments)
         {
-            var y = Margin + (size.Y - 2 * Margin) * i / (rows + 1) + rng.Next(-3, 4);
-            var avenue = i == (rows + 1) / 2;
-            AddRoad(new Vector2i(Margin + 2, y), new Vector2i(size.X - Margin - 3, y), avenue ? 5 : 3, true, avenue);
+            var half = seg.Width / 2;
+            var center = seg.Horizontal ? seg.A.Y : seg.A.X;
+            var lo = (seg.Horizontal ? seg.A.X : seg.A.Y) + 3;
+            var hi = (seg.Horizontal ? seg.B.X : seg.B.Y) - 3;
+            foreach (var sign in new[] { 1, -1 })
+            {
+                if (style == "city")
+                {
+                    // Right beyond the sidewalk, every fourteen tiles
+                    for (var a = lo + rng.Next(0, 6); a < hi; a += 14)
+                    {
+                        var across = center + sign * (half + 2);
+                        var tile = seg.Horizontal ? new Vector2i(a, across) : new Vector2i(across, a);
+                        if (FreeGround(tile))
+                            Posts.Add(tile);
+                    }
+                }
+                else
+                {
+                    // Beside the road, every five to seven tiles, with gaps
+                    var a = lo + rng.Next(0, 5);
+                    while (a < hi)
+                    {
+                        var across = center + sign * (half + 1);
+                        var tile = seg.Horizontal ? new Vector2i(a, across) : new Vector2i(across, a);
+                        if (rng.NextDouble() < 0.7 && FreeGround(tile))
+                            StreetTrees.Add(tile);
+
+                        a += rng.Next(5, 8);
+                    }
+                }
+            }
         }
     }
 
@@ -269,9 +381,6 @@ public sealed partial class LocationLayout
 
     private bool Fits((int MinX, int MinY, int MaxX, int MaxY) r, int gap)
     {
-        if (r.MinX - gap < Margin || r.MinY - gap < Margin || r.MaxX + gap >= _size.X - Margin || r.MaxY + gap >= _size.Y - Margin)
-            return false;
-
         if (TouchesShore(r.MinX, r.MinY, r.MaxX, r.MaxY))
             return false;
 
@@ -280,7 +389,7 @@ public sealed partial class LocationLayout
             for (var y = r.MinY - gap; y <= r.MaxY + gap; y++)
             {
                 var t = new Vector2i(x, y);
-                if (_occupied.Contains(t) || Roads.Contains(t) || Walks.Contains(t))
+                if (Dist(t) < Margin || _occupied.Contains(t) || Roads.Contains(t) || Walks.Contains(t))
                     return false;
             }
         }
