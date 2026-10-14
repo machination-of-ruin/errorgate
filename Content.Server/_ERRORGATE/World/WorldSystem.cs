@@ -398,7 +398,10 @@ public sealed partial class WorldSystem : EntitySystem
 
         for (var i = 0; i < layout.SpawnTiles.Count; i++)
         {
-            Spawn(i < 6 ? "SpawnPointHumanError" : "SpawnPointLatejoin", _map.GridTileToLocal(ground.Owner, ground.Comp, layout.SpawnTiles[i]));
+            // Both kinds on every spot, like the Kuznetsk map
+            var spot = _map.GridTileToLocal(ground.Owner, ground.Comp, layout.SpawnTiles[i]);
+            Spawn("SpawnPointHumanError", spot);
+            Spawn("SpawnPointLatejoin", spot);
         }
 
         // The gates, each on a plaza of its own

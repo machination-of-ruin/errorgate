@@ -251,7 +251,7 @@ public sealed partial class LocationLayout
         }
 
         // Mobs stand apart on the open ground
-        MobTiles = PlaceMany(rng, options.MobCount, 0, 14, Free);
+        MobTiles = PlaceMany(rng, options.MobCount, 0, 14, t => Free(t) && SpawnTiles.All(s => (s - t).Length > 20));
     }
 
     private List<Vector2i> PlaceMany(Random rng, int count, int clump, int spacing, Func<Vector2i, bool> free)

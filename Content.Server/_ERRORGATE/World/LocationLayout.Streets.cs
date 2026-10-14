@@ -344,23 +344,25 @@ public sealed partial class LocationLayout
         }
     }
 
-    // -- The spawn zone -------------------------------------------------------------------------------------------
+    // -- The spawn points ----------------------------------------------------------------------------------------
 
     /// <summary>
-    ///     A clearing of nine by nine tiles near the middle of the map, beside a street, with eight spawn points in a ring. Nothing is
-    ///     built or planted there.
+    ///     Seven places near the edge of the map where people come into the world (Kuznetsk had seven too): each gets a round start point
+    ///     and a late join point on the same tile. They are on open ground six to sixteen tiles from the edge, far from the gates and
+    ///     from each other, and clear of roads, buildings and the shore.
     /// </summary>
     private void PlaceSpawnZone(Random rng)
     {
-        var center = new Vector2i(Bounds.X / 2, Bounds.Y / 2);
+        const int Count = 7;
+
         bool Clear(Vector2i c)
         {
-            for (var dx = -5; dx <= 5; dx++)
+            for (var dx = -2; dx <= 2; dx++)
             {
-                for (var dy = -5; dy <= 5; dy++)
+                for (var dy = -2; dy <= 2; dy++)
                 {
                     var t = new Vector2i(c.X + dx, c.Y + dy);
-                    if (Dist(t) < Margin || Terrain.ContainsKey(t) || _occupied.Contains(t) || Roads.Contains(t) || Walks.Contains(t))
+                    if (!InShape(t) || Terrain.ContainsKey(t) || _nearShore.Contains(t) || _occupied.Contains(t) || Roads.Contains(t) || Walks.Contains(t))
                         return false;
                 }
             }
@@ -368,45 +370,60 @@ public sealed partial class LocationLayout
             return true;
         }
 
-        // The nearest clearing to the middle, in rings
-        for (var radius = 0; radius < Math.Max(Bounds.X, Bounds.Y) / 2; radius += 2)
+        var ground = new List<Vector2i>();
+        for (var x = 0; x < Bounds.X; x++)
         {
-            var best = (Vector2i?) null;
-            var bestDistance = double.MaxValue;
-            for (var dx = -radius; dx <= radius; dx += 2)
+            for (var y = 0; y < Bounds.Y; y++)
             {
-                for (var dy = -radius; dy <= radius; dy += 2)
-                {
-                    if (Math.Max(Math.Abs(dx), Math.Abs(dy)) != radius)
-                        continue;
+                var c = new Vector2i(x, y);
+                if (InShape(c) && Dist(c) >= 6 && Dist(c) <= 16 && Clear(c))
+                    ground.Add(c);
+            }
+        }
 
-                    var c = new Vector2i(center.X + dx, center.Y + dy);
-                    var distance = (c - center).LengthSquared + rng.NextDouble();
-                    if (distance < bestDistance && Clear(c))
-                    {
-                        best = c;
-                        bestDistance = distance;
-                    }
+        // Spread out: each next point is one of the few that lie farthest from those already taken. If the map has no room for seven
+        // that far from the gates and from each other, the distances are lowered step by step
+        List<Vector2i> Try(int fromGates, int apart, Random r)
+        {
+            var candidates = ground.Where(c => !GatePlaces.Values.Any(g => (g.Tile - c).Length < fromGates)).ToList();
+            var chosen = new List<Vector2i>();
+            while (chosen.Count < Count && candidates.Count > 0)
+            {
+                var ranked = chosen.Count == 0
+                    ? candidates.OrderBy(_ => r.Next()).Take(1).ToList()
+                    : candidates
+                        .Select(c => (Tile: c, Gap: chosen.Min(p => (p - c).Length)))
+                        .OrderByDescending(c => c.Gap)
+                        .Take(12)
+                        .Select(c => c.Tile)
+                        .ToList();
+
+                var pick = ranked[r.Next(ranked.Count)];
+                chosen.Add(pick);
+                candidates.RemoveAll(c => (c - pick).Length < apart);
+            }
+
+            return chosen;
+        }
+
+        var best = new List<Vector2i>();
+        foreach (var (fromGates, apart) in new[] { (45, 30), (40, 24), (35, 18), (30, 14), (25, 10) })
+        {
+            best = Try(fromGates, apart, new Random(rng.Next()));
+            if (best.Count >= Count)
+                break;
+        }
+
+        foreach (var pick in best)
+        {
+            SpawnTiles.Add(pick);
+            for (var dx = -3; dx <= 3; dx++)
+            {
+                for (var dy = -3; dy <= 3; dy++)
+                {
+                    _occupied.Add(new Vector2i(pick.X + dx, pick.Y + dy));
                 }
             }
-
-            if (best is not { } at)
-                continue;
-
-            for (var dx = -4; dx <= 4; dx++)
-            {
-                for (var dy = -4; dy <= 4; dy++)
-                {
-                    _occupied.Add(new Vector2i(at.X + dx, at.Y + dy));
-                }
-            }
-
-            foreach (var d in new[] { new Vector2i(-2, -2), new Vector2i(0, -2), new Vector2i(2, -2), new Vector2i(-2, 0), new Vector2i(2, 0), new Vector2i(-2, 2), new Vector2i(0, 2), new Vector2i(2, 2) })
-            {
-                SpawnTiles.Add(at + d);
-            }
-
-            return;
         }
     }
 
