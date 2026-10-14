@@ -73,6 +73,8 @@ public sealed partial class WorldSystem
         _gates.Clear();
         _storm.Clear();
         _pendingAir.Clear();
+        _jobs.Clear();
+        _building.Clear();
         _graph = null;
     }
 
@@ -555,8 +557,7 @@ public sealed partial class WorldSystem
         foreach (var name in FollowersOf(id).Prepend(id).ToList())
         {
             _storm.Remove(name);
-            if (!TryBuild(name, null, out var error))
-                Log.Error($"World: could not build {name} again: {error}");
+            QueueBuild(name, null);
         }
 
         ScheduleStrike(id);

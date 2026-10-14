@@ -86,32 +86,117 @@ public sealed partial class WorldSystem : EntitySystem
 
     public bool IsBuilt(string id) => _locations.TryGetValue(id, out var loc) && !TerminatingOrDeleted(loc.Map);
 
+    /// <summary>The state and the result of a build that runs in steps.</summary>
+    private sealed class BuildContext
+    {
+        public bool Ok;
+        public string Error = string.Empty;
+    }
+
+    private sealed record BuildJob(string Id, IEnumerator<bool> Steps, BuildContext Context);
+
+    private readonly List<BuildJob> _jobs = new();
+    private readonly HashSet<string> _building = new();
+
+    /// <summary>The time per tick a build that runs over ticks may take.</summary>
+    private const int JobBudgetMilliseconds = 6;
+
+    /// <summary>Builds a location now, in one go. Anything built under the same name is torn down first.</summary>
     public bool TryBuild(string id, int? seed, out string error)
     {
-        error = string.Empty;
+        var context = new BuildContext();
+        // A build running over ticks is finished first, so nothing is left half built
+        if (_jobs.Find(j => j.Id == id) is { } running)
+        {
+            while (running.Steps.MoveNext())
+            {
+            }
+
+            _jobs.Remove(running);
+            _building.Remove(id);
+        }
+
+        var steps = BuildSteps(id, seed, context);
+        while (steps.MoveNext())
+        {
+        }
+
+        error = context.Error;
+        return context.Ok;
+    }
+
+    /// <summary>
+    ///     Builds a location over the next ticks, so the server does not stall (the storm does this: the old location is gone at once,
+    ///     the new one appears when it is finished and nobody can come into it before).
+    /// </summary>
+    public void QueueBuild(string id, int? seed)
+    {
+        if (!_building.Add(id))
+            return;
+
+        Teardown(id);
+        var context = new BuildContext();
+        _jobs.Add(new BuildJob(id, BuildSteps(id, seed, context), context));
+    }
+
+    public bool IsBuilding(string id) => _building.Contains(id);
+
+    private void RunJobs()
+    {
+        if (_jobs.Count == 0)
+            return;
+
+        var watch = System.Diagnostics.Stopwatch.StartNew();
+        while (_jobs.Count > 0 && watch.ElapsedMilliseconds < JobBudgetMilliseconds)
+        {
+            var job = _jobs[0];
+            if (job.Steps.MoveNext())
+                continue;
+
+            _jobs.RemoveAt(0);
+            _building.Remove(job.Id);
+            if (!job.Context.Ok)
+                Log.Error($"World: could not build {job.Id} again: {job.Context.Error}");
+        }
+    }
+
+    private IEnumerator<bool> BuildSteps(string id, int? seed, BuildContext context)
+    {
         if (!_proto.TryIndex<WorldLocationPrototype>(id, out var proto))
         {
-            error = $"no location '{id}'";
-            return false;
+            context.Error = $"no location '{id}'";
+            yield break;
         }
 
         Teardown(id);
 
         var gates = GatesOf(id);
         if (proto.MapPath is { } mapPath && _res.ContentFileExists(new ResPath(mapPath)))
-            return BuildFromMap(proto, seed, new ResPath(mapPath), out error);
+        {
+            context.Ok = BuildFromMap(proto, seed, new ResPath(mapPath), out var mapError);
+            context.Error = mapError;
+            yield break;
+        }
 
         if (proto.Style == "tunnel")
-            return BuildTunnel(proto, seed, gates, out error);
+        {
+            context.Ok = BuildTunnel(proto, seed, gates, out var tunnelError);
+            context.Error = tunnelError;
+            yield break;
+        }
 
         if (proto.Style == "laboratory")
-            return BuildLaboratory(proto, seed, gates, out error);
+        {
+            context.Ok = BuildLaboratory(proto, seed, gates, out var labError);
+            context.Error = labError;
+            yield break;
+        }
 
         var pool = GetPool(proto.Theme);
         if (pool.Count == 0)
         {
-            error = $"no structures in {StructureRoot}{proto.Theme}";
-            return false;
+            context.Error = $"no structures in {StructureRoot}{proto.Theme}";
+            yield break;
         }
 
         var watch = System.Diagnostics.Stopwatch.StartNew();
@@ -120,6 +205,8 @@ public sealed partial class WorldSystem : EntitySystem
         var options = new LocationLayout.Options(proto.Style, proto.Shape, proto.Rocks, proto.TreeClumps, proto.TreeSingles, proto.Shore,
             proto.Props.Select(e => (e.Count, e.Clump)).ToList(), proto.Decals.Select(e => (e.Count, e.Clump)).ToList(), gates, proto.Mobs.Count > 0 ? proto.MobCount : 0, proto.SpawnZone);
         var layout = LocationLayout.Generate(useSeed, proto.Size, pool, proto.Density, options);
+
+        yield return true;
 
         var mapUid = CreateLocationMap(proto, out var mapId);
 
@@ -143,12 +230,18 @@ public sealed partial class WorldSystem : EntitySystem
 
         _map.SetTiles(ground.Owner, ground.Comp, tiles);
         _physics.SetBodyType(ground.Owner, BodyType.Static);
+        yield return true;
 
         // The border is the two outermost tiles of the shape
+        var spawned = 0;
         foreach (var pos in layout.ShapeTiles())
         {
-            if (layout.Dist(pos) <= 2)
-                Spawn(proto.Border, _map.GridTileToLocal(ground.Owner, ground.Comp, pos));
+            if (layout.Dist(pos) > 2)
+                continue;
+
+            Spawn(proto.Border, _map.GridTileToLocal(ground.Owner, ground.Comp, pos));
+            if (++spawned % 96 == 0)
+                yield return true;
         }
 
         // The structures, each on a grid of its own
@@ -187,15 +280,22 @@ public sealed partial class WorldSystem : EntitySystem
             _pendingAir.Add(new PendingAir(grid.Value.Owner, structureTiles, _timing.CurTime + TimeSpan.FromSeconds(120)));
             placed++;
             built.Add((grid.Value.Owner, p));
+            yield return true;
         }
 
         // The water lies on the shallow part of the shore
+        spawned = 0;
         foreach (var (pos, kind) in layout.Terrain)
         {
-            if (kind == LocationLayout.ShoreTile.Water)
-                Spawn(proto.Water, _map.GridTileToLocal(ground.Owner, ground.Comp, pos));
+            if (kind != LocationLayout.ShoreTile.Water)
+                continue;
+
+            Spawn(proto.Water, _map.GridTileToLocal(ground.Owner, ground.Comp, pos));
+            if (++spawned % 96 == 0)
+                yield return true;
         }
 
+        spawned = 0;
         // The fences around the lots; the rotation says which way each piece connects (see LocationLayout.AddFence)
         foreach (var piece in layout.Fences)
         {
@@ -209,9 +309,15 @@ public sealed partial class WorldSystem : EntitySystem
             var fence = Spawn(fenceProto, _map.GridTileToLocal(ground.Owner, ground.Comp, piece.Tile));
             if (piece.Quarter != 0)
                 _transform.SetLocalRotation(fence, Angle.FromDegrees(90 * piece.Quarter));
+
+            if (++spawned % 96 == 0)
+                yield return true;
         }
 
+        yield return true;
+
         // Rock formations and trees in the free ground
+        spawned = 0;
         foreach (var rock in layout.Rocks)
         {
             Spawn(proto.Border, _map.GridTileToLocal(ground.Owner, ground.Comp, rock));
@@ -224,6 +330,8 @@ public sealed partial class WorldSystem : EntitySystem
             {
                 var spot = _map.GridTileToLocal(ground.Owner, ground.Comp, tree);
                 Spawn(proto.Trees[treeRng.Next(proto.Trees.Count)], spot);
+                if (++spawned % 96 == 0)
+                    yield return true;
             }
         }
 
@@ -245,6 +353,8 @@ public sealed partial class WorldSystem : EntitySystem
             }
         }
 
+        yield return true;
+
         for (var i = 0; i < proto.Decals.Count && i < layout.DecalTiles.Count; i++)
         {
             foreach (var pos in layout.DecalTiles[i])
@@ -253,6 +363,8 @@ public sealed partial class WorldSystem : EntitySystem
                 _decals.TryAddDecal(proto.Decals[i].Decals[propRng.Next(proto.Decals[i].Decals.Count)], coords, out _);
             }
         }
+
+        yield return true;
 
         // Mobs on the open ground, and the spawn points of the clearing where players come into the world
         var mobRng = new Random(useSeed ^ 0x3B0B);
@@ -291,8 +403,9 @@ public sealed partial class WorldSystem : EntitySystem
         };
 
         Log.Info($"World: built {id} (seed {useSeed}): {placed} structures, {_locations[id].Entities} entities, {watch.Elapsed.TotalMilliseconds:0} ms");
-        return true;
+        context.Ok = true;
     }
+
 
     public void Teardown(string id)
     {
@@ -408,6 +521,7 @@ public sealed partial class WorldSystem : EntitySystem
     public override void Update(float frameTime)
     {
         UpdateStorm();
+        RunJobs();
 
         if (_pendingAir.Count == 0)
             return;
