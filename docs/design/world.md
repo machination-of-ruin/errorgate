@@ -100,6 +100,7 @@ Open: should trees block bullets, how thick are the forests, are rock formations
 
 Everything below is built; the world is off by default so the old maps play as before.
 
+- **One command:** `Scripts/bat/runWorld.bat` (or `Scripts/sh/runWorld.sh`) builds, starts the server with `game.map=World` and `errorgate.world.enabled=true`, and starts the client; connect to localhost.
 - **A round in the world:** set the CVars `game.map` to `World` and `errorgate.world.enabled` to `true` (the graph is `errorgate.world.graph`, `Default`). At the start of the round the web is built (village, tunnel, snow city, the military base, a tunnel, the laboratory), the ground of the village joins the station, and players spawn at the spawn zone of the village (eight spawn points in a clearing near the middle). When the round ends the world is forgotten.
 - **Gates:** `Village.east` and `TunnelVillageCity.west` lead to each other, and so on along the links in `locations.yml`. Using a gate moves you, and what you pull, to the other one. Mobs do not use them. A gate does not work while the location behind it has a storm coming.
 - **The storm:** each location that resets (the village, the city, the laboratory; the tunnels follow the location they lead to; the base never resets) has a timer of 6 to 12 hours, picked so two locations are an hour apart if the range allows. `errorgate.world.warning_seconds` (300) before it hits, a siren sounds on the map and entry is closed; when it hits, the map is deleted (everything and everyone in it) and built again with a new layout.
