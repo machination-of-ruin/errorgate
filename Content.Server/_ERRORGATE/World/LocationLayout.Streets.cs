@@ -9,7 +9,7 @@ namespace Content.Server._ERRORGATE.World;
 ///     front door is on (0 south, 1 east, 2 north, 3 west) and the tile of that door, and what the structure is for (house,
 ///     outbuilding, civic, shop, industrial). Measured once.
 /// </summary>
-public sealed record StructureInfo(string Path, int Width, int Height, Vector2i LocalMin, int FrontSide, Vector2i FrontDoor, string Role, float Weight);
+public sealed record StructureInfo(string Path, int Width, int Height, Vector2i LocalMin, int FrontSide, Vector2i FrontDoor, string Role, float Weight, bool Unique = false);
 
 /// <summary>
 ///     A structure placed in a location: its footprint rectangle after the turns, where its grid origin goes, the side its front
@@ -699,6 +699,130 @@ public sealed partial class LocationLayout
         };
     }
 
+    /// <summary>
+    ///     Puts a unique building where it fits once the lanes and sidewalks under it are taken away (never an avenue, never near the border,
+    ///     the gates or the shore), turned so that its front door looks at a street within a few tiles. The streets are cut by it.
+    /// </summary>
+    private bool PlaceUniqueByCulling(Random rng, StructureInfo info)
+    {
+        // Which tiles are not available (outside the shape, near the border or the shore, taken, avenues), as sums, so a whole rectangle
+        // can be asked about at once
+        var sums = new int[Bounds.X + 1, Bounds.Y + 1];
+        for (var x = 0; x < Bounds.X; x++)
+        {
+            for (var y = 0; y < Bounds.Y; y++)
+            {
+                var t = new Vector2i(x, y);
+                var bad = !InShape(t) || Dist(t) < Margin + 2 || Terrain.ContainsKey(t) || _nearShore.Contains(t) || _occupied.Contains(t) || MainRoadTiles.Contains(t);
+                sums[x + 1, y + 1] = sums[x, y + 1] + sums[x + 1, y] - sums[x, y] + (bad ? 1 : 0);
+            }
+        }
+
+        bool Clear(int x0, int y0, int x1, int y1)
+        {
+            if (x0 < 0 || y0 < 0 || x1 >= Bounds.X || y1 >= Bounds.Y)
+                return false;
+
+            return sums[x1 + 1, y1 + 1] - sums[x0, y1 + 1] - sums[x1 + 1, y0] + sums[x0, y0] == 0;
+        }
+
+        // Every place and turn where it fits with three clear tiles around it, in random order
+        var candidates = new List<(int Turns, Vector2i Min)>();
+        for (var turns = 0; turns < 4; turns++)
+        {
+            var shape = StructurePlacement.Create(info, turns, Vector2i.Zero);
+            for (var x = 3; x + shape.Width + 3 < Bounds.X; x += 2)
+            {
+                for (var y = 3; y + shape.Height + 3 < Bounds.Y; y += 2)
+                {
+                    if (Clear(x - 2, y - 2, x + shape.Width + 1, y + shape.Height + 1))
+                        candidates.Add((turns, new Vector2i(x, y)));
+                }
+            }
+        }
+
+        foreach (var (turns, min) in candidates.OrderBy(_ => rng.Next()).Take(400))
+        {
+            var placement = StructurePlacement.Create(info, turns, min);
+            var rect = (MinX: min.X, MinY: min.Y, MaxX: min.X + placement.Width - 1, MaxY: min.Y + placement.Height - 1);
+            var cut = new List<Vector2i>();
+            for (var x = rect.MinX - 2; x <= rect.MaxX + 2; x++)
+            {
+                for (var y = rect.MinY - 2; y <= rect.MaxY + 2; y++)
+                {
+                    var t = new Vector2i(x, y);
+                    if (Roads.Contains(t) || Walks.Contains(t))
+                        cut.Add(t);
+                }
+            }
+
+            // The front door must have a street ahead of it, within reach of the path that is cut to it (not one of the tiles that are cut)
+            var step = Dir(placement.Front);
+            var cutSet = new HashSet<Vector2i>(cut);
+            var reach = false;
+            for (var k = 2; k <= 28 && !reach; k++)
+            {
+                var ahead = placement.Door + step * k;
+                reach = (Roads.Contains(ahead) || Walks.Contains(ahead)) && !cutSet.Contains(ahead);
+            }
+
+            if (!reach)
+                continue;
+
+            foreach (var t in cut)
+            {
+                Roads.Remove(t);
+                Walks.Remove(t);
+            }
+
+            Occupy(rect);
+            Structures.Add(placement);
+            _doorPaths.Add((placement.Door, placement.Front));
+            return true;
+        }
+
+        return false;
+    }
+
+    /// <summary>Streets that a unique building cut off from the rest, and that are too short to matter, are taken away.</summary>
+    private void PruneRoadFragments(int smallerThan)
+    {
+        var all = new HashSet<Vector2i>(Roads);
+        all.UnionWith(Walks);
+        var seen = new HashSet<Vector2i>();
+        var stack = new Stack<Vector2i>();
+        foreach (var start in all)
+        {
+            if (!seen.Add(start))
+                continue;
+
+            var part = new List<Vector2i> { start };
+            stack.Push(start);
+            while (stack.Count > 0)
+            {
+                var c = stack.Pop();
+                foreach (var d in new[] { new Vector2i(1, 0), new Vector2i(-1, 0), new Vector2i(0, 1), new Vector2i(0, -1) })
+                {
+                    var n = c + d;
+                    if (all.Contains(n) && seen.Add(n))
+                    {
+                        part.Add(n);
+                        stack.Push(n);
+                    }
+                }
+            }
+
+            if (part.Count >= smallerThan || part.Any(t => MainRoadTiles.Contains(t)))
+                continue;
+
+            foreach (var t in part)
+            {
+                Roads.Remove(t);
+                Walks.Remove(t);
+            }
+        }
+    }
+
     private bool Fits((int MinX, int MinY, int MaxX, int MaxY) r, int gap)
     {
         if (TouchesShore(r.MinX, r.MinY, r.MaxX, r.MaxY))
@@ -747,16 +871,58 @@ public sealed partial class LocationLayout
 
     private void FillFrontage(Random rng, Vector2i size, IReadOnlyList<StructureInfo> pool, float density, string style)
     {
-        var byRole = pool.GroupBy(i => i.Role).ToDictionary(g => g.Key, g => g.ToList());
+        // The unique buildings are put out once each below; the random lots draw from the rest
+        var uniques = pool.Where(i => i.Unique).ToList();
+        var ordinary = pool.Where(i => !i.Unique).ToList();
+        if (ordinary.Count == 0)
+            ordinary = pool.ToList();
+
+        var byRole = ordinary.GroupBy(i => i.Role).ToDictionary(g => g.Key, g => g.ToList());
         List<StructureInfo> Of(string role)
         {
             if (byRole.TryGetValue(role, out var list) && list.Count > 0)
                 return list;
 
-            return byRole.TryGetValue("house", out var houses) && houses.Count > 0 ? houses : pool.ToList();
+            return byRole.TryGetValue("house", out var houses) && houses.Count > 0 ? houses : ordinary;
         }
 
         var skip = Math.Clamp(0.12 + (1 - density) * 0.4, 0.02, 0.7);
+
+        // The unique buildings first: each goes on the first lot along a street where it fits, the streets and the places in random order
+        foreach (var landmark in uniques.OrderBy(_ => rng.Next()))
+        {
+            var kind = landmark.Role == "industrial" ? LotKind.FencedIndustrial : landmark.Role == "shop" ? LotKind.Shop : LotKind.Civic;
+            var done = false;
+            foreach (var seg in _segments.OrderByDescending(s => s.Main).ThenBy(_ => rng.Next()))
+            {
+                foreach (var sign in new[] { 1, -1 }.OrderBy(_ => rng.Next()))
+                {
+                    var front = seg.Horizontal ? (sign > 0 ? 0 : 2) : (sign > 0 ? 3 : 1);
+                    var center = seg.Horizontal ? seg.A.Y : seg.A.X;
+                    var edge = center + sign * (seg.Width / 2 + (seg.Walk ? 1 : 0) + 1 + (style == "city" ? 1 : 3));
+                    var lo = (seg.Horizontal ? seg.A.X : seg.A.Y) + 2;
+                    var hi = (seg.Horizontal ? seg.B.X : seg.B.Y) - 2;
+                    for (var cursor = lo + rng.Next(0, 4); cursor < hi - 3 && !done; cursor += 4)
+                    {
+                        done = TryLot(rng, kind, front, edge, cursor, Of, style, landmark) > 0;
+                    }
+
+                    if (done)
+                        break;
+                }
+
+                if (done)
+                    break;
+            }
+
+            // Too big for any lot along a street (a factory, a block of flats): it goes where there is room and the streets that ran
+            // through that place are cut by it
+            if (!done)
+                PlaceUniqueByCulling(rng, landmark);
+        }
+
+        if (uniques.Count > 0)
+            PruneRoadFragments(40);
 
         // The main streets first, so the buildings that matter get the best frontage
         foreach (var seg in _segments.OrderByDescending(s => s.Main).ThenBy(_ => rng.Next()))
@@ -811,7 +977,7 @@ public sealed partial class LocationLayout
     ///     Tries to put one lot at the cursor. A homestead is a house and up to two small buildings inside a fence with a gate towards
     ///     the street; the others are a single building, a fenced one with a yard. Returns the length it takes along the street, or 0.
     /// </summary>
-    private int TryLot(Random rng, LotKind kind, int front, int edge, int cursor, Func<string, List<StructureInfo>> of, string style)
+    private int TryLot(Random rng, LotKind kind, int front, int edge, int cursor, Func<string, List<StructureInfo>> of, string style, StructureInfo? forced = null)
     {
         var fenced = kind is LotKind.Homestead or LotKind.FencedIndustrial;
         var role = kind switch
@@ -823,7 +989,7 @@ public sealed partial class LocationLayout
             _ => "house",
         };
 
-        var main = Pick(rng, of(role));
+        var main = forced ?? Pick(rng, of(role));
         var (mainAlong, mainDepth) = Dims(main, front);
 
         // The other buildings of a homestead: one beside the house, one behind it

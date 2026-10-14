@@ -747,13 +747,15 @@ public sealed partial class WorldSystem : EntitySystem
         var id = $"{theme}-{(fileName.EndsWith(".yml") ? fileName[..^4] : fileName)}";
         var role = width * height <= 48 ? "outbuilding" : "house";
         var weight = 1f;
+        var unique = false;
         if (_proto.TryIndex<WorldStructurePrototype>(id, out var structure))
         {
             role = structure.Role;
             weight = structure.Weight;
+            unique = structure.Unique;
         }
 
-        return new StructureInfo(path.ToString(), width, height, min, front, door, role, weight);
+        return new StructureInfo(path.ToString(), width, height, min, front, door, role, weight, unique);
     }
 
     private List<StructureInfo> GetPool(string theme)

@@ -247,3 +247,7 @@ Not found by the cut: buildings with a gap in their walls, open yards and the wa
 
 In the running game, as an admin: `structureview <name>` (for example `structureview review/village/kuz-wood-LANDMARK-1`, or `structureview village/kuz-wood-XL-3`) loads that structure, as it was saved and not initialized (nothing in it runs, so you can edit it and save it again), on a new map and moves you there. `structureview` without a name lists the files. Walk around, then use the `mapping` tools to cut a landmark into buildings: save each part with `savegrid <grid> <file>` and put it in the pool folder (`village` or `city`).
 
+
+## Hand-cut buildings (unique)
+
+The project owner cut seven big buildings out of the Kuznetsk landmarks by hand: `city/apartments-1` to `-4`, `city/dormitory` (role `civic`) and `city/factory-1`, `city/factory-2` (role `industrial`). They are marked `unique: true` in `structures.yml`: they are not in the random pool, every build of the city puts each of them out **once**. First it tries a lot beside a street; if the building does not fit any (the factories are about 44 x 60 and 68 x 27, a city block is 37 x 37), it goes where there is room and the lanes and sidewalks under it are cut (never an avenue, the border, the gates or the shore), turned so its front door looks at a street within 28 tiles; street pieces it cuts off that are shorter than 40 tiles are removed. Measured on real builds: 5 to 7 of the 7 fit, the two factories fit about two builds in three.

@@ -256,4 +256,11 @@ public sealed partial class WorldStructurePrototype : IPrototype
     /// <summary>How often it is picked compared to the others of its role.</summary>
     [DataField]
     public float Weight = 1f;
+
+    /// <summary>
+    ///     A building that is put out once in every location of its theme, on a lot picked for it (a hand-cut landmark), and is not part
+    ///     of the random pool.
+    /// </summary>
+    [DataField]
+    public bool Unique;
 }

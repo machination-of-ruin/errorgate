@@ -212,3 +212,40 @@
 - type: worldStructure
   id: village-kuz-wood-XXXL-1
   role: shop
+
+# Hand-cut buildings of the city, saved by the project owner from the Kuznetsk landmarks.
+
+- type: worldStructure
+  id: city-apartments-1
+  role: civic
+  unique: true
+
+- type: worldStructure
+  id: city-apartments-2
+  role: civic
+  unique: true
+
+- type: worldStructure
+  id: city-apartments-3
+  role: civic
+  unique: true
+
+- type: worldStructure
+  id: city-apartments-4
+  role: civic
+  unique: true
+
+- type: worldStructure
+  id: city-dormitory
+  role: civic
+  unique: true
+
+- type: worldStructure
+  id: city-factory-1
+  role: industrial
+  unique: true
+
+- type: worldStructure
+  id: city-factory-2
+  role: industrial
+  unique: true
