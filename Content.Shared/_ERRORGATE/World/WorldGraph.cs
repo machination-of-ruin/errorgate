@@ -46,9 +46,9 @@ public sealed class WorldCVars
     public static readonly CVarDef<float> WarningSeconds =
         CVarDef.Create("errorgate.world.warning_seconds", 300f, CVar.SERVERONLY | CVar.ARCHIVE);
 
-    /// <summary>The sound of the storm warning, played to the whole location when it starts and a minute before the wipe.</summary>
+    /// <summary>The sound of the storm warning, played to the whole location with the first notice and the last.</summary>
     public static readonly CVarDef<string> WarningSound =
-        CVarDef.Create("errorgate.world.warning_sound", "/Audio/Ambience/anomaly_scary.ogg", CVar.SERVERONLY | CVar.ARCHIVE);
+        CVarDef.Create("errorgate.world.warning_sound", "/Audio/Misc/delta_alt.ogg", CVar.SERVERONLY | CVar.ARCHIVE);
 
     /// <summary>Seconds two locations are kept apart in time when their resets are scheduled.</summary>
     public static readonly CVarDef<float> ResetSpacingSeconds =

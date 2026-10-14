@@ -695,14 +695,14 @@ public sealed partial class WorldSystem
         Log.Info($"World: the storm is coming for {id}");
     }
 
-    /// <summary>Seconds before the wipe at which the whole location is told how long is left.</summary>
-    private static readonly int[] NoticeAt = { 300, 240, 180, 120, 90, 60, 45, 30, 20, 10, 5, 4, 3, 2, 1 };
+    /// <summary>Seconds before the wipe at which the whole location is told how long is left (and the start of the warning).</summary>
+    private static readonly int[] NoticeAt = { 60, 30, 10, 5 };
 
     private readonly Dictionary<string, (int Last, int Stage)> _notice = new();
 
     /// <summary>
     ///     While a storm is coming: tells everyone in the location (and in the tunnels that go with it) the exact time left, plays the
-    ///     warning sound at the start and a minute before, and thickens the ashfall: light, then ashfall from the middle of the warning,
+    ///     warning sound with the first notice and the last, and thickens the ashfall: light, then ashfall from the middle of the warning,
     ///     then heavy for the last five seconds.
     /// </summary>
     private void UpdateNotice(string id, TimeSpan remaining)
@@ -747,7 +747,7 @@ public sealed partial class WorldSystem
             var text = shown <= 10
                 ? Loc.GetString("world-storm-count", ("seconds", shown))
                 : Loc.GetString("world-storm-warning", ("time", $"{shown / 60:00}:{shown % 60:00}"));
-            var playSound = first || state.Last == 60;
+            var playSound = first || state.Last == NoticeAt[^1];
             var sound = new SoundPathSpecifier(_cfg.GetCVar(WorldCVars.WarningSound));
             foreach (var name in FollowersOf(id).Append(id))
             {
