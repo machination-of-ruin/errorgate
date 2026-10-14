@@ -58,6 +58,7 @@ public sealed partial class WorldSystem : EntitySystem
     [Dependency] private readonly SharedWeatherSystem _weather = default!;
     [Dependency] private readonly IGameTiming _timing = default!;
     [Dependency] private readonly MetaDataSystem _meta = default!;
+    [Dependency] private readonly Content.Server.Chat.Systems.ChatSystem _chat = default!;
 
     /// <summary>A built location and what it cost.</summary>
     public sealed class Location

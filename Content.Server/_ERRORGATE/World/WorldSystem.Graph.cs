@@ -30,7 +30,6 @@ namespace Content.Server._ERRORGATE.World;
 /// </summary>
 public sealed partial class WorldSystem
 {
-    private static readonly SoundSpecifier WarningSound = new SoundPathSpecifier("/Audio/Machines/alarm.ogg");
     private static readonly SoundSpecifier GateSound = new SoundPathSpecifier("/Audio/Machines/blastdoor.ogg");
     private static readonly SoundSpecifier DenySound = new SoundPathSpecifier("/Audio/Machines/custom_deny.ogg");
 
@@ -73,6 +72,7 @@ public sealed partial class WorldSystem
         _locations.Clear();
         _gates.Clear();
         _storm.Clear();
+        _notice.Clear();
         _pendingAir.Clear();
         _jobs.Clear();
         _building.Clear();
@@ -676,6 +676,8 @@ public sealed partial class WorldSystem
                 StartWarning(id, at);
             else if (state == LocationState.Warning && _timing.CurTime >= at)
                 Strike(id);
+            else if (state == LocationState.Warning)
+                UpdateNotice(id, at - _timing.CurTime);
         }
     }
 
@@ -688,18 +690,84 @@ public sealed partial class WorldSystem
             _storm[follower] = (LocationState.Warning, null);
         }
 
-        foreach (var name in FollowersOf(id).Append(id))
+        _notice[id] = (int.MaxValue, 0);
+        UpdateNotice(id, strike - _timing.CurTime);
+        Log.Info($"World: the storm is coming for {id}");
+    }
+
+    /// <summary>Seconds before the wipe at which the whole location is told how long is left.</summary>
+    private static readonly int[] NoticeAt = { 300, 240, 180, 120, 90, 60, 45, 30, 20, 10, 5, 4, 3, 2, 1 };
+
+    private readonly Dictionary<string, (int Last, int Stage)> _notice = new();
+
+    /// <summary>
+    ///     While a storm is coming: tells everyone in the location (and in the tunnels that go with it) the exact time left, plays the
+    ///     warning sound at the start and a minute before, and thickens the ashfall: light, then ashfall from the middle of the warning,
+    ///     then heavy for the last five seconds.
+    /// </summary>
+    private void UpdateNotice(string id, TimeSpan remaining)
+    {
+        if (!_notice.TryGetValue(id, out var state))
+            state = (int.MaxValue, 0);
+
+        var seconds = Math.Max(0, remaining.TotalSeconds);
+        var warning = _cfg.GetCVar(WorldCVars.WarningSeconds);
+
+        // The ashfall
+        var stage = seconds <= 5 ? 3 : seconds <= warning / 2 ? 2 : 1;
+        if (stage != state.Stage)
         {
-            if (_locations.TryGetValue(name, out var loc))
-                _audio.PlayGlobal(WarningSound, Filter.BroadcastMap(loc.MapId), true);
+            var weather = stage switch { 3 => "AshfallHeavy", 2 => "Ashfall", _ => "AshfallLight" };
+            foreach (var name in FollowersOf(id).Append(id))
+            {
+                if (_locations.TryGetValue(name, out var loc) && !loc.Proto.Underground && _proto.TryIndex<Content.Shared.Weather.WeatherPrototype>(weather, out var weatherProto))
+                    _weather.SetWeather(loc.MapId, weatherProto, null);
+            }
+
+            state.Stage = stage;
         }
 
-        Log.Info($"World: the storm is coming for {id}");
+        // The notices: at the first one that is due, once
+        var due = int.MaxValue;
+        foreach (var at in NoticeAt)
+        {
+            if (seconds <= at && at < state.Last && at < due)
+                due = at;
+        }
+
+        var first = state.Last == int.MaxValue;
+        if (first || due != int.MaxValue)
+        {
+            if (!first)
+                state.Last = due;
+            else
+                state.Last = NoticeAt.Where(a => a >= seconds).DefaultIfEmpty(NoticeAt[0]).Min();
+
+            var shown = (int) Math.Ceiling(seconds);
+            var text = shown <= 10
+                ? Loc.GetString("world-storm-count", ("seconds", shown))
+                : Loc.GetString("world-storm-warning", ("time", $"{shown / 60:00}:{shown % 60:00}"));
+            var playSound = first || state.Last == 60;
+            var sound = new SoundPathSpecifier(_cfg.GetCVar(WorldCVars.WarningSound));
+            foreach (var name in FollowersOf(id).Append(id))
+            {
+                if (!_locations.TryGetValue(name, out var loc))
+                    continue;
+
+                var filter = Filter.BroadcastMap(loc.MapId);
+                _chat.DispatchFilteredAnnouncement(filter, text, sender: Loc.GetString("world-storm-sender"), playSound: false, colorOverride: Color.FromHex("#C03030"));
+                if (playSound)
+                    _audio.PlayGlobal(sound, filter, true);
+            }
+        }
+
+        _notice[id] = state;
     }
 
     /// <summary>The storm wipes a location: everything in it goes with the map, and it is built again with a new layout.</summary>
     public void Strike(string id)
     {
+        _notice.Remove(id);
         Log.Info($"World: the storm wipes {id}");
         foreach (var name in FollowersOf(id).Prepend(id).ToList())
         {
