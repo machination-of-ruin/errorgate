@@ -4,6 +4,7 @@ using Content.Shared._ERRORGATE.World;
 using Robust.Shared.Configuration;
 using Content.Shared.Administration;
 using Robust.Shared.Console;
+using Robust.Shared.Prototypes;
 
 namespace Content.Server._ERRORGATE.World;
 
@@ -11,10 +12,21 @@ namespace Content.Server._ERRORGATE.World;
 [AdminCommand(AdminFlags.Debug)]
 public sealed class WorldGenCommand : LocalizedEntityCommands
 {
+    [Dependency] private readonly IPrototypeManager _proto = default!;
     [Dependency] private readonly WorldSystem _world = default!;
 
     public override string Command => "worldgen";
     public override string Description => "Builds a world location (replacing the old one): worldgen <Village|SnowCity> [seed]";
+
+    public override CompletionResult GetCompletion(IConsoleShell shell, string[] args)
+    {
+        return args.Length switch
+        {
+            1 => CompletionResult.FromHintOptions(_proto.EnumeratePrototypes<WorldLocationPrototype>().Select(p => p.ID).OrderBy(i => i), "<location>"),
+            2 => CompletionResult.FromHint("[seed]"),
+            _ => CompletionResult.Empty,
+        };
+    }
 
     public override void Execute(IConsoleShell shell, string argStr, string[] args)
     {
@@ -44,6 +56,13 @@ public sealed class WorldClearCommand : LocalizedEntityCommands
 
     public override string Command => "worldclear";
     public override string Description => "Tears down a world location: worldclear <location|all>";
+
+    public override CompletionResult GetCompletion(IConsoleShell shell, string[] args)
+    {
+        return args.Length == 1
+            ? CompletionResult.FromHintOptions(_world.Locations.Keys.Prepend("all"), "<location|all>")
+            : CompletionResult.Empty;
+    }
 
     public override void Execute(IConsoleShell shell, string argStr, string[] args)
     {
@@ -89,10 +108,21 @@ public sealed class WorldInfoCommand : LocalizedEntityCommands
 [AdminCommand(AdminFlags.Debug)]
 public sealed class WorldBuildCommand : LocalizedEntityCommands
 {
+    [Dependency] private readonly IPrototypeManager _proto = default!;
     [Dependency] private readonly WorldSystem _world = default!;
 
     public override string Command => "worldbuild";
     public override string Description => "Builds every location of a world graph and starts their storm timers: worldbuild [graph] [seed]";
+
+    public override CompletionResult GetCompletion(IConsoleShell shell, string[] args)
+    {
+        return args.Length switch
+        {
+            1 => CompletionResult.FromHintOptions(_proto.EnumeratePrototypes<WorldGraphPrototype>().Select(p => p.ID), "[graph]"),
+            2 => CompletionResult.FromHint("[seed]"),
+            _ => CompletionResult.Empty,
+        };
+    }
 
     public override void Execute(IConsoleShell shell, string argStr, string[] args)
     {
@@ -112,11 +142,22 @@ public sealed class WorldBuildCommand : LocalizedEntityCommands
 [AdminCommand(AdminFlags.Debug)]
 public sealed class WorldResetCommand : LocalizedEntityCommands
 {
+    [Dependency] private readonly IPrototypeManager _proto = default!;
     [Dependency] private readonly WorldSystem _world = default!;
     [Dependency] private readonly IConfigurationManager _cfg = default!;
 
     public override string Command => "worldreset";
     public override string Description => "Wipes a world location with the storm and builds it again: worldreset <location> [now]. Without 'now' the warning runs first.";
+
+    public override CompletionResult GetCompletion(IConsoleShell shell, string[] args)
+    {
+        return args.Length switch
+        {
+            1 => CompletionResult.FromHintOptions(_world.Locations.Keys, "<location>"),
+            2 => CompletionResult.FromHintOptions(new[] { "now" }, "[now: no warning]"),
+            _ => CompletionResult.Empty,
+        };
+    }
 
     public override void Execute(IConsoleShell shell, string argStr, string[] args)
     {
@@ -170,6 +211,16 @@ public sealed class WorldGoCommand : LocalizedEntityCommands
 
     public override string Command => "worldgo";
     public override string Description => "Moves you to a gate of a world location: worldgo <location> <gate>";
+
+    public override CompletionResult GetCompletion(IConsoleShell shell, string[] args)
+    {
+        return args.Length switch
+        {
+            1 => CompletionResult.FromHintOptions(_world.GateNames.Select(g => g.Location).Distinct(), "<location>"),
+            2 => CompletionResult.FromHintOptions(_world.GateNames.Where(g => g.Location == args[0]).Select(g => g.Gate), "<gate>"),
+            _ => CompletionResult.Empty,
+        };
+    }
 
     public override void Execute(IConsoleShell shell, string argStr, string[] args)
     {

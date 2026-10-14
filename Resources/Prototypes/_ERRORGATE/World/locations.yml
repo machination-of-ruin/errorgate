@@ -138,7 +138,7 @@
 # A tunnel between the village and the city. It is wiped with the city.
 - type: worldLocation
   id: TunnelVillageCity
-  name: tunnel
+  name: village-city tunnel
   tier: 1
   style: tunnel
   underground: true
@@ -192,7 +192,7 @@
 # A tunnel between the city and the laboratory. It is wiped with the laboratory.
 - type: worldLocation
   id: TunnelCityLab
-  name: tunnel
+  name: city-laboratory tunnel
   tier: 2
   style: tunnel
   underground: true

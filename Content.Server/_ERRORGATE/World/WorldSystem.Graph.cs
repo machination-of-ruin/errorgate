@@ -198,6 +198,7 @@ public sealed partial class WorldSystem
     private EntityUid PlaceGatePlaza(string location, string gateId, Entity<MapGridComponent> ground, MapId mapId, GatePlacement place)
     {
         var plaza = _mapManager.CreateGridEntity(mapId);
+        _meta.SetEntityName(plaza.Owner, $"{location} gate plaza ({gateId})");
         var worn = (ContentTileDefinition) _tileDefs["FloorSteelDirty"];
         var paved = (ContentTileDefinition) _tileDefs["FloorSteelPavement"];
         var tiles = new List<(Vector2i, Tile)>();
@@ -259,6 +260,8 @@ public sealed partial class WorldSystem
     {
         var proto = _proto.Index<WorldLocationPrototype>(location);
         var entity = Spawn(proto.Gate, _map.GridTileToLocal(ground.Owner, ground.Comp, tile));
+        if (PartnerOf(location, gate) is { } beyond && _proto.TryIndex<WorldLocationPrototype>(beyond.Location, out var beyondProto))
+            _meta.SetEntityName(entity, $"hatch to {beyondProto.Name}");
         var comp = EnsureComp<WorldTransitionComponent>(entity);
         comp.Location = location;
         comp.Gate = gate;
@@ -362,6 +365,7 @@ public sealed partial class WorldSystem
 
         var mapUid = CreateLocationMap(proto, out var mapId);
         var ground = _mapManager.CreateGridEntity(mapId);
+        _meta.SetEntityName(ground.Owner, $"{proto.ID} ground");
         var floorDef = (ContentTileDefinition) _tileDefs[proto.Ground];
         var tiles = new List<(Vector2i, Tile)>();
         foreach (var t in layout.Floor.Concat(layout.Walls))
@@ -442,6 +446,7 @@ public sealed partial class WorldSystem
 
         var mapUid = CreateLocationMap(proto, out var mapId);
         var ground = _mapManager.CreateGridEntity(mapId);
+        _meta.SetEntityName(ground.Owner, $"{proto.ID} ground");
         EnsureComp<GridAtmosphereComponent>(ground.Owner);
         var floor = _bunker.BuildLaboratory(ground.Owner, ground.Comp, useSeed, out var vestibule, out var vestibuleArrival);
         _physics.SetBodyType(ground.Owner, BodyType.Static);
@@ -505,6 +510,9 @@ public sealed partial class WorldSystem
                 var hatchCoords = _map.GridTileToLocal(ground, grid, place.Tile);
                 var outside = _map.GridTileToLocal(ground, grid, place.Arrival);
                 tunnel.Hatch = _bunker.PlaceHatch(hatchCoords, outside, vestibule, arrival);
+                _meta.SetEntityName(tunnel.Hatch.Value, $"bunker hatch to {lab.Proto.Name}");
+                if (TryComp<Bunker.BunkerVestibuleComponent>(vestibule, out var vestibuleComp) && vestibuleComp.Ladder is { } ladder)
+                    _meta.SetEntityName(ladder, $"hatch to {tunnel.Proto.Name}");
             }
         }
     }
@@ -524,6 +532,7 @@ public sealed partial class WorldSystem
             return false;
         }
 
+        _meta.SetEntityName(grid.Value.Owner, $"{proto.ID} map grid");
         EnsureComp<GridAtmosphereComponent>(grid.Value.Owner);
         _physics.SetBodyType(grid.Value.Owner, BodyType.Static);
         RetierLoot(grid.Value, proto.Tier);
@@ -574,6 +583,7 @@ public sealed partial class WorldSystem
     private EntityUid CreateLocationMap(WorldLocationPrototype proto, out MapId mapId)
     {
         var mapUid = _map.CreateMap(out mapId, runMapInit: true);
+        _meta.SetEntityName(mapUid, $"{proto.ID} map");
         _map.SetAmbientLight(mapId, proto.AmbientLight);
         if (proto.LootTable is { } lootTable)
             AddComp(mapUid, new LootManagerComponent { GlobalLootTablePrototype = lootTable }); // the table is read when the component starts, so it is set first

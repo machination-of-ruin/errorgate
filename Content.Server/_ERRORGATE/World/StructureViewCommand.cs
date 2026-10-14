@@ -30,6 +30,13 @@ public sealed class StructureViewCommand : LocalizedEntityCommands
     public override string Command => "structureview";
     public override string Description => "Shows a structure of the pool on a map of its own: structureview <theme/name>. No name lists them.";
 
+    public override CompletionResult GetCompletion(IConsoleShell shell, string[] args)
+    {
+        return args.Length == 1
+            ? CompletionResult.FromHintOptions(_res.ContentFindFiles(new ResPath(Root)).Where(p => p.Extension == "yml").Select(p => p.ToString()[Root.Length..^4]).OrderBy(p => p), "<theme/name>")
+            : CompletionResult.Empty;
+    }
+
     public override void Execute(IConsoleShell shell, string argStr, string[] args)
     {
         if (args.Length < 1)

@@ -185,76 +185,67 @@ public sealed partial class LocationLayout
             DecalTiles.Add(PlaceMany(rng, count, clump, 0, Free));
         }
 
-        // Roadblocks stand in the middle of avenues that are five or more tiles wide, two tiles each, so two lanes stay open on each side
+        // Roadblocks close a street completely: the whole width of road and sidewalk, one or two tiles deep
         if (options.Roadblocks > 0)
         {
             var roadList = Roads.OrderBy(t => t.X).ThenBy(t => t.Y).ToList();
-            bool WideRoad(Vector2i c)
+            bool IsStreet(Vector2i c) => Roads.Contains(c) || Walks.Contains(c);
+            int Run(Vector2i c, Vector2i d)
             {
-                for (var dx = -2; dx <= 2; dx++)
-                {
-                    for (var dy = -2; dy <= 2; dy++)
-                    {
-                        if (!Roads.Contains(new Vector2i(c.X + dx, c.Y + dy)))
-                            return false;
-                    }
-                }
-
-                return true;
+                var n = 1;
+                for (var k = 1; k < 20 && IsStreet(c + d * k); k++) n++;
+                for (var k = 1; k < 20 && IsStreet(c - d * k); k++) n++;
+                return n;
             }
 
             var blocks = 0;
-            var basePieces = RoadPieces();
-            for (var attempt = 0; attempt < options.Roadblocks * 40 && blocks < options.Roadblocks && roadList.Count > 0; attempt++)
+            var centres = new List<Vector2i>();
+            for (var attempt = 0; attempt < options.Roadblocks * 60 && blocks < options.Roadblocks && roadList.Count > 0; attempt++)
             {
                 var t = roadList[rng.Next(roadList.Count)];
-                var next = rng.Next(2) == 0 ? new Vector2i(t.X + 1, t.Y) : new Vector2i(t.X, t.Y + 1);
-                if (Dist(t) < 10 || GatePlaces.Values.Any(g => Math.Abs(g.Arrival.X - t.X) < 8 && Math.Abs(g.Arrival.Y - t.Y) < 8) || !WideRoad(t) || !WideRoad(next) || RoadblockTiles.Any(b => Math.Abs(b.X - t.X) < 7 && Math.Abs(b.Y - t.Y) < 7))
-                    continue;
+                var wx = Run(t, new Vector2i(1, 0));
+                var wy = Run(t, new Vector2i(0, 1));
+                if (Math.Abs(wx - wy) < 4 || Math.Min(wx, wy) > 11)
+                    continue; // a crossing, not a straight street
 
-                RoadblockTiles.Add(t);
-                RoadblockTiles.Add(next);
-                if (RoadPieces() > basePieces)
+                // The street runs along the longer run; the block lies across it
+                var across = wx < wy ? new Vector2i(1, 0) : new Vector2i(0, 1);
+                var along = wx < wy ? new Vector2i(0, 1) : new Vector2i(1, 0);
+                if (Dist(t) < 10 || centres.Any(c => Math.Abs(c.X - t.X) < 8 && Math.Abs(c.Y - t.Y) < 8)
+                    || GatePlaces.Values.Any(g => Math.Abs(g.Arrival.X - t.X) < 10 && Math.Abs(g.Arrival.Y - t.Y) < 10))
                 {
-                    RoadblockTiles.RemoveRange(RoadblockTiles.Count - 2, 2);
                     continue;
                 }
 
+                var depth = rng.Next(1, 3);
+                var section = new List<Vector2i>();
+                for (var d = 0; d < depth; d++)
+                {
+                    var start = t + along * d;
+                    if (!IsStreet(start))
+                        break;
+
+                    var lo = 0;
+                    while (IsStreet(start - across * (lo + 1)) && lo < 12) lo++;
+                    var hi = 0;
+                    while (IsStreet(start + across * (hi + 1)) && hi < 12) hi++;
+                    for (var k = -lo; k <= hi; k++)
+                    {
+                        section.Add(start + across * k);
+                    }
+                }
+
+                if (section.Count == 0)
+                    continue;
+
+                RoadblockTiles.AddRange(section);
+                centres.Add(t);
                 blocks++;
             }
         }
 
         // Mobs stand apart on the open ground
         MobTiles = PlaceMany(rng, options.MobCount, 0, 14, Free);
-    }
-
-    /// <summary>How many separate pieces the roads are in, without the roadblocks.</summary>
-    private int RoadPieces()
-    {
-        var open = Roads.Where(r => !RoadblockTiles.Contains(r)).ToHashSet();
-        var seen = new HashSet<Vector2i>();
-        var pieces = 0;
-        var stack = new Stack<Vector2i>();
-        foreach (var start in open)
-        {
-            if (!seen.Add(start))
-                continue;
-
-            pieces++;
-            stack.Push(start);
-            while (stack.Count > 0)
-            {
-                var c = stack.Pop();
-                foreach (var d in new[] { new Vector2i(1, 0), new Vector2i(-1, 0), new Vector2i(0, 1), new Vector2i(0, -1) })
-                {
-                    var n = c + d;
-                    if (open.Contains(n) && seen.Add(n))
-                        stack.Push(n);
-                }
-            }
-        }
-
-        return pieces;
     }
 
     private List<Vector2i> PlaceMany(Random rng, int count, int clump, int spacing, Func<Vector2i, bool> free)

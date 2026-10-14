@@ -109,6 +109,7 @@ public sealed partial class LocationLayout
         else
             layout.BuildVillageStreets(rng, size);
 
+        layout.MendJunctions();
         layout.PlaceGates(rng, options.Gates);
         layout.Walks.ExceptWith(layout.Roads);
         if (pool.Count > 0)
@@ -156,6 +157,50 @@ public sealed partial class LocationLayout
         }
 
         _segments.Add(new Segment(horizontal ? new Vector2i(lo, c) : new Vector2i(c, lo), horizontal ? new Vector2i(hi, c) : new Vector2i(c, hi), horizontal, width, walk, main));
+    }
+
+    /// <summary>
+    ///     Streets that stop just short of each other or meet without a corner are joined: where the ends of a horizontal and a vertical
+    ///     street lie within three tiles of the square where they would cross, both are extended to cover it.
+    /// </summary>
+    private void MendJunctions()
+    {
+        var segments = _segments.ToList();
+        var count = _segments.Count;
+        foreach (var h in segments.Where(s => s.Horizontal))
+        {
+            foreach (var v in segments.Where(s => !s.Horizontal))
+            {
+                var hh = h.Width / 2;
+                var vh = v.Width / 2;
+                var rx0 = v.A.X - vh;
+                var rx1 = v.A.X + vh;
+                var ry0 = h.A.Y - hh;
+                var ry1 = h.A.Y + hh;
+                var hGap = h.B.X < rx0 ? rx0 - h.B.X : h.A.X > rx1 ? h.A.X - rx1 : 0;
+                var vGap = v.B.Y < ry0 ? ry0 - v.B.Y : v.A.Y > ry1 ? v.A.Y - ry1 : 0;
+                if (hGap > 3 || vGap > 3)
+                    continue;
+
+                var hCovers = h.A.X <= rx0 && h.B.X >= rx1;
+                var vCovers = v.A.Y <= ry0 && v.B.Y >= ry1;
+                if (hCovers && vCovers)
+                    continue; // they cross
+
+                if (h.B.X < rx1 && h.B.X >= rx0 - 3)
+                    AddRoad(new Vector2i(h.B.X + 1, h.A.Y), new Vector2i(rx1, h.A.Y), h.Width, h.Walk, false);
+                else if (h.A.X > rx0 && h.A.X <= rx1 + 3)
+                    AddRoad(new Vector2i(rx0, h.A.Y), new Vector2i(h.A.X - 1, h.A.Y), h.Width, h.Walk, false);
+
+                if (v.B.Y < ry1 && v.B.Y >= ry0 - 3)
+                    AddRoad(new Vector2i(v.A.X, v.B.Y + 1), new Vector2i(v.A.X, ry1), v.Width, v.Walk, false);
+                else if (v.A.Y > ry0 && v.A.Y <= ry1 + 3)
+                    AddRoad(new Vector2i(v.A.X, ry0), new Vector2i(v.A.X, v.A.Y - 1), v.Width, v.Walk, false);
+            }
+        }
+
+        // The pieces are joins, no lots along them
+        _segments.RemoveRange(count, _segments.Count - count);
     }
 
     private readonly HashSet<Vector2i> _nearShore = new();

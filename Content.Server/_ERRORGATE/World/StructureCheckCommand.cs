@@ -40,6 +40,13 @@ public sealed class StructureCheckCommand : LocalizedEntityCommands
     public override string Command => "structurecheck";
     public override string Description => "Checks structure files against the building rules: structurecheck [theme/name]. No name checks the whole pool.";
 
+    public override CompletionResult GetCompletion(IConsoleShell shell, string[] args)
+    {
+        return args.Length == 1
+            ? CompletionResult.FromHintOptions(_res.ContentFindFiles(new ResPath(Root)).Where(p => p.Extension == "yml").Select(p => p.ToString()[Root.Length..^4]).OrderBy(p => p), "[theme/name]")
+            : CompletionResult.Empty;
+    }
+
     public override void Execute(IConsoleShell shell, string argStr, string[] args)
     {
         var files = new List<ResPath>();

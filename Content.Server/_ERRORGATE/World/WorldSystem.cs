@@ -57,6 +57,7 @@ public sealed partial class WorldSystem : EntitySystem
     [Dependency] private readonly DecalSystem _decals = default!;
     [Dependency] private readonly SharedWeatherSystem _weather = default!;
     [Dependency] private readonly IGameTiming _timing = default!;
+    [Dependency] private readonly MetaDataSystem _meta = default!;
 
     /// <summary>A built location and what it cost.</summary>
     public sealed class Location
@@ -225,6 +226,7 @@ public sealed partial class WorldSystem : EntitySystem
 
         // The ground: terrain, roads and the border
         var ground = _mapManager.CreateGridEntity(mapId);
+        _meta.SetEntityName(ground.Owner, $"{id} ground");
         // No air of its own: outdoors the air is the map's (like on a planet), at once and everywhere, nothing to leak or to wait for
         var groundDef = (ContentTileDefinition) _tileDefs[proto.Ground];
         var roadDef = (ContentTileDefinition) _tileDefs[proto.Road];
@@ -270,6 +272,7 @@ public sealed partial class WorldSystem : EntitySystem
 
             // The grid itself stays upright, so a camera aligned with the grid matches the ground. A turned structure has its content
             // turned: tiles, positions and the way entities face. The layout says where the grid origin goes.
+            _meta.SetEntityName(grid.Value.Owner, $"{id} {p.Info.Path.Split('/')[^1].Replace(".yml", string.Empty)}");
             RotateContent(grid.Value, p.Turns);
             RemComp<GridAtmosphereComponent>(grid.Value.Owner); // the air is the map's, a file may have saved one
             RetierLoot(grid.Value, proto.Tier);
@@ -689,6 +692,7 @@ public sealed partial class WorldSystem : EntitySystem
 
         var list = new List<StructureInfo>();
         var scratch = _map.CreateMap(out var scratchId, runMapInit: false);
+        _meta.SetEntityName(scratch, "World structure measuring (scratch)");
         foreach (var path in _res.ContentFindFiles(new ResPath(StructureRoot + theme)).Where(p => p.Extension == "yml").OrderBy(p => p.ToString()))
         {
             if (!_loader.TryLoadGrid(scratchId, path, out var grid))
