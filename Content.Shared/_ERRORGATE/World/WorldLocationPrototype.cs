@@ -157,6 +157,10 @@ public sealed partial class WorldLocationPrototype : IPrototype
     [DataField]
     public Color AmbientLight = Color.FromHex("#6A6A6A");
 
+    /// <summary>The gates that stand in the border of the map (the way out is an opening in the wall of rock, with a road leading to it).</summary>
+    [DataField]
+    public List<string> BorderGates = new();
+
     /// <summary>How many world faults (see docs/design/anomalies.md) are scattered over the location, along the routes between the loot.</summary>
     [DataField]
     public int Faults;

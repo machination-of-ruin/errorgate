@@ -217,7 +217,7 @@ public sealed partial class WorldSystem : EntitySystem
         var entitiesBefore = EntityManager.EntityCount;
         var useSeed = seed ?? _random.Next();
         var options = new LocationLayout.Options(proto.Style, proto.Shape, proto.Rocks, proto.TreeClumps, proto.TreeSingles, proto.Shore,
-            proto.Props.Select(e => (e.Count, e.Clump)).ToList(), proto.Decals.Select(e => (e.Count, e.Clump)).ToList(), gates, proto.Mobs.Count > 0 ? proto.MobCount : 0, proto.SpawnZone, proto.RoadblockProtos.Count > 0 ? proto.Roadblocks : 0);
+            proto.Props.Select(e => (e.Count, e.Clump)).ToList(), proto.Decals.Select(e => (e.Count, e.Clump)).ToList(), gates, proto.Mobs.Count > 0 ? proto.MobCount : 0, proto.SpawnZone, proto.RoadblockProtos.Count > 0 ? proto.Roadblocks : 0, proto.BorderGates);
         var layout = LocationLayout.Generate(useSeed, proto.Size, pool, proto.Density, options);
 
         yield return true;
@@ -251,9 +251,18 @@ public sealed partial class WorldSystem : EntitySystem
 
         // The border is the two outermost tiles of the shape
         var spawned = 0;
+        var openings = new HashSet<Vector2i>(); // the plazas of gates in the border are openings in it
+        foreach (var gate in layout.GatePlaces.Values)
+        {
+            foreach (var (tile, _, _) in LocationLayout.PlazaTiles(gate))
+            {
+                openings.Add(tile);
+            }
+        }
+
         foreach (var pos in layout.ShapeTiles())
         {
-            if (layout.Dist(pos) > 2)
+            if (layout.Dist(pos) > 2 || openings.Contains(pos))
                 continue;
 
             Spawn(proto.Border, _map.GridTileToLocal(ground.Owner, ground.Comp, pos));

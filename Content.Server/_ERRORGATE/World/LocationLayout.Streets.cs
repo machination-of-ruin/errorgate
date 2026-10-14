@@ -110,7 +110,7 @@ public sealed partial class LocationLayout
             layout.BuildVillageStreets(rng, size);
 
         layout.MendJunctions();
-        layout.PlaceGates(rng, options.Gates);
+        layout.PlaceGates(rng, options.Gates, options.BorderGates ?? new List<string>());
         layout.Walks.ExceptWith(layout.Roads);
         if (pool.Count > 0)
             layout.FillFrontage(rng, size, pool, density, options.Style);
@@ -457,7 +457,7 @@ public sealed partial class LocationLayout
     ///     Puts the gates at the ends of the roads, far from each other, the main streets first. A gate stands five tiles beyond the end of
     ///     its road (the road is made longer to reach it) and keeps a clear square around it.
     /// </summary>
-    private void PlaceGates(Random rng, IReadOnlyList<string> ids)
+    private void PlaceGates(Random rng, IReadOnlyList<string> ids, IReadOnlyList<string> borderIds)
     {
         if (ids.Count == 0)
             return;
@@ -481,9 +481,61 @@ public sealed partial class LocationLayout
             return true;
         }
 
-        var placed = new List<Vector2i>();
-        foreach (var id in ids)
+        // A gate in the border: it stands where the border is (two tiles from the edge), the road runs out to its plaza, and the plaza
+        // (the border rocks are left out there) is the opening in the wall. Null if the street end has no such place in front of it
+        GatePlacement? BorderPlace((Vector2i End, int Dir, bool Main, Segment Seg) c)
         {
+            for (var k = 5; k < 60; k++)
+            {
+                var tile = c.End + Dir(c.Dir) * k;
+                if (Dist(tile) > 2)
+                    continue;
+
+                if (Dist(tile) != 2)
+                    return null;
+
+                var gate = new GatePlacement(tile, tile - Dir(c.Dir) * 3, c.Dir);
+                foreach (var (t, _, _) in PlazaTiles(gate))
+                {
+                    if (!InShape(t) || Terrain.ContainsKey(t) || _nearShore.Contains(t) || _occupied.Contains(t))
+                        return null;
+                }
+
+                return gate;
+            }
+
+            return null;
+        }
+
+        var placed = new List<Vector2i>();
+        foreach (var id in ids.OrderByDescending(i => borderIds.Contains(i)))
+        {
+            if (borderIds.Contains(id))
+            {
+                var borderOptions = candidates
+                    .Select(c => (Candidate: c, Place: BorderPlace(c)))
+                    .Where(c => c.Place != null)
+                    .ToList();
+                if (borderOptions.Count > 0)
+                {
+                    var pick = borderOptions
+                        .OrderByDescending(c => (c.Candidate.Main ? 1000 : 0) + (placed.Count == 0 ? rng.Next(0, 100) : placed.Min(p => (p - c.Candidate.End).Length)))
+                        .First();
+                    var place = pick.Place!;
+                    AddRoad(pick.Candidate.End, place.Tile - Dir(place.Facing) * 4, pick.Candidate.Seg.Width, pick.Candidate.Seg.Walk, false);
+                    _segments.RemoveAt(_segments.Count - 1);
+                    GatePlaces[id] = place;
+                    foreach (var (t, _, _) in PlazaTiles(place))
+                    {
+                        _occupied.Add(t);
+                    }
+
+                    placed.Add(pick.Candidate.End);
+                    candidates.Remove(pick.Candidate);
+                    continue;
+                }
+            }
+
             var options = candidates.Where(Fits).ToList();
             if (options.Count == 0)
                 break;

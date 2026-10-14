@@ -86,6 +86,7 @@
     clump: 3
   ambientLight: "#6A6E78"
   lootTable: LootTableGlobal
+  borderGates: [ base ]
   faults: 22
 
 # The border of a location: rock that cannot be dug out.
@@ -175,6 +176,7 @@
   treeSingles: 0
   ambientLight: "#6A6E78"
   lootTable: LootTableGlobal
+  borderGates: [ gate ]
 
 # The tier 3 laboratory: the generated bunker (rooms, corridors, doors, loot, bosses, radiation), entered by a gate. Pitch black.
 - type: worldLocation
