@@ -41,6 +41,7 @@
     clump: 3
   ambientLight: "#7A7A7A"
   lootTable: LootTableGlobal
+  faults: 10
 
 - type: worldLocation
   id: SnowCity
@@ -74,17 +75,18 @@
   - protos: [ FloraRockSolid ]
     count: 24
     clump: 0
-  - protos: [ Barricade, BarricadeBlock ]
+  - protos: [ N14BarricadeMetal, N14BarricadeSandbagSingle, N14BarricadeRazorwire, N14BarricadeTanktrap ]
     count: 16
     clump: 2
   roadblocks: 10
-  roadblockProtos: [ Barricade, BarricadeBlock ]
+  roadblockProtos: [ N14BarricadeMetal, N14BarricadeSandbagSingle, N14BarricadeRazorwire, N14BarricadeTanktrap ]
   decals:
   - decals: [ FloraBranchBrushwood, FloraBranchBrushwoodAlt ]
     count: 40
     clump: 3
   ambientLight: "#6A6E78"
   lootTable: LootTableGlobal
+  faults: 22
 
 # The border of a location: rock that cannot be dug out.
 - type: entity

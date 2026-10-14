@@ -157,6 +157,10 @@ public sealed partial class WorldLocationPrototype : IPrototype
     [DataField]
     public Color AmbientLight = Color.FromHex("#6A6A6A");
 
+    /// <summary>How many world faults (see docs/design/anomalies.md) are scattered over the location, along the routes between the loot.</summary>
+    [DataField]
+    public int Faults;
+
     /// <summary>How many roadblocks (wrecks, barricades) stand on the wide avenues, and what they are made of.</summary>
     [DataField]
     public int Roadblocks;

@@ -3,6 +3,7 @@ using System.Linq;
 using System.Numerics;
 using Content.Server.Atmos.Components;
 using Content.Server.Atmos.EntitySystems;
+using Content.Server._ERRORGATE.Anomalies;
 using Content.Server._ERRORGATE.LootManager;
 using Content.Server.Decals;
 using Content.Server.Gravity;
@@ -77,6 +78,14 @@ public sealed partial class WorldSystem : EntitySystem
         public EntityUid Ground;
 
         public TunnelLayout? Tunnel;
+
+        /// <summary>The airlock of a laboratory and where people arrive in it.</summary>
+        public EntityUid? Vestibule;
+
+        public EntityCoordinates? VestibuleArrival;
+
+        /// <summary>The bunker hatch at the end of a tunnel that leads to a laboratory.</summary>
+        public EntityUid? Hatch;
     }
 
     private readonly Dictionary<string, Location> _locations = new();
@@ -91,6 +100,9 @@ public sealed partial class WorldSystem : EntitySystem
     {
         public bool Ok;
         public string Error = string.Empty;
+
+        /// <summary>The map the build has made so far, which goes if the build is cancelled.</summary>
+        public EntityUid? Map;
     }
 
     private sealed record BuildJob(string Id, IEnumerator<bool> Steps, BuildContext Context);
@@ -134,7 +146,7 @@ public sealed partial class WorldSystem : EntitySystem
         if (!_building.Add(id))
             return;
 
-        Teardown(id);
+        TeardownBuilt(id);
         var context = new BuildContext();
         _jobs.Add(new BuildJob(id, BuildSteps(id, seed, context), context));
     }
@@ -168,7 +180,7 @@ public sealed partial class WorldSystem : EntitySystem
             yield break;
         }
 
-        Teardown(id);
+        TeardownBuilt(id);
 
         var gates = GatesOf(id);
         if (proto.MapPath is { } mapPath && _res.ContentFileExists(new ResPath(mapPath)))
@@ -209,6 +221,7 @@ public sealed partial class WorldSystem : EntitySystem
         yield return true;
 
         var mapUid = CreateLocationMap(proto, out var mapId);
+        context.Map = mapUid;
 
         // The ground: terrain, roads and the border
         var ground = _mapManager.CreateGridEntity(mapId);
@@ -382,17 +395,27 @@ public sealed partial class WorldSystem : EntitySystem
             Spawn(i < 6 ? "SpawnPointHumanError" : "SpawnPointLatejoin", _map.GridTileToLocal(ground.Owner, ground.Comp, layout.SpawnTiles[i]));
         }
 
-        // The gates, and the air
+        // The gates, each on a plaza of its own
+        var plazas = new List<EntityUid>();
         foreach (var (gateId, place) in layout.GatePlaces)
         {
-            PlaceGate(id, gateId, ground, place.Tile, place.Arrival, place.Facing);
+            plazas.Add(PlaceGatePlaza(id, gateId, ground, mapId, place));
         }
+
+        // The faults go in last, when the ground, the buildings and the loot are all there: the field places them on the next update
+        if (proto.Faults > 0)
+            EnsureComp<AnomalyFieldComponent>(mapUid).Count = proto.Faults;
 
         // The air is the map's. Grids that grow get an atmosphere of their own, empty at first and slow to fill: take it off
         RemComp<GridAtmosphereComponent>(ground.Owner);
         foreach (var (structure, _) in built)
         {
             RemComp<GridAtmosphereComponent>(structure);
+        }
+
+        foreach (var plaza in plazas)
+        {
+            RemComp<GridAtmosphereComponent>(plaza);
         }
 
         watch.Stop();
@@ -415,7 +438,21 @@ public sealed partial class WorldSystem : EntitySystem
     }
 
 
+    /// <summary>Removes a location, and stops its build if it is still running.</summary>
     public void Teardown(string id)
+    {
+        if (_jobs.Find(j => j.Id == id) is { } job)
+        {
+            _jobs.Remove(job);
+            _building.Remove(id);
+            if (job.Context.Map is { } partial && !TerminatingOrDeleted(partial))
+                QueueDel(partial);
+        }
+
+        TeardownBuilt(id);
+    }
+
+    private void TeardownBuilt(string id)
     {
         ForgetGates(id);
         if (!_locations.Remove(id, out var loc))

@@ -193,8 +193,24 @@ public sealed partial class BunkerSystem : EntitySystem
         var layoutSeed = seed ?? _random.Next();
         BuildBunker(bunkerGrid.Owner, bunkerGrid.Comp, layoutSeed, out var vestibule, out var arrival);
 
-        // The hatch on the surface: at run time, the map file is left alone
+        // The hatch on the surface: at run time, the map file is left alone. The way up comes out on the tile south of it
         var hatchCoords = _map.GridTileToLocal(surfaceGrid, surface, spot);
+        var hatch = PlaceHatch(hatchCoords, _map.GridTileToLocal(surfaceGrid, surface, spot + new Vector2i(0, -1)), vestibule, arrival);
+
+        Hatch = hatch;
+        BunkerMap = mapUid;
+        Log.Info($"The bunker hatch is at {spot} on {ToPrettyString(surfaceGrid)}, the bunker is on map {mapId}, layout seed {layoutSeed}");
+
+        error = string.Empty;
+        return true;
+    }
+
+    /// <summary>
+    ///     Puts the surface hatch of a bunker at a place and joins it to the vestibule: the key on it starts the sequence, and once it
+    ///     is open it leads down to <paramref name="arrival"/>. <paramref name="outside"/> is where the way up comes out.
+    /// </summary>
+    public EntityUid PlaceHatch(EntityCoordinates hatchCoords, EntityCoordinates outside, EntityUid vestibule, EntityCoordinates arrival)
+    {
         var hatch = Spawn(HatchProto, hatchCoords);
         var hatchComp = Comp<BunkerHatchComponent>(hatch);
         hatchComp.Arrival = arrival;
@@ -207,16 +223,10 @@ public sealed partial class BunkerSystem : EntitySystem
         // The siren outside, by the hatch
         vestibuleComp.OutsideSiren = Spawn(LightProto, hatchCoords);
 
-        // The way up comes out on the tile south of the hatch
         if (vestibuleComp.Ladder is { } ladder)
-            Comp<BunkerLadderComponent>(ladder).Surface = _map.GridTileToLocal(surfaceGrid, surface, spot + new Vector2i(0, -1));
+            Comp<BunkerLadderComponent>(ladder).Surface = outside;
 
-        Hatch = hatch;
-        BunkerMap = mapUid;
-        Log.Info($"The bunker hatch is at {spot} on {ToPrettyString(surfaceGrid)}, the bunker is on map {mapId}, layout seed {layoutSeed}");
-
-        error = string.Empty;
-        return true;
+        return hatch;
     }
 
     private bool TryGetPrimaryGrid(MapId mapId, out EntityUid gridUid, out MapGridComponent grid)

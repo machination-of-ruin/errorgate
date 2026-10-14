@@ -72,12 +72,12 @@ public sealed partial class BunkerSystem
             new[] { "MobSpawnerRunner" }, false, "FloorWhite"),
         [BunkerRoomType.Storage] = new(
             new[] { "ShelfMetal", "ShelfMetal", "ShelfMetal", "ShelfMetal" },
-            new[] { "CrateGenericSteel", "CrateGenericSteel", "CrateGenericSteel", "CrateGenericSteel" },
+            new[] { "OreBox", "OreBox", "OreBox", "OreBox" },
             new[] { "LootSpawnerIndustrialTier3", "LootSpawnerIndustrialTier3", "LootSpawnerLivingTier3" },
             new[] { "MobSpawnerRunner", "MobSpawnerWalkerArmored" }, false, "FloorConcrete"),
         [BunkerRoomType.AmmoDepot] = new(
             new[] { "Rack", "Rack", "Rack" },
-            new[] { "CrateGenericSteel", "CrateGenericSteel", "Rack" },
+            new[] { "OreBox", "OreBox", "Rack" },
             new[] { "LootSpawnerMilitaryTier3", "LootSpawnerMilitaryTier3", "LootSpawnerMilitaryTier3" },
             new string[] { }, true, "FloorDarkMono"),
         [BunkerRoomType.Armory] = new(
@@ -452,7 +452,7 @@ public sealed partial class BunkerSystem
                 {
                     if (TryBlock(t))
                     {
-                        Spawn("CrateGenericSteel", at(t));
+                        Spawn("OreBox", at(t));
                         break;
                     }
                 }
@@ -542,7 +542,7 @@ public sealed partial class BunkerSystem
                 else if (fromEntry > 100 && crates.All(p => (p - spot).LengthSquared >= 64) && rng.NextDouble() < 0.5)
                 {
                     crates.Add(spot);
-                    Spawn("CrateGenericSteel", at(spot));
+                    Spawn("OreBox", at(spot));
                 }
 
                 break;

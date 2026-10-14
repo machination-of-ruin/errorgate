@@ -185,6 +185,76 @@ public sealed partial class WorldSystem
 
     // -- Gates ----------------------------------------------------------------------------------------------------
 
+    private static readonly string[] PlazaBarricades =
+    {
+        "N14BarricadeMetal", "N14BarricadeSandbagSingle", "N14BarricadeRazorwire", "N14BarricadeTanktrap",
+    };
+
+    /// <summary>
+    ///     A gate on a plaza of its own (a small grid with a steel floor, hazard marks, lamps and barricades on both flanks), so a way
+    ///     into another location is easy to see and to find in the dark. The plaza replaces the ground under it. A hand-built plaza can
+    ///     take its place later. Returns the plaza grid.
+    /// </summary>
+    private EntityUid PlaceGatePlaza(string location, string gateId, Entity<MapGridComponent> ground, MapId mapId, GatePlacement place)
+    {
+        var plaza = _mapManager.CreateGridEntity(mapId);
+        var worn = (ContentTileDefinition) _tileDefs["FloorSteelDirty"];
+        var paved = (ContentTileDefinition) _tileDefs["FloorSteelPavement"];
+        var tiles = new List<(Vector2i, Tile)>();
+        var holes = new List<(Vector2i, Tile)>();
+        foreach (var (tile, _, l) in LocationLayout.PlazaTiles(place))
+        {
+            var def = Math.Abs(l) <= 1 ? paved : worn;
+            tiles.Add((tile, new Tile(def.TileId, 0, _tile.PickVariant(def))));
+            holes.Add((tile, Tile.Empty));
+        }
+
+        _map.SetTiles(plaza.Owner, plaza.Comp, tiles);
+        _map.SetTiles(ground.Owner, ground.Comp, holes);
+        _physics.SetBodyType(plaza.Owner, BodyType.Static);
+
+        EntityCoordinates At(int f, int l) => _map.GridTileToLocal(plaza.Owner, plaza.Comp, LocationLayout.PlazaTile(place, f, l));
+
+        // Hazard marks around the gate, lamps beside it, barricades along both flanks (the middle five tiles stay open)
+        foreach (var l in new[] { -1, 0, 1 })
+        {
+            _decals.TryAddDecal("WarnFull", At(-1, l), out _);
+        }
+
+        _decals.TryAddDecal("WarnFull", At(0, -1), out _);
+        _decals.TryAddDecal("WarnFull", At(0, 1), out _);
+
+        Spawn("LightPostSmall", At(0, -2));
+        Spawn("LightPostSmall", At(0, 2));
+
+        var rng = new Random(place.Tile.X * 7919 + place.Tile.Y);
+        foreach (var side in new[] { -3, 3 })
+        {
+            for (var f = -3; f <= -1; f++)
+            {
+                Spawn(PlazaBarricades[rng.Next(PlazaBarricades.Length)], At(f, side));
+            }
+
+            Spawn("N14BarricadeSandbagSingle", At(0, side));
+        }
+
+        PlaceGate(location, gateId, plaza, place.Tile, place.Arrival, place.Facing);
+        return plaza.Owner;
+    }
+
+    /// <summary>A gate in a tunnel: hazard marks in front of it and a lamp on each side.</summary>
+    private void DecorateTunnelGate(string location, string gateId, Entity<MapGridComponent> ground, GatePlacement place)
+    {
+        foreach (var l in new[] { -1, 0, 1 })
+        {
+            _decals.TryAddDecal("WarnFull", _map.GridTileToLocal(ground.Owner, ground.Comp, LocationLayout.PlazaTile(place, -1, l)), out _);
+        }
+
+        Spawn("LightPostSmall", _map.GridTileToLocal(ground.Owner, ground.Comp, LocationLayout.PlazaTile(place, 0, -1)));
+        Spawn("LightPostSmall", _map.GridTileToLocal(ground.Owner, ground.Comp, LocationLayout.PlazaTile(place, 0, 1)));
+        PlaceGate(location, gateId, ground, place.Tile, place.Arrival, place.Facing);
+    }
+
     private void PlaceGate(string location, string gate, Entity<MapGridComponent> ground, Vector2i tile, Vector2i arrival, int facing)
     {
         var proto = _proto.Index<WorldLocationPrototype>(location);
@@ -333,7 +403,11 @@ public sealed partial class WorldSystem
 
         foreach (var (gateId, place) in layout.Gates)
         {
-            PlaceGate(proto.ID, gateId, ground, place.Tile, place.Arrival, place.Facing);
+            // The way into a laboratory is the bunker hatch (see LinkBunkerEntrances), not a plain gate
+            if (PartnerOf(proto.ID, gateId) is { } partner && _proto.TryIndex<WorldLocationPrototype>(partner.Location, out var other) && other.Style == "laboratory")
+                continue;
+
+            DecorateTunnelGate(proto.ID, gateId, ground, place);
         }
 
         // The air is the map's (a grid that grows gets an atmosphere of its own by itself, which starts empty: take it off)
@@ -349,14 +423,16 @@ public sealed partial class WorldSystem
             Structures = 0,
             BuildMilliseconds = watch.Elapsed.TotalMilliseconds,
             Entities = EntityManager.EntityCount - entitiesBefore,
+            Ground = ground.Owner,
             Tunnel = layout,
         };
 
+        LinkBunkerEntrances();
         Log.Info($"World: built {proto.ID} (seed {useSeed}): tunnel of {layout.Path.Count} tiles, {_locations[proto.ID].Entities} entities, {watch.Elapsed.TotalMilliseconds:0} ms");
         return true;
     }
 
-    /// <summary>The tier 3 laboratory: the generated bunker, entered by a gate (see <see cref="Bunker.BunkerSystem.BuildLaboratory"/>).</summary>
+    /// <summary>The tier 3 laboratory: the generated bunker, entered by the bunker hatch at the end of a tunnel (see <see cref="Bunker.BunkerSystem.BuildLaboratory"/>).</summary>
     private bool BuildLaboratory(WorldLocationPrototype proto, int? seed, List<string> gates, out string error)
     {
         error = string.Empty;
@@ -367,11 +443,8 @@ public sealed partial class WorldSystem
         var mapUid = CreateLocationMap(proto, out var mapId);
         var ground = _mapManager.CreateGridEntity(mapId);
         EnsureComp<GridAtmosphereComponent>(ground.Owner);
-        var floor = _bunker.BuildLaboratory(ground.Owner, ground.Comp, useSeed);
+        var floor = _bunker.BuildLaboratory(ground.Owner, ground.Comp, useSeed, out var vestibule, out var vestibuleArrival);
         _physics.SetBodyType(ground.Owner, BodyType.Static);
-
-        if (gates.Count > 0)
-            PlaceGate(proto.ID, gates[0], ground, Bunker.BunkerSystem.LaboratoryGate, Bunker.BunkerSystem.LaboratoryArrival, 3);
 
         _pendingAir.Add(new PendingAir(ground.Owner, floor, _timing.CurTime + TimeSpan.FromSeconds(120)));
 
@@ -384,10 +457,56 @@ public sealed partial class WorldSystem
             Seed = useSeed,
             BuildMilliseconds = watch.Elapsed.TotalMilliseconds,
             Entities = EntityManager.EntityCount - entitiesBefore,
+            Vestibule = vestibule,
+            VestibuleArrival = vestibuleArrival,
         };
 
+        LinkBunkerEntrances();
         Log.Info($"World: built {proto.ID} (seed {useSeed}): laboratory of {floor.Count} floor tiles, {_locations[proto.ID].Entities} entities, {watch.Elapsed.TotalMilliseconds:0} ms");
         return true;
+    }
+
+    /// <summary>
+    ///     Joins every laboratory to the tunnel that leads to it: the end of the tunnel has the bunker hatch (a key opens the timed
+    ///     airlock, see docs/design/bunker.md) that goes down to the laboratory's vestibule. Runs whenever a tunnel or a laboratory is
+    ///     built, so whichever comes second makes the link, and again when one of them is built anew.
+    /// </summary>
+    private void LinkBunkerEntrances()
+    {
+        foreach (var (labId, lab) in _locations)
+        {
+            if (lab.Proto.Style != "laboratory" || lab.Vestibule is not { } vestibule || lab.VestibuleArrival is not { } arrival || TerminatingOrDeleted(vestibule))
+                continue;
+
+            foreach (var gate in GatesOf(labId))
+            {
+                if (PartnerOf(labId, gate) is not { } partner
+                    || !_locations.TryGetValue(partner.Location, out var tunnel)
+                    || tunnel.Tunnel is not { } layout
+                    || !layout.Gates.TryGetValue(partner.Gate, out var place))
+                {
+                    continue;
+                }
+
+                // Already joined to this very vestibule
+                if (tunnel.Hatch is { } old && !TerminatingOrDeleted(old)
+                    && TryComp<Bunker.BunkerHatchComponent>(old, out var oldComp) && oldComp.Vestibule == vestibule)
+                {
+                    continue;
+                }
+
+                if (tunnel.Hatch is { } stale && !TerminatingOrDeleted(stale))
+                    QueueDel(stale);
+
+                var ground = tunnel.Ground;
+                if (TerminatingOrDeleted(ground) || !TryComp<MapGridComponent>(ground, out var grid))
+                    continue;
+
+                var hatchCoords = _map.GridTileToLocal(ground, grid, place.Tile);
+                var outside = _map.GridTileToLocal(ground, grid, place.Arrival);
+                tunnel.Hatch = _bunker.PlaceHatch(hatchCoords, outside, vestibule, arrival);
+            }
+        }
     }
 
     /// <summary>A hand-built location: the grid of a map file, with gates it names itself.</summary>
@@ -448,7 +567,7 @@ public sealed partial class WorldSystem
     }
 
     private const string RubbleProto = "N14WallRockBasalt";
-    private const string CoverProto = "CrateGenericSteel";
+    private const string CoverProto = "OreBox";
 
     // -- The map of a location ------------------------------------------------------------------------------------
 

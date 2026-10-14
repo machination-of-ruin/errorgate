@@ -324,58 +324,72 @@ public sealed partial class LocationLayout
         Ice,
     }
 
-    /// <summary>One side of the map is a shore, with a wavy edge: sand and shallow water, or ice. It follows the edge of the shape.</summary>
+    /// <summary>
+    ///     A stretch of the map's edge is a shore: sand and shallow water, or ice. The band is measured from the edge of the shape
+    ///     (the distance to the edge), so it follows every bend of the edge, with a wavy inner line and ends that taper off.
+    /// </summary>
     private void BuildShore(Random rng, string kind)
     {
         if (kind is not ("water" or "ice"))
             return;
 
-        var side = rng.Next(4);
-        var length = side % 2 == 0 ? Bounds.X : Bounds.Y;
+        // The middle of the shape, and the direction the shore faces
+        double sumX = 0, sumY = 0;
+        var count = 0;
+        for (var x = 0; x < Bounds.X; x++)
+        {
+            for (var y = 0; y < Bounds.Y; y++)
+            {
+                if (!_in[x, y])
+                    continue;
+
+                sumX += x;
+                sumY += y;
+                count++;
+            }
+        }
+
+        if (count == 0)
+            return;
+
+        var centre = (X: sumX / count, Y: sumY / count);
+        var facing = rng.NextDouble() * Math.PI * 2;
+        var halfArc = 1.05 + rng.NextDouble() * 0.25;
+        var radius = Math.Sqrt(count / Math.PI);
         var depthBase = kind == "ice" ? 16.0 : 15.0;
         var p1 = rng.NextDouble() * 6.28;
         var p2 = rng.NextDouble() * 6.28;
         var p3 = rng.NextDouble() * 6.28;
 
-        for (var t = 0; t < length; t++)
+        for (var x = 0; x < Bounds.X; x++)
         {
-            // The outermost playable tile of this column or row on the shore side
-            var start = -1;
-            var steps = side % 2 == 0 ? Bounds.Y : Bounds.X;
-            for (var k = 0; k < steps; k++)
+            for (var y = 0; y < Bounds.Y; y++)
             {
-                var from = side == 0 || side == 2 ? k : steps - 1 - k;
-                var probe = side % 2 == 0 ? new Vector2i(t, from) : new Vector2i(from, t);
-                if (InShape(probe))
-                {
-                    start = from;
-                    break;
-                }
-            }
-
-            if (start < 0)
-                continue;
-
-            var depth = depthBase + 4.0 * Math.Sin(t * 0.06 + p1) + 2.0 * Math.Sin(t * 0.19 + p2);
-            var sandWidth = 4.0 + 1.5 * Math.Sin(t * 0.11 + p3);
-            for (var d = 0; d < depth; d++)
-            {
-                // side 0 is the low y edge, 1 the high y edge, 2 the low x edge, 3 the high x edge
-                var tile = side switch
-                {
-                    0 => new Vector2i(t, start + d),
-                    1 => new Vector2i(t, start - d),
-                    2 => new Vector2i(start + d, t),
-                    _ => new Vector2i(start - d, t),
-                };
-
+                var tile = new Vector2i(x, y);
                 if (!InShape(tile))
+                    continue;
+
+                var edge = Dist(tile) - 1; // 0 on the outermost tile
+                if (edge > 30)
+                    continue;
+
+                var angle = Math.Atan2(y - centre.Y, x - centre.X);
+                var off = Math.Abs(Math.IEEERemainder(angle - facing, Math.PI * 2));
+                if (off >= halfArc)
+                    continue;
+
+                // Full depth in the middle of the arc, fading to nothing at its ends
+                var taper = Math.Sqrt(Math.Clamp(1.0 - off / halfArc, 0.0, 1.0));
+                var along = angle * radius;
+                var depth = (depthBase + 4.0 * Math.Sin(along * 0.06 + p1) + 2.0 * Math.Sin(along * 0.19 + p2)) * taper;
+                var sandWidth = (4.0 + 1.5 * Math.Sin(along * 0.11 + p3)) * Math.Max(taper, 0.35);
+                if (edge >= depth)
                     continue;
 
                 if (kind == "ice")
                     Terrain[tile] = ShoreTile.Ice;
                 else
-                    Terrain[tile] = d < depth - sandWidth ? ShoreTile.Water : ShoreTile.Sand;
+                    Terrain[tile] = edge < depth - sandWidth ? ShoreTile.Water : ShoreTile.Sand;
             }
         }
     }

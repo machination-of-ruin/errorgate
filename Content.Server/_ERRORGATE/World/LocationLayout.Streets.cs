@@ -367,6 +367,27 @@ public sealed partial class LocationLayout
 
     // -- Gates ----------------------------------------------------------------------------------------------------
 
+    /// <summary>
+    ///     The plaza a gate stands on: a grid of its own, <c>f</c> tiles forward (toward the gate and the edge of the map, from -3 in
+    ///     front of it to 1 behind) and <c>l</c> tiles to the side (-3 to 3). The gate is at f 0, l 0.
+    /// </summary>
+    public static IEnumerable<(Vector2i Tile, int F, int L)> PlazaTiles(GatePlacement gate)
+    {
+        for (var f = -3; f <= 1; f++)
+        {
+            for (var l = -3; l <= 3; l++)
+            {
+                yield return (PlazaTile(gate, f, l), f, l);
+            }
+        }
+    }
+
+    public static Vector2i PlazaTile(GatePlacement gate, int f, int l)
+    {
+        var d = Dir(gate.Facing);
+        return gate.Tile + d * f + new Vector2i(-d.Y, d.X) * l;
+    }
+
     /// <summary>Where each gate stands, and the road tile people arrive on.</summary>
     public Dictionary<string, GatePlacement> GatePlaces = new();
 
@@ -388,15 +409,11 @@ public sealed partial class LocationLayout
 
         bool Fits((Vector2i End, int Dir, bool Main, Segment Seg) c)
         {
-            var gate = c.End + Dir(c.Dir) * 5;
-            for (var dx = -2; dx <= 2; dx++)
+            var gate = new GatePlacement(c.End + Dir(c.Dir) * 5, c.End + Dir(c.Dir) * 2, c.Dir);
+            foreach (var (t, _, _) in PlazaTiles(gate))
             {
-                for (var dy = -2; dy <= 2; dy++)
-                {
-                    var t = new Vector2i(gate.X + dx, gate.Y + dy);
-                    if (Dist(t) < 3 || Terrain.ContainsKey(t) || _occupied.Contains(t))
-                        return false;
-                }
+                if (Dist(t) < 3 || Terrain.ContainsKey(t) || _occupied.Contains(t))
+                    return false;
             }
 
             return true;
@@ -419,15 +436,12 @@ public sealed partial class LocationLayout
             AddRoad(best.End, best.End + Dir(best.Dir) * 4, best.Seg.Width, best.Seg.Walk, false);
             _segments.RemoveAt(_segments.Count - 1); // no lots along the stub
 
-            for (var dx = -2; dx <= 2; dx++)
+            GatePlaces[id] = new GatePlacement(tile, arrival, best.Dir);
+            foreach (var (t, _, _) in PlazaTiles(GatePlaces[id]))
             {
-                for (var dy = -2; dy <= 2; dy++)
-                {
-                    _occupied.Add(new Vector2i(tile.X + dx, tile.Y + dy));
-                }
+                _occupied.Add(t);
             }
 
-            GatePlaces[id] = new GatePlacement(tile, arrival, best.Dir);
             placed.Add(best.End);
             candidates.Remove(best);
         }
