@@ -118,6 +118,7 @@ public sealed partial class LocationLayout
         if (options.SpawnZone)
             layout.PlaceSpawnZone(rng);
 
+        layout.PlaceFeatures(rng, options.Landmarks ?? new List<(string Kind, int Count)>());
         layout.DressStreets(rng, options.Style);
         layout.Scatter(rng, size, options);
         return layout;

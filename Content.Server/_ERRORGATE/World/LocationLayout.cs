@@ -49,7 +49,7 @@ public sealed partial class LocationLayout
     /// <summary>Spawn points of the clearing where players come into the world.</summary>
     public List<Vector2i> SpawnTiles = new();
 
-    public sealed record Options(string Style, string Shape, int Rocks, int TreeClumps, int TreeSingles, string Shore, IReadOnlyList<(int Count, int Clump)> Props, IReadOnlyList<(int Count, int Clump)> Decals, IReadOnlyList<string> Gates, int MobCount, bool SpawnZone, int Roadblocks = 0, IReadOnlyList<string>? BorderGates = null);
+    public sealed record Options(string Style, string Shape, int Rocks, int TreeClumps, int TreeSingles, string Shore, IReadOnlyList<(int Count, int Clump)> Props, IReadOnlyList<(int Count, int Clump)> Decals, IReadOnlyList<string> Gates, int MobCount, bool SpawnZone, int Roadblocks = 0, IReadOnlyList<string>? BorderGates = null, IReadOnlyList<(string Kind, int Count)>? Landmarks = null);
 
     /// <summary>
     ///     Rock formations and trees in the free ground: away from the structures and the roads, and not on top of each other.

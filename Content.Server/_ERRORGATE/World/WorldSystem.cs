@@ -217,7 +217,8 @@ public sealed partial class WorldSystem : EntitySystem
         var entitiesBefore = EntityManager.EntityCount;
         var useSeed = seed ?? _random.Next();
         var options = new LocationLayout.Options(proto.Style, proto.Shape, proto.Rocks, proto.TreeClumps, proto.TreeSingles, proto.Shore,
-            proto.Props.Select(e => (e.Count, e.Clump)).ToList(), proto.Decals.Select(e => (e.Count, e.Clump)).ToList(), proto.RubbleEnd ? gates.Append("~rubble").ToList() : gates, proto.Mobs.Count > 0 ? proto.MobCount : 0, proto.SpawnZone, proto.RoadblockProtos.Count > 0 ? proto.Roadblocks : 0, proto.RubbleEnd ? proto.BorderGates.Append("~rubble").ToList() : proto.BorderGates);
+            proto.Props.Select(e => (e.Count, e.Clump)).ToList(), proto.Decals.Select(e => (e.Count, e.Clump)).ToList(), proto.RubbleEnd ? gates.Append("~rubble").ToList() : gates, proto.Mobs.Count > 0 ? proto.MobCount : 0, proto.SpawnZone, proto.RoadblockProtos.Count > 0 ? proto.Roadblocks : 0, proto.RubbleEnd ? proto.BorderGates.Append("~rubble").ToList() : proto.BorderGates,
+            proto.Landmarks.Select(e => (e.Kind, e.Count)).ToList());
         var layout = LocationLayout.Generate(useSeed, proto.Size, pool, proto.Density, options);
 
         yield return true;
@@ -239,7 +240,9 @@ public sealed partial class WorldSystem : EntitySystem
         foreach (var pos in layout.ShapeTiles())
         {
             // Every tile picks its own variant, so the ground does not look like a pattern
-            var def = layout.Terrain.TryGetValue(pos, out var shore)
+            var def = layout.GroundOverrides.TryGetValue(pos, out var overrideId) && !layout.Terrain.ContainsKey(pos)
+                ? (ContentTileDefinition) _tileDefs[overrideId]
+                : layout.Terrain.TryGetValue(pos, out var shore)
                 ? (shore == LocationLayout.ShoreTile.Ice ? iceDef : sandDef)
                 : layout.MainRoadTiles.Contains(pos) ? mainRoadDef : layout.Roads.Contains(pos) ? roadDef : layout.Walks.Contains(pos) ? walkDef : groundDef;
             tiles.Add((pos, new Tile(def.TileId, 0, _tile.PickVariant(def))));
@@ -367,6 +370,32 @@ public sealed partial class WorldSystem : EntitySystem
                 Spawn(post, _map.GridTileToLocal(ground.Owner, ground.Comp, tile));
             }
         }
+
+        // The places worth walking to
+        spawned = 0;
+        var featureRng = new Random(useSeed ^ 0x7E47);
+        foreach (var item in layout.Items)
+        {
+            var kind = item.Proto switch
+            {
+                "@water" => proto.Water.Id,
+                "@tree" => proto.Trees.Count > 0 ? proto.Trees[featureRng.Next(proto.Trees.Count)].Id : "FloraTree",
+                _ => item.Proto,
+            };
+
+            var thing = Spawn(kind, _map.GridTileToLocal(ground.Owner, ground.Comp, item.Tile));
+            if (item.Quarter != 0)
+                _transform.SetLocalRotation(thing, Angle.FromDegrees(90 * item.Quarter));
+
+            // Loot spawners take the tier of the location
+            if (TryComp<LootSpawnerComponent>(thing, out var lootSpawner))
+                lootSpawner.Rarity = proto.Tier;
+
+            if (++spawned % 64 == 0)
+                yield return true;
+        }
+
+        yield return true;
 
         // Roadblocks across the wide avenues
         var blockRng = new Random(useSeed ^ 0x40AD);

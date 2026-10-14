@@ -20,6 +20,21 @@
   road: FloorPlanetDirt
   mainRoad: FloorGrayConcrete
   rubbleEnd: true
+  landmarks:
+  - kind: orchard
+    count: 3
+  - kind: farm
+    count: 5
+  - kind: ruin
+    count: 7
+  - kind: camp
+    count: 8
+  - kind: pond
+    count: 5
+  - kind: windbreak
+    count: 4
+  - kind: well
+    count: 5
   borderGates: [ east ]
   density: 1
   rocks: 12

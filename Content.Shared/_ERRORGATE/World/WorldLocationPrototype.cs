@@ -169,6 +169,10 @@ public sealed partial class WorldLocationPrototype : IPrototype
     [DataField]
     public List<string> BorderGates = new();
 
+    /// <summary>The places that make the empty ground worth crossing: farm, camp, ruin, orchard, windbreak, pond, well.</summary>
+    [DataField]
+    public List<WorldLandmarkEntry> Landmarks = new();
+
     /// <summary>How many world faults (see docs/design/anomalies.md) are scattered over the location, along the routes between the loot.</summary>
     [DataField]
     public int Faults;
@@ -183,6 +187,17 @@ public sealed partial class WorldLocationPrototype : IPrototype
     /// <summary>The loot caps of this location: every location counts what its spawners have put out for itself, and gives it back when wiped.</summary>
     [DataField]
     public ProtoId<GlobalLootTablePrototype>? LootTable;
+}
+
+/// <summary>A kind of place the layout puts into the empty ground and how many of it (see LocationLayout.Features.cs).</summary>
+[DataDefinition]
+public sealed partial class WorldLandmarkEntry
+{
+    [DataField(required: true)]
+    public string Kind = string.Empty;
+
+    [DataField]
+    public int Count = 1;
 }
 
 /// <summary>A kind of entity scattered on the ground: one of the prototypes, <see cref="Count"/> places, in clumps of radius <see cref="Clump"/> (0 is single ones).</summary>
