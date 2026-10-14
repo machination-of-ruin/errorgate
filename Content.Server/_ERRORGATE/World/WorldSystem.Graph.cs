@@ -568,6 +568,14 @@ public sealed partial class WorldSystem
             tiles.Add((t, new Tile(floorDef.TileId, 0, _tile.PickVariant(floorDef))));
         }
 
+        // The plaza at the end of the way to the laboratory has a floor of its own
+        var plazaFloor = (ContentTileDefinition) _tileDefs["FloorSteelPavement"];
+        for (var i = 0; i < tiles.Count; i++)
+        {
+            if (layout.Antechamber.Contains(tiles[i].Item1))
+                tiles[i] = (tiles[i].Item1, new Tile(plazaFloor.TileId, 0, _tile.PickVariant(plazaFloor)));
+        }
+
         _map.SetTiles(ground.Owner, ground.Comp, tiles);
         _physics.SetBodyType(ground.Owner, BodyType.Static);
         CentreOnOrigin(ground);
