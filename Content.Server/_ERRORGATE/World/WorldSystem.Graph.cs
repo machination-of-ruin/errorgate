@@ -576,7 +576,7 @@ public sealed partial class WorldSystem
         var mapUid = _map.CreateMap(out mapId, runMapInit: true);
         _map.SetAmbientLight(mapId, proto.AmbientLight);
         if (proto.LootTable is { } lootTable)
-            EnsureComp<LootManagerComponent>(mapUid).GlobalLootTablePrototype = lootTable;
+            AddComp(mapUid, new LootManagerComponent { GlobalLootTablePrototype = lootTable }); // the table is read when the component starts, so it is set first
 
         // The day and the night follow the same clock in every location on the surface (no random start, the clock is the server's),
         // and the snow, if the location has it, never stops. Underground there is neither
