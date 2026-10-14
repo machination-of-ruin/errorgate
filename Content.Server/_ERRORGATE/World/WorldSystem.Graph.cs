@@ -206,7 +206,22 @@ public sealed partial class WorldSystem
     /// <summary>Whether people can come into a location now: it is built and no storm is about to wipe it.</summary>
     public bool CanEnter(string location)
     {
-        return IsBuilt(location) && (!_storm.TryGetValue(location, out var state) || state.State == LocationState.Open);
+        return IsBuilt(location) && !_building.Contains(location) && !AirPending(location) && (!_storm.TryGetValue(location, out var state) || state.State == LocationState.Open);
+    }
+
+    /// <summary>Whether a grid of the location still waits for its air (people would arrive in a vacuum).</summary>
+    private bool AirPending(string location)
+    {
+        if (!_locations.TryGetValue(location, out var loc))
+            return false;
+
+        foreach (var pending in _pendingAir)
+        {
+            if (!TerminatingOrDeleted(pending.Grid) && Transform(pending.Grid).MapID == loc.MapId)
+                return true;
+        }
+
+        return false;
     }
 
     private void OnGateActivate(Entity<WorldTransitionComponent> ent, ref ActivateInWorldEvent args)
@@ -277,7 +292,6 @@ public sealed partial class WorldSystem
 
         var mapUid = CreateLocationMap(proto, out var mapId);
         var ground = _mapManager.CreateGridEntity(mapId);
-        EnsureComp<GridAtmosphereComponent>(ground.Owner);
         var floorDef = (ContentTileDefinition) _tileDefs[proto.Ground];
         var tiles = new List<(Vector2i, Tile)>();
         foreach (var t in layout.Floor.Concat(layout.Walls))
@@ -322,7 +336,8 @@ public sealed partial class WorldSystem
             PlaceGate(proto.ID, gateId, ground, place.Tile, place.Arrival, place.Facing);
         }
 
-        _pendingAir.Add(new PendingAir(ground.Owner, layout.Floor.ToList(), _timing.CurTime + TimeSpan.FromSeconds(120)));
+        // The air is the map's (a grid that grows gets an atmosphere of its own by itself, which starts empty: take it off)
+        RemComp<GridAtmosphereComponent>(ground.Owner);
 
         watch.Stop();
         _locations[proto.ID] = new Location

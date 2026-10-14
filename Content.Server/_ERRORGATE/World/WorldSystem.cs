@@ -212,7 +212,7 @@ public sealed partial class WorldSystem : EntitySystem
 
         // The ground: terrain, roads and the border
         var ground = _mapManager.CreateGridEntity(mapId);
-        EnsureComp<GridAtmosphereComponent>(ground.Owner); // the map air only reaches a grid that has an atmosphere
+        // No air of its own: outdoors the air is the map's (like on a planet), at once and everywhere, nothing to leak or to wait for
         var groundDef = (ContentTileDefinition) _tileDefs[proto.Ground];
         var roadDef = (ContentTileDefinition) _tileDefs[proto.Road];
         var sandDef = (ContentTileDefinition) _tileDefs[proto.Sand];
@@ -258,6 +258,7 @@ public sealed partial class WorldSystem : EntitySystem
             // The grid itself stays upright, so a camera aligned with the grid matches the ground. A turned structure has its content
             // turned: tiles, positions and the way entities face. The layout says where the grid origin goes.
             RotateContent(grid.Value, p.Turns);
+            RemComp<GridAtmosphereComponent>(grid.Value.Owner); // the air is the map's, a file may have saved one
             RetierLoot(grid.Value, proto.Tier);
             var origin = p.Origin;
             _transform.SetWorldPositionRotation(grid.Value.Owner, origin, Angle.Zero);
@@ -266,18 +267,14 @@ public sealed partial class WorldSystem : EntitySystem
             _physics.SetBodyType(grid.Value.Owner, BodyType.Static);
 
             // The ground under the building is cut away, so the two grids never overlap
-            var structureTiles = new List<Vector2i>();
             var holes = new List<(Vector2i, Tile)>();
             foreach (var t in _map.GetAllTiles(grid.Value.Owner, grid.Value.Comp))
             {
-                structureTiles.Add(t.GridIndices);
                 var worldCentre = new Vector2(t.GridIndices.X + 0.5f, t.GridIndices.Y + 0.5f) + origin;
                 holes.Add((new Vector2i((int) MathF.Floor(worldCentre.X), (int) MathF.Floor(worldCentre.Y)), Tile.Empty));
             }
 
             _map.SetTiles(ground.Owner, ground.Comp, holes);
-            EnsureComp<GridAtmosphereComponent>(grid.Value.Owner);
-            _pendingAir.Add(new PendingAir(grid.Value.Owner, structureTiles, _timing.CurTime + TimeSpan.FromSeconds(120)));
             placed++;
             built.Add((grid.Value.Owner, p));
             yield return true;
@@ -391,8 +388,12 @@ public sealed partial class WorldSystem : EntitySystem
             PlaceGate(id, gateId, ground, place.Tile, place.Arrival, place.Facing);
         }
 
-        var groundTiles = _map.GetAllTiles(ground.Owner, ground.Comp).Select(t => t.GridIndices).ToList();
-        _pendingAir.Add(new PendingAir(ground.Owner, groundTiles, _timing.CurTime + TimeSpan.FromSeconds(120)));
+        // The air is the map's. Grids that grow get an atmosphere of their own, empty at first and slow to fill: take it off
+        RemComp<GridAtmosphereComponent>(ground.Owner);
+        foreach (var (structure, _) in built)
+        {
+            RemComp<GridAtmosphereComponent>(structure);
+        }
 
         watch.Stop();
         _locations[id] = new Location
