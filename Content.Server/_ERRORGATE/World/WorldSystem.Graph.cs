@@ -289,6 +289,54 @@ public sealed partial class WorldSystem
         return plaza.Owner;
     }
 
+    /// <summary>
+    ///     The far end of the village's main street: a collapsed tunnel mouth in the border. A plaza of its own with a cave floor, rock walls
+    ///     along both sides and rubble across the end. Nothing leads anywhere: it only closes the road.
+    /// </summary>
+    private EntityUid PlaceRubblePlaza(string location, Entity<MapGridComponent> ground, MapId mapId, GatePlacement place)
+    {
+        var plaza = _mapManager.CreateGridEntity(mapId);
+        _meta.SetEntityName(plaza.Owner, $"{location} collapsed tunnel plaza");
+        _transform.SetWorldPosition(plaza.Owner, _transform.GetWorldPosition(ground.Owner));
+        var cave = (ContentTileDefinition) _tileDefs["FloorCave"];
+        var tiles = new List<(Vector2i, Tile)>();
+        var holes = new List<(Vector2i, Tile)>();
+        foreach (var (tile, _, _) in LocationLayout.PlazaTiles(place))
+        {
+            tiles.Add((tile, new Tile(cave.TileId, 0, _tile.PickVariant(cave))));
+            holes.Add((tile, Tile.Empty));
+        }
+
+        _map.SetTiles(plaza.Owner, plaza.Comp, tiles);
+        _map.SetTiles(ground.Owner, ground.Comp, holes);
+        _physics.SetBodyType(plaza.Owner, BodyType.Static);
+
+        EntityCoordinates At(int f, int l) => _map.GridTileToLocal(plaza.Owner, plaza.Comp, LocationLayout.PlazaTile(place, f, l));
+
+        // Rock walls on both sides, and the rubble that blocks the end
+        foreach (var side in new[] { -3, 3 })
+        {
+            for (var f = -3; f <= 1; f++)
+            {
+                Spawn("WorldBorderWall", At(f, side));
+            }
+        }
+
+        var rng = new Random(place.Tile.X * 7919 + place.Tile.Y);
+        for (var l = -2; l <= 2; l++)
+        {
+            Spawn("N14WallRockBasalt", At(0, l));
+            Spawn("N14WallRockBasalt", At(1, l));
+            if (rng.Next(3) != 0)
+                Spawn("N14WallRockBasalt", At(-1, l));
+        }
+
+        if (rng.Next(2) == 0)
+            Spawn("N14WallRockBasalt", At(-2, rng.Next(-2, 3)));
+
+        return plaza.Owner;
+    }
+
     /// <summary>A gate in a tunnel: hazard marks in front of it and a lamp on each side.</summary>
     private void DecorateTunnelGate(string location, string gateId, Entity<MapGridComponent> ground, GatePlacement place)
     {

@@ -64,6 +64,14 @@ public sealed partial class WorldLocationPrototype : IPrototype
     [DataField]
     public string Road = "FloorAsphalt";
 
+    /// <summary>The surface of the main street, if it differs from the other roads.</summary>
+    [DataField]
+    public string MainRoad = string.Empty;
+
+    /// <summary>The far end of the main street is a collapsed tunnel mouth (a plaza of rubble in the border) and not a gate.</summary>
+    [DataField]
+    public bool RubbleEnd;
+
     /// <summary>The wall of the border.</summary>
     [DataField]
     public EntProtoId Border = "WorldBorderWall";

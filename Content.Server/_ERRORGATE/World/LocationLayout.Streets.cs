@@ -142,7 +142,11 @@ public sealed partial class LocationLayout
             {
                 var tile = horizontal ? new Vector2i(t, c + o) : new Vector2i(c + o, t);
                 if (Placeable(tile))
+                {
                     Roads.Add(tile);
+                    if (main)
+                        MainRoadTiles.Add(tile);
+                }
             }
 
             if (!walk)
@@ -203,6 +207,9 @@ public sealed partial class LocationLayout
         _segments.RemoveRange(count, _segments.Count - count);
     }
 
+    /// <summary>The tiles of the main street (and the way out to its gate): a different, harder surface.</summary>
+    public HashSet<Vector2i> MainRoadTiles = new();
+
     private readonly HashSet<Vector2i> _nearShore = new();
 
     /// <summary>The tiles within eight of the shore, which streets keep away from.</summary>
@@ -256,18 +263,43 @@ public sealed partial class LocationLayout
     /// <summary>A main street across the village, with lanes branching off it on one side or both.</summary>
     private void BuildVillageStreets(Random rng, Vector2i size)
     {
-        var horizontal = rng.Next(2) == 0;
-        var cross = horizontal ? Bounds.Y : Bounds.X;
-
-        // The line near the middle with the longest free stretch
-        var best = (Across: cross / 2, Run: (Lo: 0, Hi: -1));
-        var window = cross / 5;
-        for (var c = cross / 2 - window; c <= cross / 2 + window; c++)
+        // The main street runs across the whole village, from the edge of the map to the edge: it is the line near the middle with the
+        // longest free stretch, preferring one whose both ends reach the edge (not the shore), in either direction
+        bool EdgeReached(bool h, int across, int end, int sign)
         {
-            foreach (var run in Runs(horizontal, c, 30))
+            for (var k = 1; k <= 40; k++)
             {
-                if (run.Hi - run.Lo > best.Run.Hi - best.Run.Lo)
-                    best = (c, run);
+                var tile = At(h, end + sign * k, across);
+                if (Terrain.ContainsKey(tile) || _nearShore.Contains(tile))
+                    return false;
+
+                if (Dist(tile) <= 3)
+                    return true;
+            }
+
+            return false;
+        }
+
+        var firstHorizontal = rng.Next(2) == 0;
+        var horizontal = firstHorizontal;
+        var best = (Across: 0, Run: (Lo: 0, Hi: -1));
+        var bestScore = int.MinValue;
+        foreach (var h in new[] { firstHorizontal, !firstHorizontal })
+        {
+            var crossLength = h ? Bounds.Y : Bounds.X;
+            var window = crossLength / 5;
+            for (var c = crossLength / 2 - window; c <= crossLength / 2 + window; c++)
+            {
+                foreach (var run in Runs(h, c, 30))
+                {
+                    var score = run.Hi - run.Lo + (EdgeReached(h, c, run.Lo, -1) && EdgeReached(h, c, run.Hi, 1) ? 1000 : 0);
+                    if (score > bestScore)
+                    {
+                        bestScore = score;
+                        best = (c, run);
+                        horizontal = h;
+                    }
+                }
             }
         }
 
@@ -485,7 +517,7 @@ public sealed partial class LocationLayout
         // (the border rocks are left out there) is the opening in the wall. Null if the street end has no such place in front of it
         GatePlacement? BorderPlace((Vector2i End, int Dir, bool Main, Segment Seg) c)
         {
-            for (var k = 5; k < 60; k++)
+            for (var k = 5; k < 100; k++)
             {
                 var tile = c.End + Dir(c.Dir) * k;
                 if (Dist(tile) > 3)
@@ -514,7 +546,23 @@ public sealed partial class LocationLayout
         {
             if (borderIds.Contains(id))
             {
-                var borderOptions = candidates
+                // The ends of the streets, and spurs that branch off the streets sideways every few tiles
+                var borderCandidates = new List<(Vector2i End, int Dir, bool Main, Segment Seg)>(candidates);
+                foreach (var seg in _segments)
+                {
+                    var lo = seg.Horizontal ? seg.A.X : seg.A.Y;
+                    var hi = seg.Horizontal ? seg.B.X : seg.B.Y;
+                    for (var s = lo + 6; s <= hi - 6; s += 4)
+                    {
+                        var at = seg.Horizontal ? new Vector2i(s, seg.A.Y) : new Vector2i(seg.A.X, s);
+                        foreach (var d in seg.Horizontal ? new[] { 0, 2 } : new[] { 1, 3 })
+                        {
+                            borderCandidates.Add((at, d, seg.Main, seg));
+                        }
+                    }
+                }
+
+                var borderOptions = borderCandidates
                     .Select(c => (Candidate: c, Place: BorderPlace(c)))
                     .Where(c => c.Place != null)
                     .ToList();
@@ -524,7 +572,7 @@ public sealed partial class LocationLayout
                         .OrderByDescending(c => (c.Candidate.Main ? 1000 : 0) + (placed.Count == 0 ? rng.Next(0, 100) : placed.Min(p => (p - c.Candidate.End).Length)))
                         .First();
                     var place = pick.Place!;
-                    AddRoad(pick.Candidate.End, place.Tile - Dir(place.Facing) * 4, pick.Candidate.Seg.Width, pick.Candidate.Seg.Walk, false);
+                    AddRoad(pick.Candidate.End, place.Tile - Dir(place.Facing) * 4, pick.Candidate.Seg.Width, pick.Candidate.Seg.Walk, pick.Candidate.Seg.Main);
                     _segments.RemoveAt(_segments.Count - 1);
                     GatePlaces[id] = place;
                     foreach (var (t, _, _) in PlazaTiles(place))
@@ -549,7 +597,7 @@ public sealed partial class LocationLayout
 
             var tile = best.End + Dir(best.Dir) * 5;
             var arrival = best.End + Dir(best.Dir) * 2;
-            AddRoad(best.End, best.End + Dir(best.Dir) * 4, best.Seg.Width, best.Seg.Walk, false);
+            AddRoad(best.End, best.End + Dir(best.Dir) * 4, best.Seg.Width, best.Seg.Walk, best.Seg.Main);
             _segments.RemoveAt(_segments.Count - 1); // no lots along the stub
 
             GatePlaces[id] = new GatePlacement(tile, arrival, best.Dir);

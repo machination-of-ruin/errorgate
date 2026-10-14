@@ -18,6 +18,9 @@
   size: "160,160"
   ground: FloorPlanetGrass
   road: FloorPlanetDirt
+  mainRoad: FloorGrayConcrete
+  rubbleEnd: true
+  borderGates: [ east ]
   density: 1
   rocks: 12
   treeClumps: 14
@@ -86,7 +89,7 @@
     clump: 3
   ambientLight: "#6A6E78"
   lootTable: LootTableGlobal
-  borderGates: [ base ]
+  borderGates: [ west, base, east ]
   faults: 22
 
 # The border of a location: rock that cannot be dug out.

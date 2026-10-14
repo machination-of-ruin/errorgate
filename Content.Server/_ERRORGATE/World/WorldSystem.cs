@@ -217,7 +217,7 @@ public sealed partial class WorldSystem : EntitySystem
         var entitiesBefore = EntityManager.EntityCount;
         var useSeed = seed ?? _random.Next();
         var options = new LocationLayout.Options(proto.Style, proto.Shape, proto.Rocks, proto.TreeClumps, proto.TreeSingles, proto.Shore,
-            proto.Props.Select(e => (e.Count, e.Clump)).ToList(), proto.Decals.Select(e => (e.Count, e.Clump)).ToList(), gates, proto.Mobs.Count > 0 ? proto.MobCount : 0, proto.SpawnZone, proto.RoadblockProtos.Count > 0 ? proto.Roadblocks : 0, proto.BorderGates);
+            proto.Props.Select(e => (e.Count, e.Clump)).ToList(), proto.Decals.Select(e => (e.Count, e.Clump)).ToList(), proto.RubbleEnd ? gates.Append("~rubble").ToList() : gates, proto.Mobs.Count > 0 ? proto.MobCount : 0, proto.SpawnZone, proto.RoadblockProtos.Count > 0 ? proto.Roadblocks : 0, proto.RubbleEnd ? proto.BorderGates.Append("~rubble").ToList() : proto.BorderGates);
         var layout = LocationLayout.Generate(useSeed, proto.Size, pool, proto.Density, options);
 
         yield return true;
@@ -234,13 +234,14 @@ public sealed partial class WorldSystem : EntitySystem
         var sandDef = (ContentTileDefinition) _tileDefs[proto.Sand];
         var iceDef = (ContentTileDefinition) _tileDefs[proto.IceTile];
         var walkDef = (ContentTileDefinition) _tileDefs[proto.Walkway];
+        var mainRoadDef = proto.MainRoad == string.Empty ? roadDef : (ContentTileDefinition) _tileDefs[proto.MainRoad];
         var tiles = new List<(Vector2i, Tile)>(proto.Size.X * proto.Size.Y);
         foreach (var pos in layout.ShapeTiles())
         {
             // Every tile picks its own variant, so the ground does not look like a pattern
             var def = layout.Terrain.TryGetValue(pos, out var shore)
                 ? (shore == LocationLayout.ShoreTile.Ice ? iceDef : sandDef)
-                : layout.Roads.Contains(pos) ? roadDef : layout.Walks.Contains(pos) ? walkDef : groundDef;
+                : layout.MainRoadTiles.Contains(pos) ? mainRoadDef : layout.Roads.Contains(pos) ? roadDef : layout.Walks.Contains(pos) ? walkDef : groundDef;
             tiles.Add((pos, new Tile(def.TileId, 0, _tile.PickVariant(def))));
         }
 
@@ -417,7 +418,7 @@ public sealed partial class WorldSystem : EntitySystem
         var plazas = new List<EntityUid>();
         foreach (var (gateId, place) in layout.GatePlaces)
         {
-            plazas.Add(PlaceGatePlaza(id, gateId, ground, mapId, place));
+            plazas.Add(gateId.StartsWith('~') ? PlaceRubblePlaza(id, ground, mapId, place) : PlaceGatePlaza(id, gateId, ground, mapId, place));
         }
 
         // The faults go in last, when the ground, the buildings and the loot are all there: the field places them on the next update
