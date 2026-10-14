@@ -1,4 +1,5 @@
 using Content.Server.GameTicking;
+using Content.Server.Chat.Managers;
 using Content.Server.GameTicking.Events;
 using Content.Server.Maps;
 using Content.Server.Station.Components;
@@ -20,12 +21,44 @@ public sealed class WorldRoundSystem : EntitySystem
     [Dependency] private readonly IGameMapManager _gameMaps = default!;
     [Dependency] private readonly StationSystem _station = default!;
     [Dependency] private readonly WorldSystem _world = default!;
+    [Dependency] private readonly IChatManager _chat = default!;
+
+    private bool _active;
+    private EntityUid? _stationUid;
 
     public override void Initialize()
     {
         base.Initialize();
         SubscribeLocalEvent<RoundStartingEvent>(OnRoundStarting);
-        SubscribeLocalEvent<RoundRestartCleanupEvent>(_ => _world.Forget());
+        SubscribeLocalEvent<RoundRestartCleanupEvent>(_ =>
+        {
+            _active = false;
+            _stationUid = null;
+            _world.Forget();
+        });
+        SubscribeLocalEvent<WorldSystem.WorldLocationBuilt>(OnLocationBuilt);
+        SubscribeLocalEvent<IsJobAllowedEvent>(OnJobAllowed);
+    }
+
+    /// <summary>
+    ///     The location with the spawn spots is built again after a storm: its new ground joins the station, so people spawn there.
+    /// </summary>
+    private void OnLocationBuilt(WorldSystem.WorldLocationBuilt ev)
+    {
+        if (!_active || _stationUid is not { } station || !_world.Locations.TryGetValue(ev.Id, out var loc) || loc.Layout is not { SpawnTiles.Count: > 0 })
+            return;
+
+        _station.AddGridToStation(station, loc.Ground);
+    }
+
+    /// <summary>Nobody is spawned while the spawn location is being built again or has a storm coming: they are told to wait.</summary>
+    private void OnJobAllowed(ref IsJobAllowedEvent ev)
+    {
+        if (!_active || _world.SpawnReady())
+            return;
+
+        ev.Cancelled = true;
+        _chat.DispatchServerMessage(ev.Player, Loc.GetString("world-spawn-wait"));
     }
 
     private void OnRoundStarting(RoundStartingEvent ev)
@@ -48,6 +81,8 @@ public sealed class WorldRoundSystem : EntitySystem
         }
 
         _station.AddGridToStation(station, grid);
+        _stationUid = station;
+        _active = true;
         Log.Info("The world is built and the ground of its spawn zone belongs to the station.");
     }
 }

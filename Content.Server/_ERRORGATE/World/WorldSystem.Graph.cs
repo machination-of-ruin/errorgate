@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Linq;
+using System.Numerics;
 using Content.Server.Atmos.Components;
 using Content.Server._ERRORGATE.LootManager;
 using Content.Shared._ERRORGATE.World;
@@ -64,6 +65,30 @@ public sealed partial class WorldSystem
         }
 
         return null;
+    }
+
+    /// <summary>A location of the world was built (again).</summary>
+    public sealed record WorldLocationBuilt(string Id);
+
+    /// <summary>
+    ///     Whether people can come into the world now: the location with the spawn spots is built, is not being built again and has no storm
+    ///     coming. Nobody is put into the world while it is not (they would land on no ground at all).
+    /// </summary>
+    public bool SpawnReady()
+    {
+        if (ActiveGraph() is not { } graph)
+            return false;
+
+        foreach (var proto in _proto.EnumeratePrototypes<WorldLocationPrototype>())
+        {
+            if (!proto.SpawnZone || !graph.Locations.Contains(proto.ID))
+                continue;
+
+            if (!IsBuilt(proto.ID) || _building.Contains(proto.ID) || StormOf(proto.ID).State != LocationState.Open)
+                return false;
+        }
+
+        return true;
     }
 
     /// <summary>Forgets everything built (the round ended and its maps are gone).</summary>
@@ -195,6 +220,12 @@ public sealed partial class WorldSystem
             _transform.SetLocalRotation(barricade, Angle.FromDegrees(90));
     }
 
+    /// <summary>Decals are placed by their bottom left corner, so a decal on a tile goes half a tile down and left of the tile's middle.</summary>
+    private void AddDecal(string id, EntityCoordinates tileCentre)
+    {
+        _decals.TryAddDecal(id, tileCentre.Offset(new Vector2(-0.5f, -0.5f)), out _);
+    }
+
     private static readonly string[] PlazaBarricades =
     {
         "N14BarricadeMetal", "N14BarricadeSandbagSingle", "N14BarricadeRazorwire", "N14BarricadeTanktrap",
@@ -230,11 +261,11 @@ public sealed partial class WorldSystem
         // Hazard marks around the gate, lamps beside it, barricades along both flanks (the middle five tiles stay open)
         foreach (var l in new[] { -1, 0, 1 })
         {
-            _decals.TryAddDecal("WarnFull", At(-1, l), out _);
+            AddDecal("WarnFull", At(-1, l));
         }
 
-        _decals.TryAddDecal("WarnFull", At(0, -1), out _);
-        _decals.TryAddDecal("WarnFull", At(0, 1), out _);
+        AddDecal("WarnFull", At(0, -1));
+        AddDecal("WarnFull", At(0, 1));
 
         Spawn("LightPostSmall", At(0, -2));
         Spawn("LightPostSmall", At(0, 2));
@@ -253,7 +284,8 @@ public sealed partial class WorldSystem
             TurnBarricade(Spawn("N14BarricadeSandbagSingle", At(0, side)), "N14BarricadeSandbagSingle", vertical);
         }
 
-        PlaceGate(location, gateId, plaza, place.Tile, place.Arrival, place.Facing);
+        // People arrive on the tile in front of the gate
+        PlaceGate(location, gateId, plaza, place.Tile, LocationLayout.PlazaTile(place, -1, 0), place.Facing);
         return plaza.Owner;
     }
 
@@ -262,12 +294,12 @@ public sealed partial class WorldSystem
     {
         foreach (var l in new[] { -1, 0, 1 })
         {
-            _decals.TryAddDecal("WarnFull", _map.GridTileToLocal(ground.Owner, ground.Comp, LocationLayout.PlazaTile(place, -1, l)), out _);
+            AddDecal("WarnFull", _map.GridTileToLocal(ground.Owner, ground.Comp, LocationLayout.PlazaTile(place, -1, l)));
         }
 
         Spawn("LightPostSmall", _map.GridTileToLocal(ground.Owner, ground.Comp, LocationLayout.PlazaTile(place, 0, -1)));
         Spawn("LightPostSmall", _map.GridTileToLocal(ground.Owner, ground.Comp, LocationLayout.PlazaTile(place, 0, 1)));
-        PlaceGate(location, gateId, ground, place.Tile, place.Arrival, place.Facing);
+        PlaceGate(location, gateId, ground, place.Tile, LocationLayout.PlazaTile(place, -1, 0), place.Facing);
     }
 
     private void PlaceGate(string location, string gate, Entity<MapGridComponent> ground, Vector2i tile, Vector2i arrival, int facing)
@@ -525,7 +557,7 @@ public sealed partial class WorldSystem
                     continue;
 
                 var hatchCoords = _map.GridTileToLocal(ground, grid, place.Tile);
-                var outside = _map.GridTileToLocal(ground, grid, place.Arrival);
+                var outside = _map.GridTileToLocal(ground, grid, LocationLayout.PlazaTile(place, -1, 0));
                 tunnel.Hatch = _bunker.PlaceHatch(hatchCoords, outside, vestibule, arrival);
                 _meta.SetEntityName(tunnel.Hatch.Value, $"bunker hatch to {lab.Proto.Name}");
                 if (TryComp<Bunker.BunkerVestibuleComponent>(vestibule, out var vestibuleComp) && vestibuleComp.Ladder is { } ladder)

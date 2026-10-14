@@ -149,7 +149,8 @@
   mobs: [ MobSpawnerRunner, MobSpawnerWalkerLiving ]
   mobCount: 4
   ambientLight: "#141414"
-  resetWith: SnowCity
+  resetMinMinutes: 360
+  resetMaxMinutes: 720
 
 # The Military base: a hand-built map that never resets and is raidable (walls and doors can be broken). Build it, put WorldGate entities with
 # the gate name `gate` in it, and save it with savegrid as /Maps/_ERRORGATE/Locations/MilitaryBase.yml. Until then a walled compound of
@@ -204,7 +205,8 @@
   mobs: [ MobSpawnerRunner, MobSpawnerWalkerArmored ]
   mobCount: 5
   ambientLight: "#101010"
-  resetWith: Laboratory
+  resetMinMinutes: 360
+  resetMaxMinutes: 720
 
 # The web: which locations exist and which gates lead to which.
 - type: worldGraph

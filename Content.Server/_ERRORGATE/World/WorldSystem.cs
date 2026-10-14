@@ -392,7 +392,7 @@ public sealed partial class WorldSystem : EntitySystem
             foreach (var pos in layout.DecalTiles[i])
             {
                 var coords = _map.GridTileToLocal(ground.Owner, ground.Comp, pos);
-                _decals.TryAddDecal(proto.Decals[i].Decals[propRng.Next(proto.Decals[i].Decals.Count)], coords, out _);
+                _decals.TryAddDecal(proto.Decals[i].Decals[propRng.Next(proto.Decals[i].Decals.Count)], coords.Offset(new Vector2(-0.5f, -0.5f)), out _);
             }
         }
 
@@ -451,6 +451,7 @@ public sealed partial class WorldSystem : EntitySystem
             Entities = EntityManager.EntityCount - entitiesBefore,
         };
 
+        RaiseLocalEvent(new WorldLocationBuilt(id));
         Log.Info($"World: built {id} (seed {useSeed}): {placed} structures, {_locations[id].Entities} entities, {watch.Elapsed.TotalMilliseconds:0} ms");
         context.Ok = true;
     }

@@ -488,16 +488,18 @@ public sealed partial class LocationLayout
             for (var k = 5; k < 60; k++)
             {
                 var tile = c.End + Dir(c.Dir) * k;
-                if (Dist(tile) > 2)
+                if (Dist(tile) > 3)
                     continue;
 
-                if (Dist(tile) != 2)
+                // The gate is on the third tile from the edge: the inner row of the border is cut away for its plaza, the outer row stays
+                // whole behind it, so there is rock and no void behind the gate
+                if (Dist(tile) != 3)
                     return null;
 
                 var gate = new GatePlacement(tile, tile - Dir(c.Dir) * 3, c.Dir);
                 foreach (var (t, _, _) in PlazaTiles(gate))
                 {
-                    if (!InShape(t) || Terrain.ContainsKey(t) || _nearShore.Contains(t) || _occupied.Contains(t))
+                    if (!InShape(t) || Dist(t) < 2 || Terrain.ContainsKey(t) || _nearShore.Contains(t) || _occupied.Contains(t))
                         return null;
                 }
 
