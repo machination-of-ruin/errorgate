@@ -58,6 +58,8 @@ public sealed partial class WorldSystem : EntitySystem
     [Dependency] private readonly SharedWeatherSystem _weather = default!;
     [Dependency] private readonly IGameTiming _timing = default!;
     [Dependency] private readonly MetaDataSystem _meta = default!;
+    [Dependency] private readonly LootManagerSystem _lootManager = default!;
+    [Dependency] private readonly EntityLookupSystem _lookup = default!;
     [Dependency] private readonly Content.Server.Chat.Systems.ChatSystem _chat = default!;
 
     /// <summary>A built location and what it cost.</summary>
@@ -183,6 +185,7 @@ public sealed partial class WorldSystem : EntitySystem
         }
 
         TeardownBuilt(id);
+        EnsureLootManager();
 
         var gates = GatesOf(id);
         if (proto.MapPath is { } mapPath && _res.ContentFileExists(new ResPath(mapPath)))
@@ -275,6 +278,8 @@ public sealed partial class WorldSystem : EntitySystem
         }
 
         // The structures, each on a grid of its own
+        var lootTiers = TiersOf(proto);
+        var lootRng = new Random(useSeed ^ 0x1007);
         var placed = 0;
         var built = new List<(EntityUid, StructurePlacement)>();
         foreach (var p in layout.Structures)
@@ -290,7 +295,7 @@ public sealed partial class WorldSystem : EntitySystem
             _meta.SetEntityName(grid.Value.Owner, $"{id} {p.Info.Path.Split('/')[^1].Replace(".yml", string.Empty)}");
             RotateContent(grid.Value, p.Turns);
             RemComp<GridAtmosphereComponent>(grid.Value.Owner); // the air is the map's, a file may have saved one
-            RetierLoot(grid.Value, proto.Tier);
+            RetierLoot(grid.Value, lootTiers, lootRng);
             var origin = p.Origin;
             _transform.SetWorldPositionRotation(grid.Value.Owner, origin + offset, Angle.Zero);
 
@@ -389,7 +394,7 @@ public sealed partial class WorldSystem : EntitySystem
 
             // Loot spawners take the tier of the location
             if (TryComp<LootSpawnerComponent>(thing, out var lootSpawner))
-                lootSpawner.Rarity = proto.Tier;
+                lootSpawner.Rarity = lootTiers[featureRng.Next(lootTiers.Count)];
 
             if (++spawned % 64 == 0)
                 yield return true;
@@ -447,7 +452,12 @@ public sealed partial class WorldSystem : EntitySystem
         var plazas = new List<EntityUid>();
         foreach (var (gateId, place) in layout.GatePlaces)
         {
-            plazas.Add(gateId.StartsWith('~') ? PlaceRubblePlaza(id, ground, mapId, place) : PlaceGatePlaza(id, gateId, ground, mapId, place));
+            plazas.Add(gateId.StartsWith('~') ? PlaceRubblePlaza(id, ground, mapId, place) : PlaceGatePlaza(id, gateId, ground, mapId, place, layout));
+        }
+
+        foreach (var wanted in proto.Guaranteed)
+        {
+            PlaceGuaranteed(wanted, mapId, useSeed);
         }
 
         // The faults go in last, when the ground, the buildings and the loot are all there: the field places them on the next update
@@ -524,18 +534,21 @@ public sealed partial class WorldSystem : EntitySystem
     }
 
     /// <summary>The loot spawners of a structure are tier 1 in the file; here they take the tier of the location.</summary>
-    private void RetierLoot(Entity<MapGridComponent> grid, int tier)
+    private void RetierLoot(Entity<MapGridComponent> grid, IReadOnlyList<int> tiers, Random rng)
     {
-        if (tier <= 1)
+        if (tiers.Count == 1 && tiers[0] <= 1)
             return;
 
         var enumerator = Transform(grid.Owner).ChildEnumerator;
         while (enumerator.MoveNext(out var child))
         {
             if (TryComp<LootSpawnerComponent>(child, out var spawner))
-                spawner.Rarity = tier;
+                spawner.Rarity = tiers[rng.Next(tiers.Count)];
         }
     }
+
+    /// <summary>The tiers of a location's loot spawners: its own list, or its tier.</summary>
+    private static List<int> TiersOf(WorldLocationPrototype proto) => proto.LootTiers.Count > 0 ? proto.LootTiers : new List<int> { proto.Tier };
 
     /// <summary>
     ///     Turns what is on a grid by quarter turns around its origin, leaving the grid as it is: the tiles move, and every entity

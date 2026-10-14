@@ -1,4 +1,3 @@
-using Content.Shared._ERRORGATE.LootManager;
 using Content.Shared.Weather;
 using Robust.Shared.Prototypes;
 
@@ -184,9 +183,16 @@ public sealed partial class WorldLocationPrototype : IPrototype
     [DataField]
     public List<EntProtoId> RoadblockProtos = new();
 
-    /// <summary>The loot caps of this location: every location counts what its spawners have put out for itself, and gives it back when wiped.</summary>
+    /// <summary>
+    ///     The tiers of the loot spawners of the structures: each spawner takes one of them at random. Empty is the tier of the location.
+    ///     Which items a tier gives is the loot manager's business, the same one for the whole world.
+    /// </summary>
     [DataField]
-    public ProtoId<GlobalLootTablePrototype>? LootTable;
+    public List<int> LootTiers = new();
+
+    /// <summary>Items that every build of the location puts out for certain, on a loot spawner where they fit (the keys).</summary>
+    [DataField]
+    public List<EntProtoId> Guaranteed = new();
 }
 
 /// <summary>A kind of place the layout puts into the empty ground and how many of it (see LocationLayout.Features.cs).</summary>

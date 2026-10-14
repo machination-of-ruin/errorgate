@@ -58,8 +58,7 @@
     count: 70
     clump: 3
   ambientLight: "#7A7A7A"
-  lootTable: LootTableGlobal
-  faults: 10
+  faults: 14
 
 - type: worldLocation
   id: SnowCity
@@ -103,9 +102,23 @@
     count: 40
     clump: 3
   ambientLight: "#6A6E78"
-  lootTable: LootTableGlobal
+  lootTiers: [ 1, 2 ]
+  guaranteed: [ FactoryCard, BunkerKey ]
   borderGates: [ west, base, east ]
-  faults: 22
+  landmarks:
+  - kind: checkpoint
+    count: 4
+  - kind: dump
+    count: 4
+  - kind: parking
+    count: 5
+  - kind: construction
+    count: 4
+  - kind: ruin
+    count: 6
+  - kind: camp
+    count: 5
+  faults: 40
 
 # The border of a location: rock that cannot be dug out.
 - type: entity
@@ -185,7 +198,7 @@
   ground: FloorSnow
   road: FloorGrayConcrete
   walkway: FloorGrayConcreteSmooth
-  border: WallSolid
+  border: BunkerWallConcrete
   weather: SnowfallLight
   density: 0.5
   mobs: [ MobSpawnerWalkerArmoredMilitary ]
@@ -194,7 +207,6 @@
   treeClumps: 0
   treeSingles: 0
   ambientLight: "#6A6E78"
-  lootTable: LootTableGlobal
   borderGates: [ gate ]
 
 # The tier 3 laboratory: the generated bunker (rooms, corridors, doors, loot, bosses, radiation), entered by a gate. Pitch black.
@@ -206,7 +218,6 @@
   underground: true
   size: "108,80"
   ambientLight: "#000000"
-  lootTable: LootTableGlobal
   resetMinMinutes: 360
   resetMaxMinutes: 720
 

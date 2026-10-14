@@ -1,3 +1,4 @@
+using Content.Shared._ERRORGATE.LootManager;
 using Robust.Shared.Configuration;
 using Robust.Shared.Prototypes;
 
@@ -18,6 +19,10 @@ public sealed partial class WorldGraphPrototype : IPrototype
 
     [DataField(required: true)]
     public List<WorldLink> Links = new();
+
+    /// <summary>The loot table of the whole world: one loot manager counts every location against the same caps.</summary>
+    [DataField]
+    public ProtoId<GlobalLootTablePrototype> LootTable = "LootTableGlobal";
 }
 
 /// <summary>Two gates that lead to each other, as <c>Location.gate</c>.</summary>

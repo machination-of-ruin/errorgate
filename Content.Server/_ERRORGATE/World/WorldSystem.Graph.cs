@@ -2,7 +2,9 @@ using System.Diagnostics;
 using System.Linq;
 using System.Numerics;
 using Content.Server.Atmos.Components;
+using Content.Server._ERRORGATE.Despawn;
 using Content.Server._ERRORGATE.LootManager;
+using Content.Shared.Item;
 using Content.Shared._ERRORGATE.World;
 using Content.Shared.Atmos;
 using Content.Shared.Gravity;
@@ -91,9 +93,78 @@ public sealed partial class WorldSystem
         return true;
     }
 
+    private static readonly Dictionary<string, string[]> GuaranteedPlaces = new()
+    {
+        ["BunkerKey"] = new[] { "Military", "Security" },
+        ["FactoryCard"] = new[] { "Living", "Industrial" },
+    };
+
+    /// <summary>
+    ///     Puts an item out for certain: on a loot spawner of a fitting kind (the military ones for the laboratory key, the living ones for
+    ///     the factory card), on a tile with no item on it. It counts against the world's caps and stays until the location is wiped.
+    /// </summary>
+    private void PlaceGuaranteed(string item, MapId mapId, int seed)
+    {
+        var spots = new List<(EntityUid Uid, LootSpawnerComponent Spawner, EntityCoordinates At)>();
+        var query = EntityQueryEnumerator<LootSpawnerComponent, TransformComponent>();
+        while (query.MoveNext(out var uid, out var spawner, out var xform))
+        {
+            if (xform.MapID == mapId)
+                spots.Add((uid, spawner, xform.Coordinates));
+        }
+
+        if (spots.Count == 0)
+        {
+            Log.Warning($"World: no loot spawner to put {item} on");
+            return;
+        }
+
+        var rng = new Random(seed ^ StableHash(item));
+        var preferred = GuaranteedPlaces.TryGetValue(item, out var places) ? spots.Where(s => places.Contains(s.Spawner.Location)).ToList() : spots;
+        foreach (var spot in (preferred.Count > 0 ? preferred : spots).OrderBy(_ => rng.Next()).Take(40))
+        {
+            if (_lookup.GetEntitiesIntersecting(spot.At, LookupFlags.Uncontained).Any(e => HasComp<ItemComponent>(e) || HasComp<DespawnItemComponent>(e)))
+                continue;
+
+            var thing = Spawn(item, spot.At);
+            if (TryComp<DespawnItemComponent>(thing, out var despawn))
+            {
+                despawn.Despawn = false;
+                despawn.DespawnAt = null;
+            }
+
+            _lootManager.RegisterSpawn(item, spot.Uid);
+            return;
+        }
+
+        Log.Warning($"World: found no free tile for {item}");
+    }
+
+    private EntityUid? _lootEntity;
+
+    /// <summary>
+    ///     One loot manager for the whole world, on an entity of its own (not on a map): every spawner of every location draws from the same
+    ///     table and counts against the same caps, and what a storm deletes is given back (see LootManagerSystem).
+    /// </summary>
+    private void EnsureLootManager()
+    {
+        if (_lootEntity is { } existing && !TerminatingOrDeleted(existing))
+            return;
+
+        var table = ActiveGraph()?.LootTable ?? "LootTableGlobal";
+        var uid = Spawn(null, MapCoordinates.Nullspace);
+        _meta.SetEntityName(uid, "World loot manager");
+        AddComp(uid, new LootManagerComponent { GlobalLootTablePrototype = table }); // the table is read when the component starts, so it is set first
+        _lootEntity = uid;
+    }
+
     /// <summary>Forgets everything built (the round ended and its maps are gone).</summary>
     public void Forget()
     {
+        if (_lootEntity is { } loot && !TerminatingOrDeleted(loot))
+            QueueDel(loot);
+
+        _lootEntity = null;
         _locations.Clear();
         _gates.Clear();
         _storm.Clear();
@@ -216,7 +287,7 @@ public sealed partial class WorldSystem
     /// </summary>
     private void TurnBarricade(EntityUid barricade, string proto, bool lineRunsNorthSouth)
     {
-        if (lineRunsNorthSouth && proto is "N14BarricadeSandbagSingle" or "N14BarricadeMetal")
+        if (lineRunsNorthSouth && proto is "N14BarricadeSandbagSingle" or "N14BarricadeMetal" or "N14BarricadeRazorwire")
             _transform.SetLocalRotation(barricade, Angle.FromDegrees(90));
     }
 
@@ -236,7 +307,7 @@ public sealed partial class WorldSystem
     ///     into another location is easy to see and to find in the dark. The plaza replaces the ground under it. A hand-built plaza can
     ///     take its place later. Returns the plaza grid.
     /// </summary>
-    private EntityUid PlaceGatePlaza(string location, string gateId, Entity<MapGridComponent> ground, MapId mapId, GatePlacement place)
+    private EntityUid PlaceGatePlaza(string location, string gateId, Entity<MapGridComponent> ground, MapId mapId, GatePlacement place, LocationLayout layout)
     {
         var plaza = _mapManager.CreateGridEntity(mapId);
         _meta.SetEntityName(plaza.Owner, $"{location} gate plaza ({gateId})");
@@ -257,6 +328,14 @@ public sealed partial class WorldSystem
         _physics.SetBodyType(plaza.Owner, BodyType.Static);
 
         EntityCoordinates At(int f, int l) => _map.GridTileToLocal(plaza.Owner, plaza.Comp, LocationLayout.PlazaTile(place, f, l));
+
+        // Where the plaza is cut into the border, the rock continues behind the gate on the plaza's own grid, so the gate is part of the wall
+        var borderProto = _proto.Index<WorldLocationPrototype>(location).Border;
+        for (var l = -3; l <= 3; l++)
+        {
+            if (layout.Dist(LocationLayout.PlazaTile(place, 1, l)) <= 2)
+                Spawn(borderProto, At(1, l));
+        }
 
         // Hazard marks around the gate, lamps beside it, barricades along both flanks (the middle five tiles stay open)
         foreach (var l in new[] { -1, 0, 1 })
@@ -633,7 +712,7 @@ public sealed partial class WorldSystem
         CentreOnOrigin(grid.Value);
         EnsureComp<GridAtmosphereComponent>(grid.Value.Owner);
         _physics.SetBodyType(grid.Value.Owner, BodyType.Static);
-        RetierLoot(grid.Value, proto.Tier);
+        RetierLoot(grid.Value, TiersOf(proto), new Random(StableHash(proto.ID)));
 
         // The gates the map names: people arrive on the tile in front of them
         var enumerator = Transform(grid.Value.Owner).ChildEnumerator;
@@ -683,8 +762,6 @@ public sealed partial class WorldSystem
         var mapUid = _map.CreateMap(out mapId, runMapInit: true);
         _meta.SetEntityName(mapUid, $"{proto.ID} map");
         _map.SetAmbientLight(mapId, proto.AmbientLight);
-        if (proto.LootTable is { } lootTable)
-            AddComp(mapUid, new LootManagerComponent { GlobalLootTablePrototype = lootTable }); // the table is read when the component starts, so it is set first
 
         // The day and the night follow the same clock in every location on the surface (no random start, the clock is the server's),
         // and the snow, if the location has it, never stops. Underground there is neither

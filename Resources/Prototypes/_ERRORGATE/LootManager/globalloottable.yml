@@ -335,4 +335,5 @@
     ClothingHeadHatPlaguedoctor: 1
     ClothingOuterPlagueSuit: 1
     # Keys
-    BunkerKey: 1 # opens the way into the laboratory (the bunker hatch at the end of its tunnel), at most one per location
+    FactoryCard: 2 # the city puts one out for certain
+    BunkerKey: 1 # opens the way into the laboratory (the bunker hatch at the end of its tunnel); the city puts the one there is out for certain

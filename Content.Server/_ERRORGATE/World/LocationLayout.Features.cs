@@ -275,6 +275,141 @@ public sealed partial class LocationLayout
                         break;
                     }
 
+                    case "parking":
+                    {
+                        const int rx = 6, ry = 3;
+                        if (Find(rx, ry) is not { } c)
+                            break;
+
+                        Claim(c, rx, ry);
+                        Features.Add(new Feature(kind, c));
+
+                        // A paved lot with two rows of wrecks and what was left in them
+                        for (var x = -rx; x <= rx; x++)
+                        {
+                            for (var y = -ry; y <= ry; y++)
+                            {
+                                GroundOverrides[At(c, x, y)] = "FloorGrayConcrete";
+                            }
+                        }
+
+                        for (var x = -rx + 1; x <= rx - 1; x += 3)
+                        {
+                            if (rng.NextDouble() < 0.75)
+                                Put(At(c, x, -ry + 1), rng.Next(3) == 0 ? "N14DecorMinecart" : "N14CrateTrashcart");
+
+                            if (rng.NextDouble() < 0.6)
+                                Put(At(c, x, ry - 1), rng.Next(3) == 0 ? "N14DecorMinecart" : "N14CrateTrashcart");
+                        }
+
+                        Put(At(c, -rx, 0), "N14BurningBarrel");
+                        Put(At(c, 1, 0), "LootSpawnerIndustrialTier1");
+                        Put(At(c, -3, 0), "LootSpawnerIndustrialTier1");
+                        Put(At(c, 4, 0), "LootSpawnerLivingTier1");
+                        if (Bonus(c) > 0)
+                            Put(At(c, 2, 1), "LootSpawnerMilitaryTier1");
+
+                        break;
+                    }
+
+                    case "dump":
+                    {
+                        const int r = 5;
+                        if (Find(r, r) is not { } c)
+                            break;
+
+                        Claim(c, r, r);
+                        Features.Add(new Feature(kind, c));
+
+                        // Radioactive waste: a patch of burnt ground, barrels that glow green and are deadly close by, and what the people
+                        // who left it were guarding (needs a radiation suit to reach)
+                        for (var dx = -r; dx <= r; dx++)
+                        {
+                            for (var dy = -r; dy <= r; dy++)
+                            {
+                                if (dx * dx + dy * dy <= (r - 1) * (r - 1) + rng.Next(0, 4))
+                                    GroundOverrides[At(c, dx, dy)] = "FloorSteelDamaged";
+                            }
+                        }
+
+                        var barrels = rng.Next(5, 9);
+                        for (var i = 0; i < barrels; i++)
+                        {
+                            var angle = rng.NextDouble() * Math.PI * 2;
+                            var dist = 1.5 + rng.NextDouble() * 2.6;
+                            var tile = At(c, (int) Math.Round(Math.Cos(angle) * dist), (int) Math.Round(Math.Sin(angle) * dist));
+                            if (Items.All(it => it.Tile != tile) && tile != c)
+                                Put(tile, i < 4 ? "BunkerRadiationBarrel" : "N14BlackBarrel");
+                        }
+
+                        Put(c, "LootSpawnerIndustrialTier1");
+                        Put(At(c, 1, 1), "LootSpawnerMedicalTier1");
+                        Put(At(c, -1, 1), "LootSpawnerIndustrialTier1");
+                        if (Bonus(c) > 0)
+                            Put(At(c, 0, -1), "LootSpawnerMilitaryTier1");
+
+                        break;
+                    }
+
+                    case "checkpoint":
+                    {
+                        const int rx = 4, ry = 3;
+                        if (Find(rx, ry) is not { } c)
+                            break;
+
+                        Claim(c, rx, ry);
+                        Features.Add(new Feature(kind, c));
+
+                        // A held position: sandbags and tank traps around a few crates
+                        for (var x = -rx; x <= rx; x++)
+                        {
+                            Put(At(c, x, -ry), x % 2 == 0 ? "N14BarricadeSandbagSingle" : "N14BarricadeTanktrap");
+                            Put(At(c, x, ry), x % 2 == 0 ? "N14BarricadeSandbagSingle" : "N14BarricadeTanktrap");
+                        }
+
+                        Put(At(c, -2, 0), "N14CrateMilitary");
+                        Put(At(c, 2, 1), "N14CrateMilitary");
+                        Put(At(c, 0, -1), "LootSpawnerMilitaryTier1");
+                        Put(At(c, 1, 1), "LootSpawnerMilitaryTier1");
+                        Put(At(c, -1, 1), "LootSpawnerSecurityTier1");
+                        if (rng.NextDouble() < 0.6)
+                            Put(At(c, 0, 0), "MobSpawnerWalkerArmored");
+
+                        break;
+                    }
+
+                    case "construction":
+                    {
+                        const int rx = 6, ry = 4;
+                        if (Find(rx, ry) is not { } c)
+                            break;
+
+                        Claim(c, rx, ry);
+                        Features.Add(new Feature(kind, c));
+                        for (var x = -rx; x <= rx; x++)
+                        {
+                            for (var y = -ry; y <= ry; y++)
+                            {
+                                GroundOverrides[At(c, x, y)] = "FloorGrayConcrete";
+                            }
+                        }
+
+                        for (var i = 0; i < 9; i++)
+                        {
+                            var tile = At(c, rng.Next(-rx + 1, rx), rng.Next(-ry + 1, ry));
+                            if (Items.All(it => it.Tile != tile))
+                                Put(tile, rng.Next(4) switch { 0 => "N14CrateBreakPlain", 1 => "N14BlackBarrel", 2 => "N14CrateBreakPlainDamaged", _ => "N14DecorFloorScrapwood" });
+                        }
+
+                        Put(At(c, -3, 0), "LootSpawnerIndustrialTier1");
+                        Put(At(c, 2, -1), "LootSpawnerIndustrialTier1");
+                        Put(At(c, 4, 2), "LootSpawnerIndustrialTier1");
+                        if (Bonus(c) > 0)
+                            Put(At(c, 0, 2), "LootSpawnerSecurityTier1");
+
+                        break;
+                    }
+
                     case "well":
                     {
                         if (Find(2, 2) is not { } c)
