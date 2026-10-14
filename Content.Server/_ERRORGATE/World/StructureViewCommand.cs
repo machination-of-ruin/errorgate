@@ -50,7 +50,8 @@ public sealed class StructureViewCommand : LocalizedEntityCommands
         }
 
         var file = new ResPath(Root + args[0].Trim('/') + ".yml");
-        var mapUid = _map.CreateMap(out var mapId);
+        // Not initialized: nothing in the structure runs (spawners, doors, power), so it stays as it was saved and can be edited and saved again
+        var mapUid = _map.CreateMap(out var mapId, runMapInit: false);
         if (!_loader.TryLoadGrid(mapId, file, out var grid))
         {
             _map.DeleteMap(mapId);
@@ -66,6 +67,6 @@ public sealed class StructureViewCommand : LocalizedEntityCommands
         if (shell.Player?.AttachedEntity is { } player)
             _transform.SetMapCoordinates(player, new MapCoordinates(center, mapId));
 
-        shell.WriteLine($"{args[0]}: map {mapId}, grid {EntityManager.GetNetEntity(grid.Value.Owner)}, {grid.Value.Comp.LocalAABB.Width:0} x {grid.Value.Comp.LocalAABB.Height:0} tiles. Save an edited copy with: savegrid {EntityManager.GetNetEntity(grid.Value.Owner)} <file>. Delete the map with deletemap {mapId}.");
+        shell.WriteLine($"{args[0]}: map {mapId} (not initialized), grid {EntityManager.GetNetEntity(grid.Value.Owner)}, {grid.Value.Comp.LocalAABB.Width:0} x {grid.Value.Comp.LocalAABB.Height:0} tiles. Save an edited copy with: savegrid {EntityManager.GetNetEntity(grid.Value.Owner)} <file>. Delete the map with deletemap {mapId}.");
     }
 }

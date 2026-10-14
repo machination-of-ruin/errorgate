@@ -245,5 +245,5 @@ Not found by the cut: buildings with a gap in their walls, open yards and the wa
 
 ### How to review
 
-In the running game, as an admin: `structureview <name>` (for example `structureview review/village/kuz-wood-LANDMARK-1`, or `structureview village/kuz-wood-XL-3`) builds a fresh map with that structure on it and moves you there. `structureview` without a name lists the files. Walk around, then use the `mapping` tools to cut a landmark into buildings: save each part with `savegrid <grid> <file>` and put it in the pool folder (`village` or `city`).
+In the running game, as an admin: `structureview <name>` (for example `structureview review/village/kuz-wood-LANDMARK-1`, or `structureview village/kuz-wood-XL-3`) loads that structure, as it was saved and not initialized (nothing in it runs, so you can edit it and save it again), on a new map and moves you there. `structureview` without a name lists the files. Walk around, then use the `mapping` tools to cut a landmark into buildings: save each part with `savegrid <grid> <file>` and put it in the pool folder (`village` or `city`).
 
