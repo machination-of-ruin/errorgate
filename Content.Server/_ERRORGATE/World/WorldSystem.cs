@@ -246,6 +246,7 @@ public sealed partial class WorldSystem : EntitySystem
 
         _map.SetTiles(ground.Owner, ground.Comp, tiles);
         _physics.SetBodyType(ground.Owner, BodyType.Static);
+        var offset = CentreOnOrigin(ground);
         yield return true;
 
         // The border is the two outermost tiles of the shape
@@ -278,7 +279,7 @@ public sealed partial class WorldSystem : EntitySystem
             RemComp<GridAtmosphereComponent>(grid.Value.Owner); // the air is the map's, a file may have saved one
             RetierLoot(grid.Value, proto.Tier);
             var origin = p.Origin;
-            _transform.SetWorldPositionRotation(grid.Value.Owner, origin, Angle.Zero);
+            _transform.SetWorldPositionRotation(grid.Value.Owner, origin + offset, Angle.Zero);
 
             // A grid is a dynamic body by default and would be pushed around by the ground grid and the others it overlaps
             _physics.SetBodyType(grid.Value.Owner, BodyType.Static);
@@ -361,7 +362,8 @@ public sealed partial class WorldSystem : EntitySystem
         var blockRng = new Random(useSeed ^ 0x40AD);
         foreach (var tile in layout.RoadblockTiles)
         {
-            Spawn(proto.RoadblockProtos[blockRng.Next(proto.RoadblockProtos.Count)], _map.GridTileToLocal(ground.Owner, ground.Comp, tile));
+            var kind = proto.RoadblockProtos[blockRng.Next(proto.RoadblockProtos.Count)];
+            TurnBarricade(Spawn(kind, _map.GridTileToLocal(ground.Owner, ground.Comp, tile)), kind, layout.RoadblockVertical.Contains(tile));
         }
 
         // Boulders, barricades and the like, and decals of grass and brushwood
@@ -441,6 +443,18 @@ public sealed partial class WorldSystem : EntitySystem
         context.Ok = true;
     }
 
+
+    /// <summary>
+    ///     Moves a ground grid so the middle of its tiles lies at the origin of the map (tile numbers stay as they are). Everything built on
+    ///     the grid, the plazas and the structures included, follows the same offset. Returns the offset.
+    /// </summary>
+    private Vector2 CentreOnOrigin(Entity<MapGridComponent> ground)
+    {
+        var centre = ground.Comp.LocalAABB.Center;
+        var offset = new Vector2(-MathF.Round(centre.X), -MathF.Round(centre.Y));
+        _transform.SetWorldPosition(ground.Owner, offset);
+        return offset;
+    }
 
     /// <summary>Removes a location, and stops its build if it is still running.</summary>
     public void Teardown(string id)

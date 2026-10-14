@@ -43,6 +43,9 @@ public sealed partial class LocationLayout
     /// <summary>Wrecks and barricades in the middle of the wide avenues: pairs of tiles, never closing the road.</summary>
     public List<Vector2i> RoadblockTiles = new();
 
+    /// <summary>The roadblock tiles whose barricade lies north to south (the street runs east to west), so it is turned a quarter.</summary>
+    public HashSet<Vector2i> RoadblockVertical = new();
+
     /// <summary>Spawn points of the clearing where players come into the world.</summary>
     public List<Vector2i> SpawnTiles = new();
 
@@ -217,7 +220,7 @@ public sealed partial class LocationLayout
                     continue;
                 }
 
-                var depth = rng.Next(1, 3);
+                var depth = 1; // a single row
                 var section = new List<Vector2i>();
                 for (var d = 0; d < depth; d++)
                 {
@@ -239,6 +242,9 @@ public sealed partial class LocationLayout
                     continue;
 
                 RoadblockTiles.AddRange(section);
+                if (across.Y != 0)
+                    RoadblockVertical.UnionWith(section);
+
                 centres.Add(t);
                 blocks++;
             }

@@ -185,6 +185,16 @@ public sealed partial class WorldSystem
 
     // -- Gates ----------------------------------------------------------------------------------------------------
 
+    /// <summary>
+    ///     Barricades whose picture is a strip along the bottom of the tile: sandbags and metal barricades lie east to west as built, so
+    ///     they are turned a quarter where the line they make has to run north to south.
+    /// </summary>
+    private void TurnBarricade(EntityUid barricade, string proto, bool lineRunsNorthSouth)
+    {
+        if (lineRunsNorthSouth && proto is "N14BarricadeSandbagSingle" or "N14BarricadeMetal")
+            _transform.SetLocalRotation(barricade, Angle.FromDegrees(90));
+    }
+
     private static readonly string[] PlazaBarricades =
     {
         "N14BarricadeMetal", "N14BarricadeSandbagSingle", "N14BarricadeRazorwire", "N14BarricadeTanktrap",
@@ -199,6 +209,7 @@ public sealed partial class WorldSystem
     {
         var plaza = _mapManager.CreateGridEntity(mapId);
         _meta.SetEntityName(plaza.Owner, $"{location} gate plaza ({gateId})");
+        _transform.SetWorldPosition(plaza.Owner, _transform.GetWorldPosition(ground.Owner)); // the same offset as the ground, so the tile numbers agree
         var worn = (ContentTileDefinition) _tileDefs["FloorSteelDirty"];
         var paved = (ContentTileDefinition) _tileDefs["FloorSteelPavement"];
         var tiles = new List<(Vector2i, Tile)>();
@@ -229,14 +240,17 @@ public sealed partial class WorldSystem
         Spawn("LightPostSmall", At(0, 2));
 
         var rng = new Random(place.Tile.X * 7919 + place.Tile.Y);
+        // The flanks run along the way to the gate
+        var vertical = place.Facing % 2 == 0;
         foreach (var side in new[] { -3, 3 })
         {
             for (var f = -3; f <= -1; f++)
             {
-                Spawn(PlazaBarricades[rng.Next(PlazaBarricades.Length)], At(f, side));
+                var kind = PlazaBarricades[rng.Next(PlazaBarricades.Length)];
+                TurnBarricade(Spawn(kind, At(f, side)), kind, vertical);
             }
 
-            Spawn("N14BarricadeSandbagSingle", At(0, side));
+            TurnBarricade(Spawn("N14BarricadeSandbagSingle", At(0, side)), "N14BarricadeSandbagSingle", vertical);
         }
 
         PlaceGate(location, gateId, plaza, place.Tile, place.Arrival, place.Facing);
@@ -375,6 +389,7 @@ public sealed partial class WorldSystem
 
         _map.SetTiles(ground.Owner, ground.Comp, tiles);
         _physics.SetBodyType(ground.Owner, BodyType.Static);
+        CentreOnOrigin(ground);
 
         foreach (var wall in layout.Walls)
         {
@@ -450,6 +465,7 @@ public sealed partial class WorldSystem
         EnsureComp<GridAtmosphereComponent>(ground.Owner);
         var floor = _bunker.BuildLaboratory(ground.Owner, ground.Comp, useSeed, out var vestibule, out var vestibuleArrival);
         _physics.SetBodyType(ground.Owner, BodyType.Static);
+        CentreOnOrigin(ground);
 
         _pendingAir.Add(new PendingAir(ground.Owner, floor, _timing.CurTime + TimeSpan.FromSeconds(120)));
 
@@ -462,6 +478,7 @@ public sealed partial class WorldSystem
             Seed = useSeed,
             BuildMilliseconds = watch.Elapsed.TotalMilliseconds,
             Entities = EntityManager.EntityCount - entitiesBefore,
+            Ground = ground.Owner,
             Vestibule = vestibule,
             VestibuleArrival = vestibuleArrival,
         };
@@ -533,6 +550,7 @@ public sealed partial class WorldSystem
         }
 
         _meta.SetEntityName(grid.Value.Owner, $"{proto.ID} map grid");
+        CentreOnOrigin(grid.Value);
         EnsureComp<GridAtmosphereComponent>(grid.Value.Owner);
         _physics.SetBodyType(grid.Value.Owner, BodyType.Static);
         RetierLoot(grid.Value, proto.Tier);
@@ -696,7 +714,7 @@ public sealed partial class WorldSystem
     }
 
     /// <summary>Seconds before the wipe at which the whole location is told how long is left (and the start of the warning).</summary>
-    private static readonly int[] NoticeAt = { 60, 30, 10, 5 };
+    private static readonly int[] NoticeAt = { 60, 30, 10 };
 
     private readonly Dictionary<string, (int Last, int Stage)> _notice = new();
 
@@ -744,9 +762,7 @@ public sealed partial class WorldSystem
                 state.Last = NoticeAt.Where(a => a >= seconds).DefaultIfEmpty(1_000_000).Min(); // marks already past are skipped, the rest are still to come
 
             var shown = (int) Math.Ceiling(seconds);
-            var text = shown <= 10
-                ? Loc.GetString("world-storm-count", ("seconds", shown))
-                : Loc.GetString("world-storm-warning", ("time", $"{shown / 60:00}:{shown % 60:00}"));
+            var text = Loc.GetString("world-storm-warning", ("time", $"{shown / 60:00}:{shown % 60:00}"));
             var playSound = first || state.Last == NoticeAt[^1];
             var sound = new SoundPathSpecifier(_cfg.GetCVar(WorldCVars.WarningSound));
             foreach (var name in FollowersOf(id).Append(id))
