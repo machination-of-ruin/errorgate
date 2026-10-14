@@ -138,7 +138,7 @@ public sealed class WorldBuildCommand : LocalizedEntityCommands
     }
 }
 
-/// <summary>Starts the storm for a location now: <c>worldreset &lt;location&gt; [now]</c>. With <c>now</c> there is no warning.</summary>
+/// <summary>Starts the storm for a location: <c>worldreset &lt;location&gt; [now|seconds]</c>. With <c>now</c> there is no warning, with a number the wipe comes after that many seconds (the notices that are already past are skipped).</summary>
 [AdminCommand(AdminFlags.Debug)]
 public sealed class WorldResetCommand : LocalizedEntityCommands
 {
@@ -147,14 +147,14 @@ public sealed class WorldResetCommand : LocalizedEntityCommands
     [Dependency] private readonly IConfigurationManager _cfg = default!;
 
     public override string Command => "worldreset";
-    public override string Description => "Wipes a world location with the storm and builds it again: worldreset <location> [now]. Without 'now' the warning runs first.";
+    public override string Description => "Wipes a world location with the storm and builds it again: worldreset <location> [now|seconds]. Without an argument the full warning runs first (errorgate.world.warning_seconds).";
 
     public override CompletionResult GetCompletion(IConsoleShell shell, string[] args)
     {
         return args.Length switch
         {
             1 => CompletionResult.FromHintOptions(_world.Locations.Keys, "<location>"),
-            2 => CompletionResult.FromHintOptions(new[] { "now" }, "[now: no warning]"),
+            2 => CompletionResult.FromHintOptions(new[] { "now", "10", "30", "60", "120" }, "[now|seconds until the wipe]"),
             _ => CompletionResult.Empty,
         };
     }
@@ -163,7 +163,7 @@ public sealed class WorldResetCommand : LocalizedEntityCommands
     {
         if (args.Length < 1 || !_world.Locations.ContainsKey(args[0]))
         {
-            shell.WriteError("worldreset <location> [now]");
+            shell.WriteError("worldreset <location> [now|seconds]");
             return;
         }
 
@@ -175,6 +175,17 @@ public sealed class WorldResetCommand : LocalizedEntityCommands
         }
 
         var warning = TimeSpan.FromSeconds(_cfg.GetCVar(WorldCVars.WarningSeconds));
+        if (args.Length > 1)
+        {
+            if (!float.TryParse(args[1], out var seconds) || seconds < 1)
+            {
+                shell.WriteError("worldreset <location> [now|seconds]");
+                return;
+            }
+
+            warning = TimeSpan.FromSeconds(seconds);
+        }
+
         _world.StartWarning(args[0], _world.Now + warning);
         shell.WriteLine($"The storm is coming for {args[0]} in {warning.TotalSeconds:0} seconds.");
     }

@@ -741,7 +741,7 @@ public sealed partial class WorldSystem
             if (!first)
                 state.Last = due;
             else
-                state.Last = NoticeAt.Where(a => a >= seconds).DefaultIfEmpty(NoticeAt[0]).Min();
+                state.Last = NoticeAt.Where(a => a >= seconds).DefaultIfEmpty(1_000_000).Min(); // marks already past are skipped, the rest are still to come
 
             var shown = (int) Math.Ceiling(seconds);
             var text = shown <= 10
