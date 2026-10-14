@@ -24,25 +24,33 @@ public sealed class LootManagerEntry
 }
 
 /// <summary>
-/// Keeps the world's loot finite: every item has a cap, spawners and mobs only draw what is left of it.
+/// Keeps the world's loot finite: every item has a cap, spawners and mobs only draw what is left of it. Every map that has a
+/// loot manager counts for itself, so a location of the world has its own caps and gives them back when it is wiped.
 /// </summary>
 public sealed class LootManagerSystem : EntitySystem
 {
     [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
     [Dependency] private readonly IRobustRandom _random = default!;
 
-    public Dictionary<string, LootManagerEntry> LootManager = new();
+    private readonly Dictionary<EntityUid, Dictionary<string, LootManagerEntry>> _tables = new();
 
     public override void Initialize()
     {
         base.Initialize();
         SubscribeLocalEvent<LootManagerComponent, ComponentInit>(OnManagerInit);
-        SubscribeLocalEvent<RoundRestartCleanupEvent>(_ => LootManager = new());
+        SubscribeLocalEvent<LootManagerComponent, ComponentShutdown>(OnManagerShutdown);
+        SubscribeLocalEvent<RoundRestartCleanupEvent>(_ => _tables.Clear());
+    }
+
+    private void OnManagerShutdown(EntityUid uid, LootManagerComponent component, ComponentShutdown args)
+    {
+        _tables.Remove(uid);
     }
 
     private void OnManagerInit(EntityUid uid, LootManagerComponent component, ComponentInit args)
     {
-        LootManager = new();
+        var entries = new Dictionary<string, LootManagerEntry>();
+        _tables[uid] = entries;
 
         // a blank component (no table set) has nothing to load
         if (string.IsNullOrEmpty(component.GlobalLootTablePrototype.Id))
@@ -62,18 +70,50 @@ public sealed class LootManagerSystem : EntitySystem
                 continue;
             }
 
-            LootManager.Add(id, new LootManagerEntry(0, maxCount, loot.RarityTiers, loot.Locations, loot.ChildEntries));
+            entries.Add(id, new LootManagerEntry(0, maxCount, loot.RarityTiers, loot.Locations, loot.ChildEntries));
         }
+    }
+
+    /// <summary>The caps that count for something at this place: those of its map, else those of the first loot manager there is.</summary>
+    private Dictionary<string, LootManagerEntry>? EntriesFor(EntityUid? source)
+    {
+        if (source is { } uid && Transform(uid).MapUid is { } map && _tables.TryGetValue(map, out var own))
+            return own;
+
+        foreach (var table in _tables.Values)
+        {
+            return table;
+        }
+
+        return null;
+    }
+
+    /// <summary>The caps of the first loot manager there is (the one of a single map).</summary>
+    public Dictionary<string, LootManagerEntry> LootManager => EntriesFor(null) ?? new();
+
+    /// <summary>The entry of an item in any loot manager (for items that exist only once).</summary>
+    public bool TryGetEntry(string proto, out LootManagerEntry? entry)
+    {
+        foreach (var table in _tables.Values)
+        {
+            if (table.TryGetValue(proto, out entry))
+                return true;
+        }
+
+        entry = null;
+        return false;
     }
 
     /// <summary>
     /// Every item that may be drawn for this rarity and location, with how many of it are left.
     /// </summary>
-    public Dictionary<string, int> GetLootTable(int rarity, string location)
+    public Dictionary<string, int> GetLootTable(int rarity, string location, EntityUid? source = null)
     {
         var table = new Dictionary<string, int>();
+        if (EntriesFor(source) is not { } entries)
+            return table;
 
-        foreach (var (id, entry) in LootManager)
+        foreach (var (id, entry) in entries)
         {
             if (entry.RarityTiers.Contains(rarity) && entry.Locations.Contains(location))
                 table[id] = Math.Max(0, entry.MaxCount - entry.Count);
@@ -119,16 +159,16 @@ public sealed class LootManagerSystem : EntitySystem
     /// <summary>
     /// Counts one more of this item (and its children) as existing in the world.
     /// </summary>
-    public void RegisterSpawn(string proto)
+    public void RegisterSpawn(string proto, EntityUid? source = null)
     {
-        if (!LootManager.TryGetValue(proto, out var entry))
+        if (EntriesFor(source) is not { } entries || !entries.TryGetValue(proto, out var entry))
             return;
 
         entry.Count += 1;
 
         foreach (var child in entry.ChildEntries)
         {
-            if (LootManager.TryGetValue(child, out var childEntry))
+            if (entries.TryGetValue(child, out var childEntry))
                 childEntry.Count += 1;
         }
     }
@@ -136,9 +176,9 @@ public sealed class LootManagerSystem : EntitySystem
     /// <summary>
     /// An item is gone, its place in the cap is free again.
     /// </summary>
-    public void Refund(string proto)
+    public void Refund(string proto, EntityUid? source = null)
     {
-        if (LootManager.TryGetValue(proto, out var entry))
+        if (EntriesFor(source) is { } entries && entries.TryGetValue(proto, out var entry))
             entry.Count = Math.Max(0, entry.Count - 1);
     }
 }

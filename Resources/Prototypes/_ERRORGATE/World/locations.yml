@@ -37,6 +37,7 @@
     count: 70
     clump: 3
   ambientLight: "#7A7A7A"
+  lootTable: LootTableGlobal
 
 - type: worldLocation
   id: SnowCity
@@ -78,6 +79,7 @@
     count: 40
     clump: 3
   ambientLight: "#6A6E78"
+  lootTable: LootTableGlobal
 
 # The border of a location: rock that cannot be dug out.
 - type: entity
@@ -165,6 +167,7 @@
   treeClumps: 0
   treeSingles: 0
   ambientLight: "#6A6E78"
+  lootTable: LootTableGlobal
 
 # The tier 3 laboratory: the generated bunker (rooms, corridors, doors, loot, bosses, radiation), entered by a gate. Pitch black.
 - type: worldLocation
@@ -175,6 +178,7 @@
   underground: true
   size: "108,80"
   ambientLight: "#000000"
+  lootTable: LootTableGlobal
   resetMinMinutes: 360
   resetMaxMinutes: 720
 

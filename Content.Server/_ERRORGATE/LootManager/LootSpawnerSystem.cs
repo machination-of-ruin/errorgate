@@ -55,7 +55,7 @@ public sealed class LootSpawnerSystem : EntitySystem
         if (!_random.Prob(chance))
             return;
 
-        var table = _lootManager.GetLootTable(component.Rarity, component.Location);
+        var table = _lootManager.GetLootTable(component.Rarity, component.Location, uid);
 
         if (!CheckSpawnPointCondition(uid, table))
             return;
@@ -66,7 +66,7 @@ public sealed class LootSpawnerSystem : EntitySystem
             return;
         }
 
-        _lootManager.RegisterSpawn(entityProto);
+        _lootManager.RegisterSpawn(entityProto, uid);
 
         var coordinates = Transform(uid).Coordinates;
         Spawn(entityProto, coordinates);
