@@ -32,6 +32,9 @@
   - protos: [ FloraRockSolid ]
     count: 30
     clump: 0
+  - protos: [ CrateStoneGrave, CrateWoodenGrave ]
+    count: 14
+    clump: 5
   decals:
   - decals: [ FloraBranchBrushwood, FloraBranchBrushwoodAlt ]
     count: 70
@@ -74,6 +77,8 @@
   - protos: [ Barricade, BarricadeBlock ]
     count: 16
     clump: 2
+  roadblocks: 10
+  roadblockProtos: [ Barricade, BarricadeBlock ]
   decals:
   - decals: [ FloraBranchBrushwood, FloraBranchBrushwoodAlt ]
     count: 40

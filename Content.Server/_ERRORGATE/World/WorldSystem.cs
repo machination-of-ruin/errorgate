@@ -203,7 +203,7 @@ public sealed partial class WorldSystem : EntitySystem
         var entitiesBefore = EntityManager.EntityCount;
         var useSeed = seed ?? _random.Next();
         var options = new LocationLayout.Options(proto.Style, proto.Shape, proto.Rocks, proto.TreeClumps, proto.TreeSingles, proto.Shore,
-            proto.Props.Select(e => (e.Count, e.Clump)).ToList(), proto.Decals.Select(e => (e.Count, e.Clump)).ToList(), gates, proto.Mobs.Count > 0 ? proto.MobCount : 0, proto.SpawnZone);
+            proto.Props.Select(e => (e.Count, e.Clump)).ToList(), proto.Decals.Select(e => (e.Count, e.Clump)).ToList(), gates, proto.Mobs.Count > 0 ? proto.MobCount : 0, proto.SpawnZone, proto.RoadblockProtos.Count > 0 ? proto.Roadblocks : 0);
         var layout = LocationLayout.Generate(useSeed, proto.Size, pool, proto.Density, options);
 
         yield return true;
@@ -341,6 +341,13 @@ public sealed partial class WorldSystem : EntitySystem
             {
                 Spawn(post, _map.GridTileToLocal(ground.Owner, ground.Comp, tile));
             }
+        }
+
+        // Roadblocks across the wide avenues
+        var blockRng = new Random(useSeed ^ 0x40AD);
+        foreach (var tile in layout.RoadblockTiles)
+        {
+            Spawn(proto.RoadblockProtos[blockRng.Next(proto.RoadblockProtos.Count)], _map.GridTileToLocal(ground.Owner, ground.Comp, tile));
         }
 
         // Boulders, barricades and the like, and decals of grass and brushwood

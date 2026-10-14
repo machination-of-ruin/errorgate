@@ -40,10 +40,13 @@ public sealed partial class LocationLayout
     /// <summary>Places for mob spawners on open ground.</summary>
     public List<Vector2i> MobTiles = new();
 
+    /// <summary>Wrecks and barricades in the middle of the wide avenues: pairs of tiles, never closing the road.</summary>
+    public List<Vector2i> RoadblockTiles = new();
+
     /// <summary>Spawn points of the clearing where players come into the world.</summary>
     public List<Vector2i> SpawnTiles = new();
 
-    public sealed record Options(string Style, string Shape, int Rocks, int TreeClumps, int TreeSingles, string Shore, IReadOnlyList<(int Count, int Clump)> Props, IReadOnlyList<(int Count, int Clump)> Decals, IReadOnlyList<string> Gates, int MobCount, bool SpawnZone);
+    public sealed record Options(string Style, string Shape, int Rocks, int TreeClumps, int TreeSingles, string Shore, IReadOnlyList<(int Count, int Clump)> Props, IReadOnlyList<(int Count, int Clump)> Decals, IReadOnlyList<string> Gates, int MobCount, bool SpawnZone, int Roadblocks = 0);
 
     /// <summary>
     ///     Rock formations and trees in the free ground: away from the structures and the roads, and not on top of each other.
@@ -182,8 +185,76 @@ public sealed partial class LocationLayout
             DecalTiles.Add(PlaceMany(rng, count, clump, 0, Free));
         }
 
+        // Roadblocks stand in the middle of avenues that are five or more tiles wide, two tiles each, so two lanes stay open on each side
+        if (options.Roadblocks > 0)
+        {
+            var roadList = Roads.OrderBy(t => t.X).ThenBy(t => t.Y).ToList();
+            bool WideRoad(Vector2i c)
+            {
+                for (var dx = -2; dx <= 2; dx++)
+                {
+                    for (var dy = -2; dy <= 2; dy++)
+                    {
+                        if (!Roads.Contains(new Vector2i(c.X + dx, c.Y + dy)))
+                            return false;
+                    }
+                }
+
+                return true;
+            }
+
+            var blocks = 0;
+            var basePieces = RoadPieces();
+            for (var attempt = 0; attempt < options.Roadblocks * 40 && blocks < options.Roadblocks && roadList.Count > 0; attempt++)
+            {
+                var t = roadList[rng.Next(roadList.Count)];
+                var next = rng.Next(2) == 0 ? new Vector2i(t.X + 1, t.Y) : new Vector2i(t.X, t.Y + 1);
+                if (Dist(t) < 10 || GatePlaces.Values.Any(g => Math.Abs(g.Arrival.X - t.X) < 8 && Math.Abs(g.Arrival.Y - t.Y) < 8) || !WideRoad(t) || !WideRoad(next) || RoadblockTiles.Any(b => Math.Abs(b.X - t.X) < 7 && Math.Abs(b.Y - t.Y) < 7))
+                    continue;
+
+                RoadblockTiles.Add(t);
+                RoadblockTiles.Add(next);
+                if (RoadPieces() > basePieces)
+                {
+                    RoadblockTiles.RemoveRange(RoadblockTiles.Count - 2, 2);
+                    continue;
+                }
+
+                blocks++;
+            }
+        }
+
         // Mobs stand apart on the open ground
         MobTiles = PlaceMany(rng, options.MobCount, 0, 14, Free);
+    }
+
+    /// <summary>How many separate pieces the roads are in, without the roadblocks.</summary>
+    private int RoadPieces()
+    {
+        var open = Roads.Where(r => !RoadblockTiles.Contains(r)).ToHashSet();
+        var seen = new HashSet<Vector2i>();
+        var pieces = 0;
+        var stack = new Stack<Vector2i>();
+        foreach (var start in open)
+        {
+            if (!seen.Add(start))
+                continue;
+
+            pieces++;
+            stack.Push(start);
+            while (stack.Count > 0)
+            {
+                var c = stack.Pop();
+                foreach (var d in new[] { new Vector2i(1, 0), new Vector2i(-1, 0), new Vector2i(0, 1), new Vector2i(0, -1) })
+                {
+                    var n = c + d;
+                    if (open.Contains(n) && seen.Add(n))
+                        stack.Push(n);
+                }
+            }
+        }
+
+        return pieces;
     }
 
     private List<Vector2i> PlaceMany(Random rng, int count, int clump, int spacing, Func<Vector2i, bool> free)
