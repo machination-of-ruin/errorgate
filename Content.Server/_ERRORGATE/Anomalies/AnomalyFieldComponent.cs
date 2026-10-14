@@ -66,6 +66,18 @@ public sealed partial class AnomalyFieldComponent : Component
     public float MinDistanceFromSpawns = 25f;
 
     /// <summary>
+    ///     Minimum distance (tiles) from every gate and hatch that leads to another place, so nobody arrives next to a fault.
+    /// </summary>
+    [DataField]
+    public float MinDistanceFromExits = 35f;
+
+    /// <summary>
+    ///     Minimum distance (tiles) from every mob spawner, so the mobs do not spawn inside the danger zone of a fault.
+    /// </summary>
+    [DataField]
+    public float MinDistanceFromMobs = 15f;
+
+    /// <summary>
     ///     Minimum distance (tiles) from every point of interest (loot spawner), so the loot is not inside a fault.
     /// </summary>
     [DataField]
