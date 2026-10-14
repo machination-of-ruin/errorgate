@@ -30,8 +30,6 @@ public sealed class TunnelLayout
     /// <summary>Radioactive barrels: at the east end and along the way.</summary>
     public List<Vector2i> Radiation = new();
 
-    /// <summary>The floor of the wide room at the east end (a plaza for the entrance of the laboratory), if the tunnel has one.</summary>
-    public HashSet<Vector2i> Antechamber = new();
 
     /// <summary>The middle line of the corridor from the first gate to the last.</summary>
     public List<Vector2i> Path = new();
@@ -89,21 +87,6 @@ public sealed class TunnelLayout
                 for (var dy = -1; dy <= 1; dy++)
                 {
                     l.Floor.Add(new Vector2i(c.X + dx, c.Y + dy));
-                }
-            }
-        }
-
-        // A tunnel that leads to the laboratory (it has radiation) ends in a plaza: a room seven wide and five deep before the entrance
-        if (radiation > 0)
-        {
-            var end = l.Path[^1];
-            for (var dx = -4; dx <= 0; dx++)
-            {
-                for (var dy = -3; dy <= 3; dy++)
-                {
-                    var t = new Vector2i(end.X + dx, end.Y + dy);
-                    l.Floor.Add(t);
-                    l.Antechamber.Add(t);
                 }
             }
         }
@@ -197,8 +180,7 @@ public sealed class TunnelLayout
                 l.Lights.Add(t);
         }
 
-        // Radioactive barrels: two at the east end, four tiles from the gate (the arrival tile and the gate are inside their reach), and the
-        // rest along the corridor, alternating sides
+        // Radioactive barrels: two near the east end (the gate is inside their reach), the rest along the corridor, alternating sides
         if (radiation > 0 && l.Path.Count > 30)
         {
             var taken = new HashSet<Vector2i>(l.Rubble);
@@ -210,11 +192,11 @@ public sealed class TunnelLayout
                 return new Vector2i(along.Y != 0 ? 1 : 0, along.X != 0 ? 1 : 0);
             }
 
-            // In the plaza, both sides of the way to the entrance
-            var plaza = new GatePlacement(l.Path[^1], l.Path[^4], 1);
-            foreach (var (f, side) in new[] { (-2, -2), (-2, 2), (-4, -2), (-4, 2) })
+            // Two near the entrance, one on each side but not facing each other
+            foreach (var (back, side) in new[] { (5, 1), (9, -1) })
             {
-                var t = LocationLayout.PlazaTile(plaza, f, side);
+                var index = l.Path.Count - back;
+                var t = l.Path[index] + Across(index) * side;
                 if (taken.Add(t))
                     l.Radiation.Add(t);
             }

@@ -180,6 +180,14 @@ public sealed partial class WorldLocationPrototype : IPrototype
     [DataField]
     public int Faults;
 
+    /// <summary>The gates whose plaza has radioactive barrels (the way towards the laboratory), so people know a suit is needed.</summary>
+    [DataField]
+    public List<string> RadiationGates = new();
+
+    /// <summary>How many of the unique buildings (see WorldStructurePrototype) of each group a build puts out, from min to max.</summary>
+    [DataField]
+    public List<WorldUniqueGroup> UniqueGroups = new();
+
     /// <summary>How many roadblocks (wrecks, barricades) stand on the wide avenues, and what they are made of.</summary>
     [DataField]
     public int Roadblocks;
@@ -200,6 +208,20 @@ public sealed partial class WorldLocationPrototype : IPrototype
 }
 
 /// <summary>A kind of place the layout puts into the empty ground and how many of it (see LocationLayout.Features.cs).</summary>
+/// <summary>How many of the unique buildings of a group a location puts out.</summary>
+[DataDefinition]
+public sealed partial class WorldUniqueGroup
+{
+    [DataField(required: true)]
+    public string Group = string.Empty;
+
+    [DataField]
+    public int Min = 1;
+
+    [DataField]
+    public int Max = 1;
+}
+
 [DataDefinition]
 public sealed partial class WorldLandmarkEntry
 {
@@ -256,6 +278,17 @@ public sealed partial class WorldStructurePrototype : IPrototype
     /// <summary>How often it is picked compared to the others of its role.</summary>
     [DataField]
     public float Weight = 1f;
+
+    /// <summary>The group a unique building belongs to: the location puts out only some of each group (see UniqueGroups).</summary>
+    [DataField]
+    public string Group = string.Empty;
+
+    /// <summary>
+    ///     A unique building that may take the streets under it away if it fits nowhere else (the factories). Without it, a unique building
+    ///     is left out when no lot along a street takes it.
+    /// </summary>
+    [DataField]
+    public bool CutStreets;
 
     /// <summary>
     ///     A building that is put out once in every location of its theme, on a lot picked for it (a hand-cut landmark), and is not part

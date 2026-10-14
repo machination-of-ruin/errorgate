@@ -219,33 +219,47 @@
   id: city-apartments-1
   role: civic
   unique: true
+  group: residential
+  cutStreets: true
 
 - type: worldStructure
   id: city-apartments-2
   role: civic
   unique: true
+  group: residential
+  cutStreets: true
 
 - type: worldStructure
   id: city-apartments-3
   role: civic
   unique: true
+  group: residential
+  cutStreets: true
 
 - type: worldStructure
   id: city-apartments-4
   role: civic
   unique: true
+  group: residential
+  cutStreets: true
 
 - type: worldStructure
   id: city-dormitory
   role: civic
   unique: true
+  group: residential
+  cutStreets: true
 
 - type: worldStructure
   id: city-factory-1
   role: industrial
   unique: true
+  group: factory
+  cutStreets: true
 
 - type: worldStructure
   id: city-factory-2
   role: industrial
   unique: true
+  group: factory
+  cutStreets: true

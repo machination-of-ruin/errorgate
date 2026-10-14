@@ -9,7 +9,7 @@ namespace Content.Server._ERRORGATE.World;
 ///     front door is on (0 south, 1 east, 2 north, 3 west) and the tile of that door, and what the structure is for (house,
 ///     outbuilding, civic, shop, industrial). Measured once.
 /// </summary>
-public sealed record StructureInfo(string Path, int Width, int Height, Vector2i LocalMin, int FrontSide, Vector2i FrontDoor, string Role, float Weight, bool Unique = false);
+public sealed record StructureInfo(string Path, int Width, int Height, Vector2i LocalMin, int FrontSide, Vector2i FrontDoor, string Role, float Weight, bool Unique = false, string Group = "", bool CutStreets = false);
 
 /// <summary>
 ///     A structure placed in a location: its footprint rectangle after the turns, where its grid origin goes, the side its front
@@ -113,7 +113,7 @@ public sealed partial class LocationLayout
         layout.PlaceGates(rng, options.Gates, options.BorderGates ?? new List<string>());
         layout.Walks.ExceptWith(layout.Roads);
         if (pool.Count > 0)
-            layout.FillFrontage(rng, size, pool, density, options.Style);
+            layout.FillFrontage(rng, size, pool, density, options.Style, options.UniqueRules ?? new List<(string Group, int Min, int Max)>());
 
         if (options.SpawnZone)
             layout.PlaceSpawnZone(rng);
@@ -869,10 +869,21 @@ public sealed partial class LocationLayout
         return r < 0.75 ? LotKind.Homestead : r < 0.9 ? LotKind.House : LotKind.Outbuilding;
     }
 
-    private void FillFrontage(Random rng, Vector2i size, IReadOnlyList<StructureInfo> pool, float density, string style)
+    private void FillFrontage(Random rng, Vector2i size, IReadOnlyList<StructureInfo> pool, float density, string style, IReadOnlyList<(string Group, int Min, int Max)> uniqueRules)
     {
         // The unique buildings are put out once each below; the random lots draw from the rest
-        var uniques = pool.Where(i => i.Unique).ToList();
+        // Only some of each group of unique buildings go out (a block of flats or two, not all of them); the others are left out. The ones that
+        // may cut the streets (the factories) are placed first, since they need the most room
+        var allUniques = pool.Where(i => i.Unique).ToList();
+        var uniques = new List<StructureInfo>();
+        foreach (var rule in uniqueRules)
+        {
+            var members = allUniques.Where(u => u.Group == rule.Group).OrderBy(_ => rng.Next()).ToList();
+            uniques.AddRange(members.Take(rng.Next(rule.Min, rule.Max + 1)));
+        }
+
+        uniques.AddRange(allUniques.Where(u => !uniqueRules.Any(r => r.Group == u.Group)));
+        uniques = uniques.OrderByDescending(u => u.CutStreets).ThenBy(_ => rng.Next()).ToList();
         var ordinary = pool.Where(i => !i.Unique).ToList();
         if (ordinary.Count == 0)
             ordinary = pool.ToList();
@@ -917,7 +928,7 @@ public sealed partial class LocationLayout
 
             // Too big for any lot along a street (a factory, a block of flats): it goes where there is room and the streets that ran
             // through that place are cut by it
-            if (!done)
+            if (!done && landmark.CutStreets)
                 PlaceUniqueByCulling(rng, landmark);
         }
 

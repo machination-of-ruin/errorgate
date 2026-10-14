@@ -221,7 +221,7 @@ public sealed partial class WorldSystem : EntitySystem
         var useSeed = seed ?? _random.Next();
         var options = new LocationLayout.Options(proto.Style, proto.Shape, proto.Rocks, proto.TreeClumps, proto.TreeSingles, proto.Shore,
             proto.Props.Select(e => (e.Count, e.Clump)).ToList(), proto.Decals.Select(e => (e.Count, e.Clump)).ToList(), proto.RubbleEnd ? gates.Append("~rubble").ToList() : gates, proto.Mobs.Count > 0 ? proto.MobCount : 0, proto.SpawnZone, proto.RoadblockProtos.Count > 0 ? proto.Roadblocks : 0, proto.RubbleEnd ? proto.BorderGates.Append("~rubble").ToList() : proto.BorderGates,
-            proto.Landmarks.Select(e => (e.Kind, e.Count)).ToList());
+            proto.Landmarks.Select(e => (e.Kind, e.Count)).ToList(), proto.UniqueGroups.Select(e => (e.Group, e.Min, e.Max)).ToList());
         var layout = LocationLayout.Generate(useSeed, proto.Size, pool, proto.Density, options);
 
         yield return true;
@@ -748,14 +748,18 @@ public sealed partial class WorldSystem : EntitySystem
         var role = width * height <= 48 ? "outbuilding" : "house";
         var weight = 1f;
         var unique = false;
+        var group = string.Empty;
+        var cut = false;
         if (_proto.TryIndex<WorldStructurePrototype>(id, out var structure))
         {
             role = structure.Role;
             weight = structure.Weight;
             unique = structure.Unique;
+            group = structure.Group;
+            cut = structure.CutStreets;
         }
 
-        return new StructureInfo(path.ToString(), width, height, min, front, door, role, weight, unique);
+        return new StructureInfo(path.ToString(), width, height, min, front, door, role, weight, unique, group, cut);
     }
 
     private List<StructureInfo> GetPool(string theme)

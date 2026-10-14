@@ -366,6 +366,18 @@ public sealed partial class WorldSystem
         SpawnPostLight("LightPostSmall", At(0, 2), place.Tile.X * 37 + place.Tile.Y);
 
         var rng = new Random(place.Tile.X * 7919 + place.Tile.Y);
+        // Radioactive barrels on the plaza of the way to the laboratory: three, at different depths and on random sides, so they do not
+        // mirror each other
+        if (_proto.Index<WorldLocationPrototype>(location).RadiationGates.Contains(gateId))
+        {
+            var barrelRng = new Random(place.Tile.X * 104729 + place.Tile.Y);
+            foreach (var f in new[] { -3, -2, -1 })
+            {
+                var side = barrelRng.Next(2) == 0 ? -2 : 2;
+                Spawn("BunkerRadiationBarrel", At(f, side));
+            }
+        }
+
         // The flanks run along the way to the gate
         var vertical = place.Facing % 2 == 0;
         foreach (var side in new[] { -3, 3 })
@@ -566,14 +578,6 @@ public sealed partial class WorldSystem
         foreach (var t in layout.Floor.Concat(layout.Walls))
         {
             tiles.Add((t, new Tile(floorDef.TileId, 0, _tile.PickVariant(floorDef))));
-        }
-
-        // The plaza at the end of the way to the laboratory has a floor of its own
-        var plazaFloor = (ContentTileDefinition) _tileDefs["FloorSteelPavement"];
-        for (var i = 0; i < tiles.Count; i++)
-        {
-            if (layout.Antechamber.Contains(tiles[i].Item1))
-                tiles[i] = (tiles[i].Item1, new Tile(plazaFloor.TileId, 0, _tile.PickVariant(plazaFloor)));
         }
 
         _map.SetTiles(ground.Owner, ground.Comp, tiles);
