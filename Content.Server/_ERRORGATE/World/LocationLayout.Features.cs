@@ -133,7 +133,7 @@ public sealed partial class LocationLayout
 
                         Claim(c, r, r);
                         Features.Add(new Feature(kind, c));
-                        Put(c, "Bonfire");
+                        Put(c, "CampfireWorld");
                         Put(At(c, -2, 1), "N14Bedroll", 1);
                         Put(At(c, 2, -1), "N14Bedroll", 3);
                         Put(At(c, 1, 3), "N14Bedroll", 2);

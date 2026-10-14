@@ -141,7 +141,7 @@
 - type: entity
   id: WorldGate
   parent: BaseStructure
-  name: hatch
+  name: entrance
   categories: [ HideSpawnMenu ]
   components:
   - type: Transform
@@ -233,6 +233,7 @@
   post: LightPostSmall
   mobs: [ MobSpawnerRunner, MobSpawnerWalkerArmored ]
   mobCount: 5
+  radiationBarrels: 7
   ambientLight: "#101010"
   resetMinMinutes: 360
   resetMaxMinutes: 720

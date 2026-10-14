@@ -372,7 +372,7 @@ public sealed partial class WorldSystem : EntitySystem
         {
             foreach (var tile in layout.Posts)
             {
-                Spawn(post, _map.GridTileToLocal(ground.Owner, ground.Comp, tile));
+                SpawnPostLight(post, _map.GridTileToLocal(ground.Owner, ground.Comp, tile), tile.X * 53 + tile.Y);
             }
         }
 

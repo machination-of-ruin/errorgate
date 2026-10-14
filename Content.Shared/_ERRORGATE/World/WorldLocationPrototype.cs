@@ -172,6 +172,10 @@ public sealed partial class WorldLocationPrototype : IPrototype
     [DataField]
     public List<WorldLandmarkEntry> Landmarks = new();
 
+    /// <summary>Radioactive barrels in a tunnel (a few along the way and two at the end that leads to a laboratory): a sign that a suit is needed.</summary>
+    [DataField]
+    public int RadiationBarrels;
+
     /// <summary>How many world faults (see docs/design/anomalies.md) are scattered over the location, along the routes between the loot.</summary>
     [DataField]
     public int Faults;

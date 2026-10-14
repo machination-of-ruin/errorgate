@@ -297,6 +297,13 @@ public sealed partial class WorldSystem
         _decals.TryAddDecal(id, tileCentre.Offset(new Vector2(-0.5f, -0.5f)), out _);
     }
 
+    /// <summary>A post light that is broken 60 times in a hundred: no light, no glow.</summary>
+    private void SpawnPostLight(string proto, EntityCoordinates at, int seed)
+    {
+        var broken = new Random(seed).NextDouble() < 0.6;
+        Spawn(broken ? "LightPostSmallBroken" : proto, at);
+    }
+
     private static readonly string[] PlazaBarricades =
     {
         "N14BarricadeMetal", "N14BarricadeSandbagSingle", "N14BarricadeRazorwire", "N14BarricadeTanktrap",
@@ -343,11 +350,20 @@ public sealed partial class WorldSystem
             AddDecal("WarnFull", At(-1, l));
         }
 
-        AddDecal("WarnFull", At(0, -1));
-        AddDecal("WarnFull", At(0, 1));
+        // The gate stands in a niche of the rock: rock on both sides of it and behind it. People arrive on the tile in front
+        if (layout.Dist(LocationLayout.PlazaTile(place, 1, 0)) <= 2)
+        {
+            Spawn(borderProto, At(0, -1));
+            Spawn(borderProto, At(0, 1));
+        }
+        else
+        {
+            AddDecal("WarnFull", At(0, -1));
+            AddDecal("WarnFull", At(0, 1));
+        }
 
-        Spawn("LightPostSmall", At(0, -2));
-        Spawn("LightPostSmall", At(0, 2));
+        SpawnPostLight("LightPostSmall", At(0, -2), place.Tile.X * 31 + place.Tile.Y);
+        SpawnPostLight("LightPostSmall", At(0, 2), place.Tile.X * 37 + place.Tile.Y);
 
         var rng = new Random(place.Tile.X * 7919 + place.Tile.Y);
         // The flanks run along the way to the gate
@@ -417,16 +433,22 @@ public sealed partial class WorldSystem
     }
 
     /// <summary>A gate in a tunnel: hazard marks in front of it and a lamp on each side.</summary>
-    private void DecorateTunnelGate(string location, string gateId, Entity<MapGridComponent> ground, GatePlacement place)
+    private void DecorateTunnelGate(string location, string gateId, Entity<MapGridComponent> ground, GatePlacement place, bool placeGate = true)
     {
+        var rock = _proto.Index<WorldLocationPrototype>(location).Border;
+        // The same niche as the plazas have: rock on both sides of the gate (the rock behind it is the end of the tunnel)
+        Spawn(rock, _map.GridTileToLocal(ground.Owner, ground.Comp, LocationLayout.PlazaTile(place, 0, -1)));
+        Spawn(rock, _map.GridTileToLocal(ground.Owner, ground.Comp, LocationLayout.PlazaTile(place, 0, 1)));
+
         foreach (var l in new[] { -1, 0, 1 })
         {
             AddDecal("WarnFull", _map.GridTileToLocal(ground.Owner, ground.Comp, LocationLayout.PlazaTile(place, -1, l)));
         }
 
-        Spawn("LightPostSmall", _map.GridTileToLocal(ground.Owner, ground.Comp, LocationLayout.PlazaTile(place, 0, -1)));
-        Spawn("LightPostSmall", _map.GridTileToLocal(ground.Owner, ground.Comp, LocationLayout.PlazaTile(place, 0, 1)));
-        PlaceGate(location, gateId, ground, place.Tile, LocationLayout.PlazaTile(place, -1, 0), place.Facing);
+        SpawnPostLight("LightPostSmall", _map.GridTileToLocal(ground.Owner, ground.Comp, LocationLayout.PlazaTile(place, -1, -1)), place.Tile.X * 43 + place.Tile.Y);
+        SpawnPostLight("LightPostSmall", _map.GridTileToLocal(ground.Owner, ground.Comp, LocationLayout.PlazaTile(place, -1, 1)), place.Tile.X * 47 + place.Tile.Y);
+        if (placeGate)
+            PlaceGate(location, gateId, ground, place.Tile, LocationLayout.PlazaTile(place, -1, 0), place.Facing);
     }
 
     private void PlaceGate(string location, string gate, Entity<MapGridComponent> ground, Vector2i tile, Vector2i arrival, int facing)
@@ -434,7 +456,7 @@ public sealed partial class WorldSystem
         var proto = _proto.Index<WorldLocationPrototype>(location);
         var entity = Spawn(proto.Gate, _map.GridTileToLocal(ground.Owner, ground.Comp, tile));
         if (PartnerOf(location, gate) is { } beyond && _proto.TryIndex<WorldLocationPrototype>(beyond.Location, out var beyondProto))
-            _meta.SetEntityName(entity, $"hatch to {beyondProto.Name}");
+            _meta.SetEntityName(entity, $"entrance to {beyondProto.Name}");
         var comp = EnsureComp<WorldTransitionComponent>(entity);
         comp.Location = location;
         comp.Gate = gate;
@@ -534,7 +556,7 @@ public sealed partial class WorldSystem
         var watch = Stopwatch.StartNew();
         var entitiesBefore = EntityManager.EntityCount;
         var useSeed = seed ?? _random.Next();
-        var layout = TunnelLayout.Generate(useSeed, proto.Size, gates, proto.Mobs.Count > 0 ? proto.MobCount : 0);
+        var layout = TunnelLayout.Generate(useSeed, proto.Size, gates, proto.Mobs.Count > 0 ? proto.MobCount : 0, proto.RadiationBarrels);
 
         var mapUid = CreateLocationMap(proto, out var mapId);
         var ground = _mapManager.CreateGridEntity(mapId);
@@ -565,11 +587,17 @@ public sealed partial class WorldSystem
             Spawn(CoverProto, _map.GridTileToLocal(ground.Owner, ground.Comp, crate));
         }
 
+        // Radioactive barrels: a warning that a suit is needed, and a danger on the way to the laboratory
+        foreach (var barrel in layout.Radiation)
+        {
+            Spawn("BunkerRadiationBarrel", _map.GridTileToLocal(ground.Owner, ground.Comp, barrel));
+        }
+
         if (proto.Post is { } post)
         {
             foreach (var light in layout.Lights)
             {
-                Spawn(post, _map.GridTileToLocal(ground.Owner, ground.Comp, light));
+                SpawnPostLight(post, _map.GridTileToLocal(ground.Owner, ground.Comp, light), light.X * 41 + light.Y);
             }
         }
 
@@ -582,10 +610,8 @@ public sealed partial class WorldSystem
         foreach (var (gateId, place) in layout.Gates)
         {
             // The way into a laboratory is the bunker hatch (see LinkBunkerEntrances), not a plain gate
-            if (PartnerOf(proto.ID, gateId) is { } partner && _proto.TryIndex<WorldLocationPrototype>(partner.Location, out var other) && other.Style == "laboratory")
-                continue;
-
-            DecorateTunnelGate(proto.ID, gateId, ground, place);
+            var toLab = PartnerOf(proto.ID, gateId) is { } partner && _proto.TryIndex<WorldLocationPrototype>(partner.Location, out var other) && other.Style == "laboratory";
+            DecorateTunnelGate(proto.ID, gateId, ground, place, !toLab);
         }
 
         // The air is the map's (a grid that grows gets an atmosphere of its own by itself, which starts empty: take it off)
@@ -686,9 +712,9 @@ public sealed partial class WorldSystem
                 var hatchCoords = _map.GridTileToLocal(ground, grid, place.Tile);
                 var outside = _map.GridTileToLocal(ground, grid, LocationLayout.PlazaTile(place, -1, 0));
                 tunnel.Hatch = _bunker.PlaceHatch(hatchCoords, outside, vestibule, arrival);
-                _meta.SetEntityName(tunnel.Hatch.Value, $"bunker hatch to {lab.Proto.Name}");
+                _meta.SetEntityName(tunnel.Hatch.Value, $"bunker entrance to {lab.Proto.Name}");
                 if (TryComp<Bunker.BunkerVestibuleComponent>(vestibule, out var vestibuleComp) && vestibuleComp.Ladder is { } ladder)
-                    _meta.SetEntityName(ladder, $"hatch to {tunnel.Proto.Name}");
+                    _meta.SetEntityName(ladder, $"entrance to {tunnel.Proto.Name}");
             }
         }
     }

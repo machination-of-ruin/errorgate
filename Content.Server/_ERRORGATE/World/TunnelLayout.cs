@@ -27,6 +27,9 @@ public sealed class TunnelLayout
 
     public List<Vector2i> Lights = new();
 
+    /// <summary>Radioactive barrels: at the east end and along the way.</summary>
+    public List<Vector2i> Radiation = new();
+
     /// <summary>The middle line of the corridor from the first gate to the last.</summary>
     public List<Vector2i> Path = new();
 
@@ -35,7 +38,7 @@ public sealed class TunnelLayout
         new(1, 0), new(-1, 0), new(0, 1), new(0, -1), new(1, 1), new(1, -1), new(-1, 1), new(-1, -1),
     };
 
-    public static TunnelLayout Generate(int seed, Vector2i size, IReadOnlyList<string> gateIds, int mobCount)
+    public static TunnelLayout Generate(int seed, Vector2i size, IReadOnlyList<string> gateIds, int mobCount, int radiation = 0)
     {
         var rng = new Random(seed);
         var l = new TunnelLayout { Bounds = size };
@@ -167,6 +170,38 @@ public sealed class TunnelLayout
             var t = here + across;
             if (!l.Rubble.Contains(t) && !l.Cover.Contains(t))
                 l.Lights.Add(t);
+        }
+
+        // Radioactive barrels: two at the east end, four tiles from the gate (the arrival tile and the gate are inside their reach), and the
+        // rest along the corridor, alternating sides
+        if (radiation > 0 && l.Path.Count > 30)
+        {
+            var taken = new HashSet<Vector2i>(l.Rubble);
+            taken.UnionWith(l.Cover);
+            taken.UnionWith(l.Lights);
+            Vector2i Across(int index)
+            {
+                var along = l.Path[index + 1] - l.Path[index];
+                return new Vector2i(along.Y != 0 ? 1 : 0, along.X != 0 ? 1 : 0);
+            }
+
+            var end = l.Path.Count - 5;
+            foreach (var side in new[] { 1, -1 })
+            {
+                var t = l.Path[end] + Across(end) * side;
+                if (taken.Add(t))
+                    l.Radiation.Add(t);
+            }
+
+            var rest = Math.Max(0, radiation - 2);
+            for (var i = 0; i < rest; i++)
+            {
+                var index = 14 + (int) ((i + 0.5) * (l.Path.Count - 40) / Math.Max(1, rest));
+                index = Math.Clamp(index, 10, l.Path.Count - 14);
+                var t = l.Path[index] + Across(index) * (i % 2 == 0 ? 1 : -1);
+                if (l.Floor.Contains(t) && taken.Add(t))
+                    l.Radiation.Add(t);
+            }
         }
 
         // Mobs spread along the way, well away from the gates
