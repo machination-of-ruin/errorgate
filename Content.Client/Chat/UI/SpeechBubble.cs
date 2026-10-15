@@ -217,6 +217,53 @@ namespace Content.Client.Chat.UI
             return msg;
         }
 
+        private static readonly (int X, int Y)[] OutlineOffsets =
+        {
+            (-1, 0), (1, 0), (0, -1), (0, 1), (-1, -1), (1, -1), (-1, 1), (1, 1),
+        };
+
+        /// <summary>
+        ///     ERRORGATE speech: bold Bedstead with a black outline and no box behind it. The outline is the same text drawn eight times
+        ///     in black, a pixel off in every direction, under the text itself. All the copies have the same margin in total, so they
+        ///     measure the same and the bubble is as wide as the text with a pixel of room on each side.
+        /// </summary>
+        protected Control BuildOutlined(string markup, Color? fontColor, bool italic, float maxWidth = SpeechMaxWidth, float opacity = 1f)
+        {
+            var fontId = italic ? "BedsteadBoldItalic" : "BedsteadBold";
+            var holder = new Control();
+            var plain = FormattedMessage.RemoveMarkupPermissive(markup);
+
+            foreach (var (dx, dy) in OutlineOffsets)
+            {
+                var shadow = new RichTextLabel
+                {
+                    MaxWidth = maxWidth,
+                    Margin = new Thickness(1 + dx, 1 + dy, 1 - dx, 1 - dy),
+                    ModulateSelfOverride = Color.White.WithAlpha(opacity),
+                };
+
+                var shadowMessage = new FormattedMessage();
+                shadowMessage.PushColor(Color.Black);
+                shadowMessage.AddMarkupOrThrow($"[font=\"{fontId}\"]");
+                shadowMessage.AddText(plain);
+                shadowMessage.AddMarkupOrThrow("[/font]");
+                shadow.SetMessage(shadowMessage);
+                holder.AddChild(shadow);
+            }
+
+            var main = new RichTextLabel
+            {
+                MaxWidth = maxWidth,
+                Margin = new Thickness(1),
+                ModulateSelfOverride = Color.White.WithAlpha(opacity),
+            };
+
+            // The message brings its own font tag; bold and italic pick the variant of whatever font is in force
+            main.SetMessage(FormatSpeech(italic ? $"[bold][italic]{markup}[/italic][/bold]" : $"[bold]{markup}[/bold]", fontColor, "Bedstead"));
+            holder.AddChild(main);
+            return holder;
+        }
+
         protected FormattedMessage ExtractAndFormatSpeechSubstring(ChatMessage message, string tag, Color? fontColor = null)
         {
             return FormatSpeech(SharedChatSystem.GetStringInsideTag(message, tag), fontColor);
@@ -233,21 +280,8 @@ namespace Content.Client.Chat.UI
 
         protected override Control BuildBubble(ChatMessage message, string speechStyleClass, Color? fontColor = null)
         {
-            var label = new RichTextLabel
-            {
-                MaxWidth = SpeechMaxWidth,
-            };
-
-            label.SetMessage(FormatSpeech(message.WrappedMessage, fontColor, "Bedstead")); // WWDP EDIT
-
-            var panel = new PanelContainer
-            {
-                StyleClasses = { "speechBox", speechStyleClass },
-                Children = { label },
-                ModulateSelfOverride = Color.White.WithAlpha(ConfigManager.GetCVar(CCVars.SpeechBubbleBackgroundOpacity))
-            };
-
-            return panel;
+            // Emotes and LOOC are drawn like the rest of the speech, in italics
+            return BuildOutlined(message.WrappedMessage, fontColor, true, SpeechMaxWidth, ConfigManager.GetCVar(CCVars.SpeechBubbleTextOpacity));
         }
     }
 
@@ -261,68 +295,21 @@ namespace Content.Client.Chat.UI
 
         protected override Control BuildBubble(ChatMessage message, string speechStyleClass, Color? fontColor = null)
         {
+            var italic = speechStyleClass == "whisperBox";
+            var textOpacity = ConfigManager.GetCVar(CCVars.SpeechBubbleTextOpacity);
+            var content = BuildOutlined(SharedChatSystem.GetStringInsideTag(message, "BubbleContent"), fontColor, italic, SpeechMaxWidth, textOpacity);
             if (!ConfigManager.GetCVar(CCVars.ChatEnableFancyBubbles))
-            {
-                var label = new RichTextLabel
-                {
-                    MaxWidth = SpeechMaxWidth
-                };
+                return content;
 
-                label.SetMessage(FormatSpeech(SharedChatSystem.GetStringInsideTag(message, "BubbleContent"), fontColor, "Bedstead")); // WWDP EDIT // LESS USELESS ONE LINER FUNCS PLS
+            // The name of the speaker above the text, in the same outline
+            var header = BuildOutlined(SharedChatSystem.GetStringInsideTag(message, "BubbleHeader"), fontColor, false, SpeechMaxWidth, ConfigManager.GetCVar(CCVars.SpeechBubbleSpeakerOpacity));
+            header.HorizontalAlignment = HAlignment.Center;
+            header.VerticalAlignment = VAlignment.Top;
+            content.HorizontalAlignment = HAlignment.Center;
+            content.VerticalAlignment = VAlignment.Bottom;
+            content.Margin = new Thickness(0, 14, 0, 0);
 
-                var unfanciedPanel = new PanelContainer
-                {
-                    StyleClasses = { "speechBox", speechStyleClass },
-                    Children = { label },
-                    ModulateSelfOverride = Color.White.WithAlpha(ConfigManager.GetCVar(CCVars.SpeechBubbleBackgroundOpacity)),
-                };
-                return unfanciedPanel;
-            }
-
-            var bubbleHeader = new RichTextLabel
-            {
-                ModulateSelfOverride = Color.White.WithAlpha(ConfigManager.GetCVar(CCVars.SpeechBubbleSpeakerOpacity)),
-                Margin = new Thickness(1, 1, 1, 1),
-            };
-
-            var bubbleContent = new RichTextLabel
-            {
-                ModulateSelfOverride = Color.White.WithAlpha(ConfigManager.GetCVar(CCVars.SpeechBubbleTextOpacity)),
-                MaxWidth = SpeechMaxWidth,
-                Margin = new Thickness(2, 6, 2, 2),
-                StyleClasses = { "bubbleContent" },
-            };
-
-            //We'll be honest. *Yes* this is hacky. Doing this in a cleaner way would require a bottom-up refactor of how saycode handles sending chat messages. -Myr
-            bubbleHeader.SetMessage(FormatSpeech(SharedChatSystem.GetStringInsideTag(message, "BubbleHeader"), fontColor, "Bedstead")); // WWDP EDIT // LESS USELESS ONE LINER FUNCS PLS
-            bubbleContent.SetMessage(FormatSpeech(SharedChatSystem.GetStringInsideTag(message, "BubbleContent"), fontColor, "Bedstead")); // WWDP EDIT
-
-            //As for below: Some day this could probably be converted to xaml. But that is not today. -Myr
-            var mainPanel = new PanelContainer
-            {
-                StyleClasses = { "speechBox", speechStyleClass },
-                Children = { bubbleContent },
-                ModulateSelfOverride = Color.White.WithAlpha(ConfigManager.GetCVar(CCVars.SpeechBubbleBackgroundOpacity)),
-                HorizontalAlignment = HAlignment.Center,
-                VerticalAlignment = VAlignment.Bottom,
-                Margin = new Thickness(4, 14, 4, 2)
-            };
-
-            var headerPanel = new PanelContainer
-            {
-                StyleClasses = { "speechBox", speechStyleClass },
-                Children = { bubbleHeader },
-                ModulateSelfOverride = Color.White.WithAlpha(ConfigManager.GetCVar(CCVars.ChatFancyNameBackground) ? ConfigManager.GetCVar(CCVars.SpeechBubbleBackgroundOpacity) : 0f),
-                HorizontalAlignment = HAlignment.Center,
-                VerticalAlignment = VAlignment.Top
-            };
-
-            var panel = new PanelContainer
-            {
-                Children = { mainPanel, headerPanel }
-            };
-
-            return panel;
+            return new Control { Children = { content, header } };
         }
     }
 }
