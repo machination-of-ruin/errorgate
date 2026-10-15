@@ -56,15 +56,6 @@ namespace Content.Client.Chat.UI
 
         private float _timeLeft = TotalTime;
 
-        /// <summary>What the bubble has above and below its text (the space for the speaker's name).</summary>
-        private float _heightAroundText;
-
-        /// <summary>The text that appears letter by letter, if the bubble has one (set while the bubble is built).</summary>
-        protected OutlinedSpeechText? RevealText;
-
-        /// <summary>Seconds between two letters of a voice without barks, and the longer pause after punctuation.</summary>
-        private const float DefaultLetterPause = 0.045f;
-
         public float VerticalOffset { get; set; }
         private float _verticalOffsetAchieved;
 
@@ -118,77 +109,6 @@ namespace Content.Client.Chat.UI
             bubble.Measure(Vector2Helpers.Infinity);
             ContentSize = bubble.DesiredSize;
             _verticalOffsetAchieved = -ContentSize.Y;
-
-            // The box is measured with the whole text; then the text is taken away and comes back letter by letter
-            if (RevealText != null && ConfigManager.GetCVar(CCVars.ChatBubbleLetterReveal))
-            {
-                _heightAroundText = ContentSize.Y - RevealText.DesiredSize.Y;
-                StartReveal(speechStyleClass == "whisperBox");
-            }
-        }
-
-        /// <summary>
-        ///     Works out when each letter appears: the way the voice barks do (Content.Client/_White/Bark): one letter per bark, the pause
-        ///     before each as the voice's data gives it, longer after punctuation and shorter after consonants. A voice without barks
-        ///     uses a steady pace. The bubble stays long enough to be read after the last letter.
-        /// </summary>
-        private void StartReveal(bool whisper)
-        {
-            var text = RevealText!.PlainText;
-            var count = text.Length;
-            var times = new float[count];
-
-            var barkVoice = _entityManager.TryGetComponent<Content.Shared._White.Bark.Components.BarkComponent>(_senderEntity, out var bark) ? bark.VoiceData : null;
-            if (barkVoice == null)
-            {
-                // No voice, no barks: a steady pace
-                var steady = 0f;
-                for (var i = 0; i < count; i++)
-                {
-                    steady += text[i] is '.' or ',' or '?' or '!' ? DefaultLetterPause * 1.2f : DefaultLetterPause;
-                    times[i] = steady;
-                }
-            }
-            else
-            {
-                // The way ClientBarkSystem.Update plays them: it takes the next bark, waits until its pause has run out in steps of one
-                // tick, plays it, and takes the next one at the next tick. So every bark costs its pause rounded up to whole ticks and one
-                // tick more, not just its pause
-                var barks = _entityManager.System<Content.Client._White.Bark.BarkSystem>();
-                var tick = (float) IoCManager.Resolve<IGameTiming>().TickPeriod.TotalSeconds;
-                var tickIndex = 0;
-                var waited = 0f;
-                for (var i = 0; i < count; i++)
-                {
-                    var pause = barks.GenBarkData(barkVoice, text[i], whisper).Pause;
-                    waited = 0f;
-                    while (true)
-                    {
-                        tickIndex++;
-                        if (pause <= waited)
-                            break;
-
-                        waited += tick;
-                    }
-
-                    times[i] = tickIndex * tick;
-                }
-
-                // A long message gets barks only for its first letters (the bark limit of the options); the letters are revealed in that
-                // same time, so the text is done when the barks are
-                var limit = ConfigManager.GetCVar(WhiteCVars.BarkLimit);
-                if (limit > 0 && count > limit)
-                {
-                    var factor = times[limit - 1] / times[count - 1];
-                    for (var i = 0; i < count; i++)
-                    {
-                        times[i] *= factor;
-                    }
-                }
-            }
-
-            _timeLeft = TotalTime + (count > 0 ? times[count - 1] : 0f);
-            RevealText.SetSchedule(times);
         }
 
         protected abstract Control BuildBubble(ChatMessage message, string speechStyleClass, Color? fontColor = null);
@@ -198,7 +118,6 @@ namespace Content.Client.Chat.UI
             base.FrameUpdate(args);
 
             _timeLeft -= args.DeltaSeconds;
-
             if (_entityManager.Deleted(_senderEntity) || _timeLeft <= 0)
             {
                 // Timer spawn to prevent concurrent modification exception.
@@ -249,17 +168,12 @@ namespace Content.Client.Chat.UI
             var worldPos = _transformSystem.GetWorldPosition(xform) + offset;
 
             var lowerCenter = _eyeManager.WorldToScreen(worldPos) / UIScale;
-            // While the text is coming in the bubble is only as tall as the lines revealed so far: it grows upwards from the head
-            var shownHeight = ContentSize.Y;
-            if (RevealText != null)
-                shownHeight = Math.Min(ContentSize.Y, RevealText.VisibleHeight + _heightAroundText);
-
-            var screenPos = lowerCenter - new Vector2(ContentSize.X / 2, shownHeight + _verticalOffsetAchieved);
+            var screenPos = lowerCenter - new Vector2(ContentSize.X / 2, ContentSize.Y + _verticalOffsetAchieved);
             // Round to nearest 0.5
             screenPos = (screenPos * 2).Rounded() / 2;
             LayoutContainer.SetPosition(this, screenPos);
 
-            var height = MathF.Ceiling(MathHelper.Clamp(lowerCenter.Y - screenPos.Y, 0, shownHeight));
+            var height = MathF.Ceiling(MathHelper.Clamp(lowerCenter.Y - screenPos.Y, 0, ContentSize.Y));
             SetHeight = height;
         }
 
@@ -303,10 +217,62 @@ namespace Content.Client.Chat.UI
             return msg;
         }
 
-        /// <summary>ERRORGATE speech: bold Bedstead with a black outline and no box (see <see cref="OutlinedSpeechText"/>).</summary>
-        protected OutlinedSpeechText BuildOutlined(string markup, Color? fontColor, bool italic, float maxWidth = SpeechMaxWidth, float opacity = 1f)
+        // A round outline two pixels thick: every offset within a distance of two, but not the corners
+        private static readonly (int X, int Y)[] OutlineOffsets = BuildOutlineOffsets();
+
+        private const int OutlineWidth = 2;
+
+        private static (int, int)[] BuildOutlineOffsets()
         {
-            return new OutlinedSpeechText(markup, fontColor, italic, maxWidth, opacity);
+            var list = new List<(int, int)>();
+            for (var x = -OutlineWidth; x <= OutlineWidth; x++)
+            {
+                for (var y = -OutlineWidth; y <= OutlineWidth; y++)
+                {
+                    if ((x == 0 && y == 0) || x * x + y * y > OutlineWidth * OutlineWidth + 1)
+                        continue;
+
+                    list.Add((x, y));
+                }
+            }
+
+            return list.ToArray();
+        }
+
+        /// <summary>
+        ///     ERRORGATE speech: bold Bedstead with a black outline and no box behind it. The outline is the very same message drawn in
+        ///     black, shifted a pixel or two in every direction, under the text itself, so it always lines up with the text however the
+        ///     message is built. All the copies have the same margin in total, so they measure the same.
+        /// </summary>
+        protected Control BuildOutlined(string markup, Color? fontColor, bool italic, float maxWidth = SpeechMaxWidth, float opacity = 1f)
+        {
+            // The message brings its own font tag; bold and italic pick the variant of whatever font is in force
+            var styled = italic ? $"[bold][italic]{markup}[/italic][/bold]" : $"[bold]{markup}[/bold]";
+            var holder = new Control();
+
+            foreach (var (dx, dy) in OutlineOffsets)
+            {
+                var shadow = new RichTextLabel
+                {
+                    MaxWidth = maxWidth,
+                    Margin = new Thickness(OutlineWidth + dx, OutlineWidth + dy, OutlineWidth - dx, OutlineWidth - dy),
+                    ModulateSelfOverride = Color.Black.WithAlpha(opacity),
+                };
+
+                shadow.SetMessage(FormatSpeech(styled, fontColor, "Bedstead"));
+                holder.AddChild(shadow);
+            }
+
+            var main = new RichTextLabel
+            {
+                MaxWidth = maxWidth,
+                Margin = new Thickness(OutlineWidth),
+                ModulateSelfOverride = Color.White.WithAlpha(opacity),
+            };
+
+            main.SetMessage(FormatSpeech(styled, fontColor, "Bedstead"));
+            holder.AddChild(main);
+            return holder;
         }
 
         protected FormattedMessage ExtractAndFormatSpeechSubstring(ChatMessage message, string tag, Color? fontColor = null)
@@ -343,7 +309,6 @@ namespace Content.Client.Chat.UI
             var italic = speechStyleClass == "whisperBox";
             var textOpacity = ConfigManager.GetCVar(CCVars.SpeechBubbleTextOpacity);
             var content = BuildOutlined(SharedChatSystem.GetStringInsideTag(message, "BubbleContent"), fontColor, italic, SpeechMaxWidth, textOpacity);
-            RevealText = content;
             if (!ConfigManager.GetCVar(CCVars.ChatEnableFancyBubbles))
                 return content;
 

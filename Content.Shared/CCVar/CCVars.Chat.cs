@@ -48,12 +48,6 @@ public sealed partial class CCVars
             CVar.CLIENTONLY | CVar.ARCHIVE,
             "Toggles displaying fancy speech bubbles, which display the speaking character's name.");
 
-    public static readonly CVarDef<bool> ChatBubbleLetterReveal =
-        CVarDef.Create("chat.bubble_letter_reveal",
-            true,
-            CVar.CLIENTONLY | CVar.ARCHIVE,
-            "Toggles revealing the text of speech bubbles letter by letter, at the pace of the voice barks.");
-
     public static readonly CVarDef<bool> ChatFancyNameBackground =
         CVarDef.Create("chat.fancy_name_background",
             false,
