@@ -25,7 +25,7 @@ public sealed class DespawnItemSystem : EntitySystem
     {
         // The item is gone, its place in the loot cap is free again
         if (MetaData(uid).EntityPrototype is { } proto)
-            _lootManager.Refund(proto.ID);
+            _lootManager.Refund(proto.ID, uid);
     }
 
     private void OnMapInit(EntityUid uid, DespawnItemComponent component, MapInitEvent args)

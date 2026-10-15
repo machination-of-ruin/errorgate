@@ -4,6 +4,8 @@ Keep this list current when a map is added, replaced or removed.
 
 ## Played maps
 
+**Being replaced.** EDGE OF ENTROPY and Kuznetsk are retired by the world rework: a fixed web of generated locations (see [world.md](world.md)). They stay in the repo and in the default pool until the first slice of the new world replaces them. The bunker is gated to Kuznetsk and moves into location 3 (see [bunker.md](bunker.md)).
+
 | Map | Prototype | File | Purpose |
 |---|---|---|---|
 | EDGE OF ENTROPY | `EdgeOfEntropy` | `Resources/Maps/edge_of_entropy/EdgeOfEntropy.yml` | Main world map of the original fork. In the default pool. |

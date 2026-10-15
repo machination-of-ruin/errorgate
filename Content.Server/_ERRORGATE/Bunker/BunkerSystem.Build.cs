@@ -72,12 +72,12 @@ public sealed partial class BunkerSystem
             new[] { "MobSpawnerRunner" }, false, "FloorWhite"),
         [BunkerRoomType.Storage] = new(
             new[] { "ShelfMetal", "ShelfMetal", "ShelfMetal", "ShelfMetal" },
-            new[] { "CrateGenericSteel", "CrateGenericSteel", "CrateGenericSteel", "CrateGenericSteel" },
+            new[] { "OreBox", "OreBox", "OreBox", "OreBox" },
             new[] { "LootSpawnerIndustrialTier3", "LootSpawnerIndustrialTier3", "LootSpawnerLivingTier3" },
             new[] { "MobSpawnerRunner", "MobSpawnerWalkerArmored" }, false, "FloorConcrete"),
         [BunkerRoomType.AmmoDepot] = new(
             new[] { "Rack", "Rack", "Rack" },
-            new[] { "CrateGenericSteel", "CrateGenericSteel", "Rack" },
+            new[] { "OreBox", "OreBox", "Rack" },
             new[] { "LootSpawnerMilitaryTier3", "LootSpawnerMilitaryTier3", "LootSpawnerMilitaryTier3" },
             new string[] { }, true, "FloorDarkMono"),
         [BunkerRoomType.Armory] = new(
@@ -135,10 +135,15 @@ public sealed partial class BunkerSystem
             }
         }
 
+        // All the tiles go in with one call at the end: put in one by one, a tile that does not touch the others yet is split off by the
+        // grid into a grid of its own, and the bunker ended up as more than a thousand grids
+        var allTiles = new List<(Vector2i, Tile)>();
         foreach (var (pos, tile) in floors)
         {
-            _map.SetTile(gridUid, grid, pos, new Tile(_tileDefs[tile].TileId));
+            allTiles.Add((pos, new Tile(_tileDefs[tile].TileId)));
         }
+
+        var wallSpawns = new List<(Vector2i Pos, EntProtoId Proto)>();
 
         // -- Walls ---------------------------------------------------------------------------------------------
         var built = new HashSet<Vector2i>(floors.Keys);
@@ -152,9 +157,9 @@ public sealed partial class BunkerSystem
                 if (!built.Add(pos))
                     continue;
 
-                _map.SetTile(gridUid, grid, pos, new Tile(_tileDefs["FloorDark"].TileId));
+                allTiles.Add((pos, new Tile(_tileDefs["FloorDark"].TileId)));
                 if (pos != HatchUpTile)
-                    Spawn(RoomWallProto, AtTile(pos));
+                    wallSpawns.Add((pos, RoomWallProto));
             }
         }
 
@@ -163,11 +168,17 @@ public sealed partial class BunkerSystem
             if (!built.Add(pos))
                 continue;
 
-            _map.SetTile(gridUid, grid, pos, new Tile(_tileDefs["FloorDark"].TileId));
+            allTiles.Add((pos, new Tile(_tileDefs["FloorDark"].TileId)));
 
             // Some rooms have grey brick walls, the tunnels never do
             var brick = roomWall && layout.RoomOfWall(pos)?.BrickWalls == true;
-            Spawn(brick ? BrickWallProto : RoomWallProto, AtTile(pos));
+            wallSpawns.Add((pos, brick ? BrickWallProto : RoomWallProto));
+        }
+
+        _map.SetTiles(gridUid, grid, allTiles);
+        foreach (var (pos, proto) in wallSpawns)
+        {
+            Spawn(proto, AtTile(pos));
         }
 
         // -- The vestibule -------------------------------------------------------------------------------------
@@ -452,7 +463,7 @@ public sealed partial class BunkerSystem
                 {
                     if (TryBlock(t))
                     {
-                        Spawn("CrateGenericSteel", at(t));
+                        Spawn("OreBox", at(t));
                         break;
                     }
                 }
@@ -542,7 +553,7 @@ public sealed partial class BunkerSystem
                 else if (fromEntry > 100 && crates.All(p => (p - spot).LengthSquared >= 64) && rng.NextDouble() < 0.5)
                 {
                     crates.Add(spot);
-                    Spawn("CrateGenericSteel", at(spot));
+                    Spawn("OreBox", at(spot));
                 }
 
                 break;

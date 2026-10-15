@@ -48,10 +48,12 @@ CVar `errorgate.respawn_cooldown` (`ErrorgateCVars.RespawnCooldown`, seconds, se
 
 ## Respawn location
 
-Fixed spawn zones: a set of designated spawn areas (DayZ-style), not random spots. Maps currently spawn players through the `HumanError` job at spawn points (see [maps.md](maps.md)); designated zones come with the survival spawn rules.
+Players without a faction spawn in **location 1** at its designated spawn zones (DayZ-style), not at random spots. Players with enough reputation can instead spawn at their **faction base** with the faction's basic kit (the one exception to "come back with nothing"); high-tier roles have better gear and limited slots (see [factions.md](factions.md)). Maps currently spawn players through the `HumanError` job at spawn points (see [maps.md](maps.md)).
+
+When a location resets, everyone inside is killed and sent to the death void (see [world.md](world.md)). While a location resets, its spawn zones are closed.
 
 ## Open
 
-- How a spawn zone is picked (random among all, nearest/farthest from the body, player choice).
+- How a spawn zone is picked inside location 1 (random among all, player choice).
 
 - Whether revival should stay possible after the player has already respawned (currently respawning abandons the body).

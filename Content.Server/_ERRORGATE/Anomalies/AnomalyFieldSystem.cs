@@ -189,6 +189,12 @@ public sealed class AnomalyFieldSystem : EntitySystem
         public Dictionary<Vector2i, bool> FreeCache = new();
 
         public List<Vector2> Spawns = new();
+
+        /// <summary>Gates and hatches that lead to other places.</summary>
+        public List<Vector2> Exits = new();
+
+        /// <summary>Mob spawners.</summary>
+        public List<Vector2> Mobs = new();
         public List<Vector2> PoiPoints = new();
         public Dictionary<Vector2i, List<Vector2>> PoiBuckets = new();
         public List<(Vector2 Center, int Cell, int Weight)> Clusters = new();
@@ -307,6 +313,20 @@ public sealed class AnomalyFieldSystem : EntitySystem
         {
             if (spawnXform.MapID == mapId)
                 state.Spawns.Add(Vector2.Transform(_transform.GetWorldPosition(spawnXform), toLocal));
+        }
+
+        var exitQuery = EntityQueryEnumerator<TransformComponent>();
+        while (exitQuery.MoveNext(out var exit, out var exitXform))
+        {
+            if (exitXform.MapID == mapId && (HasComp<World.WorldTransitionComponent>(exit) || HasComp<Bunker.BunkerHatchComponent>(exit)))
+                state.Exits.Add(Vector2.Transform(_transform.GetWorldPosition(exitXform), toLocal));
+        }
+
+        var mobQuery = EntityQueryEnumerator<SmartMobSpawner.SmartMobSpawnerComponent, TransformComponent>();
+        while (mobQuery.MoveNext(out _, out var mobXform))
+        {
+            if (mobXform.MapID == mapId)
+                state.Mobs.Add(Vector2.Transform(_transform.GetWorldPosition(mobXform), toLocal));
         }
 
         var lootQuery = EntityQueryEnumerator<LootSpawnerComponent, TransformComponent>();
@@ -676,6 +696,8 @@ public sealed class AnomalyFieldSystem : EntitySystem
 
                 if (!state.Coarse.TryCellOf(center, out var cell) || !state.Coarse.Reachable[cell]
                     || NearAny(state.Spawns, center, field.MinDistanceFromSpawns)
+                    || NearAny(state.Exits, center, field.MinDistanceFromExits)
+                    || NearAny(state.Mobs, center, field.MinDistanceFromMobs)
                     || NearPoi(state, center, field.MinDistanceFromPoi)
                     || !NearPoi(state, center, field.MaxDistanceFromPoi)
                     || NearAny(packCenters, center, packDistance))
@@ -764,6 +786,8 @@ public sealed class AnomalyFieldSystem : EntitySystem
             if (!state.Coarse.TryCellOf(tile, out var cell) || !state.Coarse.Reachable[cell]
                 || state.ReachableTiles != null && !state.ReachableTiles.Contains(tile)
                 || NearAny(state.Spawns, position, field.MinDistanceFromSpawns)
+                || NearAny(state.Exits, position, field.MinDistanceFromExits)
+                || NearAny(state.Mobs, position, field.MinDistanceFromMobs)
                 || NearPoi(state, position, field.MinDistanceFromPoi))
             {
                 continue;

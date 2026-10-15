@@ -1,0 +1,269 @@
+# The locations of the world, see docs/design/world.md. First slice: tier 1 and tier 2; tier 3 (the bunker-laboratory) comes with its generator.
+
+- type: worldLocation
+  id: Village
+  name: village and shore resort
+  tier: 1
+  resetMinMinutes: 360
+  resetMaxMinutes: 720
+  theme: village
+  style: village
+  spawnZone: true
+  mobs: [ MobSpawnerRunner, MobSpawnerWalkerLiving ]
+  mobCount: 8
+  walkway: FloorLowDesert
+  fenceStraight: FenceWoodHighStraight
+  fenceCorner: FenceWoodHighCorner
+  fenceGate: FenceWoodHighGate
+  size: "160,160"
+  ground: FloorPlanetGrass
+  road: FloorPlanetDirt
+  mainRoad: FloorGrayConcrete
+  rubbleEnd: true
+  landmarks:
+  - kind: orchard
+    count: 3
+  - kind: farm
+    count: 5
+  - kind: ruin
+    count: 7
+  - kind: camp
+    count: 8
+  - kind: pond
+    count: 5
+  - kind: windbreak
+    count: 4
+  - kind: well
+    count: 5
+  borderGates: [ east ]
+  density: 1
+  rocks: 12
+  treeClumps: 14
+  treeSingles: 50
+  shore: water
+  trees:
+  - FloraTree
+  - FloraTreeLarge
+  - N14FloraTreePine
+  - N14FloraTreeBald
+  props:
+  - protos: [ FloraRockSolid ]
+    count: 30
+    clump: 0
+  - protos: [ CrateStoneGrave, CrateWoodenGrave ]
+    count: 14
+    clump: 5
+  decals:
+  - decals: [ FloraBranchBrushwood, FloraBranchBrushwoodAlt ]
+    count: 70
+    clump: 3
+  ambientLight: "#7A7A7A"
+  faults: 14
+
+- type: worldLocation
+  id: SnowCity
+  name: snow city
+  tier: 2
+  resetMinMinutes: 360
+  resetMaxMinutes: 720
+  theme: city
+  style: city
+  mobs: [ MobSpawnerWalkerArmored, MobSpawnerRunner, MobSpawnerWalkerArmoredMilitary ]
+  mobCount: 14
+  walkway: FloorGrayConcreteSmooth
+  post: LightPostSmall
+  fenceStraight: FenceMetalStraight
+  fenceCorner: FenceMetalCorner
+  fenceGate: FenceMetalGate
+  size: "210,210"
+  ground: FloorSnow
+  road: FloorAsphalt
+  density: 1
+  rocks: 10
+  treeClumps: 8
+  treeSingles: 30
+  shore: ice
+  weather: SnowfallLight
+  trees:
+  - FloraTreeSnow
+  - FloraTreeConifer
+  - FloraTreeStumpConifer
+  props:
+  - protos: [ FloraRockSolid ]
+    count: 24
+    clump: 0
+  - protos: [ N14BarricadeMetal, N14BarricadeSandbagSingle, N14BarricadeRazorwire, N14BarricadeTanktrap ]
+    count: 16
+    clump: 2
+  roadblocks: 10
+  roadblockProtos: [ N14BarricadeMetal, N14BarricadeSandbagSingle, N14BarricadeRazorwire, N14BarricadeTanktrap ]
+  decals:
+  - decals: [ FloraBranchBrushwood, FloraBranchBrushwoodAlt ]
+    count: 40
+    clump: 3
+  ambientLight: "#6A6E78"
+  lootTiers: [ 1, 2 ]
+  guaranteed: [ FactoryCard, BunkerKey ]
+  borderGates: [ west, base, east ]
+  radiationGates: [ east ]
+  uniqueGroups:
+  - group: residential
+    min: 1
+    max: 2
+  - group: factory
+    min: 1
+    max: 2
+  landmarks:
+  - kind: checkpoint
+    count: 4
+  - kind: dump
+    count: 4
+  - kind: parking
+    count: 5
+  - kind: construction
+    count: 4
+  - kind: ruin
+    count: 6
+  - kind: camp
+    count: 5
+  faults: 40
+
+# The border of a location: rock that cannot be dug out.
+- type: entity
+  parent: BaseWallIndestructible
+  id: WorldBorderWall
+  name: rock
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: Sprite
+    sprite: Structures/Walls/rock.rsi
+    layers:
+    - state: rock_wall
+  - type: Icon
+    sprite: Structures/Walls/rock.rsi
+    state: rock_wall
+  - type: IconSmooth
+    mode: NoSprite
+
+# The two ends of a tunnel are gates; people use them to go to the other side. Looks like the hatch of the bunker until it has art of its own.
+- type: entity
+  id: WorldGate
+  parent: BaseStructure
+  name: entrance
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: Transform
+    anchored: true
+  - type: Sprite
+    sprite: Structures/Doors/Airlocks/Standard/hatch.rsi
+    drawdepth: Mobs
+    layers:
+    - state: closed
+  - type: InteractionOutline
+  - type: Physics
+    bodyType: Static
+  - type: Fixtures
+    fixtures:
+      fix1:
+        shape:
+          !type:PhysShapeAabb
+          bounds: "-0.49,-0.49,0.49,0.49"
+        density: 1000
+        mask:
+        - FullTileMask
+        layer:
+        - AirlockLayer
+  - type: WorldTransition
+
+# A tunnel between the village and the city. It is wiped with the city.
+- type: worldLocation
+  id: TunnelVillageCity
+  name: village-city tunnel
+  tier: 1
+  style: tunnel
+  underground: true
+  size: "140,48"
+  ground: FloorCave
+  post: LightPostSmall
+  mobs: [ MobSpawnerRunner, MobSpawnerWalkerLiving ]
+  mobCount: 4
+  ambientLight: "#141414"
+  resetMinMinutes: 360
+  resetMaxMinutes: 720
+
+# The Military base: a hand-built map that never resets and is raidable (walls and doors can be broken). Build it, put WorldGate entities with
+# the gate name `gate` in it, and save it with savegrid as /Maps/_ERRORGATE/Locations/MilitaryBase.yml. Until then a walled compound of
+# city buildings stands in.
+- type: worldLocation
+  id: MilitaryBase
+  name: military base
+  tier: 2
+  theme: city
+  style: city
+  shape: rect
+  size: "96,72"
+  mapPath: /Maps/_ERRORGATE/Locations/MilitaryBase.yml
+  ground: FloorSnow
+  road: FloorGrayConcrete
+  walkway: FloorGrayConcreteSmooth
+  border: BunkerWallConcrete
+  weather: SnowfallLight
+  density: 0.5
+  mobs: [ MobSpawnerWalkerArmoredMilitary ]
+  mobCount: 6
+  rocks: 0
+  treeClumps: 0
+  treeSingles: 0
+  ambientLight: "#6A6E78"
+  borderGates: [ gate ]
+
+# The tier 3 laboratory: the generated bunker (rooms, corridors, doors, loot, bosses, radiation), entered by a gate. Pitch black.
+- type: worldLocation
+  id: Laboratory
+  name: laboratory
+  tier: 3
+  style: laboratory
+  underground: true
+  size: "108,80"
+  ambientLight: "#000000"
+  resetMinMinutes: 360
+  resetMaxMinutes: 720
+
+# A tunnel between the city and the laboratory. It is wiped with the laboratory.
+- type: worldLocation
+  id: TunnelCityLab
+  name: city-laboratory tunnel
+  tier: 2
+  style: tunnel
+  underground: true
+  size: "120,44"
+  ground: FloorCave
+  post: LightPostSmall
+  mobs: [ MobSpawnerRunner, MobSpawnerWalkerArmored ]
+  mobCount: 5
+  radiationBarrels: 7
+  ambientLight: "#101010"
+  resetMinMinutes: 360
+  resetMaxMinutes: 720
+
+# The web: which locations exist and which gates lead to which.
+- type: worldGraph
+  id: Default
+  locations:
+  - Village
+  - MilitaryBase
+  - TunnelVillageCity
+  - SnowCity
+  - TunnelCityLab
+  - Laboratory
+  links:
+  - a: Village.east
+    b: TunnelVillageCity.west
+  - a: TunnelVillageCity.east
+    b: SnowCity.west
+  - a: SnowCity.base
+    b: MilitaryBase.gate
+  - a: SnowCity.east
+    b: TunnelCityLab.west
+  - a: TunnelCityLab.east
+    b: Laboratory.up

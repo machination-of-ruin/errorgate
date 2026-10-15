@@ -36,7 +36,7 @@ public sealed class MobLootSystem : EntitySystem
         if (!_random.Prob(component.DropChance))
             return;
 
-        var table = _lootManager.GetLootTable(component.Rarity, component.Location);
+        var table = _lootManager.GetLootTable(component.Rarity, component.Location, uid);
 
         if (!_lootManager.TryPickLoot(table, out var entityProto) || entityProto == null)
         {
@@ -44,7 +44,7 @@ public sealed class MobLootSystem : EntitySystem
             return;
         }
 
-        _lootManager.RegisterSpawn(entityProto);
+        _lootManager.RegisterSpawn(entityProto, uid);
 
         var lootDrop = SpawnNextToOrDrop(entityProto, uid);
 

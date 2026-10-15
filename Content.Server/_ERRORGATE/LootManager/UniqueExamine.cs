@@ -18,7 +18,7 @@ public sealed class UniqueExamine : EntitySystem
         if (MetaData(uid).EntityPrototype is not { } proto)
             return;
 
-        if (_lootManager.LootManager.TryGetValue(proto.ID, out var value) && value.MaxCount == 1)
+        if (_lootManager.TryGetEntry(proto.ID, out var value) && value!.MaxCount == 1)
             args.PushMarkup("[color=red][italic]>>> Unique <<<[/italic][/color]", 200);
     }
 }

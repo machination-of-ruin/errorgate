@@ -23,3 +23,5 @@ tips-dataset-22 = Do not eat yellow snow.
 tips-dataset-23 = Running drains stamina, and when you are tired you move slower.
 tips-dataset-24 = Watch out for spike traps.
 tips-dataset-25 = Throw an item ahead of you. A thrown item that lands in a fault, or sets one off, shows it for a few seconds.
+tips-dataset-26 = Rest beside a campfire to recover and heal slowly.
+tips-dataset-27 = Campfires found in map-generated camps never burn out.

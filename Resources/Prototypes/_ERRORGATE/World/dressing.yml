@@ -1,0 +1,58 @@
+# Things the world generator puts out (docs/design/world.md): broken post lights and campfires that burn for good.
+
+# A post light that has been smashed: the same post, no light and no glow. 60 in a hundred of the posts the generator puts out are these.
+- type: entity
+  id: LightPostSmallBroken
+  parent: LightPostSmall
+  suffix: Broken
+  components:
+  - type: PointLight
+    enabled: false
+  - type: Sprite
+    layers:
+    - map: ["enum.PoweredLightLayers.Base"]
+      state: base
+
+# The campfire of the camps: a fire that does not burn out, and heals those who rest beside it (see CampfireWarmthSystem).
+- type: entity
+  name: campfire
+  parent: Bonfire
+  id: CampfireWorld
+  description: A source of light and heat.
+  components:
+  - type: CampfireWarmth
+  - type: StepTrigger # the fire sets whoever walks over it on fire, as in the old build
+    requiredTriggeredSpeed: 0
+    intersectRatio: 0.1
+  - type: TileEntityEffect
+    effects:
+    - !type:FlammableReaction
+      multiplier: 2.5
+      multiplierOnExisting: 0.5
+    - !type:Ignite
+  - type: EntityHeater
+    requiresPower: false
+    power: 2400
+  - type: ItemPlacer
+    maxEntities: 4
+    whitelist:
+      components:
+      - Temperature
+  - type: PlaceableSurface
+  - type: Physics
+    bodyType: Static
+  - type: Fixtures
+    fixtures:
+      fix1:
+        shape:
+          !type:PhysShapeAabb
+          bounds: "-0.5,-0.5,0.5,0.5"
+        mask:
+        - TabletopMachineMask
+        layer:
+        - Impassable
+        - MidImpassable
+        - LowImpassable
+        - SlipLayer
+        hard: false
+        density: 1000

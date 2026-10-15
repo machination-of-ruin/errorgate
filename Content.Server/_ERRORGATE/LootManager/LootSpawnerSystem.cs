@@ -1,3 +1,5 @@
+using Content.Server._ERRORGATE.Despawn;
+using Content.Shared.Item;
 using Robust.Shared.Map.Components;
 using Robust.Shared.Random;
 using Robust.Shared.Timing;
@@ -55,7 +57,7 @@ public sealed class LootSpawnerSystem : EntitySystem
         if (!_random.Prob(chance))
             return;
 
-        var table = _lootManager.GetLootTable(component.Rarity, component.Location);
+        var table = _lootManager.GetLootTable(component.Rarity, component.Location, uid);
 
         if (!CheckSpawnPointCondition(uid, table))
             return;
@@ -66,7 +68,7 @@ public sealed class LootSpawnerSystem : EntitySystem
             return;
         }
 
-        _lootManager.RegisterSpawn(entityProto);
+        _lootManager.RegisterSpawn(entityProto, uid);
 
         var coordinates = Transform(uid).Coordinates;
         Spawn(entityProto, coordinates);
@@ -74,7 +76,8 @@ public sealed class LootSpawnerSystem : EntitySystem
     }
 
     /// <summary>
-    /// Nothing is spawned on a tile where one of the table's items already lies.
+    /// Nothing is spawned on a tile where an item already lies (whatever it is: loot of another table, an item the map put there, or
+    /// something thrown), so items never pile up on one tile. Items in containers and on bodies do not count.
     /// </summary>
     private bool CheckSpawnPointCondition(EntityUid uid, Dictionary<string, int> table)
     {
@@ -86,8 +89,11 @@ public sealed class LootSpawnerSystem : EntitySystem
         var spawnPos = _map.TileIndicesFor(grid, gridComp, xform.Coordinates);
         var coords = _map.ToCenterCoordinates(grid, spawnPos);
 
-        foreach (var intersect in _entityLookup.GetEntitiesIntersecting(coords, LookupFlags.All))
+        foreach (var intersect in _entityLookup.GetEntitiesIntersecting(coords, LookupFlags.Uncontained))
         {
+            if (HasComp<ItemComponent>(intersect) || HasComp<DespawnItemComponent>(intersect))
+                return false;
+
             var entityPrototype = MetaData(intersect).EntityPrototype;
             if (entityPrototype != null && table.ContainsKey(entityPrototype.ID))
                 return false;
