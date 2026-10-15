@@ -47,6 +47,11 @@ public sealed class PopupUIController : UIController, IOnStateEntered<GameplaySt
         _popupControl = null;
     }
 
+    private static readonly (int X, int Y)[] OutlineOffsets =
+    {
+        (-1, 0), (1, 0), (0, -1), (0, 1), (-1, -1), (1, -1), (-1, 1), (1, 1),
+    };
+
     public void DrawPopup(PopupSystem.PopupLabel popup, DrawingHandleScreen handle, Vector2 position, float scale)
     {
         var lifetime = PopupSystem.GetPopupLifetime(popup);
@@ -82,7 +87,16 @@ public sealed class PopupUIController : UIController, IOnStateEntered<GameplaySt
         }
 
         var dimensions = handle.GetDimensions(font, popup.Text, scale);
-        handle.DrawString(font, updatedPosition - dimensions / 2f, popup.Text, scale, color.WithAlpha(alpha));
+        var origin = updatedPosition - dimensions / 2f;
+
+        // ERRORGATE: the same black outline the speech bubbles have, drawn first, a pixel off in every direction
+        var outline = Color.Black.WithAlpha(alpha);
+        foreach (var (dx, dy) in OutlineOffsets)
+        {
+            handle.DrawString(font, origin + new Vector2(dx, dy) * scale, popup.Text, scale, outline);
+        }
+
+        handle.DrawString(font, origin, popup.Text, scale, color.WithAlpha(alpha));
     }
 
     /// <summary>
