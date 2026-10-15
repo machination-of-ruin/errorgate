@@ -217,49 +217,60 @@ namespace Content.Client.Chat.UI
             return msg;
         }
 
-        private static readonly (int X, int Y)[] OutlineOffsets =
+        // A round outline two pixels thick: every offset within a distance of two, but not the corners
+        private static readonly (int X, int Y)[] OutlineOffsets = BuildOutlineOffsets();
+
+        private const int OutlineWidth = 2;
+
+        private static (int, int)[] BuildOutlineOffsets()
         {
-            (-1, 0), (1, 0), (0, -1), (0, 1), (-1, -1), (1, -1), (-1, 1), (1, 1),
-        };
+            var list = new List<(int, int)>();
+            for (var x = -OutlineWidth; x <= OutlineWidth; x++)
+            {
+                for (var y = -OutlineWidth; y <= OutlineWidth; y++)
+                {
+                    if ((x == 0 && y == 0) || x * x + y * y > OutlineWidth * OutlineWidth + 1)
+                        continue;
+
+                    list.Add((x, y));
+                }
+            }
+
+            return list.ToArray();
+        }
 
         /// <summary>
-        ///     ERRORGATE speech: bold Bedstead with a black outline and no box behind it. The outline is the same text drawn eight times
-        ///     in black, a pixel off in every direction, under the text itself. All the copies have the same margin in total, so they
-        ///     measure the same and the bubble is as wide as the text with a pixel of room on each side.
+        ///     ERRORGATE speech: bold Bedstead with a black outline and no box behind it. The outline is the very same message drawn in
+        ///     black, shifted a pixel or two in every direction, under the text itself, so it always lines up with the text however the
+        ///     message is built. All the copies have the same margin in total, so they measure the same.
         /// </summary>
         protected Control BuildOutlined(string markup, Color? fontColor, bool italic, float maxWidth = SpeechMaxWidth, float opacity = 1f)
         {
-            var fontId = italic ? "BedsteadBoldItalic" : "BedsteadBold";
+            // The message brings its own font tag; bold and italic pick the variant of whatever font is in force
+            var styled = italic ? $"[bold][italic]{markup}[/italic][/bold]" : $"[bold]{markup}[/bold]";
             var holder = new Control();
-            var plain = FormattedMessage.RemoveMarkupPermissive(markup);
 
             foreach (var (dx, dy) in OutlineOffsets)
             {
                 var shadow = new RichTextLabel
                 {
                     MaxWidth = maxWidth,
-                    Margin = new Thickness(1 + dx, 1 + dy, 1 - dx, 1 - dy),
-                    ModulateSelfOverride = Color.White.WithAlpha(opacity),
+                    Margin = new Thickness(OutlineWidth + dx, OutlineWidth + dy, OutlineWidth - dx, OutlineWidth - dy),
+                    ModulateSelfOverride = Color.Black.WithAlpha(opacity),
                 };
 
-                var shadowMessage = new FormattedMessage();
-                shadowMessage.PushColor(Color.Black);
-                shadowMessage.AddMarkupOrThrow($"[font=\"{fontId}\"]");
-                shadowMessage.AddText(plain);
-                shadowMessage.AddMarkupOrThrow("[/font]");
-                shadow.SetMessage(shadowMessage);
+                shadow.SetMessage(FormatSpeech(styled, fontColor, "Bedstead"));
                 holder.AddChild(shadow);
             }
 
             var main = new RichTextLabel
             {
                 MaxWidth = maxWidth,
-                Margin = new Thickness(1),
+                Margin = new Thickness(OutlineWidth),
                 ModulateSelfOverride = Color.White.WithAlpha(opacity),
             };
 
-            // The message brings its own font tag; bold and italic pick the variant of whatever font is in force
-            main.SetMessage(FormatSpeech(italic ? $"[bold][italic]{markup}[/italic][/bold]" : $"[bold]{markup}[/bold]", fontColor, "Bedstead"));
+            main.SetMessage(FormatSpeech(styled, fontColor, "Bedstead"));
             holder.AddChild(main);
             return holder;
         }
