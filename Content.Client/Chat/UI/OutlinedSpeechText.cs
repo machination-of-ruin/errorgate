@@ -254,6 +254,9 @@ public sealed class OutlinedSpeechText : Control
         UpdateLayout(UIScale);
         var scale = UIScale;
 
+        // Every outline first, then every letter on top: the outline of a letter reaches into its neighbours (the font has a pixel of room
+        // between letters), so drawing a letter and its outline together would cover the letter before it
+        var drawn = new List<(Glyph Glyph, Vector2 Origin)>(_placed.Count);
         foreach (var (index, baseline) in _placed)
         {
             if (_times != null && index < _times.Length && _times[index] > _elapsed)
@@ -268,13 +271,22 @@ public sealed class OutlinedSpeechText : Control
                     origin.Y -= JumpHeight * scale * 4f * age * (1f - age);
             }
 
+            drawn.Add((glyph, origin));
+        }
+
+        var outline = Color.Black.WithAlpha(_opacity);
+        foreach (var (glyph, origin) in drawn)
+        {
             var font = glyph.Italic ? _italic : _regular;
-            var outline = Color.Black.WithAlpha(_opacity);
             foreach (var (dx, dy) in OutlineOffsets)
             {
                 font.DrawChar(handle, glyph.Rune, origin + new Vector2(dx, dy) * scale, scale, outline);
             }
+        }
 
+        foreach (var (glyph, origin) in drawn)
+        {
+            var font = glyph.Italic ? _italic : _regular;
             font.DrawChar(handle, glyph.Rune, origin, scale, glyph.Color.WithAlpha(glyph.Color.A * _opacity));
         }
     }
