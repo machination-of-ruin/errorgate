@@ -64,8 +64,6 @@ ui-options-show-offer-mode-indicators = Show offer mode indicators with cursor
 ui-options-opaque-storage-window = Opaque storage window
 ui-options-show-ooc-patron-color = Show OOC Patreon color
 ui-options-show-looc-on-head = Show LOOC chat above characters head
-ui-options-fancy-speech = Show names in speech bubbles
-ui-options-fancy-name-background = Add background to speech bubble names
 ui-options-no-filters = Disable species vision filters
 ui-options-vsync = VSync
 ui-options-fullscreen = Fullscreen
@@ -363,7 +361,6 @@ ui-options-screen-shake-intensity = Screen shake intensity
 
 ui-options-chat-window-opacity = Chat window opacity
 ui-options-speech-bubble-text-opacity = Speech bubble text opacity
-ui-options-speech-bubble-speaker-opacity = Speech bubble speaker opacity
 ui-options-speech-bubble-background-opacity = Speech bubble background opacity
 ui-options-vacuum-overlay-intensity = Vacuum overlay intensity
 ui-options-screen-shake-percent = { TOSTRING($intensity, "P0") }

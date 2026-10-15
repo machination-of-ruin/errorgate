@@ -183,6 +183,7 @@ namespace Content.Client.Entry
             _euiManager.Initialize();
             _voteManager.Initialize();
             _userInterfaceManager.SetDefaultTheme("SS14DefaultTheme");
+            _configManager.OverrideDefault(CVars.InterfaceTheme, "SS14AshenTheme"); // ERRORGATE: Ashen is the default look
             _userInterfaceManager.SetActiveTheme(_configManager.GetCVar(CVars.InterfaceTheme));
             _documentParsingManager.Initialize();
             _titleWindowManager.Initialize();

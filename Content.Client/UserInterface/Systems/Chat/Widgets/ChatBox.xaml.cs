@@ -36,7 +36,6 @@ public partial class ChatBox : UIWidget
     private bool _chatStackEnabled => _chatStackAmount > 0;
     private List<ChatStackData> _chatStackList;
 
-    private bool _chatFontEnabled; // WWDP EDIT
 
     public ChatBox()
     {
@@ -61,7 +60,6 @@ public partial class ChatBox : UIWidget
         //    _chatStackAmount = 0;
         _chatStackList = new(_chatStackAmount);
         _cfg.OnValueChanged(CCVars.ChatStackLastLines, UpdateChatStack, true);
-        _cfg.OnValueChanged(WhiteCVars.ChatFancyFont, value => { _chatFontEnabled = value; Repopulate(); }, true); // WWDP EDIT
     }
 
     private void UpdateChatStack(int value)
@@ -175,16 +173,13 @@ public partial class ChatBox : UIWidget
     public void AddLine(string message, Color color, int repeat = 0)
     {
         // WWDP EDIT START // I FUCKING HATE THIS ENGINE
-        if (_chatFontEnabled)
-        {
-            message = $"[font=\"Chat\"]{message}[/font]";
-            message = message.Replace("[font size=", "[font=\"Chat\" size="); // AAAAAAAAAAAAAAAA
-            message = message.Replace("[font=\"Default\"", "[font=\"Chat\""); // AAAAAAAAAAAAAAAA
-            message = message.Replace("[bold]", "[cb]");
-            message = message.Replace("[/bold]", "[/cb]");
-            message = message.Replace("[italic]", "[ci]");
-            message = message.Replace("[/italic]", "[/ci]");
-        }
+        message = $"[font=\"Chat\"]{message}[/font]";
+        message = message.Replace("[font size=", "[font=\"Chat\" size="); // AAAAAAAAAAAAAAAA
+        message = message.Replace("[font=\"Default\"", "[font=\"Chat\""); // AAAAAAAAAAAAAAAA
+        message = message.Replace("[bold]", "[cb]");
+        message = message.Replace("[/bold]", "[/cb]");
+        message = message.Replace("[italic]", "[ci]");
+        message = message.Replace("[/italic]", "[/ci]");
         // WWDP EDIT END
         var formatted = new FormattedMessage(4);
         formatted.PushColor(color);

@@ -56,6 +56,16 @@ namespace Content.Client.Chat.UI
 
         private float _timeLeft = TotalTime;
 
+        /// <summary>The text that appears letter by letter, if the bubble has one (set while the bubble is built).</summary>
+        protected OutlinedSpeechText? RevealText;
+
+        /// <summary>When each letter of <see cref="RevealText"/> appears, in seconds from the start.</summary>
+        private float[]? _revealTimes;
+        private float _revealElapsed;
+
+        /// <summary>Seconds between two letters of a voice without barks, and the longer pause after punctuation.</summary>
+        private const float DefaultLetterPause = 0.045f;
+
         public float VerticalOffset { get; set; }
         private float _verticalOffsetAchieved;
 
@@ -106,9 +116,86 @@ namespace Content.Client.Chat.UI
 
             ForceRunStyleUpdate();
 
+            if (bubble is OutlinedSpeechText single)
+                single.Tighten();
+            else
+            {
+                foreach (var child in bubble.Children)
+                {
+                    (child as OutlinedSpeechText)?.Tighten();
+                }
+            }
+
             bubble.Measure(Vector2Helpers.Infinity);
             ContentSize = bubble.DesiredSize;
             _verticalOffsetAchieved = -ContentSize.Y;
+
+            // The box is measured with the whole text; the letters then come back one by one
+            if (RevealText != null)
+                StartReveal(speechStyleClass == "whisperBox");
+        }
+
+        /// <summary>
+        ///     Works out when each letter appears, the way the voice barks play (Content.Client/_White/Bark): one letter per bark. The
+        ///     queue takes a bark, waits its pause in steps of one tick, plays it and takes the next one a tick later, so every bark
+        ///     costs its pause rounded up to whole ticks plus one tick. A voice without barks has a steady pace. The bubble stays long
+        ///     enough to be read after the last letter.
+        /// </summary>
+        private void StartReveal(bool whisper)
+        {
+            var text = RevealText!.PlainText;
+            var count = text.Length;
+            if (count == 0)
+                return;
+
+            var times = new float[count];
+            var barkVoice = _entityManager.TryGetComponent<Content.Shared._White.Bark.Components.BarkComponent>(_senderEntity, out var bark) ? bark.VoiceData : null;
+            if (barkVoice == null)
+            {
+                var steady = 0f;
+                for (var i = 0; i < count; i++)
+                {
+                    steady += text[i] is '.' or ',' or '?' or '!' ? DefaultLetterPause * 1.2f : DefaultLetterPause;
+                    times[i] = steady;
+                }
+            }
+            else
+            {
+                var barks = _entityManager.System<Content.Client._White.Bark.BarkSystem>();
+                var tick = (float) IoCManager.Resolve<IGameTiming>().TickPeriod.TotalSeconds;
+                var tickIndex = 0;
+                for (var i = 0; i < count; i++)
+                {
+                    var pause = barks.GenBarkData(barkVoice, text[i], whisper).Pause;
+                    var waited = 0f;
+                    while (true)
+                    {
+                        tickIndex++;
+                        if (pause <= waited)
+                            break;
+
+                        waited += tick;
+                    }
+
+                    times[i] = tickIndex * tick;
+                }
+
+                // A long message gets barks only for its first letters (the bark limit of the options); the text is revealed in that
+                // same time, so it is done when the barks are
+                var limit = ConfigManager.GetCVar(WhiteCVars.BarkLimit);
+                if (limit > 0 && count > limit)
+                {
+                    var factor = times[limit - 1] / times[count - 1];
+                    for (var i = 0; i < count; i++)
+                    {
+                        times[i] *= factor;
+                    }
+                }
+            }
+
+            _revealTimes = times;
+            _timeLeft = TotalTime + times[count - 1];
+            RevealText.Reveal(0);
         }
 
         protected abstract Control BuildBubble(ChatMessage message, string speechStyleClass, Color? fontColor = null);
@@ -118,6 +205,19 @@ namespace Content.Client.Chat.UI
             base.FrameUpdate(args);
 
             _timeLeft -= args.DeltaSeconds;
+
+            if (_revealTimes != null && RevealText != null)
+            {
+                _revealElapsed += args.DeltaSeconds;
+                var shown = 0;
+                while (shown < _revealTimes.Length && _revealTimes[shown] <= _revealElapsed)
+                    shown++;
+
+                RevealText.Reveal(shown);
+                if (shown >= _revealTimes.Length)
+                    _revealTimes = null;
+            }
+
             if (_entityManager.Deleted(_senderEntity) || _timeLeft <= 0)
             {
                 // Timer spawn to prevent concurrent modification exception.
@@ -217,6 +317,12 @@ namespace Content.Client.Chat.UI
             return msg;
         }
 
+        /// <summary>ERRORGATE speech: bold Bedstead with a black outline and no box (see <see cref="OutlinedSpeechText"/>).</summary>
+        protected OutlinedSpeechText BuildOutlined(string markup, Color? fontColor, bool italic, float maxWidth = SpeechMaxWidth, float opacity = 1f)
+        {
+            return new OutlinedSpeechText(markup, fontColor, italic, maxWidth, opacity);
+        }
+
         protected FormattedMessage ExtractAndFormatSpeechSubstring(ChatMessage message, string tag, Color? fontColor = null)
         {
             return FormatSpeech(SharedChatSystem.GetStringInsideTag(message, tag), fontColor);
@@ -233,21 +339,13 @@ namespace Content.Client.Chat.UI
 
         protected override Control BuildBubble(ChatMessage message, string speechStyleClass, Color? fontColor = null)
         {
-            var label = new RichTextLabel
-            {
-                MaxWidth = SpeechMaxWidth,
-            };
+            // Emotes and LOOC are drawn like the rest of the speech, in italics
+            // An emote is the action behind an asterisk, without the name: *laughs
+            var text = message.Channel == ChatChannel.Emotes
+                ? "*" + FormattedMessage.EscapeText(message.Message)
+                : message.WrappedMessage;
 
-            label.SetMessage(FormatSpeech(message.WrappedMessage, fontColor, "Bedstead")); // WWDP EDIT
-
-            var panel = new PanelContainer
-            {
-                StyleClasses = { "speechBox", speechStyleClass },
-                Children = { label },
-                ModulateSelfOverride = Color.White.WithAlpha(ConfigManager.GetCVar(CCVars.SpeechBubbleBackgroundOpacity))
-            };
-
-            return panel;
+            return BuildOutlined(text, fontColor, true, SpeechMaxWidth, ConfigManager.GetCVar(CCVars.SpeechBubbleTextOpacity));
         }
     }
 
@@ -261,68 +359,11 @@ namespace Content.Client.Chat.UI
 
         protected override Control BuildBubble(ChatMessage message, string speechStyleClass, Color? fontColor = null)
         {
-            if (!ConfigManager.GetCVar(CCVars.ChatEnableFancyBubbles))
-            {
-                var label = new RichTextLabel
-                {
-                    MaxWidth = SpeechMaxWidth
-                };
-
-                label.SetMessage(FormatSpeech(SharedChatSystem.GetStringInsideTag(message, "BubbleContent"), fontColor, "Bedstead")); // WWDP EDIT // LESS USELESS ONE LINER FUNCS PLS
-
-                var unfanciedPanel = new PanelContainer
-                {
-                    StyleClasses = { "speechBox", speechStyleClass },
-                    Children = { label },
-                    ModulateSelfOverride = Color.White.WithAlpha(ConfigManager.GetCVar(CCVars.SpeechBubbleBackgroundOpacity)),
-                };
-                return unfanciedPanel;
-            }
-
-            var bubbleHeader = new RichTextLabel
-            {
-                ModulateSelfOverride = Color.White.WithAlpha(ConfigManager.GetCVar(CCVars.SpeechBubbleSpeakerOpacity)),
-                Margin = new Thickness(1, 1, 1, 1),
-            };
-
-            var bubbleContent = new RichTextLabel
-            {
-                ModulateSelfOverride = Color.White.WithAlpha(ConfigManager.GetCVar(CCVars.SpeechBubbleTextOpacity)),
-                MaxWidth = SpeechMaxWidth,
-                Margin = new Thickness(2, 6, 2, 2),
-                StyleClasses = { "bubbleContent" },
-            };
-
-            //We'll be honest. *Yes* this is hacky. Doing this in a cleaner way would require a bottom-up refactor of how saycode handles sending chat messages. -Myr
-            bubbleHeader.SetMessage(FormatSpeech(SharedChatSystem.GetStringInsideTag(message, "BubbleHeader"), fontColor, "Bedstead")); // WWDP EDIT // LESS USELESS ONE LINER FUNCS PLS
-            bubbleContent.SetMessage(FormatSpeech(SharedChatSystem.GetStringInsideTag(message, "BubbleContent"), fontColor, "Bedstead")); // WWDP EDIT
-
-            //As for below: Some day this could probably be converted to xaml. But that is not today. -Myr
-            var mainPanel = new PanelContainer
-            {
-                StyleClasses = { "speechBox", speechStyleClass },
-                Children = { bubbleContent },
-                ModulateSelfOverride = Color.White.WithAlpha(ConfigManager.GetCVar(CCVars.SpeechBubbleBackgroundOpacity)),
-                HorizontalAlignment = HAlignment.Center,
-                VerticalAlignment = VAlignment.Bottom,
-                Margin = new Thickness(4, 14, 4, 2)
-            };
-
-            var headerPanel = new PanelContainer
-            {
-                StyleClasses = { "speechBox", speechStyleClass },
-                Children = { bubbleHeader },
-                ModulateSelfOverride = Color.White.WithAlpha(ConfigManager.GetCVar(CCVars.ChatFancyNameBackground) ? ConfigManager.GetCVar(CCVars.SpeechBubbleBackgroundOpacity) : 0f),
-                HorizontalAlignment = HAlignment.Center,
-                VerticalAlignment = VAlignment.Top
-            };
-
-            var panel = new PanelContainer
-            {
-                Children = { mainPanel, headerPanel }
-            };
-
-            return panel;
+            var italic = speechStyleClass == "whisperBox";
+            var textOpacity = ConfigManager.GetCVar(CCVars.SpeechBubbleTextOpacity);
+            var content = BuildOutlined(SharedChatSystem.GetStringInsideTag(message, "BubbleContent"), fontColor, italic, SpeechMaxWidth, textOpacity);
+            RevealText = content;
+            return content;
         }
     }
 }

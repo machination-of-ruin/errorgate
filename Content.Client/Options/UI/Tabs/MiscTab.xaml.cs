@@ -66,11 +66,8 @@ public sealed partial class MiscTab : Control
         Control.AddOptionCheckBox(CCVars.HudHeldItemShow, ShowHeldItemCheckBox);
         Control.AddOptionCheckBox(CCVars.CombatModeIndicatorsPointShow, ShowCombatModeIndicatorsCheckBox);
         Control.AddOptionCheckBox(CCVars.OpaqueStorageWindow, OpaqueStorageWindowCheckBox);
-        Control.AddOptionCheckBox(CCVars.ChatEnableFancyBubbles, FancySpeechBubblesCheckBox);
-        Control.AddOptionCheckBox(CCVars.ChatFancyNameBackground, FancyNameBackgroundsCheckBox);
         // WD EDIT START
         Control.AddOptionCheckBox(WhiteCVars.ColoredBubbleChat, EnableColorBubbleChatCheckBox);
-        Control.AddOptionCheckBox(WhiteCVars.ChatFancyFont, EnableChatFancyFontCheckBox);
         // WD EDIT END
         Control.AddOptionDropDown(CCVars.ChatStackLastLines, ChatStackOption, chatStackEntries);
         Control.AddOptionCheckBox(WhiteCVars.LogInChat, LogInChatCheckBox); // WD EDIT
