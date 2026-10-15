@@ -59,10 +59,6 @@ namespace Content.Client.Chat.UI
         /// <summary>The text that appears letter by letter, if the bubble has one (set while the bubble is built).</summary>
         protected OutlinedSpeechText? RevealText;
 
-        private float[] _revealTimes = Array.Empty<float>();
-        private float _revealElapsed;
-        private int _revealed;
-
         /// <summary>Seconds between two letters of a voice without barks, and the longer pause after punctuation.</summary>
         private const float DefaultLetterPause = 0.045f;
 
@@ -133,23 +129,60 @@ namespace Content.Client.Chat.UI
         private void StartReveal(bool whisper)
         {
             var text = RevealText!.PlainText;
-            _revealTimes = new float[text.Length];
+            var count = text.Length;
+            var times = new float[count];
 
             var barkVoice = _entityManager.TryGetComponent<Content.Shared._White.Bark.Components.BarkComponent>(_senderEntity, out var bark) ? bark.VoiceData : null;
-            var barks = barkVoice != null ? _entityManager.System<Content.Client._White.Bark.BarkSystem>() : null;
-            var time = 0f;
-            for (var i = 0; i < text.Length; i++)
+            if (barkVoice == null)
             {
-                var pause = barks != null && barkVoice != null
-                    ? barks.GenBarkData(barkVoice, text[i], whisper).Pause
-                    : text[i] is '.' or ',' or '?' or '!' ? DefaultLetterPause * 1.2f : DefaultLetterPause;
+                // No voice, no barks: a steady pace
+                var steady = 0f;
+                for (var i = 0; i < count; i++)
+                {
+                    steady += text[i] is '.' or ',' or '?' or '!' ? DefaultLetterPause * 1.2f : DefaultLetterPause;
+                    times[i] = steady;
+                }
+            }
+            else
+            {
+                // The way ClientBarkSystem.Update plays them: it takes the next bark, waits until its pause has run out in steps of one
+                // tick, plays it, and takes the next one at the next tick. So every bark costs its pause rounded up to whole ticks and one
+                // tick more, not just its pause
+                var barks = _entityManager.System<Content.Client._White.Bark.BarkSystem>();
+                var tick = (float) IoCManager.Resolve<IGameTiming>().TickPeriod.TotalSeconds;
+                var tickIndex = 0;
+                var waited = 0f;
+                for (var i = 0; i < count; i++)
+                {
+                    var pause = barks.GenBarkData(barkVoice, text[i], whisper).Pause;
+                    waited = 0f;
+                    while (true)
+                    {
+                        tickIndex++;
+                        if (pause <= waited)
+                            break;
 
-                time += pause;
-                _revealTimes[i] = time;
+                        waited += tick;
+                    }
+
+                    times[i] = tickIndex * tick;
+                }
+
+                // A long message gets barks only for its first letters (the bark limit of the options); the letters are revealed in that
+                // same time, so the text is done when the barks are
+                var limit = ConfigManager.GetCVar(WhiteCVars.BarkLimit);
+                if (limit > 0 && count > limit)
+                {
+                    var factor = times[limit - 1] / times[count - 1];
+                    for (var i = 0; i < count; i++)
+                    {
+                        times[i] *= factor;
+                    }
+                }
             }
 
-            _timeLeft = TotalTime + time;
-            RevealText.Reveal(0);
+            _timeLeft = TotalTime + (count > 0 ? times[count - 1] : 0f);
+            RevealText.SetSchedule(times);
         }
 
         protected abstract Control BuildBubble(ChatMessage message, string speechStyleClass, Color? fontColor = null);
@@ -160,21 +193,6 @@ namespace Content.Client.Chat.UI
 
             _timeLeft -= args.DeltaSeconds;
 
-            if (RevealText != null && _revealed < _revealTimes.Length)
-            {
-                _revealElapsed += args.DeltaSeconds;
-                var n = _revealed;
-                while (n < _revealTimes.Length && _revealTimes[n] <= _revealElapsed)
-                {
-                    n++;
-                }
-
-                if (n != _revealed)
-                {
-                    _revealed = n;
-                    RevealText.Reveal(n);
-                }
-            }
             if (_entityManager.Deleted(_senderEntity) || _timeLeft <= 0)
             {
                 // Timer spawn to prevent concurrent modification exception.
