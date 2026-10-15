@@ -56,6 +56,9 @@ namespace Content.Client.Chat.UI
 
         private float _timeLeft = TotalTime;
 
+        /// <summary>What the bubble has above and below its text (the space for the speaker's name).</summary>
+        private float _heightAroundText;
+
         /// <summary>The text that appears letter by letter, if the bubble has one (set while the bubble is built).</summary>
         protected OutlinedSpeechText? RevealText;
 
@@ -118,7 +121,10 @@ namespace Content.Client.Chat.UI
 
             // The box is measured with the whole text; then the text is taken away and comes back letter by letter
             if (RevealText != null && ConfigManager.GetCVar(CCVars.ChatBubbleLetterReveal))
+            {
+                _heightAroundText = ContentSize.Y - RevealText.DesiredSize.Y;
                 StartReveal(speechStyleClass == "whisperBox");
+            }
         }
 
         /// <summary>
@@ -243,12 +249,17 @@ namespace Content.Client.Chat.UI
             var worldPos = _transformSystem.GetWorldPosition(xform) + offset;
 
             var lowerCenter = _eyeManager.WorldToScreen(worldPos) / UIScale;
-            var screenPos = lowerCenter - new Vector2(ContentSize.X / 2, ContentSize.Y + _verticalOffsetAchieved);
+            // While the text is coming in the bubble is only as tall as the lines revealed so far: it grows upwards from the head
+            var shownHeight = ContentSize.Y;
+            if (RevealText != null)
+                shownHeight = Math.Min(ContentSize.Y, RevealText.VisibleHeight + _heightAroundText);
+
+            var screenPos = lowerCenter - new Vector2(ContentSize.X / 2, shownHeight + _verticalOffsetAchieved);
             // Round to nearest 0.5
             screenPos = (screenPos * 2).Rounded() / 2;
             LayoutContainer.SetPosition(this, screenPos);
 
-            var height = MathF.Ceiling(MathHelper.Clamp(lowerCenter.Y - screenPos.Y, 0, ContentSize.Y));
+            var height = MathF.Ceiling(MathHelper.Clamp(lowerCenter.Y - screenPos.Y, 0, shownHeight));
             SetHeight = height;
         }
 

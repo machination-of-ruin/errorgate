@@ -1,99 +1,89 @@
 using System.Numerics;
-using System.Text;
-using Robust.Client.Graphics;
-using Robust.Client.ResourceManagement;
 using Robust.Client.UserInterface;
+using Robust.Client.UserInterface.Controls;
 using Robust.Shared.Timing;
 using Robust.Shared.Utility;
 
 namespace Content.Client.Chat.UI;
 
 /// <summary>
-///     ERRORGATE speech: bold Bedstead with a black outline two pixels thick, no box behind it. It draws the letters itself (it wraps the
-///     lines and draws every letter), so each letter can be revealed at its own time and the letters of an exclamation can jump when
-///     they appear. The markup of the message gives the colours and the italics; the font is always Bedstead Bold.
+///     ERRORGATE speech: bold Bedstead with a black outline and no box behind it. The outline is the very same message drawn in black,
+///     shifted a pixel or two in every direction, under the text itself, so it always lines up with the text however the message is
+///     built. All the copies have the same margin in total, so they measure the same.
 ///
-///     The size of the text is that of the whole message from the start, so the box and the lines do not change while the letters
-///     come in (<see cref="SetSchedule"/>).
+///     The text can be revealed letter by letter (<see cref="SetSchedule"/>): the letters not yet revealed stay in the layout but are drawn
+///     transparent, so the box and the line breaks do not move while the text appears.
 /// </summary>
 public sealed class OutlinedSpeechText : Control
 {
     private const int OutlineWidth = 2;
-    private const int FontSize = 12;
-
-    /// <summary>How long a letter of an exclamation jumps, and how high, in pixels.</summary>
-    private const float JumpSeconds = 0.2f;
-    private const float JumpHeight = 3f;
 
     // A round outline two pixels thick: every offset within a distance of two, but not the corners
     private static readonly (int X, int Y)[] OutlineOffsets = BuildOutlineOffsets();
 
-    private readonly record struct Glyph(Rune Rune, Color Color, bool Italic, bool Jumps);
-
-    private readonly List<Glyph> _glyphs = new();
-    private readonly List<(int Glyph, Vector2 Baseline)> _placed = new();
-    private readonly float _maxWidth;
-    private readonly float _opacity;
-    private readonly VectorFont _regular;
-    private readonly VectorFont _italic;
-
-    private float _laidOutScale = -1;
-    private Vector2 _sizePixels;
+    private readonly List<RichTextLabel> _labels = new();
+    private readonly FormattedMessage _full;
+    private int _shown = -1;
     private float[]? _times;
     private float _elapsed;
+    private int _revealed;
+    private float _lineHeight = -1;
 
-    /// <summary>How many letters the text has (markup not counted).</summary>
-    public int Length => _glyphs.Count;
+    /// <summary>How many characters the text has (markup not counted).</summary>
+    public int Length { get; }
 
-    /// <summary>The text without markup, letter by letter.</summary>
+    /// <summary>The text without markup, character by character.</summary>
     public string PlainText { get; }
 
     public OutlinedSpeechText(string markup, Color? fontColor, bool italic, float maxWidth, float opacity)
     {
-        _maxWidth = maxWidth;
-        _opacity = opacity;
+        // The message brings its own font tag; bold and italic pick the variant of whatever font is in force
+        var styled = italic ? $"[bold][italic]{markup}[/italic][/bold]" : $"[bold]{markup}[/bold]";
+        _full = new FormattedMessage();
+        if (fontColor != null)
+            _full.PushColor(fontColor.Value);
 
-        var cache = IoCManager.Resolve<IResourceCache>();
-        _regular = new VectorFont(cache.GetResource<FontResource>("/Fonts/_White/Bedstead/Bedstead-bold.otf"), FontSize);
-        _italic = new VectorFont(cache.GetResource<FontResource>("/Fonts/_White/Bedstead/Bedstead-bold-italic.ttf"), FontSize);
+        _full.AddMarkupOrThrow("[font=\"Bedstead\"]");
+        _full.AddMarkupOrThrow(styled);
+        _full.AddMarkupOrThrow("[/font]");
 
-        // The letters with their colours and italics, from the markup of the message
-        var colors = new Stack<Color>();
-        colors.Push(fontColor ?? Color.White);
-        var italics = italic ? 1 : 0;
-        var plain = new StringBuilder();
-        foreach (var node in FormattedMessage.FromMarkupPermissive(markup).Nodes)
+        var length = 0;
+        var plain = new System.Text.StringBuilder();
+        foreach (var node in _full.Nodes)
         {
-            if (node.Name == null)
-            {
-                if (node.Value.StringValue is not { } text)
-                    continue;
-
-                foreach (var rune in text.EnumerateRunes())
-                {
-                    _glyphs.Add(new Glyph(rune, colors.Peek(), italics > 0, false));
-                    plain.Append(rune.ToString());
-                }
-
+            if (node.Name != null || node.Value.StringValue is not { } text)
                 continue;
-            }
 
-            switch (node.Name)
-            {
-                case "color" when !node.Closing:
-                    colors.Push(node.Value.ColorValue ?? (node.Value.StringValue is { } name && Color.TryFromName(name, out var named) ? named : colors.Peek()));
-                    break;
-                case "color" when colors.Count > 1:
-                    colors.Pop();
-                    break;
-                case "italic":
-                    italics += node.Closing ? -1 : 1;
-                    break;
-            }
+            length += text.Length;
+            plain.Append(text);
         }
 
+        Length = length;
         PlainText = plain.ToString();
-        MarkExclamations();
+
+        foreach (var (dx, dy) in OutlineOffsets)
+        {
+            var shadow = new RichTextLabel
+            {
+                MaxWidth = maxWidth,
+                Margin = new Thickness(OutlineWidth + dx, OutlineWidth + dy, OutlineWidth - dx, OutlineWidth - dy),
+                ModulateSelfOverride = Color.Black.WithAlpha(opacity),
+            };
+
+            _labels.Add(shadow);
+            AddChild(shadow);
+        }
+
+        var main = new RichTextLabel
+        {
+            MaxWidth = maxWidth,
+            Margin = new Thickness(OutlineWidth),
+            ModulateSelfOverride = Color.White.WithAlpha(opacity),
+        };
+
+        _labels.Add(main);
+        AddChild(main);
+        Reveal(Length);
     }
 
     private static (int, int)[] BuildOutlineOffsets()
@@ -113,181 +103,104 @@ public sealed class OutlinedSpeechText : Control
         return list.ToArray();
     }
 
-    /// <summary>The letters of a sentence that ends in an exclamation mark are the ones that jump.</summary>
-    private void MarkExclamations()
+    /// <summary>Shows the first <paramref name="count"/> characters; the rest are in the layout but transparent.</summary>
+    public void Reveal(int count)
     {
-        var start = 0;
-        for (var i = 0; i < _glyphs.Count; i++)
+        count = Math.Clamp(count, 0, Length);
+        if (count == _shown)
+            return;
+
+        _shown = count;
+        var message = new FormattedMessage();
+        var seen = 0;
+        foreach (var node in _full.Nodes)
         {
-            if (_glyphs[i].Rune.Value is not ('.' or '?' or '!'))
+            if (node.Name != null)
+            {
+                if (node.Closing)
+                    message.Pop();
+                else
+                    message.PushTag(node);
+
+                continue;
+            }
+
+            if (node.Value.StringValue is not { } text)
                 continue;
 
-            // A run of terminators ends the sentence; one '!' in it makes the sentence an exclamation
-            var end = i;
-            var exclamation = false;
-            while (end < _glyphs.Count && _glyphs[end].Rune.Value is '.' or '?' or '!')
-            {
-                exclamation |= _glyphs[end].Rune.Value == '!';
-                end++;
-            }
+            var visible = Math.Clamp(count - seen, 0, text.Length);
+            seen += text.Length;
+            if (visible > 0)
+                message.AddText(text[..visible]);
 
-            if (exclamation)
+            if (visible < text.Length)
             {
-                for (var k = start; k < end; k++)
-                {
-                    if (!Rune.IsWhiteSpace(_glyphs[k].Rune))
-                        _glyphs[k] = _glyphs[k] with { Jumps = true };
-                }
+                message.PushTag(new MarkupNode("color", new MarkupParameter(Color.Transparent), null));
+                message.AddText(text[visible..]);
+                message.Pop();
             }
+        }
 
-            start = end;
-            i = end - 1;
+        foreach (var label in _labels)
+        {
+            label.SetMessage(message);
         }
     }
 
-    /// <summary>
-    ///     Sets when each letter appears, in seconds from now (the time of the letter at the same place in <see cref="PlainText"/>). Without a
-    ///     schedule all the letters are there at once.
-    /// </summary>
+    /// <summary>Sets when each letter appears, in seconds from now. Without a schedule all the letters are there at once.</summary>
     public void SetSchedule(float[]? times)
     {
         _times = times;
         _elapsed = 0;
-    }
-
-    private void UpdateLayout(float scale)
-    {
-        if (MathF.Abs(scale - _laidOutScale) < 0.001f)
-            return;
-
-        _laidOutScale = scale;
-        _placed.Clear();
-
-        var pad = OutlineWidth * scale;
-        var limit = MathF.Max(1f, _maxWidth * scale - 2 * pad);
-        var lineHeight = _regular.GetLineHeight(scale);
-        var ascent = _regular.GetAscent(scale);
-        var jumpRoom = JumpHeight * scale;
-
-        float Advance(int index)
-        {
-            var glyph = _glyphs[index];
-            var font = glyph.Italic ? _italic : _regular;
-            return font.TryGetCharMetrics(glyph.Rune, scale, out var metrics) ? metrics.Advance : 0;
-        }
-
-        var x = 0f;
-        var line = 0;
-        var widest = 0f;
-        var i = 0;
-        while (i < _glyphs.Count)
-        {
-            if (_glyphs[i].Rune.Value == '\n')
-            {
-                widest = MathF.Max(widest, x);
-                x = 0;
-                line++;
-                i++;
-                continue;
-            }
-
-            if (Rune.IsWhiteSpace(_glyphs[i].Rune))
-            {
-                x += Advance(i);
-                i++;
-                continue;
-            }
-
-            // A word is placed whole; it goes to the next line if it does not fit (a word longer than a line is broken where it ends)
-            var end = i;
-            var wordWidth = 0f;
-            while (end < _glyphs.Count && !Rune.IsWhiteSpace(_glyphs[end].Rune))
-            {
-                wordWidth += Advance(end);
-                end++;
-            }
-
-            if (x > 0 && x + wordWidth > limit)
-            {
-                widest = MathF.Max(widest, x);
-                x = 0;
-                line++;
-            }
-
-            for (var k = i; k < end; k++)
-            {
-                var advance = Advance(k);
-                if (x > 0 && x + advance > limit)
-                {
-                    widest = MathF.Max(widest, x);
-                    x = 0;
-                    line++;
-                }
-
-                _placed.Add((k, new Vector2(pad + x, pad + jumpRoom + line * lineHeight + ascent)));
-                x += advance;
-            }
-
-            i = end;
-        }
-
-        widest = MathF.Max(widest, x);
-        _sizePixels = new Vector2(widest + 2 * pad, (line + 1) * lineHeight + 2 * pad + jumpRoom);
-    }
-
-    protected override Vector2 MeasureOverride(Vector2 availableSize)
-    {
-        UpdateLayout(UIScale);
-        return _sizePixels / UIScale;
+        _revealed = 0;
+        Reveal(times == null ? Length : 0);
     }
 
     protected override void FrameUpdate(FrameEventArgs args)
     {
         base.FrameUpdate(args);
-        if (_times != null)
-            _elapsed += args.DeltaSeconds;
+        if (_times == null || _revealed >= _times.Length)
+            return;
+
+        _elapsed += args.DeltaSeconds;
+        var n = _revealed;
+        while (n < _times.Length && _times[n] <= _elapsed)
+        {
+            n++;
+        }
+
+        if (n != _revealed)
+        {
+            _revealed = n;
+            Reveal(n);
+        }
     }
 
-    protected override void Draw(DrawingHandleScreen handle)
+    /// <summary>
+    ///     The height of the lines that have letters so far (the whole height without a schedule), estimated from how much of the text is
+    ///     there: the bubble is as tall as this and grows upwards from the head as the lines come in.
+    /// </summary>
+    public float VisibleHeight
     {
-        base.Draw(handle);
-        UpdateLayout(UIScale);
-        var scale = UIScale;
-
-        // Every outline first, then every letter on top: the outline of a letter reaches into its neighbours (the font has a pixel of room
-        // between letters), so drawing a letter and its outline together would cover the letter before it
-        var drawn = new List<(Glyph Glyph, Vector2 Origin)>(_placed.Count);
-        foreach (var (index, baseline) in _placed)
+        get
         {
-            if (_times != null && index < _times.Length && _times[index] > _elapsed)
-                continue;
+            var full = DesiredSize.Y;
+            if (_times == null || _revealed >= Length || Length == 0)
+                return full;
 
-            var glyph = _glyphs[index];
-            var origin = baseline;
-            if (_times != null && glyph.Jumps && index < _times.Length)
+            if (_lineHeight < 0)
             {
-                var age = (_elapsed - _times[index]) / JumpSeconds;
-                if (age is >= 0 and < 1)
-                    origin.Y -= JumpHeight * scale * 4f * age * (1f - age);
+                // The height of one line: this text's own font, measured once
+                var probe = new RichTextLabel { MaxWidth = 1000 };
+                probe.SetMessage(FormattedMessage.FromMarkupPermissive("[font=\"Bedstead\"][bold]A[/bold][/font]"));
+                probe.Measure(new Vector2(1000, 1000));
+                _lineHeight = Math.Max(1f, probe.DesiredSize.Y);
             }
 
-            drawn.Add((glyph, origin));
-        }
-
-        var outline = Color.Black.WithAlpha(_opacity);
-        foreach (var (glyph, origin) in drawn)
-        {
-            var font = glyph.Italic ? _italic : _regular;
-            foreach (var (dx, dy) in OutlineOffsets)
-            {
-                font.DrawChar(handle, glyph.Rune, origin + new Vector2(dx, dy) * scale, scale, outline);
-            }
-        }
-
-        foreach (var (glyph, origin) in drawn)
-        {
-            var font = glyph.Italic ? _italic : _regular;
-            font.DrawChar(handle, glyph.Rune, origin, scale, glyph.Color.WithAlpha(glyph.Color.A * _opacity));
+            var content = full - 2 * OutlineWidth;
+            var lines = Math.Max(1, (int) MathF.Round(content / _lineHeight));
+            var visible = Math.Clamp((int) MathF.Ceiling(lines * (_revealed + 1f) / Length), 1, lines);
+            return visible * _lineHeight + 2 * OutlineWidth;
         }
     }
 }
