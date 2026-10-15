@@ -190,17 +190,20 @@ public sealed class OutlinedSpeechText : Control
 
             if (_lineHeight < 0)
             {
-                // The height of one line: this text's own font, measured once
-                var probe = new RichTextLabel { MaxWidth = 1000 };
-                probe.SetMessage(FormattedMessage.FromMarkupPermissive("[font=\"Bedstead\"][bold]A[/bold][/font]"));
-                probe.Measure(new Vector2(1000, 1000));
-                _lineHeight = Math.Max(1f, probe.DesiredSize.Y);
+                // The height of one line of this font; a label that is not in the tree yet cannot be asked, it answers zero
+                var cache = IoCManager.Resolve<Robust.Client.ResourceManagement.IResourceCache>();
+                var font = new Robust.Client.Graphics.VectorFont(cache.GetResource<Robust.Client.ResourceManagement.FontResource>("/Fonts/_White/Bedstead/Bedstead-bold.otf"), 12);
+                _lineHeight = font.GetLineHeight(UIScale) / UIScale;
             }
+
+            // Without a sensible line height the bubble is simply whole
+            if (_lineHeight < 4f)
+                return full;
 
             var content = full - 2 * OutlineWidth;
             var lines = Math.Max(1, (int) MathF.Round(content / _lineHeight));
             var visible = Math.Clamp((int) MathF.Ceiling(lines * (_revealed + 1f) / Length), 1, lines);
-            return visible * _lineHeight + 2 * OutlineWidth;
+            return OutlineWidth * 2 + content * visible / lines;
         }
     }
 }
