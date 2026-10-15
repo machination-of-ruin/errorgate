@@ -70,7 +70,7 @@ public sealed partial class CCVars
     ///     Goes from to 0 (completely transparent) to 1 (completely opaque)
     /// </summary>
     public static readonly CVarDef<float> SpeechBubbleBackgroundOpacity =
-        CVarDef.Create("accessibility.speech_bubble_background_opacity", 0.75f, CVar.CLIENTONLY | CVar.ARCHIVE);
+        CVarDef.Create("accessibility.speech_bubble_background_opacity", 0.95f, CVar.CLIENTONLY | CVar.ARCHIVE);
 
     /// <summary>
     /// If enabled, censors character nudity by forcing clothes markings on characters, selected by the client.

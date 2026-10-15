@@ -473,6 +473,26 @@ namespace Content.Client.Stylesheets
             whisperBox.SetPatchMargin(StyleBox.Margin.All, 2);
             whisperBox.SetContentMarginOverride(StyleBox.Margin.Horizontal, 7);
 
+            // ERRORGATE speech bubbles: near-black boxes with a thin edge, the same margin on every side (the old texture had a heavier
+            // right and bottom edge, which made the bubbles lopsided and cut the text off on the right)
+            var sayBubble = new StyleBoxFlat
+            {
+                BackgroundColor = Color.FromHex("#0B0B0D"),
+                BorderColor = Color.FromHex("#B3262B"),
+                BorderThickness = new Thickness(1),
+            };
+            sayBubble.SetContentMarginOverride(StyleBox.Margin.Horizontal, 6);
+            sayBubble.SetContentMarginOverride(StyleBox.Margin.Vertical, 3);
+
+            var whisperBubble = new StyleBoxFlat
+            {
+                BackgroundColor = Color.FromHex("#0B0B0D"),
+                BorderColor = Color.FromHex("#5E6270"),
+                BorderThickness = new Thickness(1),
+            };
+            whisperBubble.SetContentMarginOverride(StyleBox.Margin.Horizontal, 6);
+            whisperBubble.SetContentMarginOverride(StyleBox.Margin.Vertical, 3);
+
             // Placeholder
             var placeholderTexture = resCache.GetTexture("/Textures/Interface/Nano/placeholder.png");
             var placeholder = new StyleBoxTexture { Texture = placeholderTexture };
@@ -1067,12 +1087,12 @@ namespace Content.Client.Stylesheets
 
                 new StyleRule(new SelectorElement(typeof(PanelContainer), new[] {"speechBox", "sayBox"}, null, null), new[]
                 {
-                    new StyleProperty(PanelContainer.StylePropertyPanel, tooltipBox)
+                    new StyleProperty(PanelContainer.StylePropertyPanel, sayBubble)
                 }),
 
                 new StyleRule(new SelectorElement(typeof(PanelContainer), new[] {"speechBox", "whisperBox"}, null, null), new[]
                 {
-                    new StyleProperty(PanelContainer.StylePropertyPanel, whisperBox)
+                    new StyleProperty(PanelContainer.StylePropertyPanel, whisperBubble)
                 }),
 
                 new StyleRule(new SelectorChild(
