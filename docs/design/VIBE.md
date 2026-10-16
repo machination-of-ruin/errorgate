@@ -73,7 +73,7 @@ Two-key doors, power relays and scarcity need several people. She builds them an
 
 - Strip omniscience: no crew manifest, no global radio by default, no medical/security HUDs, no tracking through PDAs or IDs. *Partly implemented: no manifest or guidebook button, no role nicknames.*
 - Strangers are unknown: consider hiding names on examine until a face has been seen up close or the person introduces themselves.
-- Darkness is real: nights are dark, light sources reveal the carrier, field of view and occlusion hide what is behind walls. *Partly implemented: lighter slot, glowsticks in loot, emergency lights, Kuznetsk day-night cycle.*
+- Darkness is real: nights are dark, light sources reveal the carrier, field of view and occlusion hide what is behind walls. *Partly implemented: lighter slot, glowsticks in loot, emergency lights, Kuznetsk day-night cycle, and a faint glow around your own character (client-only, a floor of visibility, never a light source: `Content.Client/_ERRORGATE/PlayerGlow`).*
 - Sound carries: gunfire and footsteps travel far; ambience is mostly quiet, broken by sudden noises. *Implemented for gunfire (distant shots by caliber, directional); footsteps and ambience are still proposed.*
 
 ### The GOD's whisper
