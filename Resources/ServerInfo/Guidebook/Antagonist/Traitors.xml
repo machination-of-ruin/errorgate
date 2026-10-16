@@ -27,7 +27,7 @@
 
   <Box>
     <GuideEntityEmbed Entity="WeaponPistolCobra" Caption="Вооружение"/>
-    <GuideEntityEmbed Entity="MagazineBoxLightRifle" State="icon" Caption="Патроны"/>
+    <GuideEntityEmbed Entity="AmmoBox762x39" State="icon" Caption="Патроны"/>
     <GuideEntityEmbed Entity="C4" Caption="Взрывчатка"/>
     <GuideEntityEmbed Entity="ClothingOuterHardsuitSyndie" Caption="Снаряжение"/>
     <GuideEntityEmbed Entity="Stimpack" Caption="Химикаты"/>

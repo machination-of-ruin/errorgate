@@ -47,7 +47,7 @@
   Вы можете приобрести те же виды снаряжения, что и Предатели, но у вас есть доступ к более качественному снаряжению и больше телекристаллов для трат.
   <Box>
     <GuideEntityEmbed Entity="WeaponLightMachineGunL6" Caption="Вооружение"/>
-    <GuideEntityEmbed Entity="MagazineLightRifleBox" State="icon" Caption="Патроны"/>
+    <GuideEntityEmbed Entity="Magazine762x39Box" State="icon" Caption="Патроны"/>
     <GuideEntityEmbed Entity="C4" Caption="Взрывчатка"/>
     <GuideEntityEmbed Entity="ClothingOuterHardsuitJuggernaut" Caption="Снаряжение"/>
     <GuideEntityEmbed Entity="Stimpack" Caption="Химикаты"/>

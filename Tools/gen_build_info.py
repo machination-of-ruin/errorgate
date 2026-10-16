@@ -7,6 +7,7 @@ import hashlib
 import io
 import json
 import os
+import re
 import subprocess
 from zipfile import ZipFile, ZIP_DEFLATED
 
@@ -78,10 +79,19 @@ def generate_manifest_hash(file: str) -> str:
     return manifestHash.hexdigest().upper()
 
 def get_engine_version() -> str:
-    proc = subprocess.run(["git", "describe","--tags", "--abbrev=0"], stdout=subprocess.PIPE, cwd="RobustToolbox", check=True, encoding="UTF-8")
+    # Upstream tags its engine releases; the fork of the engine we build on has no tags, so fall back to the version the engine
+    # itself declares.
+    proc = subprocess.run(["git", "describe","--tags", "--abbrev=0"], stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, cwd="RobustToolbox", encoding="UTF-8")
     tag = proc.stdout.strip()
-    assert tag.startswith("v")
-    return tag[1:] # Cut off v prefix.
+    if proc.returncode == 0 and tag.startswith("v"):
+        return tag[1:] # Cut off v prefix.
+
+    props = os.path.join("RobustToolbox", "MSBuild", "Robust.Engine.Version.props")
+    with open(props, encoding="UTF-8-sig") as f:
+        match = re.search(r"<Version>([^<]+)</Version>", f.read())
+
+    assert match, "no engine version found"
+    return match.group(1)
 
 
 def sha256_file(path: str) -> str:

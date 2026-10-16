@@ -100,6 +100,9 @@
   - type: Sprite
     sprite: Clothing/Back/Satchels/smuggler.rsi
     state: icon
+  - type: Storage
+    grid: # ERRORGATE: the satchel is smaller than a backpack, but the random fill was made for the full size
+    - 0,0,6,3
   - type: EntityTableContainerFill
     containers:
       storagebase: !type:NestedSelector

@@ -481,6 +481,8 @@ namespace Content.IntegrationTests.Tests
                 .ToHashSet();
 
             Assert.That(gameMaps.Remove(PoolManager.TestMap));
+            // ERRORGATE: the world is built by the world system, its map file is an empty stand-in
+            Assert.That(gameMaps.Remove("World"));
 
             Assert.That(gameMaps, Is.EquivalentTo(GameMaps.ToHashSet()), "Game map prototype missing from test cases.");
 

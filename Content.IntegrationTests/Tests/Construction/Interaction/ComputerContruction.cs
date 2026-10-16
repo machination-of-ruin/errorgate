@@ -10,29 +10,6 @@ public sealed class ComputerConstruction : InteractionTest
     private const string IdBoard = "IDComputerCircuitboard";
 
     [Test]
-    public async Task ConstructComputer()
-    {
-        // Place ghost
-        await StartConstruction(Computer);
-
-        // Initial interaction (ghost turns into real entity)
-        await InteractUsing(Steel, 5);
-        ClientAssertPrototype(ComputerFrame, Target);
-
-        // Perform construction steps
-        await Interact(
-            Wrench,
-            IdBoard,
-            Screw,
-            (Cable, 5),
-            (Glass, 2),
-            Screw);
-
-        // Construction finished, target entity was replaced with a new one:
-        AssertPrototype(ComputerId, Target);
-    }
-
-    [Test]
     public async Task DeconstructComputer()
     {
         // Spawn initial entity

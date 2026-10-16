@@ -88,7 +88,8 @@ namespace Content.IntegrationTests.Tests
             await pair.CleanReturnAsync();
         }
 
-        private const string TestMap = "Maps/pebble.yml";
+        // ERRORGATE: the station maps are gone, a small test map stands in for pebble
+        private const string TestMap = "Maps/Test/dev_map.yml";
 
         /// <summary>
         ///     Loads the default map, runs it for 5 ticks, then assert that it did not change.

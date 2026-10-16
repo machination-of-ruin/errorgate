@@ -80,6 +80,7 @@
     - type: Construction # ERRORGATE: skull helmet
       graph: BoneHelmet
       node: skull
+      deconstructionTarget: null
     - type: Input
       context: "human"
     - type: Speech

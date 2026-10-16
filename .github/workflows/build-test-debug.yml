@@ -47,6 +47,12 @@ jobs:
     - name: Run Content.Tests
       run: dotnet test --no-build --configuration DebugOpt Content.Tests/Content.Tests.csproj -- NUnit.ConsoleOut=0
 
+    # The integration tests start a client, which loads OpenAL; the runner image does not have it
+    - name: Install OpenAL
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y libopenal1
+
     - name: Run Content.IntegrationTests
       shell: pwsh
       run: |
