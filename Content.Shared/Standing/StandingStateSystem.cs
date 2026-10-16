@@ -38,7 +38,6 @@ public sealed class StandingStateSystem : EntitySystem
 
     private void OnMobTargetCollide(Entity<StandingStateComponent> ent, ref AttemptMobTargetCollideEvent args)
     {
-        Log.Debug(ent.Comp.CurrentState.ToString());
         if (ent.Comp.CurrentState != StandingState.Standing)
         {
             args.Cancelled = true;
