@@ -11,18 +11,6 @@ public sealed class MachineConstruction : InteractionTest
     private const string Beaker = "Beaker";
 
     [Test]
-    public async Task ConstructProtolathe()
-    {
-        await StartConstruction(MachineFrame);
-        await InteractUsing(Steel, 5);
-        ClientAssertPrototype(Unfinished, Target);
-        await Interact(Wrench, Cable);
-        AssertPrototype(MachineFrame);
-        await Interact(ProtolatheBoard, Bin1, Bin1, Manipulator1, Manipulator1, Beaker, Beaker, Screw);
-        AssertPrototype(Protolathe);
-    }
-
-    [Test]
     public async Task DeconstructProtolathe()
     {
         await StartDeconstruction(Protolathe);

@@ -125,7 +125,7 @@
   Как уже говорилось, блоб очень уязвим к урону от огня. Поэтому следующие предметы очень хороши для борьбы с ним:
 
   <Box>
-    <GuideEntityEmbed Entity="MagazineBoxPistolIncendiary" Caption="Зажигательные патроны"/>
+    <GuideEntityEmbed Entity="AmmoBox9x19Incendiary" Caption="Зажигательные патроны"/>
     <GuideEntityEmbed Entity="WeaponLaserCarbine" Caption="Лазерная винтовка"/>
     <GuideEntityEmbed Entity="Welder" Caption="Сварочный аппарат"/>
   </Box>

@@ -13,7 +13,6 @@
       - CrewManifestCartridge
       - NotekeeperCartridge
       - NewsReaderCartridge
-      - CrimeAssistCartridge
       - SecWatchCartridge
       - NanoChatCartridge
   - type: Pda
@@ -57,7 +56,6 @@
       - CrewManifestCartridge
       - NotekeeperCartridge
       - NewsReaderCartridge
-      - CrimeAssistCartridge
       - NanoChatCartridge
 
 - type: entity
@@ -88,7 +86,6 @@
       - CrewManifestCartridge
       - NotekeeperCartridge
       - NewsReaderCartridge
-      - CrimeAssistCartridge
       - NanoChatCartridge # DeltaV
 
 - type: entity
@@ -119,7 +116,6 @@
       - CrewManifestCartridge
       - NotekeeperCartridge
       - NewsReaderCartridge
-      - CrimeAssistCartridge
       - NanoChatCartridge
 
 - type: entity

@@ -430,6 +430,7 @@
   - type: Construction
     graph: BoneHelmet
     node: helmet
+    deconstructionTarget: null # ERRORGATE: the graph starts at the skull, there is no 'start' node to take it apart into
 
 - type: entity
   parent: [ ClothingHeadHelmetBase, BaseMinorContraband ]

@@ -28,8 +28,16 @@ public sealed class ExecutionTest
             entMan.System<Robust.Server.GameObjects.MapSystem>().CreateMap(out var mapId);
             var coords = new MapCoordinates(0, 0, mapId);
             attacker = entMan.SpawnEntity("MobHuman", coords);
-            victim = entMan.SpawnEntity("MobHuman", coords);
+            // Mobs push each other apart now, and moving breaks the do-after: the victim stands next to the attacker, not in them
+            victim = entMan.SpawnEntity("MobHuman", new MapCoordinates(1.2f, 0, mapId));
             weapon = entMan.SpawnEntity(weaponId, coords);
+
+            // The test map is empty space: pressure damage would break the do-after too
+            foreach (var mob in new[] { attacker, victim })
+            {
+                entMan.RemoveComponent<Content.Server.Atmos.Components.BarotraumaComponent>(mob);
+            }
+
             Assert.That(entMan.System<SharedHandsSystem>().TryPickup(attacker, weapon), "The attacker could not pick the weapon up.");
         });
         await pair.RunTicksSync(5);
