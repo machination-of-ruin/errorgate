@@ -2,6 +2,7 @@ using System.Numerics;
 using Content.Shared._White.CCVar;
 using Content.Shared.CCVar;
 using Content.Shared.Chat;
+using Content.Shared.IdentityManagement;
 using Content.Shared.Speech;
 using Robust.Client.GameObjects;
 using Robust.Client.Graphics;
@@ -53,6 +54,9 @@ namespace Content.Client.Chat.UI
         public const float SpeechMaxWidth = 256;
 
         private readonly EntityUid _senderEntity;
+
+        protected EntityUid SenderEntity => _senderEntity;
+        protected IEntityManager EntityManager => _entityManager;
 
         private float _timeLeft = TotalTime;
 
@@ -136,7 +140,7 @@ namespace Content.Client.Chat.UI
         }
 
         /// <summary>
-        ///     Works out when each letter appears, the way the voice barks play (Content.Client/_White/Bark): one letter per bark. The
+        ///     Works out when each letter appears, the way the voice barks play (Content.Client/_White/Bark): one bark per syllable, the letters before it appearing with it. The
         ///     queue takes a bark, waits its pause in steps of one tick, plays it and takes the next one a tick later, so every bark
         ///     costs its pause rounded up to whole ticks plus one tick. A voice without barks has a steady pace. The bubble stays long
         ///     enough to be read after the last letter.
@@ -161,35 +165,60 @@ namespace Content.Client.Chat.UI
             }
             else
             {
+                // Only the barks that sound are in the queue (one per syllable); each letter appears with its bark
                 var barks = _entityManager.System<Content.Client._White.Bark.BarkSystem>();
+                var plan = barks.GenBarkPlan(barkVoice, text, whisper, out var charEntry);
+                if (plan.Count == 0)
+                    return;
+
                 var tick = (float) IoCManager.Resolve<IGameTiming>().TickPeriod.TotalSeconds;
+                var entryTimes = new float[plan.Count];
                 var tickIndex = 0;
-                for (var i = 0; i < count; i++)
+                for (var i = 0; i < plan.Count; i++)
                 {
-                    var pause = barks.GenBarkData(barkVoice, text[i], whisper).Pause;
                     var waited = 0f;
                     while (true)
                     {
                         tickIndex++;
-                        if (pause <= waited)
+                        if (plan[i].Pause <= waited)
                             break;
 
                         waited += tick;
                     }
 
-                    times[i] = tickIndex * tick;
+                    entryTimes[i] = tickIndex * tick;
                 }
 
-                // A long message gets barks only for its first letters (the bark limit of the options); the text is revealed in that
+                // A long message gets barks only for its first syllables (the bark limit of the options); the text is revealed in that
                 // same time, so it is done when the barks are
                 var limit = ConfigManager.GetCVar(WhiteCVars.BarkLimit);
-                if (limit > 0 && count > limit)
+                if (limit > 0 && plan.Count > limit)
                 {
-                    var factor = times[limit - 1] / times[count - 1];
-                    for (var i = 0; i < count; i++)
+                    var factor = entryTimes[limit - 1] / entryTimes[^1];
+                    for (var i = 0; i < plan.Count; i++)
                     {
-                        times[i] *= factor;
+                        entryTimes[i] *= factor;
                     }
+                }
+
+                // The letters of a bark come one by one in the time since the bark before it, not all together with it
+                var group = 0;
+                for (var i = 0; i < count; i++)
+                {
+                    var entry = Math.Max(charEntry[i], 0);
+                    if (i > 0 && entry == Math.Max(charEntry[i - 1], 0))
+                        group++;
+                    else
+                        group = 0;
+
+                    var size = 1;
+                    while (i - group + size < count && Math.Max(charEntry[i - group + size], 0) == entry)
+                    {
+                        size++;
+                    }
+
+                    var from = entry > 0 ? entryTimes[entry - 1] : 0f;
+                    times[i] = from + (entryTimes[entry] - from) * (group + 1) / size;
                 }
             }
 
@@ -337,13 +366,38 @@ namespace Content.Client.Chat.UI
         {
         }
 
+        /// <summary>
+        ///     Interactions are written to chat as "Darius Houser points at the rock."; above the head the name goes: "points at the rock."
+        ///     The chat keeps the whole line.
+        /// </summary>
+        private bool TryRemoveSubject(string action, out string rest)
+        {
+            var name = Identity.Name(SenderEntity, EntityManager);
+            foreach (var subject in new[] { name, "the " + name })
+            {
+                if (action.Length > subject.Length && action.StartsWith(subject + " ", StringComparison.OrdinalIgnoreCase))
+                {
+                    rest = action[(subject.Length + 1)..];
+                    return true;
+                }
+            }
+
+            rest = action;
+            return false;
+        }
+
         protected override Control BuildBubble(ChatMessage message, string speechStyleClass, Color? fontColor = null)
         {
             // Emotes and LOOC are drawn like the rest of the speech, in italics
             // An emote is the action behind an asterisk, without the name: *laughs
-            var text = message.Channel == ChatChannel.Emotes
-                ? "*" + FormattedMessage.EscapeText(message.Message)
-                : message.WrappedMessage;
+            var text = message.WrappedMessage;
+            if (message.Channel == ChatChannel.Emotes)
+            {
+                // Interactions come as "Darius Houser points at the rock.": above the head the name goes and every emote gets the
+                // asterisk: "*points at the rock.", "*helps you up.", "*laughs"
+                var action = TryRemoveSubject(message.Message, out var rest) ? rest : message.Message;
+                text = "*" + FormattedMessage.EscapeText(action);
+            }
 
             return BuildOutlined(text, fontColor, true, SpeechMaxWidth, ConfigManager.GetCVar(CCVars.SpeechBubbleTextOpacity));
         }
