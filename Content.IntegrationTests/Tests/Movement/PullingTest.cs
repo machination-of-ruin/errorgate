@@ -70,9 +70,10 @@ public sealed class PullingTest : MovementTest
         Assert.That(cAlert.IsShowingAlert(CPlayer, puller.PullingAlert), Is.False);
         Assert.That(sAlert.IsShowingAlert(SPlayer, puller.PullingAlert), Is.False);
 
-        // Move back to the left and ensure the target is no longer following us.
-        await Move(DirectionFlag.West, 2);
-        Assert.That(Delta(), Is.GreaterThan(2f));
+        // Move on to the right and ensure the target is no longer following us.
+        // ERRORGATE: mobs block each other now, so we do not walk back through the target, we walk away from it.
+        await Move(DirectionFlag.East, 1);
+        Assert.That(Delta(), Is.LessThan(-1.5f));
     }
 }
 

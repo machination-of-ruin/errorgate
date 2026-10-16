@@ -31,6 +31,22 @@ public sealed class StoreTests
     slots:
     - idcard
   - type: Pda
+
+- type: entity
+  name: HumanUniformDummy
+  id: HumanUniformDummy
+  components:
+  - type: Inventory
+  - type: ContainerContainer
+
+- type: entity
+  name: UniformDummy
+  id: UniformDummy
+  components:
+  - type: Clothing
+    slots: [innerclothing]
+  - type: Item
+    size: Tiny
 ";
     [Test]
     public async Task StoreDiscountAndRefund()

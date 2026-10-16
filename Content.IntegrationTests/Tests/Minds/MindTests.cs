@@ -27,6 +27,13 @@ public sealed partial class MindTests
     [TestPrototypes]
     private const string Prototypes = @"
 - type: entity
+  id: GhostRoleTestEntity
+  components:
+  - type: MindContainer
+  - type: GhostRole
+  - type: GhostTakeoverAvailable
+
+- type: entity
   id: MindTestEntityDamageable
   components:
   - type: MindContainer

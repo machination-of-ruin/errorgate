@@ -1,5 +1,6 @@
 ﻿using System.Numerics;
 using Content.IntegrationTests.Pair;
+using Content.Shared._ERRORGATE.DeathVoid;
 using Content.Shared.Ghost;
 using Content.Shared.Mind;
 using Content.Shared.Players;
@@ -103,57 +104,47 @@ public sealed class GhostTests
     }
 
     /// <summary>
-    /// Test that a ghost gets created when the player entity is deleted.
+    /// Test that a player whose entity is deleted ends up in the death void (ERRORGATE has no ghosts).
     /// 1. Delete mob
-    /// 2. Assert is ghost
+    /// 2. Assert is in the void
     /// </summary>
     [Test]
     public async Task TestGridGhostOnDelete()
     {
         var data = await SetupData();
 
-        var oldPosition = data.SEntMan.GetComponent<TransformComponent>(data.SPlayerEnt).Coordinates;
-
-        Assert.That(!data.SEntMan.HasComponent<GhostComponent>(data.SPlayerEnt), "Player was initially a ghost?");
+        Assert.That(!data.SEntMan.HasComponent<DeathVoidComponent>(data.SPlayerEnt), "Player was initially in the death void?");
 
         // Delete entity
         await data.Server.WaitPost(() => data.SEntMan.DeleteEntity(data.SPlayerEnt));
         await data.Pair.RunTicksSync(5);
 
-        var ghost = data.ServerSession.AttachedEntity!.Value;
-        Assert.That(data.SEntMan.HasComponent<GhostComponent>(ghost), "Player did not become a ghost");
-
-        // Ensure the position is the same
-        var ghostPosition = data.SEntMan.GetComponent<TransformComponent>(ghost).Coordinates;
-        Assert.That(ghostPosition, Is.EqualTo(oldPosition));
+        // ERRORGATE: there are no ghosts, a player whose body is gone ends up in the death void
+        var voided = data.ServerSession.AttachedEntity!.Value;
+        Assert.That(data.SEntMan.HasComponent<DeathVoidComponent>(voided), "Player did not end up in the death void");
 
         await data.Pair.CleanReturnAsync();
     }
 
     /// <summary>
-    /// Test that a ghost gets created when the player entity is queue deleted.
+    /// Test that a player whose entity is queue deleted ends up in the death void (ERRORGATE has no ghosts).
     /// 1. Delete mob
-    /// 2. Assert is ghost
+    /// 2. Assert is in the void
     /// </summary>
     [Test]
     public async Task TestGridGhostOnQueueDelete()
     {
         var data = await SetupData();
 
-        var oldPosition = data.SEntMan.GetComponent<TransformComponent>(data.SPlayerEnt).Coordinates;
-
-        Assert.That(!data.SEntMan.HasComponent<GhostComponent>(data.SPlayerEnt), "Player was initially a ghost?");
+        Assert.That(!data.SEntMan.HasComponent<DeathVoidComponent>(data.SPlayerEnt), "Player was initially in the death void?");
 
         // Delete entity
         await data.Server.WaitPost(() => data.SEntMan.QueueDeleteEntity(data.SPlayerEnt));
         await data.Pair.RunTicksSync(5);
 
-        var ghost = data.ServerSession.AttachedEntity!.Value;
-        Assert.That(data.SEntMan.HasComponent<GhostComponent>(ghost), "Player did not become a ghost");
-
-        // Ensure the position is the same
-        var ghostPosition = data.SEntMan.GetComponent<TransformComponent>(ghost).Coordinates;
-        Assert.That(ghostPosition, Is.EqualTo(oldPosition));
+        // ERRORGATE: there are no ghosts, a player whose body is gone ends up in the death void
+        var voided = data.ServerSession.AttachedEntity!.Value;
+        Assert.That(data.SEntMan.HasComponent<DeathVoidComponent>(voided), "Player did not end up in the death void");
 
         await data.Pair.CleanReturnAsync();
     }
