@@ -388,6 +388,11 @@ namespace Content.Server.Administration.Managers
                 return;
             }
 
+            // The session left while its admin data loaded (a quick reconnect or a second client): its content data is gone with it. This is
+            // an async void, so letting the next lines throw takes the whole server down.
+            if (session.ContentData() is not { } contentData)
+                return;
+
             var (dat, rankId, specialLogin) = adminDat.Value;
             var reg = new AdminReg(session, dat)
             {
@@ -397,7 +402,7 @@ namespace Content.Server.Administration.Managers
 
             _admins.Add(session, reg);
 
-            if (session.ContentData()!.Stealthed)
+            if (contentData.Stealthed)
                 reg.Data.Stealth = true;
 
             if (reg.Data.Active)
