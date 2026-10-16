@@ -4,6 +4,10 @@ using Robust.Client.GameObjects;
 using Robust.Client.Player;
 using Robust.Shared.Map;
 using Robust.Shared.Map.Components;
+using Robust.Shared.Physics;
+using Content.Shared.Physics;
+using Robust.Shared.Physics.Systems;
+using System.Numerics;
 
 namespace Content.Client._ERRORGATE.PlayerGlow;
 
@@ -25,6 +29,7 @@ public sealed class PlayerGlowSystem : EntitySystem
     [Dependency] private readonly SharedMapSystem _map = default!;
     [Dependency] private readonly EntityLookupSystem _lookup = default!;
     [Dependency] private readonly PointLightSystem _lights = default!;
+    [Dependency] private readonly SharedPhysicsSystem _physics = default!;
 
     private readonly HashSet<Entity<PointLightComponent>> _nearby = new();
     private EntityUid? _glow;
@@ -101,8 +106,16 @@ public sealed class PlayerGlowSystem : EntitySystem
             if (uid == glow || !lamp.Enabled || lamp.Energy <= 0f || lamp.Radius <= 0f)
                 continue;
 
-            var diff = _transform.GetWorldPosition(uid) - position.Position;
-            already += LampBrightness(lamp, diff.LengthSquared(), lamp.Energy);
+            var lampPosition = _transform.GetWorldPosition(uid);
+            var diff = lampPosition - position.Position;
+            var brightness = LampBrightness(lamp, diff.LengthSquared(), lamp.Energy);
+
+            // A lamp that casts shadows does not light through a wall, so it does not count
+            var blocked = brightness > 0.001f && lamp.CastShadows && Blocked(position.MapId, lampPosition, position.Position);
+            if (blocked)
+                continue;
+
+            already += brightness;
         }
 
         var missing = comp.Floor - already;
@@ -112,6 +125,28 @@ public sealed class PlayerGlowSystem : EntitySystem
         // What the glow itself gives at its own centre per point of energy (the same shape the light shader draws)
         var perEnergy = LampBrightness(light, 0f, 1f);
         return perEnergy > 0f ? missing / perEnergy : 0f;
+    }
+
+    /// <summary>Whether something opaque (a wall, a closed door) stands between a lamp and the character.</summary>
+    private bool Blocked(MapId map, Vector2 lamp, Vector2 character)
+    {
+        // Wall lamps sit in or on the wall: start the ray a little away from the lamp so it does not hit its own wall
+        const float skip = 0.6f;
+        var toCharacter = character - lamp;
+        var distance = toCharacter.Length();
+        if (distance <= skip)
+            return false;
+
+        var direction = toCharacter / distance;
+        var ray = new CollisionRay(lamp + direction * skip, direction, (int) CollisionGroup.Opaque);
+        // Only what the engine's own shadows use stands in the way: an occluder that is on (a wall, a closed door). Bodies of mobs and the
+        // lamp itself have opaque fixtures too, but they do not block light.
+        foreach (var _ in _physics.IntersectRayWithPredicate(map, ray, distance - skip, e => !TryComp(e, out OccluderComponent? occluder) || !occluder.Enabled, returnOnFirstHit: true))
+        {
+            return true;
+        }
+
+        return false;
     }
 
     private float AmbientBrightness(MapId map)

@@ -18,9 +18,9 @@ public sealed partial class PlayerGlowComponent : Component
     [DataField]
     public float SampleInterval = 0.12f;
 
-    /// <summary>How fast the glow comes up when it gets darker, per second. Slow: the eyes take their time to get used to the dark.</summary>
+    /// <summary>How fast the glow comes up when it gets darker, per second. Slow: the eyes take their time to get used to the dark (0.3 is about 10 seconds to nearly all of it).</summary>
     [DataField]
-    public float SmoothingUp = 0.35f;
+    public float SmoothingUp = 0.3f;
 
     /// <summary>How fast the glow goes away when it gets lighter, per second. Fast, so it never adds to a lit place.</summary>
     [DataField]
