@@ -148,7 +148,6 @@
   parent: BaseWallIndestructible
   id: BunkerWallConcrete
   name: concrete wall
-  categories: [ HideSpawnMenu ]
   components:
   - type: Sprite
     sprite: _Nuclear14/Structures/Walls/nc14/concretedark.rsi
@@ -215,7 +214,6 @@
   parent: YellowBarrelFull
   id: BunkerRadiationBarrel
   suffix: Bunker
-  categories: [ HideSpawnMenu ]
   components:
   - type: RadiationSource
     intensity: 12

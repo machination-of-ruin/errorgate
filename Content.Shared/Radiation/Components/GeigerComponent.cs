@@ -91,7 +91,7 @@ public sealed partial class GeigerComponent : Component
     ///     Used for all geiger counter audio controls, allowing entities to override default audio parameters.
     /// </summary>
     [DataField]
-    public AudioParams AudioParameters;
+    public AudioParams AudioParameters = AudioParams.Default.WithLoop(true); // ERRORGATE: without a value the zeroed struct was used: no loop, no range, no clicking
 }
 
 [Serializable, NetSerializable]

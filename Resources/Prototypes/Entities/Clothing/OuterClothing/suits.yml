@@ -140,7 +140,7 @@
     modifiers:
       coefficients:
         Heat: 0.90
-        Radiation: 0.001
+        Radiation: 0.65 # ERRORGATE: was 0.001, swapped with the hood (see ClothingHeadHatHoodRad)
   - type: Clothing
     sprite: Clothing/OuterClothing/Suits/rad.rsi
     clothingType: suit # WD EDIT

@@ -4,9 +4,12 @@
 - type: entity
   parent: ClothingOuterSuitRad
   id: ClothingUniformJumpsuitRad
+  suffix: Jumpsuit
   components:
   - type: Sprite
     sprite: _ERRORGATE/Clothing/Uniforms/rad_jumpsuit.rsi
   - type: Clothing
     sprite: _ERRORGATE/Clothing/Uniforms/rad_jumpsuit.rsi
     slots: [ innerclothing ]
+  - type: ToggleableClothing # the hood still comes up, from the jumpsuit slot
+    requiredSlot: INNERCLOTHING
