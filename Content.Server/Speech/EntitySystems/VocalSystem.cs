@@ -94,7 +94,7 @@ public sealed class VocalSystem : EntitySystem
     {
         if (_random.Prob(component.WilhelmProbability))
         {
-            _audio.PlayPvs(component.Wilhelm, uid, component.Wilhelm.Params);
+            _chat.PlayVoiceSound(uid, component.Wilhelm, component.Wilhelm.Params);
             return true;
         }
 

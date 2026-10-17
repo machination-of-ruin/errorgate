@@ -12,6 +12,8 @@ namespace Content.Shared._ERRORGATE.Bark;
 /// </summary>
 public sealed class BarkMuffleSystem : EntitySystem
 {
+    [Dependency] private readonly InventorySystem _inventory = default!;
+
     public override void Initialize()
     {
         base.Initialize();
@@ -34,5 +36,21 @@ public sealed class BarkMuffleSystem : EntitySystem
             PitchVariance = voice.PitchVariance,
             VolumeAverage = voice.VolumeAverage + ent.Comp.VolumeShift,
         };
+    }
+
+    /// <summary>
+    ///     The muffling mask the wearer has on over the mouth, if any (a mask pulled down does not count). Used for the sounds of the voice
+    ///     that are not barks: screams, laughs, coughs.
+    /// </summary>
+    public bool TryGetMask(EntityUid wearer, out BarkMuffleComponent mask)
+    {
+        mask = default!;
+        if (!_inventory.TryGetSlotEntity(wearer, "mask", out var worn)
+            || !TryComp(worn, out BarkMuffleComponent? muffle)
+            || TryComp<MaskComponent>(worn, out var pulled) && pulled.IsToggled)
+            return false;
+
+        mask = muffle;
+        return true;
     }
 }
