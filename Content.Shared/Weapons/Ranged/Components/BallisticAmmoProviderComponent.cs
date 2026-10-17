@@ -79,6 +79,12 @@ public sealed partial class BallisticAmmoProviderComponent : Component
     public TimeSpan FillDelay = TimeSpan.FromSeconds(0.75); // ERRORGATE: slower manual loading
 
     /// <summary>
+    /// ERRORGATE: how long it takes to put one cartridge in by hand.
+    /// </summary>
+    [DataField]
+    public TimeSpan HandInsertDelay = TimeSpan.FromSeconds(0.75);
+
+    /// <summary>
     /// Is ammo ejected after each shot, or not.
     /// </summary>
     [DataField]

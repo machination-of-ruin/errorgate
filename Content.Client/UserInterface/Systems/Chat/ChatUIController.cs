@@ -440,13 +440,28 @@ public sealed class ChatUIController : UIController
 
         bubble.OnDied += SpeechBubbleDied;
 
+        // ERRORGATE: in the UI before it is measured, so the text wraps at the scale of the player's UI
+        _speechBubbleRoot.AddChild(bubble);
+        bubble.Setup();
+
         if (_activeSpeechBubbles.TryGetValue(entity, out var existing))
         {
             // Push up existing bubbles above the mob's head.
-            foreach (var existingBubble in existing)
+            var older = new List<SpeechBubble>(existing);
+            foreach (var existingBubble in older)
             {
                 existingBubble.VerticalOffset += bubble.ContentSize.Y;
             }
+
+            // ERRORGATE: a long bubble grows line by line, the ones above it move up with it
+            bubble.OnGrown += grown =>
+            {
+                foreach (var olderBubble in older)
+                {
+                    if (!olderBubble.Disposed)
+                        olderBubble.VerticalOffset += grown;
+                }
+            };
         }
         else
         {
@@ -455,7 +470,6 @@ public sealed class ChatUIController : UIController
         }
 
         existing.Add(bubble);
-        _speechBubbleRoot.AddChild(bubble);
 
         if (existing.Count > SpeechBubbleCap)
         {

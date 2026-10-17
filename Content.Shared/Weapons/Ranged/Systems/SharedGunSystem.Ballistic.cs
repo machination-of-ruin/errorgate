@@ -36,6 +36,7 @@ public abstract partial class SharedGunSystem
         SubscribeLocalEvent<BallisticAmmoProviderComponent, InteractUsingEvent>(OnBallisticInteractUsing);
         SubscribeLocalEvent<BallisticAmmoProviderComponent, AfterInteractEvent>(OnBallisticAfterInteract);
         SubscribeLocalEvent<BallisticAmmoProviderComponent, AmmoFillDoAfterEvent>(OnBallisticAmmoFillDoAfter);
+        SubscribeLocalEvent<BallisticAmmoProviderComponent, AmmoInsertDoAfterEvent>(OnBallisticInsertDoAfter); // ERRORGATE
         SubscribeLocalEvent<BallisticAmmoProviderComponent, UseInHandEvent>(OnBallisticUse);
     }
 
@@ -68,12 +69,57 @@ public abstract partial class SharedGunSystem
         }
         // WWDP EDIT END
 
-        // WD EDIT START
-        var entity = args.Used;
-        var doInsert = true;
-        if (TryComp(args.Used, out StackComponent? stack) && stack.Count > 1)
+        // ERRORGATE: a cartridge put in by hand takes a moment (the fill from a box or speed loader has its own delay per round and puts the
+        // rounds in at once, see SimulateInsertAmmo)
+        if (!_instantBallisticInsert)
         {
-            entity = GetStackEntity(args.Used, stack);
+            args.Handled = true;
+
+            // The do-after is started once, not again when the prediction is replayed
+            if (Timing.IsFirstTimePredicted)
+            {
+                _doAfter.TryStartDoAfter(new DoAfterArgs(EntityManager, args.User, component.HandInsertDelay, new AmmoInsertDoAfterEvent(), uid, target: uid, used: args.Used)
+                {
+                    BreakOnMove = true,
+                    BreakOnDamage = false,
+                    NeedHand = true,
+                });
+            }
+
+            return;
+        }
+
+        args.Handled = true;
+        InsertRound(uid, component, args.Used, args.User);
+    }
+
+    private void OnBallisticInsertDoAfter(EntityUid uid, BallisticAmmoProviderComponent component, AmmoInsertDoAfterEvent args)
+    {
+        if (args.Handled || args.Cancelled || args.Used is not { } used || Deleted(used))
+            return;
+
+        // Whatever changed while the hands were busy: a full gun or a round that no longer fits takes nothing
+        if (_whitelistSystem.IsWhitelistFailOrNull(component.Whitelist, used) || GetBallisticShots(component) >= component.Capacity)
+        {
+            Popup(Loc.GetString("gun-ballistic-full"), uid, args.User);
+            return;
+        }
+
+        args.Handled = true;
+        InsertRound(uid, component, used, args.User);
+    }
+
+    // True while a transfer from a box or speed loader puts its rounds in: those are not hand inserts, no do-after for each
+    private bool _instantBallisticInsert;
+
+    private void InsertRound(EntityUid uid, BallisticAmmoProviderComponent component, EntityUid used, EntityUid user)
+    {
+        // WD EDIT START
+        var entity = used;
+        var doInsert = true;
+        if (TryComp(used, out StackComponent? stack) && stack.Count > 1)
+        {
+            entity = GetStackEntity(used, stack);
             doInsert = false;
         }
 
@@ -85,8 +131,7 @@ public abstract partial class SharedGunSystem
             Containers.Insert(entity, component.Container);
         // WD EDIT END
         // Not predicted so
-        Audio.PlayPredicted(component.SoundInsert, uid, args.User);
-        args.Handled = true;
+        Audio.PlayPredicted(component.SoundInsert, uid, user);
         component.Cycled = true;
         UpdateAmmoCount(uid);
         UpdateBallisticAppearance(uid, component);
@@ -145,7 +190,15 @@ public abstract partial class SharedGunSystem
         void SimulateInsertAmmo(EntityUid ammo, EntityUid ammoProvider, EntityCoordinates coordinates)
         {
             var evInsert = new InteractUsingEvent(args.User, ammo, ammoProvider, coordinates);
-            RaiseLocalEvent(ammoProvider, evInsert);
+            _instantBallisticInsert = true;
+            try
+            {
+                RaiseLocalEvent(ammoProvider, evInsert);
+            }
+            finally
+            {
+                _instantBallisticInsert = false;
+            }
         }
 
         List<(EntityUid? Entity, IShootable Shootable)> ammo = new();
@@ -488,3 +541,9 @@ public abstract partial class SharedGunSystem
 /// </summary>
 [Serializable, NetSerializable]
 public sealed partial class AmmoFillDoAfterEvent : SimpleDoAfterEvent { }
+
+/// <summary>
+/// ERRORGATE: DoAfter event for putting one cartridge into a ballistic ammo provider by hand.
+/// </summary>
+[Serializable, NetSerializable]
+public sealed partial class AmmoInsertDoAfterEvent : SimpleDoAfterEvent { }

@@ -78,6 +78,12 @@ namespace Content.Client.Chat.UI
         // man down
         public event Action<EntityUid, SpeechBubble>? OnDied;
 
+        /// <summary>The bubble got taller (a new line of its text came). The bubbles above it have to move up by the amount.</summary>
+        public event Action<float>? OnGrown;
+
+        // A long text grows from its first line: the box is as tall as the lines that have come so far
+        private bool _growing;
+
 
         public static SpeechBubble CreateSpeechBubble(SpeechType type, ChatMessage message, EntityUid senderEntity)
         {
@@ -114,29 +120,49 @@ namespace Content.Client.Chat.UI
             // Use text clipping so new messages don't overlap old ones being pushed up.
             RectClipContent = true;
 
-            var bubble = BuildBubble(message, speechStyleClass, fontColor);
+            _bubble = BuildBubble(message, speechStyleClass, fontColor);
+            _whisper = speechStyleClass == "whisperBox";
 
-            AddChild(bubble);
+            AddChild(_bubble);
+        }
 
+        private readonly Control _bubble;
+        private readonly bool _whisper;
+        private bool _ready;
+
+        /// <summary>
+        ///     Measures the text and gets the box ready. Call it once the bubble is in the UI: how the text wraps depends on the UI scale, which a
+        ///     control that is not in the UI yet does not know (it measures at 100%, so at 75% the lines broke in other places than in the end
+        ///     and the box grew at the wrong letters).
+        /// </summary>
+        public void Setup()
+        {
+            if (_ready)
+                return;
+
+            _ready = true;
             ForceRunStyleUpdate();
 
-            if (bubble is OutlinedSpeechText single)
+            if (_bubble is OutlinedSpeechText single)
                 single.Tighten();
             else
             {
-                foreach (var child in bubble.Children)
+                foreach (var child in _bubble.Children)
                 {
                     (child as OutlinedSpeechText)?.Tighten();
                 }
             }
 
-            bubble.Measure(Vector2Helpers.Infinity);
-            ContentSize = bubble.DesiredSize;
+            // Where the lines of a long text break, so the box can grow one line at a time
+            var growable = RevealText?.MeasureLines() ?? false;
+
+            _bubble.Measure(Vector2Helpers.Infinity);
+            ContentSize = _bubble.DesiredSize;
             _verticalOffsetAchieved = -ContentSize.Y;
 
             // The box is measured with the whole text; the letters then come back one by one
             if (RevealText != null)
-                StartReveal(speechStyleClass == "whisperBox");
+                StartReveal(_whisper, growable);
         }
 
         /// <summary>
@@ -145,7 +171,7 @@ namespace Content.Client.Chat.UI
         ///     costs its pause rounded up to whole ticks plus one tick. A voice without barks has a steady pace. The bubble stays long
         ///     enough to be read after the last letter.
         /// </summary>
-        private void StartReveal(bool whisper)
+        private void StartReveal(bool whisper, bool growable)
         {
             var text = RevealText!.PlainText;
             var count = text.Length;
@@ -225,6 +251,14 @@ namespace Content.Client.Chat.UI
             _revealTimes = times;
             _timeLeft = TotalTime + times[count - 1];
             RevealText.Reveal(0);
+
+            // A long text starts with its first line at the head and the box grows upwards, a line at a time
+            if (growable)
+            {
+                _growing = true;
+                ContentSize = new Vector2(ContentSize.X, RevealText.HeightFor(0));
+                _verticalOffsetAchieved = -ContentSize.Y;
+            }
         }
 
         protected abstract Control BuildBubble(ChatMessage message, string speechStyleClass, Color? fontColor = null);
@@ -232,6 +266,9 @@ namespace Content.Client.Chat.UI
         protected override void FrameUpdate(FrameEventArgs args)
         {
             base.FrameUpdate(args);
+
+            if (!_ready)
+                Setup();
 
             _timeLeft -= args.DeltaSeconds;
 
@@ -243,6 +280,17 @@ namespace Content.Client.Chat.UI
                     shown++;
 
                 RevealText.Reveal(shown);
+                if (_growing)
+                {
+                    var newHeight = RevealText.HeightFor(shown);
+                    if (MathF.Abs(newHeight - ContentSize.Y) > 0.01f)
+                    {
+                        var grown = newHeight - ContentSize.Y;
+                        ContentSize = new Vector2(ContentSize.X, newHeight);
+                        OnGrown?.Invoke(grown);
+                    }
+                }
+
                 if (shown >= _revealTimes.Length)
                     _revealTimes = null;
             }

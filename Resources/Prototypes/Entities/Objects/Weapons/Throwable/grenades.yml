@@ -58,12 +58,9 @@
     totalIntensity: 120 # about a ~4 tile radius
     canCreateVacuum: false
   - type: OnUseTimerTrigger
-    beepSound:
-      path: "/Audio/Effects/beep1.ogg"
-      params:
-        volume: 5
+    # ERRORGATE: no beep, the fuse just burns (beepSound removed)
     initialBeepDelay: 0
-    beepInterval: 2 # 2 beeps total (at 0 and 2)
+    beepInterval: 2
   # WD EDIT START
   - type: Tag
     tags:
@@ -90,9 +87,7 @@
   - type: SpawnOnTrigger
     proto: GrenadeFlashEffect
   - type: Appearance
-  - type: TimerTriggerVisuals
-    primingSound:
-      path: /Audio/Effects/countdown.ogg
+  - type: TimerTriggerVisuals # ERRORGATE: no countdown beep while it burns (primingSound removed)
   - type: GuideHelp
     guides:
     - Security
