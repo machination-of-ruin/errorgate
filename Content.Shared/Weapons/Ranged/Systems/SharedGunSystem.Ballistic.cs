@@ -78,7 +78,10 @@ public abstract partial class SharedGunSystem
         }
 
         component.Entities.Add(entity);
-        if (_netManager.IsServer || doInsert)
+        // ERRORGATE: the client predicts the insert only for a round it has in hand. A round it sees as detached (not in its state yet) is left to
+        // the server: inserting it here made the container system assert (in a debug build that killed the client while loading a sawn-off).
+        var detached = TryComp<MetaDataComponent>(entity, out var roundMeta) && (roundMeta.Flags & MetaDataFlags.Detached) != 0;
+        if (_netManager.IsServer || (doInsert && !detached))
             Containers.Insert(entity, component.Container);
         // WD EDIT END
         // Not predicted so
@@ -240,14 +243,14 @@ public abstract partial class SharedGunSystem
             args.PushMarkup(Loc.GetString("gun-ammocount-examine", ("color", AmmoExamineColor), ("count", GetBallisticShots(component))));
 
             // Show top round
-            if (component.Entities.Count > 0)
+            // ERRORGATE: the round may not exist on this client (moved or deleted while the list was not yet updated): Name() throws and took
+            // the client down, so look the name up safely and skip the line if the round is not there
+            if (component.Entities.Count > 0 && TryComp<MetaDataComponent>(component.Entities[^1], out var topRound))
             {
-                var round = Name(component.Entities[^1]);
-
                 args.PushMarkup(
-                    Loc.GetString("ammo-top-round-examine", ("color", ModeExamineColor), ("round", round)));
+                    Loc.GetString("ammo-top-round-examine", ("color", ModeExamineColor), ("round", topRound.EntityName)));
             }
-            else if (component.UnspawnedCount > 0)
+            else if (component.Entities.Count == 0 && component.UnspawnedCount > 0)
             {
                 if (!_proto.TryIndex(component.Proto, out var round))
                     return;
