@@ -16,7 +16,7 @@
   locations: [Industrial]
 
 - type: lootEntry
-  id: ClothingOuterSuitRad
+  id: ClothingUniformJumpsuitRad
   rarityTiers: [2, 3]
   locations: [Industrial, Medical]
 
