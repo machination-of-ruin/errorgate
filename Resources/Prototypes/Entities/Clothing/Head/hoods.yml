@@ -154,7 +154,7 @@
     modifiers:
       coefficients:
         Heat: 0.95
-        Radiation: 0.65
+        Radiation: 0.001 # ERRORGATE: the hood carries the protection, the suit is only worth it with the hood up (values swapped with the suit)
   - type: IdentityBlocker
   - type: BreathMask
   - type: HideLayerClothing

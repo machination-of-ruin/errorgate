@@ -1,0 +1,49 @@
+{
+    "version": 1,
+    "license": "CC-BY-SA-4.0",
+    "copyright": "Copied from the radiation suit and renamed for the jumpsuit slot (ERRORGATE). Original: Made by WWDP team, equipped-INNERCLOTHING-resomi made by Pofitlo, reptilian made by kuro(388673708753027083), lamia & segment by @noctyrnal",
+    "size": {
+        "x": 32,
+        "y": 32
+    },
+    "states": [
+        {
+            "name": "icon"
+        },
+        {
+            "name": "equipped-INNERCLOTHING",
+            "directions": 4
+        },
+        {
+            "name": "equipped-INNERCLOTHING-harpy",
+            "directions": 4
+        },
+        {
+            "name": "equipped-INNERCLOTHING-vox",
+            "directions": 4
+        },
+        {
+            "name": "equipped-INNERCLOTHING-reptilian",
+            "directions": 4
+        },
+        {
+            "name": "equipped-INNERCLOTHING-resomi",
+            "directions": 4
+        },
+        {
+            "name": "equipped-INNERCLOTHING-lamia",
+            "directions": 4
+        },
+        {
+            "name": "segment"
+        },
+        {
+            "name": "inhand-left",
+            "directions": 4
+        },
+        {
+            "name": "inhand-right",
+            "directions": 4
+        }
+    ]
+}
