@@ -56,8 +56,7 @@
     - suitStorage # ERRORGATE: sling
   - type: Tool
     qualities:
-      - Prying
-      - AdvancedPrying # White Dream
+      - Prying # ERRORGATE: AdvancedPrying (White Dream) is gone, the axe no longer takes plating apart; it still pries airlocks and breaks windows
   - type: ToolTileCompatible
   - type: Prying
   - type: UseDelay

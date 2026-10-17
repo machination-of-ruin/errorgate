@@ -115,7 +115,7 @@ public sealed class OutlinedSpeechText : Control
         main.MaxWidth = limit;
         if (main.DesiredSize.Y <= height)
         {
-            main.Measure(Vector2Helpers.Infinity);
+            RefreshMeasure();
             return;
         }
 
@@ -141,6 +141,22 @@ public sealed class OutlinedSpeechText : Control
             // A little slack: the slant of italic letters reaches past the width the line measures
             label.MaxWidth = MathF.Ceiling(high) + 6;
         }
+
+        RefreshMeasure();
+    }
+
+    /// <summary>
+    ///     Throws away the measures the labels remember: after the width search of <see cref="Tighten"/> they can hold the height of a width
+    ///     that was only tried, which made the box too short and cut the lower half of a line.
+    /// </summary>
+    private void RefreshMeasure()
+    {
+        foreach (var label in _labels)
+        {
+            label.InvalidateMeasure();
+        }
+
+        InvalidateMeasure();
     }
 
     /// <summary>Shows the first <paramref name="count"/> characters; the rest are in the layout but transparent.</summary>
@@ -151,6 +167,23 @@ public sealed class OutlinedSpeechText : Control
             return;
 
         _shown = count;
+        SetAll(BuildMessage(count, true));
+    }
+
+    private void SetAll(FormattedMessage message)
+    {
+        foreach (var label in _labels)
+        {
+            label.SetMessage(message);
+        }
+    }
+
+    /// <summary>
+    ///     The message with the first <paramref name="count"/> characters shown. With <paramref name="transparentRest"/> the other letters
+    ///     stay in the layout, drawn transparent; without it they are left out, which gives the size of the text as far as it has come.
+    /// </summary>
+    private FormattedMessage BuildMessage(int count, bool transparentRest)
+    {
         var message = new FormattedMessage();
         var seen = 0;
         foreach (var node in _full.Nodes)
@@ -173,7 +206,7 @@ public sealed class OutlinedSpeechText : Control
             if (visible > 0)
                 message.AddText(text[..visible]);
 
-            if (visible < text.Length)
+            if (transparentRest && visible < text.Length)
             {
                 message.PushTag(new MarkupNode("color", new MarkupParameter(Color.Transparent), null));
                 message.AddText(text[visible..]);
@@ -181,9 +214,120 @@ public sealed class OutlinedSpeechText : Control
             }
         }
 
+        return message;
+    }
+
+    // How tall the box has to be once each word has come: the height of the text up to the end of that word. Lines are not all the same
+    // height (a line with a taller glyph is taller), so the heights are measured, not worked out from a line count.
+    private int[]? _wordEnds;
+    private float[]? _wordHeights;
+
+    /// <summary>The height of the whole text with all its lines.</summary>
+    public float FullHeight { get; private set; }
+
+    /// <summary>
+    ///     Measures the text as far as it has come, to the end of each word (a word that does not fit goes to the next line whole, so the
+    ///     text to the end of a word is laid out as it will be in the end). With that a bubble can grow from its first line at the head, as
+    ///     the words come. Call it once the text is in the tree with its style, and after <see cref="Tighten"/>. Returns false when the text
+    ///     is as tall from its first word to its last (one line) or the numbers do not add up; the bubble then stays at its full size.
+    /// </summary>
+    public bool MeasureLines()
+    {
+        var main = _labels[^1];
+        main.Measure(Vector2Helpers.Infinity);
+        FullHeight = main.DesiredSize.Y;
+        _wordEnds = null;
+        _wordHeights = null;
+        if (Length == 0)
+            return false;
+
+        var ends = new List<int>();
+        var heights = new List<float>();
+        var i = 0;
+        while (i < Length)
+        {
+            var end = WordEnd(i);
+            ends.Add(end);
+            heights.Add(HeightOf(main, end));
+            i = end;
+            while (i < Length && char.IsWhiteSpace(PlainText[i]))
+            {
+                i++;
+            }
+        }
+
+        RestoreAfterMeasure();
+        Measure(Vector2Helpers.Infinity);
+
+        // The box never gets smaller while the text comes
+        for (var k = 1; k < heights.Count; k++)
+        {
+            heights[k] = Math.Max(heights[k], heights[k - 1]);
+        }
+
+        // The measure of the whole text, made the same way as the others, is the height of the box once all of it has come
+        FullHeight = heights[^1];
+        RefreshMeasure();
+        var ok = heights.Count > 1 && heights[^1] > heights[0] + 0.5f;
+        if (!ok)
+            return false;
+
+        _wordEnds = ends.ToArray();
+        _wordHeights = heights.ToArray();
+        return true;
+    }
+
+    private float HeightOf(RichTextLabel label, int count)
+    {
+        label.SetMessage(BuildMessage(count, false));
+        label.Measure(Vector2Helpers.Infinity);
+        return label.DesiredSize.Y;
+    }
+
+    private void RestoreAfterMeasure()
+    {
+        var main = _labels[^1];
+        main.SetMessage(BuildMessage(_shown < 0 ? Length : _shown, true));
+        main.Measure(Vector2Helpers.Infinity);
         foreach (var label in _labels)
         {
-            label.SetMessage(message);
+            if (label != main)
+                label.SetMessage(BuildMessage(_shown < 0 ? Length : _shown, true));
         }
+    }
+
+    /// <summary>The count of characters up to and including the end of the word that holds the character at <paramref name="index"/>.</summary>
+    private int WordEnd(int index)
+    {
+        var end = index + 1;
+        while (end < PlainText.Length && !char.IsWhiteSpace(PlainText[end]))
+        {
+            end++;
+        }
+
+        return Math.Min(end, Length);
+    }
+
+    /// <summary>The height the box needs when the first <paramref name="shown"/> characters have been revealed.</summary>
+    public float HeightFor(int shown)
+    {
+        if (_wordEnds == null || _wordHeights == null)
+            return FullHeight;
+
+        // The word being written counts whole: the box is as tall as the text to the end of that word. A space after a word does not start
+        // the next one: the box grows when the first letter of the word that goes on the new line is drawn, not when the space before it is
+        var count = Math.Min(shown, PlainText.Length);
+        while (count > 0 && char.IsWhiteSpace(PlainText[count - 1]))
+        {
+            count--;
+        }
+
+        for (var k = 0; k < _wordEnds.Length; k++)
+        {
+            if (_wordEnds[k] >= count)
+                return _wordHeights[k];
+        }
+
+        return _wordHeights[^1];
     }
 }

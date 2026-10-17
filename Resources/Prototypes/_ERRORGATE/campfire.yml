@@ -15,6 +15,8 @@
       multiplier: 2.5
       multiplierOnExisting: 0.5
     - !type:Ignite
+  - type: CampfireWarmth # ERRORGATE: resting beside it mends brute and burn as slowly as a plain bed (0.5 per group every 5 seconds)
+    heal: 0.5
   - type: EntityHeater
     requiresPower: false # a fire needs no power, it always heats what is on it
     power: 2400

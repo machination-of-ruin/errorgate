@@ -11,7 +11,7 @@
   locations: [Prison, Industrial]
 
 - type: lootEntry
-  id: BoxShotgun00BuckshotRandom
+  id: BoxShotgun00Buckshot
   rarityTiers: [1, 2, 3]
   locations: [Living, Church, Industrial, Security, Prison, Military]
 
@@ -23,7 +23,7 @@
   locations: [Security, Military]
 
 - type: lootEntry
-  id: BoxShotgunSlugRandom
+  id: BoxShotgunSlug
   rarityTiers: [2, 3]
   locations: [Security, Military]
 

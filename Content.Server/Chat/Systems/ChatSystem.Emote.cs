@@ -1,8 +1,10 @@
 using System.Collections.Frozen;
 using System.Linq;
+using Content.Shared._ERRORGATE.Bark;
 using Content.Shared.Chat;
 using Content.Shared.Chat.Prototypes;
 using Content.Shared.Speech;
+using Robust.Shared.Audio;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Random;
 
@@ -11,6 +13,8 @@ namespace Content.Server.Chat.Systems;
 // emotes using emote prototype
 public partial class ChatSystem
 {
+    [Dependency] private readonly BarkMuffleSystem _barkMuffle = default!; // ERRORGATE: masks change the voice
+
     private FrozenDictionary<string, EmotePrototype> _wordEmoteDict = FrozenDictionary<string, EmotePrototype>.Empty;
     private IReadOnlyList<string> Punctuation { get; } = new List<string> { ",", ".", "!", "?", "-", "~", "'", "\"", };
 
@@ -155,8 +159,20 @@ public partial class ChatSystem
 
         // if general params for all sounds set - use them
         var param = proto.GeneralParams ?? sound.Params;
-        _audio.PlayPvs(sound, uid, param);
+        PlayVoiceSound(uid, sound, param);
         return true;
+    }
+
+    /// <summary>
+    ///     Plays a sound of the voice of someone (a scream, a laugh, a cough). Behind a muffling mask it is lower and quieter, as the barks
+    ///     are (<see cref="BarkMuffleSystem"/>).
+    /// </summary>
+    public void PlayVoiceSound(EntityUid uid, SoundSpecifier sound, AudioParams param)
+    {
+        if (_barkMuffle.TryGetMask(uid, out var mask))
+            param = param.WithPitchScale(param.Pitch * (1f + mask.PitchShift)).AddVolume(mask.VolumeShift);
+
+        _audio.PlayPvs(sound, uid, param);
     }
     /// <summary>
     /// Checks if a valid emote was typed, to play sounds and etc and invokes an event.

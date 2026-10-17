@@ -9,6 +9,9 @@
       types:
         Poison: -0.1
         Blunt: -0.1
+        Slash: -0.1 # ERRORGATE: rest mends cuts, stabs and burns too, just as slowly
+        Piercing: -0.1
+        Heat: -0.1
   - type: Physics
     bodyType: Static
   - type: Fixtures
@@ -78,6 +81,9 @@
         Poison: -0.2
         Cold: -0.4
         Blunt: -0.2
+        Slash: -0.2 # ERRORGATE
+        Piercing: -0.2
+        Heat: -0.2
   - type: Construction
     graph: bed
     node: medicalbed

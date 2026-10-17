@@ -1,4 +1,5 @@
 using Content.Shared._White.Move;
+using Content.Shared.Bed.Sleep;
 using Content.Shared.Buckle;
 using Content.Shared.Rotation;
 using Content.Shared.Standing;
@@ -48,6 +49,7 @@ public sealed class LayingDownSystem : SharedLayingDownSystem
         if (!_timing.IsFirstTimePredicted
             || !_standing.IsDown(uid)
             || _buckle.IsBuckled(uid)
+            || HasComp<SleepingComponent>(uid) // ERRORGATE: a sleeper does not turn over when the keys are pressed, the sprite flipped while sleeping
             || _animation.HasRunningAnimation(uid, "rotate")
             || !TryComp<TransformComponent>(uid, out var transform)
             || !TryComp<SpriteComponent>(uid, out var sprite)

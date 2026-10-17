@@ -9,6 +9,7 @@
       - SpeedLoaderRifleHeavy
   - type: SpeedLoader
   - type: BallisticAmmoProvider
+    fillDelay: 0.2 # ERRORGATE: a speed loader fills fast, a box takes its time
     whitelist:
       tags:
         - Cartridge556x45

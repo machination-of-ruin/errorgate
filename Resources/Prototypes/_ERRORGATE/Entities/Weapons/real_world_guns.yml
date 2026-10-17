@@ -525,7 +525,7 @@
     - state: sks
       map: [ "enum.GunVisualLayers.Base" ]
   - type: Item
-    storedRotation: 45 # ERRORGATE: same inventory grid as the Mosin
+    storedRotation: 0 # ERRORGATE: the sks storage sprite is drawn lying flat (stock left, muzzle right), so it needs no rotation in the flat 8x1 grid; 45 tilted it
     shape:
     - 0,0,7,0
     storedSprite:

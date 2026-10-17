@@ -9,6 +9,7 @@
   - type: Clothing
     sprite: Clothing/Mask/gas.rsi
   - type: BreathMask
+  - type: BarkMuffle # ERRORGATE: a gas mask muffles the voice
   - type: IngestionBlocker
     blockSmokeIngestion: true # WWDP
   - type: IdentityBlocker
@@ -365,6 +366,7 @@
   - type: Clothing
     sprite: Clothing/Mask/plaguedoctormask.rsi
   - type: BreathMask
+  - type: BarkMuffle # ERRORGATE: a full face mask muffles the voice
   - type: IngestionBlocker
   - type: IdentityBlocker
   - type: HideLayerClothing
@@ -613,7 +615,7 @@
     - IPCMaskWearable
 
 - type: entity
-  parent: ClothingMaskBase
+  parent: ClothingMaskPullableBase # ERRORGATE: it can be pulled down (no pulled-down sprite: the worn sprite is hidden while it is down)
   id: ClothingMaskNeckGaiter
   name: neck gaiter
   description: Stylish neck gaiter for your neck, can protect from the cosmic wind?...
