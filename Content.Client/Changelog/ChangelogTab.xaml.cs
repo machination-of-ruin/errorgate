@@ -137,7 +137,8 @@ public sealed partial class ChangelogTab : Control
                 foreach (var change in groupedEntry.SelectMany(c => c.Changes))
                 {
                     var text = new RichTextLabel();
-                    text.SetMessage(FormattedMessage.FromMarkupOrThrow(change.Message));
+                    // ERRORGATE: a message with broken markup (some old entries have a lone "[ ? ]") is shown as it is, it must not take the client down
+                    text.SetMessage(FormattedMessage.FromMarkupPermissive(change.Message));
                     ChangelogBody.AddChild(new BoxContainer
                     {
                         Orientation = LayoutOrientation.Horizontal,
