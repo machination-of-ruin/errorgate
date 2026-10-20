@@ -167,7 +167,9 @@ public sealed class StructureCheckCommand : LocalizedEntityCommands
                     lines.Add($"  PROBLEM the {sides[i].Item1} side is mostly bare floor ({covered} of {edge.Count} tiles are wall or door): an apron around the walls?");
             }
 
-            if (doorCounts.Sum() == 0)
+            if (doorCounts.Sum() == 0 && structure is { OpenFront: not "" })
+                lines.Add("  no door on the edge, but the structure is marked openFront: the front is the widest doorless gap on its " + structure!.OpenFront + " side");
+            else if (doorCounts.Sum() == 0)
                 lines.Add("  PROBLEM no door on the edge of the footprint: the generator needs a front door on the outer wall (build facing south: the door on the south side)");
             else
                 lines.Add($"  doors on the edge: south {doorCounts[0]}, east {doorCounts[1]}, north {doorCounts[2]}, west {doorCounts[3]}; the front is the side with most (south on a tie)");

@@ -9,7 +9,7 @@ namespace Content.Server._ERRORGATE.World;
 ///     front door is on (0 south, 1 east, 2 north, 3 west) and the tile of that door, and what the structure is for (house,
 ///     outbuilding, civic, shop, industrial). Measured once.
 /// </summary>
-public sealed record StructureInfo(string Path, int Width, int Height, Vector2i LocalMin, int FrontSide, Vector2i FrontDoor, string Role, float Weight, bool Unique = false, string Group = "", bool CutStreets = false, IReadOnlyList<string>? Mobs = null, int MobCount = 0);
+public sealed record StructureInfo(string Path, int Width, int Height, Vector2i LocalMin, int FrontSide, Vector2i FrontDoor, string Role, float Weight, bool Unique = false, string Group = "", bool CutStreets = false, IReadOnlyList<string>? Mobs = null, int MobCount = 0, bool Shore = false, int FrontWidth = 1);
 
 /// <summary>
 ///     A structure placed in a location: its footprint rectangle after the turns, where its grid origin goes, the side its front
@@ -112,6 +112,7 @@ public sealed partial class LocationLayout
         layout.MendJunctions();
         layout.PlaceGates(rng, options.Gates, options.BorderGates ?? new List<string>());
         layout.Walks.ExceptWith(layout.Roads);
+        layout.PlaceShoreStructures(rng, pool);
         if (pool.Count > 0)
             layout.FillFrontage(rng, size, pool, density, options.Style, options.UniqueRules ?? new List<(string Group, int Min, int Max)>());
 
@@ -784,6 +785,179 @@ public sealed partial class LocationLayout
         return false;
     }
 
+    /// <summary>
+    ///     Puts the structures marked <c>shore</c> (the resort) on the land just inland of the water: inside a fence, with a park in front
+    ///     of the building, its front door turned away from the sea and, when a street is near, towards it. A location without a shore
+    ///     places nothing.
+    /// </summary>
+    private void PlaceShoreStructures(Random rng, IReadOnlyList<StructureInfo> pool)
+    {
+        if (Terrain.Count == 0)
+            return;
+
+        foreach (var info in pool.Where(i => i.Shore).OrderBy(_ => rng.Next()))
+        {
+            if (!PlaceOnShore(rng, info))
+                ShoreMisses.Add(info.Path);
+        }
+    }
+
+    /// <summary>The shore structures that found no room, by path (for the world checks).</summary>
+    public List<string> ShoreMisses = new();
+
+    private bool PlaceOnShore(Random rng, StructureInfo info)
+    {
+        // The park in front of the building, and the strip of yard on its other sides (the fence is the outer line of both)
+        const int park = 9, yard = 3, reachNear = 6;
+
+        // Prefix sums of the tiles that cannot be built on, and of the shore tiles
+        var bad = new int[Bounds.X + 1, Bounds.Y + 1];
+        var shore = new int[Bounds.X + 1, Bounds.Y + 1];
+        for (var x = 0; x < Bounds.X; x++)
+        {
+            for (var y = 0; y < Bounds.Y; y++)
+            {
+                var t = new Vector2i(x, y);
+                var unfit = !InShape(t) || Dist(t) < Margin + 2 || Terrain.ContainsKey(t) || _occupied.Contains(t) || Roads.Contains(t) || Walks.Contains(t) || MainRoadTiles.Contains(t);
+                bad[x + 1, y + 1] = bad[x, y + 1] + bad[x + 1, y] - bad[x, y] + (unfit ? 1 : 0);
+                shore[x + 1, y + 1] = shore[x, y + 1] + shore[x + 1, y] - shore[x, y] + (Terrain.ContainsKey(t) ? 1 : 0);
+            }
+        }
+
+        static int Sum(int[,] s, int x0, int y0, int x1, int y1) => s[x1 + 1, y1 + 1] - s[x0, y1 + 1] - s[x1 + 1, y0] + s[x0, y0];
+
+        bool Inside(int x0, int y0, int x1, int y1) => x0 >= 0 && y0 >= 0 && x1 < Bounds.X && y1 < Bounds.Y;
+
+        var candidates = new List<(int Front, Vector2i Min, bool Reach)>();
+        for (var front = 0; front < 4; front++)
+        {
+            var shape = StructurePlacement.Create(info, TurnsFor(info, front), Vector2i.Zero);
+            var step = Dir(front);
+            for (var x = 3; x + shape.Width + 3 < Bounds.X; x += 2)
+            {
+                for (var y = 3; y + shape.Height + 3 < Bounds.Y; y += 2)
+                {
+                    var lot = ShoreLot(front, x, y, shape.Width, shape.Height, park, yard);
+                    if (!Inside(lot.MinX - 1, lot.MinY - 1, lot.MaxX + 1, lot.MaxY + 1) || Sum(bad, lot.MinX - 1, lot.MinY - 1, lot.MaxX + 1, lot.MaxY + 1) != 0)
+                        continue;
+
+                    // On the water's edge: no shore tile inside, some within a few steps of the fence
+                    var x0 = Math.Max(0, lot.MinX - reachNear);
+                    var y0 = Math.Max(0, lot.MinY - reachNear);
+                    var x1 = Math.Min(Bounds.X - 1, lot.MaxX + reachNear);
+                    var y1 = Math.Min(Bounds.Y - 1, lot.MaxY + reachNear);
+                    if (Sum(shore, lot.MinX - 1, lot.MinY - 1, lot.MaxX + 1, lot.MaxY + 1) != 0 || Sum(shore, x0, y0, x1, y1) == 0)
+                        continue;
+
+                    // The door must not look at the water
+                    double sx = 0, sy = 0;
+                    var n = 0;
+                    for (var tx = x0; tx <= x1; tx++)
+                    {
+                        for (var ty = y0; ty <= y1; ty++)
+                        {
+                            if (!Terrain.ContainsKey(new Vector2i(tx, ty)))
+                                continue;
+
+                            sx += tx;
+                            sy += ty;
+                            n++;
+                        }
+                    }
+
+                    var centre = ((lot.MinX + lot.MaxX) / 2.0, (lot.MinY + lot.MaxY) / 2.0);
+                    if ((sx / n - centre.Item1) * step.X + (sy / n - centre.Item2) * step.Y > 0)
+                        continue;
+
+                    var placed = StructurePlacement.Create(info, TurnsFor(info, front), new Vector2i(x, y));
+                    var reach = false;
+                    for (var k = 2; k <= 28 && !reach; k++)
+                    {
+                        var ahead = placed.Door + step * k;
+                        reach = Roads.Contains(ahead) || Walks.Contains(ahead);
+                    }
+
+                    candidates.Add((front, new Vector2i(x, y), reach));
+                }
+            }
+        }
+
+        if (candidates.Count == 0)
+            return false;
+
+        // A place with a street ahead of the door first, then at random
+        var (frontSide, min, _) = candidates.OrderBy(c => c.Reach ? 0 : 1).ThenBy(_ => rng.Next()).First();
+        var placement = StructurePlacement.Create(info, TurnsFor(info, frontSide), min);
+        var rect = ShoreLot(frontSide, min.X, min.Y, placement.Width, placement.Height, park, yard);
+        Occupy(rect);
+        Structures.Add(placement);
+        _doorPaths.Add((placement.Door, frontSide));
+        AddFence(rect, frontSide, placement.Door, info.FrontWidth);
+
+        // The park: trees on the lawn in front of the building, two benches either side of the path from the gate to the door
+        var forward = Dir(frontSide);
+        var across = new Vector2i(-forward.Y, forward.X);
+        int DepthOf(Vector2i t) => t.X * forward.X + t.Y * forward.Y;
+        int AcrossOf(Vector2i t) => t.X * across.X + t.Y * across.Y;
+        var frontEdge = DepthOf(placement.Door);
+        var doorAcross = AcrossOf(placement.Door);
+        var benches = new HashSet<Vector2i>();
+        foreach (var d in new[] { 3, 6 })
+        {
+            foreach (var sign in new[] { -1, 1 })
+            {
+                var t = placement.Door + forward * d + across * (sign * 2);
+                benches.Add(t);
+
+                // A bench faces the path, the way back across from the side it stands on (a bench turned q quarters faces the side q)
+                var toPath = across * -sign;
+                var faces = toPath.X > 0 ? 1 : toPath.X < 0 ? 3 : toPath.Y > 0 ? 2 : 0;
+                Items.Add(new FeatureItem(t, "WoodenBench", faces));
+            }
+        }
+
+        for (var x = rect.MinX + 1; x <= rect.MaxX - 1; x++)
+        {
+            for (var y = rect.MinY + 1; y <= rect.MaxY - 1; y++)
+            {
+                var t = new Vector2i(x, y);
+                if (DepthOf(t) <= frontEdge || Math.Abs(AcrossOf(t) - doorAcross) < 3 || benches.Contains(t))
+                    continue;
+
+                if (x % 3 == 0 && y % 3 == 0 && rng.NextDouble() < 0.7)
+                    Items.Add(new FeatureItem(t, "@tree"));
+            }
+        }
+
+        return true;
+    }
+
+    /// <summary>The lot of a shore building with its front door on the side <paramref name="front"/>: the building, a strip of yard, and the park in front.</summary>
+    private static (int MinX, int MinY, int MaxX, int MaxY) ShoreLot(int front, int x, int y, int width, int height, int park, int yard)
+    {
+        var minX = x - yard;
+        var minY = y - yard;
+        var maxX = x + width - 1 + yard;
+        var maxY = y + height - 1 + yard;
+        switch (front)
+        {
+            case 0:
+                minY = y - park;
+                break;
+            case 1:
+                maxX = x + width - 1 + park;
+                break;
+            case 2:
+                maxY = y + height - 1 + park;
+                break;
+            default:
+                minX = x - park;
+                break;
+        }
+
+        return (minX, minY, maxX, maxY);
+    }
+
     /// <summary>Streets that a unique building cut off from the rest, and that are too short to matter, are taken away.</summary>
     private void PruneRoadFragments(int smallerThan)
     {
@@ -874,7 +1048,7 @@ public sealed partial class LocationLayout
         // The unique buildings are put out once each below; the random lots draw from the rest
         // Only some of each group of unique buildings go out (a block of flats or two, not all of them); the others are left out. The ones that
         // may cut the streets (the factories) are placed first, since they need the most room
-        var allUniques = pool.Where(i => i.Unique).ToList();
+        var allUniques = pool.Where(i => i.Unique && !i.Shore).ToList();
         var uniques = new List<StructureInfo>();
         foreach (var rule in uniqueRules)
         {
@@ -970,6 +1144,8 @@ public sealed partial class LocationLayout
         foreach (var (door, front) in _doorPaths)
         {
             var step = Dir(front);
+            var across = new Vector2i(-step.Y, step.X);
+            var lanes = Math.Max(1, Structures.FirstOrDefault(s => s.Door == door)?.Info.FrontWidth ?? 1);
             var cur = door + step;
             for (var i = 0; i < 30; i++)
             {
@@ -977,6 +1153,18 @@ public sealed partial class LocationLayout
                     break;
 
                 Walks.Add(cur);
+
+                // A wide entrance has a wide path: the lanes beside the middle one
+                for (var lane = 1; lane <= (lanes - 1) / 2; lane++)
+                {
+                    foreach (var sign in new[] { -1, 1 })
+                    {
+                        var side = cur + across * (lane * sign);
+                        if (!Roads.Contains(side) && !Terrain.ContainsKey(side))
+                            Walks.Add(side);
+                    }
+                }
+
                 cur += step;
             }
         }
@@ -1080,7 +1268,7 @@ public sealed partial class LocationLayout
     }
 
     /// <summary>The fence around a lot: corners, straight pieces, and a gate on the side that faces the street, in line with the door.</summary>
-    private void AddFence((int MinX, int MinY, int MaxX, int MaxY) r, int front, Vector2i door)
+    private void AddFence((int MinX, int MinY, int MaxX, int MaxY) r, int front, Vector2i door, int gateWidth = 1)
     {
         var gate = front switch
         {
@@ -1114,6 +1302,10 @@ public sealed partial class LocationLayout
                     };
 
                     Fences.Add(new FencePiece(tile, FenceKind.Corner, quarter));
+                }
+                else if (gateWidth > 1 && (front % 2 == 0 ? y == gate.Y && Math.Abs(x - gate.X) <= (gateWidth - 1) / 2 : x == gate.X && Math.Abs(y - gate.Y) <= (gateWidth - 1) / 2))
+                {
+                    // A wide entrance is an opening in the fence, as wide as the path
                 }
                 else if (tile == gate)
                 {

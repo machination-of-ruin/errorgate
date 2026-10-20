@@ -307,4 +307,19 @@ public sealed partial class WorldStructurePrototype : IPrototype
     /// </summary>
     [DataField]
     public bool Unique;
+
+    /// <summary>
+    ///     Stands on the land just inland of the shore (the resort), inside a fence with a park in front of it, its front door turned away
+    ///     from the water. Used with <see cref="Unique"/>; a location without a shore does not place it.
+    /// </summary>
+    [DataField]
+    public bool Shore;
+
+    /// <summary>
+    ///     The side of the building (<c>south</c>, <c>east</c>, <c>north</c> or <c>west</c>, as it is built) whose widest doorless gap in
+    ///     the outer wall (floor on the edge of the footprint with no wall, window or door on it) is the front; the path to the street is
+    ///     as wide as the gap. For buildings cut out of a bigger place with an open entrance. Empty: the front is the side with the doors.
+    /// </summary>
+    [DataField]
+    public string OpenFront = string.Empty;
 }
