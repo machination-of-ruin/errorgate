@@ -619,9 +619,12 @@ public sealed partial class WorldSystem : EntitySystem
 
         // Taking the tiles away must not take the things on them with it, so they wait on the map meanwhile
         var mapUid = xform.MapUid!.Value;
+        // The grid sits over the ground grid meanwhile: grid traversal would hand the things over to the ground (whichever of the two grids
+        // the broadphase lists first), so it is off until they are back on their grid
         foreach (var (child, anchored, _, _) in children)
         {
             var childXform = Transform(child);
+            childXform.GridTraversal = false;
             if (anchored)
                 _transform.Unanchor(child, childXform);
 
@@ -655,6 +658,8 @@ public sealed partial class WorldSystem : EntitySystem
             _transform.SetCoordinates(uid, childXform, new EntityCoordinates(grid.Owner, RotateVector(pos, turns)), faces ? rot + angle : rot);
             if (anchored)
                 _transform.AnchorEntity(uid, childXform);
+
+            childXform.GridTraversal = true;
         }
     }
 

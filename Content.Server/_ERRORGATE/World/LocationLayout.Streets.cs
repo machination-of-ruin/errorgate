@@ -779,6 +779,7 @@ public sealed partial class LocationLayout
             Occupy(rect);
             Structures.Add(placement);
             _doorPaths.Add((placement.Door, placement.Front));
+            ReserveDoorPath(placement);
             return true;
         }
 
@@ -892,6 +893,7 @@ public sealed partial class LocationLayout
         Occupy(rect);
         Structures.Add(placement);
         _doorPaths.Add((placement.Door, frontSide));
+        ReserveDoorPath(placement);
         AddFence(rect, frontSide, placement.Door, info.FrontWidth);
 
         // The park: trees on the lawn in front of the building, two benches either side of the path from the gate to the door
@@ -956,6 +958,30 @@ public sealed partial class LocationLayout
         }
 
         return (minX, minY, maxX, maxY);
+    }
+
+    /// <summary>
+    ///     Keeps the way from a front door to the street free: the tiles of the path (as wide as the entrance, with a tile to spare on each
+    ///     side) are taken, so no lot placed later stands on it.
+    /// </summary>
+    private void ReserveDoorPath(StructurePlacement placement)
+    {
+        var step = Dir(placement.Front);
+        var across = new Vector2i(-step.Y, step.X);
+        var half = (Math.Max(1, placement.Info.FrontWidth) - 1) / 2 + 1;
+        var cur = placement.Door + step;
+        for (var i = 0; i < 30; i++)
+        {
+            if (Roads.Contains(cur) || Walks.Contains(cur) || Terrain.ContainsKey(cur))
+                break;
+
+            for (var lane = -half; lane <= half; lane++)
+            {
+                _occupied.Add(cur + across * lane);
+            }
+
+            cur += step;
+        }
     }
 
     /// <summary>Streets that a unique building cut off from the rest, and that are too short to matter, are taken away.</summary>
