@@ -68,8 +68,8 @@
   resetMaxMinutes: 720
   theme: city
   style: city
-  mobs: [ MobSpawnerWalkerArmored, MobSpawnerRunner, MobSpawnerWalkerArmoredMilitary ]
-  mobCount: 14
+  mobs: [ MobSpawnerWalkerArmored, MobSpawnerRunner, MobSpawnerRunner, MobSpawnerWalkerArmoredMilitary ] # runners twice as often
+  mobCount: 30 # was 14: the city felt empty
   walkway: FloorGrayConcreteSmooth
   post: LightPostSmall
   fenceStraight: FenceMetalStraight

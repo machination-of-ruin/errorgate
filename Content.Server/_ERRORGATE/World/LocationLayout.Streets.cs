@@ -9,7 +9,7 @@ namespace Content.Server._ERRORGATE.World;
 ///     front door is on (0 south, 1 east, 2 north, 3 west) and the tile of that door, and what the structure is for (house,
 ///     outbuilding, civic, shop, industrial). Measured once.
 /// </summary>
-public sealed record StructureInfo(string Path, int Width, int Height, Vector2i LocalMin, int FrontSide, Vector2i FrontDoor, string Role, float Weight, bool Unique = false, string Group = "", bool CutStreets = false);
+public sealed record StructureInfo(string Path, int Width, int Height, Vector2i LocalMin, int FrontSide, Vector2i FrontDoor, string Role, float Weight, bool Unique = false, string Group = "", bool CutStreets = false, IReadOnlyList<string>? Mobs = null, int MobCount = 0);
 
 /// <summary>
 ///     A structure placed in a location: its footprint rectangle after the turns, where its grid origin goes, the side its front

@@ -62,6 +62,49 @@ public sealed partial class WorldSystem : EntitySystem
     [Dependency] private readonly EntityLookupSystem _lookup = default!;
     [Dependency] private readonly Content.Server.Chat.Systems.ChatSystem _chat = default!;
 
+    /// <summary>
+    ///     Puts the mob spawners a building asks for (the runners of a factory) on free floor inside it: a tile with floor and nothing
+    ///     anchored on it, so not in a wall or under a machine, a few steps from the others.
+    /// </summary>
+    private void PlaceStructureMobs(Entity<MapGridComponent> grid, StructurePlacement placement, int seed)
+    {
+        var info = placement.Info;
+        if (info.Mobs is not { Count: > 0 } mobs || info.MobCount <= 0)
+            return;
+
+        var free = new List<Vector2i>();
+        foreach (var tile in _map.GetAllTiles(grid.Owner, grid.Comp))
+        {
+            if (tile.Tile.IsEmpty)
+                continue;
+
+            var any = false;
+            foreach (var _ in _map.GetAnchoredEntities(grid.Owner, grid.Comp, tile.GridIndices))
+            {
+                any = true;
+                break;
+            }
+
+            if (!any)
+                free.Add(tile.GridIndices);
+        }
+
+        var rng = new Random(seed ^ 0x6A57 ^ placement.Min.X * 31 ^ placement.Min.Y * 17);
+        var chosen = new List<Vector2i>();
+        foreach (var tile in free.OrderBy(_ => rng.Next()))
+        {
+            if (chosen.Count >= info.MobCount)
+                break;
+
+            // A few steps apart, so they do not come out as a pack on one spot
+            if (chosen.Any(c => (c - tile).Length < 4))
+                continue;
+
+            chosen.Add(tile);
+            Spawn(mobs[rng.Next(mobs.Count)], _map.GridTileToLocal(grid.Owner, grid.Comp, tile));
+        }
+    }
+
     /// <summary>A built location and what it cost.</summary>
     public sealed class Location
     {
@@ -313,6 +356,7 @@ public sealed partial class WorldSystem : EntitySystem
             _map.SetTiles(ground.Owner, ground.Comp, holes);
             placed++;
             built.Add((grid.Value.Owner, p));
+            PlaceStructureMobs(grid.Value, p, useSeed);
             yield return true;
         }
 
@@ -750,6 +794,8 @@ public sealed partial class WorldSystem : EntitySystem
         var unique = false;
         var group = string.Empty;
         var cut = false;
+        IReadOnlyList<string>? mobs = null;
+        var mobCount = 0;
         if (_proto.TryIndex<WorldStructurePrototype>(id, out var structure))
         {
             role = structure.Role;
@@ -757,9 +803,11 @@ public sealed partial class WorldSystem : EntitySystem
             unique = structure.Unique;
             group = structure.Group;
             cut = structure.CutStreets;
+            mobs = structure.Mobs;
+            mobCount = structure.MobCount;
         }
 
-        return new StructureInfo(path.ToString(), width, height, min, front, door, role, weight, unique, group, cut);
+        return new StructureInfo(path.ToString(), width, height, min, front, door, role, weight, unique, group, cut, mobs, mobCount);
     }
 
     private List<StructureInfo> GetPool(string theme)

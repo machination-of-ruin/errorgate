@@ -291,6 +291,17 @@ public sealed partial class WorldStructurePrototype : IPrototype
     public bool CutStreets;
 
     /// <summary>
+    ///     Mob spawners (one of them is picked for each) put on free floor tiles inside the building when it is built: the runners in a
+    ///     factory. Empty for none.
+    /// </summary>
+    [DataField]
+    public List<string> Mobs = new();
+
+    /// <summary>How many of the <see cref="Mobs"/> go inside, a few steps apart.</summary>
+    [DataField]
+    public int MobCount;
+
+    /// <summary>
     ///     A building that is put out once in every location of its theme, on a lot picked for it (a hand-cut landmark), and is not part
     ///     of the random pool.
     /// </summary>
