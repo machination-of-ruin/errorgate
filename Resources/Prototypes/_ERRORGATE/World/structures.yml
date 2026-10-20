@@ -256,6 +256,8 @@
   unique: true
   group: factory
   cutStreets: true
+  mobs: [ MobSpawnerRunner ] # a factory is not empty: runners wait between the machines
+  mobCount: 8
 
 - type: worldStructure
   id: city-factory-2
@@ -263,3 +265,5 @@
   unique: true
   group: factory
   cutStreets: true
+  mobs: [ MobSpawnerRunner ]
+  mobCount: 8

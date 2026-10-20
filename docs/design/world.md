@@ -157,3 +157,17 @@ AI GOD work comes after this rework is fully implemented (see [ai-god.md](ai-god
 - Whether tunnels can have encounters, loot or NPCs.
 - Weather and light per location (the snow city keeps a day-night cycle and a snowstorm).
 - Whether the shore of location 1 can be crossed or is only a backdrop.
+
+## Mob counts (spawners, each with a mob; measured over seeds 1 to 3)
+
+Measured with a throwaway test that builds every location and counts the mob spawners, the live mobs (`MobState`) and the NPCs (HTN), and the server time of a tick with no players about (a rough idle proxy: it includes the maps built before).
+
+| Location | Mobs before | Mobs after | Idle ms per tick before | after |
+|---|---|---|---|---|
+| Village | 10 to 15 | 10 to 15 | 1.6 to 1.8 | 1.8 to 2.2 |
+| Snow city | 18 to 20 (4 to 6 runners) | 39 to 43 (17 to 23 runners) | 1.2 to 3.1 | 1.4 to 1.6 |
+| Military base | 6 | 6 | 0.9 to 1.8 | 0.9 to 1.7 |
+| Laboratory | 24 | 24 | 1.4 to 1.5 | 1.4 to 1.6 |
+| Tunnels | 4 to 5 | 4 to 5 | 1.2 to 1.5 | 1.5 to 1.7 |
+
+The snow city has `mobCount: 30` (was 14), runners twice as likely among its mobs, and 8 runners inside each factory (`city-factory-1`, `-2`). Idle cost is within the noise of the test; the cost with players near (mobs chasing) is not measured. To scale down: lower `mobCount` on the location or `mobCount` on the factories.
