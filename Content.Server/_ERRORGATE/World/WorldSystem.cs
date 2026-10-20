@@ -619,9 +619,12 @@ public sealed partial class WorldSystem : EntitySystem
 
         // Taking the tiles away must not take the things on them with it, so they wait on the map meanwhile
         var mapUid = xform.MapUid!.Value;
+        // The grid sits over the ground grid meanwhile: grid traversal would hand the things over to the ground (whichever of the two grids
+        // the broadphase lists first), so it is off until they are back on their grid
         foreach (var (child, anchored, _, _) in children)
         {
             var childXform = Transform(child);
+            childXform.GridTraversal = false;
             if (anchored)
                 _transform.Unanchor(child, childXform);
 
@@ -655,6 +658,8 @@ public sealed partial class WorldSystem : EntitySystem
             _transform.SetCoordinates(uid, childXform, new EntityCoordinates(grid.Owner, RotateVector(pos, turns)), faces ? rot + angle : rot);
             if (anchored)
                 _transform.AnchorEntity(uid, childXform);
+
+            childXform.GridTraversal = true;
         }
     }
 
@@ -796,6 +801,8 @@ public sealed partial class WorldSystem : EntitySystem
         var cut = false;
         IReadOnlyList<string>? mobs = null;
         var mobCount = 0;
+        var shore = false;
+        var frontWidth = 1;
         if (_proto.TryIndex<WorldStructurePrototype>(id, out var structure))
         {
             role = structure.Role;
@@ -805,9 +812,69 @@ public sealed partial class WorldSystem : EntitySystem
             cut = structure.CutStreets;
             mobs = structure.Mobs;
             mobCount = structure.MobCount;
+            shore = structure.Shore;
+            if (structure.OpenFront != string.Empty && FindOpenFront(grid, min, max, structure.OpenFront) is { } open)
+                (front, door, frontWidth) = open;
         }
 
-        return new StructureInfo(path.ToString(), width, height, min, front, door, role, weight, unique, group, cut, mobs, mobCount);
+        return new StructureInfo(path.ToString(), width, height, min, front, door, role, weight, unique, group, cut, mobs, mobCount, shore, frontWidth);
+    }
+
+    /// <summary>
+    ///     The widest run of floor with no wall, window or door on the edge of the footprint, on the side <paramref name="sideName"/>:
+    ///     that side, the tile in the middle of the run and its length. Null if that side has no gap.
+    /// </summary>
+    private (int Side, Vector2i Door, int Width)? FindOpenFront(Entity<MapGridComponent> grid, Vector2i min, Vector2i max, string sideName)
+    {
+        var floor = new HashSet<Vector2i>();
+        foreach (var tile in _map.GetAllTiles(grid.Owner, grid.Comp))
+        {
+            floor.Add(tile.GridIndices);
+        }
+
+        var blocked = new HashSet<Vector2i>();
+        var enumerator = Transform(grid.Owner).ChildEnumerator;
+        while (enumerator.MoveNext(out var child))
+        {
+            if (!Transform(child).Anchored || !(HasComp<DoorComponent>(child) || TryComp<AirtightComponent>(child, out var air) && air.AirBlocked))
+                continue;
+
+            blocked.Add(_map.TileIndicesFor(grid.Owner, grid.Comp, Transform(child).Coordinates));
+        }
+
+        // The sides in the order south, east, north, west, each walked along its length
+        var sides = new[]
+        {
+            Enumerable.Range(min.X, max.X - min.X + 1).Select(x => new Vector2i(x, min.Y)).ToList(),
+            Enumerable.Range(min.Y, max.Y - min.Y + 1).Select(y => new Vector2i(max.X, y)).ToList(),
+            Enumerable.Range(min.X, max.X - min.X + 1).Select(x => new Vector2i(x, max.Y)).ToList(),
+            Enumerable.Range(min.Y, max.Y - min.Y + 1).Select(y => new Vector2i(min.X, y)).ToList(),
+        };
+
+        (int Side, Vector2i Door, int Width)? best = null;
+        var wanted = Array.IndexOf(new[] { "south", "east", "north", "west" }, sideName);
+        for (var side = 0; side < 4; side++)
+        {
+            if (side != wanted)
+                continue;
+
+            var run = new List<Vector2i>();
+            for (var i = 0; i <= sides[side].Count; i++)
+            {
+                if (i < sides[side].Count && floor.Contains(sides[side][i]) && !blocked.Contains(sides[side][i]))
+                {
+                    run.Add(sides[side][i]);
+                    continue;
+                }
+
+                if (run.Count > (best?.Width ?? 0))
+                    best = (side, run[run.Count / 2], run.Count);
+
+                run.Clear();
+            }
+        }
+
+        return best;
     }
 
     private List<StructureInfo> GetPool(string theme)

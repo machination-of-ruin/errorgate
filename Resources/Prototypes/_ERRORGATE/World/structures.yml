@@ -267,3 +267,17 @@
   cutStreets: true
   mobs: [ MobSpawnerRunner ]
   mobCount: 8
+
+- type: worldStructure
+  id: city-hospital
+  role: civic
+  unique: true # one in every city
+  cutStreets: true
+  openFront: west # the front is the 3 wide gap in the west wall, not a door
+
+- type: worldStructure
+  id: village-resort
+  role: civic
+  unique: true
+  shore: true # on the land at the water, fenced, with a park in front
+  openFront: east # the front is the 3 wide gap in the east wall, not a door
