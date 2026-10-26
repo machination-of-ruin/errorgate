@@ -139,3 +139,31 @@ public sealed class EliminateSquadTask(EntityUid target) : SquadTask
         return system.GetSquad(Target) is not { Members.Count: > 0 };
     }
 }
+
+/// <summary>A shot was heard from afar: goes to look at the place, stays a little, and then patrols again.</summary>
+public sealed class InvestigateTask(EntityCoordinates place) : SquadTask
+{
+    public override string Name => "investigate";
+
+    public EntityCoordinates Place = place;
+
+    private bool _asked;
+
+    private bool _done;
+
+    public override EntityCoordinates? NextGoal(SquadSystem system, Entity<SquadComponent> squad)
+    {
+        if (_asked)
+        {
+            _done = true;
+            return null;
+        }
+
+        _asked = true;
+        return system.RandomFreeTileAround(Place, 0f, 6f) ?? Place;
+    }
+
+    public override TimeSpan HoldTime(IRobustRandom random) => TimeSpan.FromSeconds(random.Next(8, 16));
+
+    public override bool IsDone(SquadSystem system, Entity<SquadComponent> squad) => _done;
+}

@@ -16,6 +16,7 @@ Extend `SquadTask` (`SquadTasks.cs`): `NextGoal`, `IsDone`, `HoldTime`, `GoalIsI
 
 - `PatrolTask`: 55% of goals are building points not yet visited, the rest open ground 25 to 50 tiles away.
 - `GuardTask(home, radius)`: stays near a place. Used for the resort boss squad (`task: guard` on the structure squad).
+- `InvestigateTask(place)`: a patrol that could hear a shot (the range of the distant gunfire, `GunfireHeardEvent` from `DistantGunfireSystem`; not silenced guns, not its own members, not while fighting, once per 45 s) goes to look, stays 8 to 16 s, then patrols again.
 - `FollowTask(entity)`, `HuntTask` (nearest player), `EliminateSquadTask(squad)`.
 
 Admin commands: `squads` lists them, `squadtask <squad or member id> patrol|guard|hunt|follow <id>|eliminate <id>` gives a task.
@@ -32,6 +33,9 @@ Admin commands: `squads` lists them, `squadtask <squad or member id> patrol|guar
 - Soldiers and bandits open doors and airlocks (`NavInteract`, `NavPry`, `Prying` with `pryPowered`) (not fences: with `NavClimb` they got stuck on them).
 - **Fences:** the pathfinder samples points 0.25 tiles apart and a fence (0.2 wide, in the tile centre) fell between them, so it was invisible and NPCs walked into `FenceWoodHighStraight` and `FenceMetalStraight`. `PathfindingSystem.Grid.cs` (marked `ERRORGATE`) now tests the whole sample cell for thin walls (under 0.5 wide, at least 0.8 long). Throwaway probe on real maps: 12 of 12 wood fences (village) and 12 of 12 metal fences (snow city) were walked straight through before, 0 of 12 after.
 - Loot goes into the first worn container it fits in; never into the hands.
+- **Guns:** the best gun they carry is drawn (`NpcWeaponRanking`, `Factions/weapon_ranking.yml`, higher is better, `RandomMag` stripped, unlisted 10); out of combat a carried gun that outranks the one in hand is swapped in (`NpcGunSystem.TryUpgrade`). A gun counts as loaded only if the chamber holds a live round: a fresh pistol has an empty chamber and used to click forever, a dry NPC now racks the first round of the new magazine. An empty gun is reloaded even with no enemy in sight.
+- **Loot caps:** what soldiers and bandits are born with counts against the loot manager (`NpcKitLootSystem`, a plain gun counts as its `RandomMag` entry), so NPC kits do not inflate the loot of the world.
+- **Ice:** on a slippery tile an NPC that moves across or against its goal pushes against its motion until it slows (`NPCSteeringSystem.BrakeOnIce`); before, it circled its goal for ever.
 - Hunger and thirst are held at "okay" (`NpcNeedsSystem`).
 - A dropped gun within 2.5 tiles is picked up again before another is drawn (`NpcGunMemoryComponent`).
 

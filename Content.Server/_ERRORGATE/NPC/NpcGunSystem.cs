@@ -1,13 +1,18 @@
 using Content.Server.Weapons.Ranged.Systems;
+using Content.Shared._ERRORGATE.NPC;
 using Robust.Shared.Audio;
 using Robust.Shared.Audio.Systems;
 using Content.Shared.Containers.ItemSlots;
 using Content.Shared.Hands.Components;
 using Content.Shared.Hands.EntitySystems;
 using Content.Shared.Inventory;
+using Content.Shared.Storage;
+using Content.Shared.Storage.EntitySystems;
+using Content.Shared.Weapons.Ranged;
 using Content.Shared.Weapons.Ranged.Components;
 using Content.Shared.Weapons.Ranged.Events;
 using Robust.Shared.Containers;
+using Robust.Shared.Prototypes;
 
 namespace Content.Server._ERRORGATE.NPC;
 
@@ -26,7 +31,11 @@ public sealed class NpcGunSystem : EntitySystem
 {
     private const string MagazineSlot = "gun_magazine";
     private const string ChamberSlot = "gun_chamber";
+    private const string RankingId = "NpcWeaponRanking";
+    private const string RandomMagSuffix = "RandomMag";
 
+    [Dependency] private readonly IPrototypeManager _proto = default!;
+    [Dependency] private readonly SharedStorageSystem _storage = default!;
     [Dependency] private readonly SharedAudioSystem _audio = default!;
     [Dependency] private readonly GunSystem _gun = default!;
     [Dependency] private readonly InventorySystem _inventory = default!;
@@ -71,15 +80,30 @@ public sealed class NpcGunSystem : EntitySystem
 
     private bool TryFindGun(EntityUid owner, out EntityUid gun)
     {
+        gun = default;
+        var best = int.MinValue;
+
         // Dropped on the ground within reach
         if (TryComp<NpcGunMemoryComponent>(owner, out var memory) && Exists(memory.Gun) && HasComp<GunComponent>(memory.Gun)
             && !_container.IsEntityOrParentInContainer(memory.Gun)
             && Transform(owner).Coordinates.TryDistance(EntityManager, Transform(memory.Gun).Coordinates, out var distance) && distance <= 2.5f)
         {
             gun = memory.Gun;
-            return true;
+            best = Rank(gun);
         }
 
+        if (TryFindCarried(owner, null, out var carried, out _) && Rank(carried) > best)
+            gun = carried;
+
+        return best != int.MinValue || gun != default;
+    }
+
+    /// <summary>The best gun the NPC wears or carries in a holster, a belt or a bag (one level in), other than <paramref name="except"/>.</summary>
+    private bool TryFindCarried(EntityUid owner, EntityUid? except, out EntityUid gun, out BaseContainer? from)
+    {
+        gun = default;
+        from = null;
+        var best = int.MinValue;
         var slots = _inventory.GetSlotEnumerator(owner);
         while (slots.MoveNext(out var slot))
         {
@@ -88,8 +112,14 @@ public sealed class NpcGunSystem : EntitySystem
 
             if (HasComp<GunComponent>(item))
             {
-                gun = item;
-                return true;
+                if (item != except && Rank(item) > best)
+                {
+                    gun = item;
+                    from = slot;
+                    best = Rank(item);
+                }
+
+                continue;
             }
 
             // A holster, a belt or a bag: one level in
@@ -100,17 +130,62 @@ public sealed class NpcGunSystem : EntitySystem
             {
                 foreach (var inside in container.ContainedEntities)
                 {
-                    if (!HasComp<GunComponent>(inside))
+                    if (inside == except || !HasComp<GunComponent>(inside) || Rank(inside) <= best)
                         continue;
 
                     gun = inside;
-                    return true;
+                    from = container;
+                    best = Rank(inside);
                 }
             }
         }
 
-        gun = default;
-        return false;
+        return from != null;
+    }
+
+    /// <summary>Puts an item into the first holster, belt or bag the NPC wears that takes it; it stays on the floor if none does.</summary>
+    private void StowInStorage(EntityUid owner, EntityUid item)
+    {
+        var slots = _inventory.GetSlotEnumerator(owner);
+        while (slots.MoveNext(out var slot))
+        {
+            if (slot.ContainedEntity is { } worn && HasComp<StorageComponent>(worn) && _storage.Insert(worn, item, out _, playSound: false))
+                return;
+        }
+    }
+
+    /// <summary>How good the NPCs think a gun is (<see cref="NpcWeaponRankingPrototype"/>).</summary>
+    public int Rank(EntityUid gun)
+    {
+        var ranking = _proto.Index<NpcWeaponRankingPrototype>(RankingId);
+        if (MetaData(gun).EntityPrototype?.ID is not { } id)
+            return ranking.Default;
+
+        if (id.EndsWith(RandomMagSuffix))
+            id = id[..^RandomMagSuffix.Length];
+
+        return ranking.Ranks.GetValueOrDefault(id, ranking.Default);
+    }
+
+    /// <summary>
+    ///     Out of combat: a gun in the holster or the bag that outranks the one in the hand goes into the hand, and the old one takes its
+    ///     place in the holster or the bag. True if it swapped.
+    /// </summary>
+    public bool TryUpgrade(EntityUid owner)
+    {
+        if (!_gun.TryGetGun(owner, out var held, out _) || !TryFindCarried(owner, held, out var better, out var from) || from == null
+            || Rank(better) <= Rank(held))
+            return false;
+
+        if (!_hands.TryDrop(owner, held, checkActionBlocker: false))
+            return false;
+
+        // The old gun takes the place of the new one; if it does not fit it stays on the floor, and the memory forgets it
+        _container.Remove(better, from, force: true);
+        if (!_container.Insert(held, from))
+            StowInStorage(owner, held);
+        EnsureComp<NpcGunMemoryComponent>(owner).Gun = better;
+        return _hands.TryPickupAnyHand(owner, better, checkActionBlocker: false, animate: false) && _hands.TrySelect(owner, better);
     }
 
     /// <summary>
@@ -134,6 +209,20 @@ public sealed class NpcGunSystem : EntitySystem
             }
 
             return false;
+        }
+
+        // A gun with a chamber fires what is in the chamber: a magazine with rounds and an empty chamber, a spent casing in the chamber or
+        // an open bolt is a gun that clicks (the ammo count does not tell)
+        if (TryComp<ChamberMagazineAmmoProviderComponent>(gun, out var chambered))
+        {
+            if (chambered.BoltClosed == false)
+                return false;
+
+            if (!_itemSlots.TryGetSlot(gun, ChamberSlot, out var chamber) || chamber.Item is not { } round)
+                return false;
+
+            if (TryComp<CartridgeAmmoComponent>(round, out var cartridge) && cartridge.Spent)
+                return false;
         }
 
         var ev = new GetAmmoCountEvent();
@@ -201,7 +290,10 @@ public sealed class NpcGunSystem : EntitySystem
         if (!TryComp<ItemSlotsComponent>(gun, out var slots) || !_itemSlots.TryGetSlot(gun, MagazineSlot, out var magSlot, slots))
             return false;
 
-        // A new magazine of the kind it has, or the one the gun comes with
+        // A new magazine of the kind it has, or the one the gun comes with (and a closed bolt)
+        if (TryComp<ChamberMagazineAmmoProviderComponent>(gun, out var chambered) && chambered.BoltClosed == false)
+            _gun.SetBoltClosed(gun, chambered, true);
+
         var magProto = magSlot.Item is { } old ? MetaData(old).EntityPrototype?.ID : magSlot.StartingItem;
         if (magProto == null)
             return false;
@@ -214,8 +306,33 @@ public sealed class NpcGunSystem : EntitySystem
             return false;
 
         // A rifle that fired its last round has an empty chamber
-        if (_itemSlots.TryGetSlot(gun, ChamberSlot, out var chamber, slots) && chamber.Item == null && chamber.StartingItem != null)
-            _itemSlots.TryInsert(gun, chamber, Spawn(chamber.StartingItem, coords), null);
+        if (_itemSlots.TryGetSlot(gun, ChamberSlot, out var chamber, slots) && chamber.StartingItem != null)
+        {
+            if (chamber.Item is { } old2 && TryComp<CartridgeAmmoComponent>(old2, out var spent) && spent.Spent)
+            {
+                _itemSlots.SetLock(gun, chamber, false, slots);
+                _itemSlots.TryEject(gun, chamber, null, out var casing, true);
+                if (casing != null)
+                    QueueDel(casing);
+            }
+
+            if (chamber.Item == null)
+                _itemSlots.TryInsert(gun, chamber, Spawn(chamber.StartingItem, coords), null);
+        }
+
+        // A gun that starts with a magazine and an empty chamber (a pistol out of the factory): rack it, the first round of the magazine
+        // goes into the chamber
+        if (_itemSlots.TryGetSlot(gun, ChamberSlot, out var empty, slots) && empty.Item == null && magSlot.Item is { } mag)
+        {
+            var take = new TakeAmmoEvent(1, new List<(EntityUid? Entity, IShootable Shootable)>(), coords, null);
+            RaiseLocalEvent(mag, take);
+            if (take.Ammo.Count > 0 && take.Ammo[0].Entity is { } round)
+            {
+                _itemSlots.SetLock(gun, empty, false, slots);
+                _itemSlots.TryInsert(gun, empty, round, null);
+                _itemSlots.SetLock(gun, empty, true, slots);
+            }
+        }
 
         return true;
     }

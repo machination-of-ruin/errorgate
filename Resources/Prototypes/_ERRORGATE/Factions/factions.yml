@@ -51,6 +51,17 @@
     - tasks:
         - !type:HTNCompoundTask
           task: ErrorgateGunCombatCompound
+
+    # No enemy to shoot at (it ducked out of sight, the fight is over) and the gun is dry: load it anyway
+    - preconditions:
+        - !type:ActiveHandComponentPrecondition
+          components:
+            - type: Gun
+        - !type:GunLoadedPrecondition
+          invert: true
+      tasks:
+        - !type:HTNPrimitiveTask
+          operator: !type:ReloadGunOperator
     - tasks:
         - !type:HTNPrimitiveTask
           operator: !type:UtilityOperator

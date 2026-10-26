@@ -1,6 +1,7 @@
 using System.Linq;
 using System.Numerics;
 using System.Threading;
+using Content.Server._ERRORGATE.DistantGunfire;
 using Content.Server._ERRORGATE.SmartMobSpawner;
 using Content.Server.NPC.Components;
 using Content.Server.NPC.HTN;
@@ -30,6 +31,7 @@ public sealed class SquadSystem : EntitySystem
 
     private const float LegLength = 14f;
     // The squad keeps together: the leader waits when a member is further than StragglerRange (5 to 10 tiles is the aim)
+    private static readonly TimeSpan InvestigateCooldown = TimeSpan.FromSeconds(45);
     private const float StragglerRange = 9f;
     private const float FollowRange = 7f;
     private const float CatchUpRange = 8f;
@@ -62,6 +64,28 @@ public sealed class SquadSystem : EntitySystem
     {
         base.Initialize();
         SubscribeLocalEvent<SquadSlotComponent, SmartMobSpawnedEvent>(OnSpawned);
+        SubscribeLocalEvent<GunfireHeardEvent>(OnGunfireHeard);
+    }
+
+    /// <summary>Patrols that could hear a shot (the range of the distant gunfire) go to the place it came from, unless they are fighting.</summary>
+    private void OnGunfireHeard(ref GunfireHeardEvent args)
+    {
+        var now = _timing.CurTime;
+        var query = EntityQueryEnumerator<SquadComponent>();
+        while (query.MoveNext(out var uid, out var comp))
+        {
+            if (comp.Task is not PatrolTask || comp.InCombat || comp.Leader is not { } leader || comp.Members.Contains(args.Shooter)
+                || comp.InvestigateAfter > now)
+                continue;
+
+            var at = _transform.GetMapCoordinates(leader);
+            if (at.MapId != args.Origin.MapId || (at.Position - args.Origin.Position).Length() > args.Range)
+                continue;
+
+            comp.InvestigateAfter = now + InvestigateCooldown;
+            var map = _map.GetMapOrInvalid(args.Origin.MapId);
+            SetTask((uid, comp), new InvestigateTask(new EntityCoordinates(map, args.Origin.Position)));
+        }
     }
 
     // -- Creating squads ---------------------------------------------------------------------------------------------

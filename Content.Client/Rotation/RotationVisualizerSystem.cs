@@ -18,6 +18,26 @@ public sealed class RotationVisualizerSystem : SharedRotationVisualsSystem
         SubscribeLocalEvent<RotationVisualsComponent, AppearanceChangeEvent>(OnAppearanceChange);
     }
 
+    public override void FrameUpdate(float frameTime)
+    {
+        base.FrameUpdate(frameTime);
+
+        // ERRORGATE: a sprite that kept the wrong rotation (an animation cut short, a state that flipped between two updates) is drawn
+        // prone while the mob stands, or the other way round. The appearance says what it should be; once no animation runs, make it so.
+        var query = EntityQueryEnumerator<RotationVisualsComponent, AppearanceComponent, SpriteComponent>();
+        while (query.MoveNext(out var uid, out var visuals, out var appearance, out var sprite))
+        {
+            if (!_appearance.TryGetData<RotationState>(uid, RotationVisuals.RotationState, out var state, appearance)
+                || _animation.HasRunningAnimation(uid, "rotate"))
+                continue;
+
+            if (state == RotationState.Vertical && !sprite.Rotation.EqualsApprox(visuals.VerticalRotation))
+                sprite.Rotation = visuals.VerticalRotation;
+            else if (state == RotationState.Horizontal && sprite.Rotation.EqualsApprox(visuals.VerticalRotation))
+                sprite.Rotation = visuals.HorizontalRotation;
+        }
+    }
+
     private void OnAppearanceChange(EntityUid uid, RotationVisualsComponent component, ref AppearanceChangeEvent args)
     {
         if (args.Sprite == null)

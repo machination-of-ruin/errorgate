@@ -156,12 +156,18 @@ public sealed class LootManagerSystem : EntitySystem
         return false;
     }
 
+    /// <summary>The entry that counts an item: its own, else that of its random-magazine variant (what the loot tables list, a gear gun is the plain one).</summary>
+    private static bool TryResolve(Dictionary<string, LootManagerEntry> entries, string proto, out LootManagerEntry entry)
+    {
+        return entries.TryGetValue(proto, out entry!) || entries.TryGetValue(proto + "RandomMag", out entry!);
+    }
+
     /// <summary>
     /// Counts one more of this item (and its children) as existing in the world.
     /// </summary>
     public void RegisterSpawn(string proto, EntityUid? source = null)
     {
-        if (EntriesFor(source) is not { } entries || !entries.TryGetValue(proto, out var entry))
+        if (EntriesFor(source) is not { } entries || !TryResolve(entries, proto, out var entry))
             return;
 
         entry.Count += 1;
@@ -178,7 +184,7 @@ public sealed class LootManagerSystem : EntitySystem
     /// </summary>
     public void Refund(string proto, EntityUid? source = null)
     {
-        if (EntriesFor(source) is { } entries && entries.TryGetValue(proto, out var entry))
+        if (EntriesFor(source) is { } entries && TryResolve(entries, proto, out var entry))
             entry.Count = Math.Max(0, entry.Count - 1);
     }
 }

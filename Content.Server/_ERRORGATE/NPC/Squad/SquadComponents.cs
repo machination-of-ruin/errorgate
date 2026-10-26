@@ -68,6 +68,9 @@ public sealed partial class SquadComponent : Component
 
     public TimeSpan StuckSince;
 
+    /// <summary>A heard shot sends the squad to look only after this time (one look per shot burst, not per bullet).</summary>
+    public TimeSpan InvestigateAfter;
+
     public TimeSpan NextChatter;
 
     public EntityUid? Replier;

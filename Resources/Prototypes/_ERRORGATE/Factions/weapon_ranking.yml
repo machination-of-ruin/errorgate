@@ -1,0 +1,45 @@
+# What soldiers and bandits draw first: the highest rank they carry, in the hand, the holster, the belt or the bag. A looted gun that
+# outranks the one in the hand is swapped in as soon as the shooting stops. Unlisted guns rank 10.
+- type: npcWeaponRanking
+  id: NpcWeaponRanking
+  default: 10
+  ranks:
+    # Machine guns
+    WeaponLightMachineM249: 100
+    WeaponLightMachineM249C: 95
+    # Snipers and rifles
+    WeaponSniperHristov: 88
+    WeaponRifleAk: 85
+    WeaponRifleL1A1: 85
+    WeaponRifleASVal: 80
+    WeaponRifleJackdaw: 78
+    WeaponRifleLecter: 78
+    WeaponSniperSKS: 75
+    WeaponRifleTenebra: 75
+    WeaponRifleM90GrenadeLauncher: 70
+    # Shotguns
+    WeaponShotgunBenelli: 74
+    WeaponShotgunBulldog: 74
+    WeaponShotgunRemington: 70
+    WeaponShotgunDoubleBarreled: 60
+    WeaponShotgunSawn: 55
+    # Submachine guns
+    WeaponSubMachineGunVector45ACP: 65
+    WeaponSubMachineGunVector9x19mm: 62
+    WeaponSubMachineGunMP5: 62
+    WeaponSubMachineGunThompson: 60
+    WeaponSubMachineGunWt550: 60
+    WeaponSubMachineMP9: 58
+    # Revolvers
+    WeaponRevolverPython: 45
+    WeaponRevolverSmithAndWesson: 40
+    WeaponRevolverMateba: 40
+    WeaponRevolverLucky: 35
+    # Pistols
+    WeaponPistolStechkin: 42
+    WeaponPistolM1911: 40
+    WeaponPistolUSP: 40
+    WeaponPistolP226: 38
+    WeaponPistolGlock: 38
+    WeaponPistolBeretta: 36
+    WeaponPistolMakarov: 30

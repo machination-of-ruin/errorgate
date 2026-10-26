@@ -8,7 +8,7 @@ namespace Content.Server._ERRORGATE.NPC;
 
 /// <summary>
 ///     Soldiers and bandits get up when they are lying and nothing keeps them down (a knockdown, a wound that took their legs), and pick up
-///     the gun they dropped when they are standing again, in combat or not.
+///     the gun they dropped when they are standing again, in combat or not, and swap to a better gun they carry once the shooting stops.
 /// </summary>
 public sealed class NpcStandSystem : EntitySystem
 {
@@ -35,8 +35,9 @@ public sealed class NpcStandSystem : EntitySystem
 
             if (standing.CurrentState == StandingState.Lying)
                 _layingDown.TryStandUp(uid, standingState: standing);
-            else if (standing.CurrentState == StandingState.Standing)
-                _guns.TryPickUpDropped(uid);
+            else if (standing.CurrentState == StandingState.Standing && !_guns.TryPickUpDropped(uid)
+                     && !(TryComp<NpcNoiseComponent>(uid, out var noise) && noise.Until > _timing.CurTime)) // not while shooting
+                _guns.TryUpgrade(uid);
         }
     }
 }
