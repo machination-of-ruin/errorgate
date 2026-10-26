@@ -83,8 +83,8 @@ public sealed class SquadSystem : EntitySystem
                 continue;
 
             comp.InvestigateAfter = now + InvestigateCooldown;
-            var map = _map.GetMapOrInvalid(args.Origin.MapId);
-            SetTask((uid, comp), new InvestigateTask(new EntityCoordinates(map, args.Origin.Position)));
+            SetTask((uid, comp), new InvestigateTask(args.Origin));
+            _speech.TrySay(leader, "investigate", 1f);
         }
     }
 
@@ -214,6 +214,34 @@ public sealed class SquadSystem : EntitySystem
         return null;
     }
 
+    /// <summary>How far the leader of the squad is from a point of the map (very far if it has no leader or is on another map).</summary>
+    public float LeaderDistance(Entity<SquadComponent> squad, MapCoordinates point)
+    {
+        if (squad.Comp.Leader is not { } leader)
+            return float.MaxValue;
+
+        var at = _transform.GetMapCoordinates(leader);
+        return at.MapId == point.MapId ? (at.Position - point.Position).Length() : float.MaxValue;
+    }
+
+    /// <summary>A free tile within <paramref name="radius"/> of a point of the map, on the grid there (a building) or else on the ground: a goal the squad can walk to.</summary>
+    public EntityCoordinates? GoalNear(Entity<SquadComponent> squad, MapCoordinates world, float radius)
+    {
+        if (squad.Comp.Leader is not { } leader)
+            return null;
+
+        var coordinates = _transform.ToCoordinates(world);
+        if (_transform.GetGrid(coordinates) == null)
+        {
+            if (GroundOf(world.MapId) is not { } ground)
+                return null;
+
+            coordinates = new EntityCoordinates(ground, Vector2.Transform(world.Position, _transform.GetInvWorldMatrix(ground)));
+        }
+
+        return RandomFreeTileAround(coordinates, 0f, radius) ?? OnGround(leader, world);
+    }
+
     /// <summary>A free spot on the open ground of the squad's map, <paramref name="min"/> to <paramref name="max"/> tiles from the leader.</summary>
     public EntityCoordinates? RandomOpenGround(Entity<SquadComponent> squad, float min, float max)
     {
@@ -312,7 +340,12 @@ public sealed class SquadSystem : EntitySystem
         var leader = comp.Leader.Value;
 
         if (comp.Task.IsDone(this, squad))
+        {
+            if (comp.Task is InvestigateTask)
+                _speech.TrySay(leader, "investigatedone", 0.8f);
+
             SetTask(squad, new PatrolTask());
+        }
 
         // A fight is the members' own business; the squad takes up again when it is over
         var fighting = comp.Members.Any(IsFighting);

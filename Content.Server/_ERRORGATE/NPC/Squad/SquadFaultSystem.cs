@@ -23,6 +23,9 @@ public sealed class SquadFaultSystem : EntitySystem
     /// <summary>How far a member sees a fault, at most (the screen effect radius of the faults is about this).</summary>
     private const float SpotRange = 8f;
 
+    /// <summary>Faults this close to a member are planned around.</summary>
+    private const float KnowRange = 40f;
+
     /// <summary>The chance per second that a member within <see cref="SpotRange"/> notices a fault it does not know yet.</summary>
     private const float SpotChance = 0.5f;
 
@@ -67,13 +70,19 @@ public sealed class SquadFaultSystem : EntitySystem
                     continue;
 
                 var coords = _transform.GetMapCoordinates(member);
-                foreach (var fault in _lookup.GetEntitiesInRange<ErrorgateAnomalyComponent>(coords, SpotRange))
+                foreach (var fault in _lookup.GetEntitiesInRange<ErrorgateAnomalyComponent>(coords, KnowRange))
                 {
                     if (squad.KnownFaults.Contains(fault.Owner))
                         continue;
 
                     var distance = (_transform.GetWorldPosition(fault) - coords.Position).Length();
-                    if (distance <= fault.Comp.EffectiveDanger + 1f || _random.Prob(SpotChance))
+                    if (distance > SpotRange)
+                    {
+                        // Far off: the squad plans around it without a word (for now every fault near the squad is avoided)
+                        squad.KnownFaults.Add(fault.Owner);
+                        squad.Leg = null;
+                    }
+                    else if (distance <= fault.Comp.EffectiveDanger + 1f || _random.Prob(SpotChance))
                         Learn((uid, squad), fault.Owner, member, "fault");
                 }
             }

@@ -2,6 +2,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Numerics;
 using Content.Server._ERRORGATE.NPC;
+using Content.Shared._ERRORGATE.Anomalies;
 using Content.Server.NPC.Components;
 using Content.Server.NPC.Pathfinding;
 using Content.Shared.Climbing.Components;
@@ -758,7 +759,27 @@ public sealed partial class NPCSteeringSystem
                 danger[i] = MathF.Max(dot * weight, danger[i]);
             }
         }
+
+        // World faults: always kept away from, the danger radius and a little more, whatever the NPC knows of them
+        foreach (var fault in _lookup.GetEntitiesInRange<ErrorgateAnomalyComponent>(xform.Coordinates, FaultAvoidSearch, LookupFlags.Static | LookupFlags.Sensors | LookupFlags.Dynamic))
+        {
+            var offset = _transform.GetWorldPosition(fault.Owner) - worldPos;
+            var distance = offset.Length();
+            var radius = fault.Comp.EffectiveDanger + 0.8f;
+            if (distance > radius + 0.6f)
+                continue;
+
+            var weight = distance <= radius ? 1f : 1f - (distance - radius) / 0.6f;
+            var norm = distance < 0.01f ? _random.NextAngle().ToVec() : Vector2.Normalize(offsetRot.RotateVec(offset));
+            for (var i = 0; i < InterestDirections; i++)
+            {
+                var dot = Vector2.Dot(norm, Directions[i]);
+                danger[i] = MathF.Max(dot * weight, danger[i]);
+            }
+        }
     }
+
+    private const float FaultAvoidSearch = 12f;
 
     #endregion
 

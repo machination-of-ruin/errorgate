@@ -1,5 +1,5 @@
 # What soldiers and bandits say (NpcSpeechSystem): npc-speech-{faction}-{category}-{n}, n from 1 up with no gaps.
-# Categories: contact (sees an enemy), clear (the fight is over), reload, mandown, arrive (going into a building), loot (picked something up), chatter (the squad stands and talks).
+# Categories: contact (sees an enemy), clear (the fight is over), reload, mandown, arrive (going into a building), loot (picked something up), chatter (the squad stands and talks), investigate (a patrol heard gunfire and goes to look), investigatedone (it found nothing and goes back to patrol).
 
 npc-speech-military-contact-1 = Contact!
 npc-speech-military-contact-2 = Hostile spotted!
@@ -67,3 +67,19 @@ npc-speech-bandit-chatter-4 = Hear something?
 npc-speech-bandit-chatter-5 = I'm bored.
 npc-speech-bandit-chatter-6 = Keep your eyes open. Soldiers are about.
 npc-speech-bandit-chatter-7 = Don't look at me like that.
+
+npc-speech-military-investigate-1 = Shots fired. Moving to investigate.
+npc-speech-military-investigate-2 = Gunfire. Check it out.
+npc-speech-military-investigate-3 = Heard that. Move up, stay sharp.
+npc-speech-military-investigate-4 = Possible contact. Move out.
+
+npc-speech-military-investigatedone-1 = Nothing here. Back to patrol.
+npc-speech-military-investigatedone-2 = Source not found. Resume.
+
+npc-speech-bandit-investigate-1 = Hear that? Shooting. Let's go see.
+npc-speech-bandit-investigate-2 = Somebody's got a gun out there. Move.
+npc-speech-bandit-investigate-3 = That's gunfire. Could be loot. Could be trouble.
+npc-speech-bandit-investigate-4 = Go look. Quietly.
+
+npc-speech-bandit-investigatedone-1 = Nothing. Let's go.
+npc-speech-bandit-investigatedone-2 = Whoever it was, they're gone.

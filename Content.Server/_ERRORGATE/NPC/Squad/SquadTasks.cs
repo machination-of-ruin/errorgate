@@ -141,26 +141,45 @@ public sealed class EliminateSquadTask(EntityUid target) : SquadTask
 }
 
 /// <summary>A shot was heard from afar: goes to look at the place, stays a little, and then patrols again.</summary>
-public sealed class InvestigateTask(EntityCoordinates place) : SquadTask
+public sealed class InvestigateTask(MapCoordinates place) : SquadTask
 {
     public override string Name => "investigate";
 
-    public EntityCoordinates Place = place;
+    public MapCoordinates Place = place;
 
-    private bool _asked;
+    private bool _reached;
+
+    private int _misses;
+
+    private int _retries;
 
     private bool _done;
 
     public override EntityCoordinates? NextGoal(SquadSystem system, Entity<SquadComponent> squad)
     {
-        if (_asked)
+        // Asked again after the hold at the place, or after the way there was given up: a squad that is still far away tries again
+        // (another spot, another way round a fault), three times at most
+        if (_reached)
         {
+            if (_retries < 3 && system.LeaderDistance(squad, Place) > 12f && system.GoalNear(squad, Place, 6f) is { } again)
+            {
+                _retries++;
+                return again;
+            }
+
             _done = true;
             return null;
         }
 
-        _asked = true;
-        return system.RandomFreeTileAround(Place, 0f, 6f) ?? Place;
+        var goal = system.GoalNear(squad, Place, 6f);
+        if (goal == null)
+        {
+            _done = ++_misses >= 5;
+            return null;
+        }
+
+        _reached = true;
+        return goal;
     }
 
     public override TimeSpan HoldTime(IRobustRandom random) => TimeSpan.FromSeconds(random.Next(8, 16));
