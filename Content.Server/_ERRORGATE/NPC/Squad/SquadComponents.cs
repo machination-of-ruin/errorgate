@@ -60,6 +60,11 @@ public sealed partial class SquadComponent : Component
     /// <summary>Since when the leader waits for a straggler; null while it does not.</summary>
     public TimeSpan? WaitSince;
 
+    /// <summary>Where the leader was when it last moved, and since when it has stood there (to notice a leader that is stuck).</summary>
+    public Vector2 StuckPos;
+
+    public TimeSpan StuckSince;
+
     public TimeSpan NextChatter;
 
     public EntityUid? Replier;

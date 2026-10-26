@@ -106,7 +106,7 @@ public sealed class SquadDebugOverlay : Overlay
             {
                 var goalScreen = view.WorldToScreen(goal);
                 handle.DrawCircle(goalScreen, 8f, color.WithAlpha(0.8f), false);
-                handle.DrawString(_font, goalScreen + new Vector2(10, -6), $"goal {squad.Id}", color);
+                handle.DrawString(_font, goalScreen + new Vector2(10, -6), $"{squad.Faction} squad {squad.Id} goal", color);
             }
 
             if (squad.Home is { } home)
@@ -125,11 +125,11 @@ public sealed class SquadDebugOverlay : Overlay
                 if (member.Target is { } target)
                     handle.DrawLine(screen, view.WorldToScreen(target), shade.WithAlpha(0.5f));
 
-                handle.DrawString(_font, screen + new Vector2(10, -4), $"{member.Name} {member.Plan}", shade);
+                handle.DrawString(_font, screen + new Vector2(10, -4), alone ? $"{member.Name} (no squad) {member.Plan}" : $"{(member.Leader ? "LEADER" : member.Name)} of {squad.Faction} squad {squad.Id}: {member.Plan}", shade);
             }
 
             if (header is { } at)
-                handle.DrawString(_font, at + new Vector2(10, -18), $"squad {squad.Id} {squad.Task} {squad.State}", color);
+                handle.DrawString(_font, at + new Vector2(10, -18), alone ? "no squad" : $"{squad.Faction} squad {squad.Id}: {squad.Task}, {squad.State}", color);
         }
     }
 }

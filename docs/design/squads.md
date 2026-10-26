@@ -22,17 +22,21 @@ Admin commands: `squads` lists them, `squadtask <squad or member id> patrol|guar
 
 ## >>> DEBUGGING
 
-- `showsquads` (client console, needs the `Debug` admin flag): draws every squad in its own colour (state, task, goal ring, guard radius), each member with the step of its plan and a line to where it is going, the leader as a filled circle, soldiers and bandits without a squad in grey, and the building points patrols pick from as white rings. Code: `SquadDebugSystem` on both sides, `Content.Shared/_ERRORGATE/NPC/SquadDebug.cs`.
+- `showsquads` (client console, needs the `Debug` admin flag): draws every squad in red, labelled with its faction and squad id (state, task, goal ring, guard radius), the leader marked LEADER, each member with the step of its plan and a line to where it is going, the leader as a filled circle, soldiers and bandits without a squad (single spawners) as "no squad", and the building points patrols pick from as white rings. Code: `SquadDebugSystem` on both sides, `Content.Shared/_ERRORGATE/NPC/SquadDebug.cs`.
 - `pathfinder` (the NPC window): the walking nodes and polygons of the pathfinder. `showhtn`: the HTN plan text over each NPC.
 - `squads` and `squadtask` (server console): see above.
 
 ## >>> MOVEMENT AND NEEDS
 
-- Out of combat squads walk (`walk: true` on the `MoveTo` of `ErrorgateSquadCompound`, `NPCSteeringComponent.Walk`); combat movement still runs.
-- Soldiers and bandits open doors and airlocks (`NavInteract`, `NavPry`, `Prying` with `pryPowered`) and climb obstacles.
+- Out of combat squads walk, including the idle wander (`ErrorgateIdleCompound`); a member more than 8 tiles from the leader runs to catch up (`SquadSystem.Pace`). A leader that does not move for 8 s drops its leg and after 4 legs its goal (`CheckStuck`). Formation spots are snapped to a free tile on a grid (`OnGround`): a spot off the tiles made the HTN `MoveTo` fail, which left members standing in their idle plan. (`walk: true` on the `MoveTo` of `ErrorgateSquadCompound`, `NPCSteeringComponent.Walk`); combat movement still runs.
+- Soldiers and bandits open doors and airlocks (`NavInteract`, `NavPry`, `Prying` with `pryPowered`) (not fences: with `NavClimb` they got stuck on `FenceWoodHighStraight` and `FenceMetalStraight`, so the pathfinder routes around them).
 - Loot goes into the first worn container it fits in; never into the hands.
 - Hunger and thirst are held at "okay" (`NpcNeedsSystem`).
 - A dropped gun within 2.5 tiles is picked up again before another is drawn (`NpcGunMemoryComponent`).
+
+## >>> RESPAWN
+
+Squads respawn per member: every `SmartMobSpawner` of a member keeps its `SquadSlotComponent`; when it spawns a new mob (after the usual respawn time, `3600 / spawnRate` seconds) `SmartMobSpawnedEvent` puts the mob back into its squad and slot. The squad entity stays on the map when all members are dead. Not tested over a full respawn cycle.
 
 ## >>> OPEN
 

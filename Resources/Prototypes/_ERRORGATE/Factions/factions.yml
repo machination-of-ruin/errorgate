@@ -94,7 +94,36 @@
             key: SquadWait
     - tasks:
         - !type:HTNCompoundTask
-          task: IdleCompound
+          task: ErrorgateIdleCompound
+
+# IdleCompound at a walk: out of combat soldiers and bandits do not run
+- type: htnCompound
+  id: ErrorgateIdleCompound
+  branches:
+    - preconditions:
+        - !type:BuckledPrecondition
+          isBuckled: false
+        - !type:PulledPrecondition
+          isPulled: false
+      tasks:
+        - !type:HTNPrimitiveTask
+          operator: !type:PickAccessibleOperator
+            rangeKey: IdleRange
+        - !type:HTNPrimitiveTask
+          operator: !type:MoveToOperator
+            pathfindInPlanning: false
+            walk: true
+        - !type:HTNPrimitiveTask
+          operator: !type:RandomOperator
+            targetKey: IdleTime
+            minKey: MinimumIdleTime
+            maxKey: MaximumIdleTime
+        - !type:HTNPrimitiveTask
+          operator: !type:WaitOperator
+            key: IdleTime
+          preconditions:
+            - !type:KeyExistsPrecondition
+              key: IdleTime
 
 # Like NearbyGunTargets and NearbyMeleeTargets, but a target must also be sensed: lit, heard, close, or in the share of the range the daylight allows
 - type: utilityQuery

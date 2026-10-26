@@ -1,3 +1,4 @@
+using System.Linq;
 using System.Numerics;
 using Content.Server.Administration.Managers;
 using Content.Server.NPC.HTN;
@@ -5,6 +6,7 @@ using Content.Shared._ERRORGATE.NPC;
 using Content.Shared.Administration;
 using Content.Shared.Mobs;
 using Content.Shared.Mobs.Components;
+using Content.Shared.NPC.Components;
 using Robust.Server.Player;
 using Robust.Shared.Enums;
 using Robust.Shared.Map;
@@ -91,8 +93,13 @@ public sealed class SquadDebugSystem : EntitySystem
                 radius = guard.Radius;
             }
 
+            var faction = "-";
+            if (squad.Leader is { } lead && TryComp<NpcFactionMemberComponent>(lead, out var factions) && factions.Factions.Count > 0)
+                faction = factions.Factions.First().Id;
+
             squads.Add(new SquadDebugSquad(
                 GetNetEntity(uid),
+                faction,
                 squad.Task.Name,
                 squad.InCombat ? "fighting" : squad.Holding ? "holding" : squad.Goal != null ? "moving" : "idle",
                 map,
@@ -116,7 +123,7 @@ public sealed class SquadDebugSystem : EntitySystem
         }
 
         if (loners.Count > 0)
-            squads.Add(new SquadDebugSquad(NetEntity.Invalid, "none", "alone", MapId.Nullspace, null, null, 0f, loners));
+            squads.Add(new SquadDebugSquad(NetEntity.Invalid, "-", "none", "alone", MapId.Nullspace, null, null, 0f, loners));
 
         var points = new List<(MapId, Vector2)>();
         foreach (var map in maps)

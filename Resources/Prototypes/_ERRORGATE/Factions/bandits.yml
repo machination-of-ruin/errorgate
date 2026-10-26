@@ -105,8 +105,6 @@
         true
       NavPry: !type:Bool
         true
-      NavClimb: !type:Bool
-        true
   - type: Prying # doors without power or access: pried open
     pryPowered: true
 

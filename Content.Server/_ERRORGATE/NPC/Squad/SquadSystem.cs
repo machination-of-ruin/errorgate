@@ -2,6 +2,7 @@ using System.Linq;
 using System.Numerics;
 using System.Threading;
 using Content.Server._ERRORGATE.SmartMobSpawner;
+using Content.Server.NPC.Components;
 using Content.Server.NPC.HTN;
 using Content.Server.NPC.Pathfinding;
 using Content.Shared.Item;
@@ -30,6 +31,8 @@ public sealed class SquadSystem : EntitySystem
     // The squad keeps together: the leader waits when a member is further than StragglerRange (5 to 10 tiles is the aim)
     private const float StragglerRange = 9f;
     private const float FollowRange = 7f;
+    private const float CatchUpRange = 8f;
+    private static readonly TimeSpan StuckTime = TimeSpan.FromSeconds(8);
     private static readonly TimeSpan MaxWait = TimeSpan.FromSeconds(15);
     private const float TrailStep = 3f;
 
@@ -335,9 +338,11 @@ public sealed class SquadSystem : EntitySystem
                 comp.Heading = Vector2.Normalize(heading);
         }
 
+        CheckStuck(comp, leaderPos, now);
         UpdateTrail(comp, leaderPos);
         Formation(squad, leaderPos, now);
         WakeIdlers(comp);
+        Pace(comp, leaderPos);
 
         if (comp.Holding && comp.Goal != null)
             Idle(squad, now);
@@ -365,6 +370,42 @@ public sealed class SquadSystem : EntitySystem
                 _htn.ShutdownPlan(htn);
                 _htn.Replan(htn);
             }
+        }
+    }
+
+    /// <summary>A leader that has a leg to walk but does not move (a fence, a corner) gives that leg up; after a few such legs the goal.</summary>
+    private void CheckStuck(SquadComponent comp, MapCoordinates leaderPos, TimeSpan now)
+    {
+        if (comp.Goal == null || comp.Holding || (leaderPos.Position - comp.StuckPos).Length() > 1.5f)
+        {
+            comp.StuckPos = leaderPos.Position;
+            comp.StuckSince = now;
+            return;
+        }
+
+        // Waiting for the others is not being stuck
+        if (comp.WaitSince != null || comp.Leg == null || now - comp.StuckSince < StuckTime)
+            return;
+
+        comp.Leg = null;
+        comp.LegTries++;
+        comp.StuckSince = now;
+        if (comp.LegTries >= 4)
+        {
+            comp.Goal = null;
+            comp.LegTries = 0;
+        }
+    }
+
+    /// <summary>Out of combat the squad walks; a member that has fallen behind the leader runs to catch up.</summary>
+    private void Pace(SquadComponent comp, MapCoordinates leaderPos)
+    {
+        foreach (var uid in comp.Members)
+        {
+            if (!TryComp<NPCSteeringComponent>(uid, out var steering))
+                continue;
+
+            steering.Walk = Distance(leaderPos, Transform(uid).Coordinates) <= CatchUpRange;
         }
     }
 
@@ -434,9 +475,27 @@ public sealed class SquadSystem : EntitySystem
 
             // Far behind: along the way the leader came
             member.MovePoint = here.MapId == place.MapId && (place.Position - here.Position).Length() > FollowRange
-                ? _transform.ToCoordinates(new MapCoordinates(AlongTrail(comp, here.Position), place.MapId))
-                : _transform.ToCoordinates(place);
+                ? OnGround(comp.Members[i], new MapCoordinates(AlongTrail(comp, here.Position), place.MapId))
+                : OnGround(comp.Members[i], place);
         }
+    }
+
+    /// <summary>
+    ///     A free tile at or near the point, relative to a grid: the MoveTo of the HTN needs a grid under its target, and a point that is
+    ///     off the tiles (a formation spot over a wall or the void) would be relative to the map and the plan would fail.
+    /// </summary>
+    private EntityCoordinates OnGround(EntityUid member, MapCoordinates world)
+    {
+        var coordinates = _transform.ToCoordinates(world);
+        if (_transform.GetGrid(coordinates) == null)
+        {
+            if ((Transform(member).GridUid ?? GroundOf(world.MapId)) is not { } grid)
+                return coordinates;
+
+            coordinates = new EntityCoordinates(grid, Vector2.Transform(world.Position, _transform.GetInvWorldMatrix(grid)));
+        }
+
+        return RandomFreeTileAround(coordinates, 0f, 1.5f) ?? coordinates;
     }
 
     private void UpdateTrail(SquadComponent comp, MapCoordinates leaderPos)

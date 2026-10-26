@@ -17,7 +17,7 @@ public sealed record SquadDebugMember(NetEntity Entity, string Name, Vector2 Pos
 
 /// <summary>One squad in the squad debug feed: <see cref="Id"/> is zero for NPCs that belong to none.</summary>
 [Serializable, NetSerializable]
-public sealed record SquadDebugSquad(NetEntity Id, string Task, string State, MapId Map, Vector2? Goal, Vector2? Home, float HomeRadius, List<SquadDebugMember> Members);
+public sealed record SquadDebugSquad(NetEntity Id, string Faction, string Task, string State, MapId Map, Vector2? Goal, Vector2? Home, float HomeRadius, List<SquadDebugMember> Members);
 
 /// <summary>Server to client: what the squads are doing, and the points of interest (building spots) patrols pick from.</summary>
 [Serializable, NetSerializable]
