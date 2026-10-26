@@ -769,6 +769,10 @@ public sealed class SquadSystem : EntitySystem
             if (TerminatingOrDeleted(item) || Transform(item).Anchored || _container.IsEntityOrParentInContainer(item.Owner))
                 continue;
 
+            // Not what lies in a fire
+            if (_lookup.GetEntitiesInRange<NpcAvoidComponent>(Transform(item).Coordinates, 2f, LookupFlags.Static | LookupFlags.Sensors).Count > 0)
+                continue;
+
             // What lies on the ground: not what someone is wearing, and guns less often
             if (HasComp<GunComponent>(item) && Random.Prob(0.5f))
                 continue;

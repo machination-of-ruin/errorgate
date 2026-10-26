@@ -97,6 +97,8 @@
   - type: MobMover
   - type: NpcFlashlight
   - type: NpcNeeds
+  - type: MindContainer
+    showExamineInfo: false # no "catatonic" in the examine text of an NPC
   - type: HTN
     rootTask:
       task: ErrorgateHumanoidHostileCompound

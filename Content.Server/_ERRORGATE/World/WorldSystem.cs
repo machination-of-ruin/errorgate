@@ -69,6 +69,47 @@ public sealed partial class WorldSystem : EntitySystem
     ///     Puts the mob spawners a building asks for (the runners of a factory) on free floor inside it: a tile with floor and nothing
     ///     anchored on it, so not in a wall or under a machine, a few steps from the others.
     /// </summary>
+    /// <summary>
+    ///     The pathfinder only walks within a grid, so every outer door of a building gets a portal to the ground tile in front of it.
+    ///     Without it nobody could path indoors.
+    /// </summary>
+    private void LinkDoors(Entity<MapGridComponent> building, Entity<MapGridComponent> ground)
+    {
+        var path = EntityManager.System<Content.Server.NPC.Pathfinding.PathfindingSystem>();
+        var doors = new List<Vector2>();
+        var query = EntityQueryEnumerator<DoorComponent, TransformComponent>();
+        while (query.MoveNext(out _, out _, out var xform))
+        {
+            if (xform.ParentUid == building.Owner)
+                doors.Add(xform.LocalPosition);
+        }
+
+        var buildingXform = Transform(building);
+        var groundInv = _transform.GetInvWorldMatrix(ground.Owner);
+        foreach (var door in doors)
+        {
+            var doorTile = new Vector2i((int) MathF.Floor(door.X), (int) MathF.Floor(door.Y));
+            foreach (var dir in new[] { Vector2i.Right, Vector2i.Left, Vector2i.Up, Vector2i.Down })
+            {
+                var outside = doorTile + dir;
+                if (!_map.GetTileRef(building.Owner, building.Comp, outside).Tile.IsEmpty)
+                    continue;
+
+                var outsideWorld = _transform.GetWorldPosition(buildingXform) + new Vector2(outside.X + 0.5f, outside.Y + 0.5f);
+                var groundLocal = Vector2.Transform(outsideWorld, groundInv);
+                var groundTile = new Vector2i((int) MathF.Floor(groundLocal.X), (int) MathF.Floor(groundLocal.Y));
+                if (_map.GetTileRef(ground.Owner, ground.Comp, groundTile).Tile.IsEmpty)
+                    continue;
+
+                path.TryCreatePortal(
+                    new EntityCoordinates(ground.Owner, new Vector2(groundTile.X + 0.5f, groundTile.Y + 0.5f)),
+                    new EntityCoordinates(building.Owner, new Vector2(doorTile.X + 0.5f, doorTile.Y + 0.5f)),
+                    out _);
+                break;
+            }
+        }
+    }
+
     private void PlaceStructureMobs(Entity<MapGridComponent> grid, StructurePlacement placement, int seed)
     {
         var info = placement.Info;
@@ -409,6 +450,7 @@ public sealed partial class WorldSystem : EntitySystem
             placed++;
             built.Add((grid.Value.Owner, p));
             PlaceStructureMobs(grid.Value, p, useSeed);
+            LinkDoors(grid.Value, ground);
             yield return true;
         }
 

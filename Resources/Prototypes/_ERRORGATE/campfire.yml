@@ -4,6 +4,7 @@
   id: CampfireCraftable
   description: A source of light and heat. It will burn out.
   components:
+  - type: NpcAvoid # soldiers and bandits walk around it
   - type: TimedDespawn
     lifetime: 300 # 5 minutes
   - type: StepTrigger # the fire sets whoever walks over it on fire, as in the old build

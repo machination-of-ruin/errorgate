@@ -1,6 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Numerics;
+using Content.Server._ERRORGATE.NPC;
 using Content.Server.NPC.Components;
 using Content.Server.NPC.Pathfinding;
 using Content.Shared.Climbing.Components;
@@ -736,6 +737,27 @@ public sealed partial class NPCSteeringSystem
         }
 
         _entSetPool.Return(ents);
+    }
+
+    /// <summary>ERRORGATE: keeps away from things with <see cref="NpcAvoidComponent"/> (a campfire burns whoever walks over it).</summary>
+    private void AvoidHazards(Angle offsetRot, Vector2 worldPos, TransformComponent xform, Span<float> danger)
+    {
+        foreach (var hazard in _lookup.GetEntitiesInRange<NpcAvoidComponent>(xform.Coordinates, 2.5f, LookupFlags.Static | LookupFlags.Sensors))
+        {
+            var offset = _transform.GetWorldPosition(hazard.Owner) - worldPos;
+            var distance = offset.Length();
+            if (distance > hazard.Comp.Radius + 0.4f)
+                continue;
+
+            // Full danger inside the radius, fading out over the last 0.4 tiles
+            var weight = distance <= hazard.Comp.Radius ? 1f : 1f - (distance - hazard.Comp.Radius) / 0.4f;
+            var norm = distance < 0.01f ? _random.NextAngle().ToVec() : Vector2.Normalize(offsetRot.RotateVec(offset));
+            for (var i = 0; i < InterestDirections; i++)
+            {
+                var dot = Vector2.Dot(norm, Directions[i]);
+                danger[i] = MathF.Max(dot * weight, danger[i]);
+            }
+        }
     }
 
     #endregion
