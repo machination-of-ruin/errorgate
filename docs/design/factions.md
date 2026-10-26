@@ -69,6 +69,13 @@ Given by an NPC in the faction's base at first, later by any NPC of the faction.
 - **Squads:** roaming groups of soldiers in locations 1 to 3 and guards at the base. NPCs are only simulated in loaded maps.
 - **Currency, trader stock and task kind:** Later (a first pass is enough for the slice).
 
+### Soldiers and bandits (built)
+
+- **Factions:** `Military` and `Bandit` (`Resources/Prototypes/_ERRORGATE/Factions`). Both are hostile to players (`Syndicate`), to each other, to walkers and runners (`SimpleHostile`), xenos and zombies; walkers and runners are hostile to both. Members of a faction are friendly to each other, so all bandits stand together, whatever their squad.
+- **Mobs:** soldier (rifleman), medic, officer; bandit, bandit boss. Looks follow the Solar Alliance kits (`MilitaryRiflemanGear`, `MilitaryMedicGear`, `MilitaryOfficerGear`, `BanditGear`, `BanditBossGear`), PVP-only items replaced by repo ones. Each has a spawner (`MobSpawnerMilitary*`, `MobSpawnerBandit*`) in the spawn menu.
+- **Squads:** `squads` on a `worldLocation`: a list of `members` (a spawner each) and a `count`. The generator puts each squad on a cluster of free tiles within 3 steps of its first tile, away from the spawn clearing and other squads. In use: the village has 2 bandit squads (3 bandits + boss), the snow city 1 bandit squad and 3 military squads (officer, 2 riflemen, medic).
+- **Gear:** they wear it for real, so a dead soldier is a source of weapons. A living NPC cannot be stripped (`SharedStrippableSystem.IsLivingNpc`: an NPC that is awake, i.e. alive and not downed); a dead or downed one can.
+
 ## Technical notes
 
 - No reputation table exists in the database. It is a new table, modeled on `PlayTime` (account id, faction, value), with migrations for **both Postgres and SQLite**.

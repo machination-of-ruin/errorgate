@@ -40,6 +40,9 @@ public sealed partial class LocationLayout
     /// <summary>Places for mob spawners on open ground.</summary>
     public List<Vector2i> MobTiles = new();
 
+    /// <summary>The tiles of each squad (one per member, within a few steps of each other), in the order of <see cref="Options.SquadSizes"/>.</summary>
+    public List<List<Vector2i>> Squads = new();
+
     /// <summary>Wrecks and barricades in the middle of the wide avenues: pairs of tiles, never closing the road.</summary>
     public List<Vector2i> RoadblockTiles = new();
 
@@ -49,7 +52,7 @@ public sealed partial class LocationLayout
     /// <summary>Spawn points of the clearing where players come into the world.</summary>
     public List<Vector2i> SpawnTiles = new();
 
-    public sealed record Options(string Style, string Shape, int Rocks, int TreeClumps, int TreeSingles, string Shore, IReadOnlyList<(int Count, int Clump)> Props, IReadOnlyList<(int Count, int Clump)> Decals, IReadOnlyList<string> Gates, int MobCount, bool SpawnZone, int Roadblocks = 0, IReadOnlyList<string>? BorderGates = null, IReadOnlyList<(string Kind, int Count)>? Landmarks = null, IReadOnlyList<(string Group, int Min, int Max)>? UniqueRules = null);
+    public sealed record Options(string Style, string Shape, int Rocks, int TreeClumps, int TreeSingles, string Shore, IReadOnlyList<(int Count, int Clump)> Props, IReadOnlyList<(int Count, int Clump)> Decals, IReadOnlyList<string> Gates, int MobCount, bool SpawnZone, int Roadblocks = 0, IReadOnlyList<string>? BorderGates = null, IReadOnlyList<(string Kind, int Count)>? Landmarks = null, IReadOnlyList<(string Group, int Min, int Max)>? UniqueRules = null, IReadOnlyList<int>? SquadSizes = null);
 
     /// <summary>
     ///     Rock formations and trees in the free ground: away from the structures and the roads, and not on top of each other.
@@ -252,6 +255,38 @@ public sealed partial class LocationLayout
 
         // Mobs stand apart on the open ground
         MobTiles = PlaceMany(rng, options.MobCount, 0, 14, t => Free(t) && SpawnTiles.All(s => (s - t).Length > 20));
+
+        // Squads: a cluster of free tiles, one per member, away from the spawn clearing, the single mobs and the other squads
+        var used = new HashSet<Vector2i>(MobTiles);
+        foreach (var members in options.SquadSizes ?? Array.Empty<int>())
+        {
+            for (var attempt = 0; attempt < 400; attempt++)
+            {
+                var centre = RandomTile(rng);
+                if (!Free(centre) || SpawnTiles.Any(s => (s - centre).Length <= 20) || used.Any(u => (u - centre).Length < 10))
+                    continue;
+
+                var near = new List<Vector2i>();
+                for (var dx = -3; dx <= 3; dx++)
+                {
+                    for (var dy = -3; dy <= 3; dy++)
+                    {
+                        var t = new Vector2i(centre.X + dx, centre.Y + dy);
+                        if (t != centre && Free(t))
+                            near.Add(t);
+                    }
+                }
+
+                if (near.Count < members - 1)
+                    continue;
+
+                var squad = new List<Vector2i> { centre };
+                squad.AddRange(near.OrderBy(_ => rng.Next()).Take(members - 1));
+                Squads.Add(squad);
+                used.UnionWith(squad);
+                break;
+            }
+        }
     }
 
     private List<Vector2i> PlaceMany(Random rng, int count, int clump, int spacing, Func<Vector2i, bool> free)

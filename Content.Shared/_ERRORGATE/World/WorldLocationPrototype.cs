@@ -157,6 +157,10 @@ public sealed partial class WorldLocationPrototype : IPrototype
     [DataField]
     public int MobCount = 4;
 
+    /// <summary>Squads of mobs standing together on the open ground: each entry is a mob spawner for every member, <c>count</c> times.</summary>
+    [DataField]
+    public List<WorldSquad> Squads = new();
+
     /// <summary>A weather that never ends in this location.</summary>
     [DataField]
     public ProtoId<WeatherPrototype>? Weather;
@@ -220,6 +224,18 @@ public sealed partial class WorldUniqueGroup
 
     [DataField]
     public int Max = 1;
+}
+
+[DataDefinition]
+public sealed partial class WorldSquad
+{
+    /// <summary>One mob spawner per member.</summary>
+    [DataField]
+    public List<EntProtoId> Members = new();
+
+    /// <summary>How many squads of this kind.</summary>
+    [DataField]
+    public int Count = 1;
 }
 
 [DataDefinition]

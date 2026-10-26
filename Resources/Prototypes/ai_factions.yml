@@ -59,6 +59,8 @@
   friendly:
   - AnimalFriend
   hostile:
+  - Military # ERRORGATE: the walkers and runners go for soldiers and bandits too
+  - Bandit
   - NanoTrasen
   - Syndicate
   - Passive

@@ -1,0 +1,22 @@
+# The NPC factions of the world (docs/design/factions.md). Players are on the Syndicate faction, the walkers and runners on SimpleHostile.
+# Hostility is read from the side of the one who looks: who a soldier shoots, who a bandit shoots. Members of one faction are friends.
+
+# The Military: soldiers, by the book. Shot on sight for everyone who is not a friend yet (reputation will add friends, later).
+- type: npcFaction
+  id: Military
+  hostile:
+  - Syndicate
+  - Bandit
+  - SimpleHostile
+  - Xeno
+  - Zombie
+
+# Bandits: no side but their own. Everybody else is prey, soldiers included.
+- type: npcFaction
+  id: Bandit
+  hostile:
+  - Syndicate
+  - Military
+  - SimpleHostile
+  - Xeno
+  - Zombie

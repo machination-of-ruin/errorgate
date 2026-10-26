@@ -1,0 +1,111 @@
+# Bandits (docs/design/factions.md): no faction but their own, hostile to everyone else. The kits follow the fugitive bandits of the
+# PvP prototypes, with what this repo has in place of the PvP-only items.
+
+# A striped shirt (the fugitive bandits' vest)
+- type: entity
+  parent: ClothingUniformJumpsuitMime
+  id: ClothingUniformJumpsuitStripedShirt
+  name: striped shirt
+  description: A striped shirt.
+
+- type: startingGear
+  id: BanditGear
+  equipment:
+    jumpsuit: ClothingUniformJumpsuitStripedShirt
+    outerClothing: ClothingOuterCoatBomber
+    head: ClothingHeadHatUshanka
+    mask: ClothingMaskNeckGaiter
+    shoes: ClothingShoesBootsWork
+    gloves: ClothingHandsGlovesFingerless
+    belt: ClothingBeltHolster
+    suitstorage: WeaponShotgunSawn
+    pocket1: Crowbar
+    pocket2: Handcuffs
+  storage:
+    belt:
+    - WeaponRevolverPython
+    - SpeedLoader357Magnum
+    - SpeedLoader357Magnum
+
+- type: startingGear
+  id: BanditBossGear
+  equipment:
+    jumpsuit: ClothingUniformJumpsuitStripedShirt
+    outerClothing: ClothingOuterCoatGentle
+    head: ClothingHeadHatTCFLBeretDress
+    eyes: ClothingEyesGlassesSunglasses
+    mask: ClothingMaskNeckGaiter
+    shoes: ClothingShoesBootsWork
+    gloves: ClothingHandsGlovesFingerless
+    belt: ClothingBeltHolster
+    suitstorage: WeaponRifleAk
+    pocket1: Crowbar
+    pocket2: Handcuffs
+  storage:
+    belt:
+    - WeaponRevolverPython
+    - SpeedLoader357Magnum
+    - SpeedLoader357Magnum
+
+- type: entity
+  abstract: true
+  parent: BaseMobHuman
+  id: MobBanditBase
+  components:
+  - type: NpcFactionMember
+    factions:
+    - Bandit
+  - type: InputMover
+  - type: MobMover
+  - type: HTN
+    rootTask:
+      task: SimpleHumanoidHostileCompound
+
+- type: entity
+  parent: MobBanditBase
+  id: MobBandit
+  name: bandit
+  suffix: Bandit
+  components:
+  - type: Loadout
+    prototypes: [ BanditGear ]
+
+- type: entity
+  parent: MobBanditBase
+  id: MobBanditBoss
+  name: bandit boss
+  suffix: Bandit
+  components:
+  - type: Loadout
+    prototypes: [ BanditBossGear ]
+
+- type: entity
+  abstract: true
+  parent: MobSpawnerBase
+  id: MobSpawnerBanditBase
+  components:
+  - type: SmartMobSpawner
+    spawnRate: 0.5
+  - type: Sprite
+    layers:
+    - state: red
+    - sprite: Mobs/Species/Human/parts.rsi
+      state: full
+
+- type: entity
+  parent: MobSpawnerBanditBase
+  id: MobSpawnerBandit
+  name: mob spawner
+  suffix: bandit, Bandit
+  components:
+  - type: SmartMobSpawner
+    mobPrototype: MobBandit
+
+- type: entity
+  parent: MobSpawnerBanditBase
+  id: MobSpawnerBanditBoss
+  name: mob spawner
+  suffix: bandit boss, Bandit
+  components:
+  - type: SmartMobSpawner
+    mobPrototype: MobBanditBoss

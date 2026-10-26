@@ -262,9 +262,11 @@ public sealed partial class WorldSystem : EntitySystem
         var watch = System.Diagnostics.Stopwatch.StartNew();
         var entitiesBefore = EntityManager.EntityCount;
         var useSeed = seed ?? _random.Next();
+        var squads = proto.Squads.SelectMany(s => Enumerable.Repeat(s, s.Count)).ToList();
         var options = new LocationLayout.Options(proto.Style, proto.Shape, proto.Rocks, proto.TreeClumps, proto.TreeSingles, proto.Shore,
             proto.Props.Select(e => (e.Count, e.Clump)).ToList(), proto.Decals.Select(e => (e.Count, e.Clump)).ToList(), proto.RubbleEnd ? gates.Append("~rubble").ToList() : gates, proto.Mobs.Count > 0 ? proto.MobCount : 0, proto.SpawnZone, proto.RoadblockProtos.Count > 0 ? proto.Roadblocks : 0, proto.RubbleEnd ? proto.BorderGates.Append("~rubble").ToList() : proto.BorderGates,
-            proto.Landmarks.Select(e => (e.Kind, e.Count)).ToList(), proto.UniqueGroups.Select(e => (e.Group, e.Min, e.Max)).ToList());
+            proto.Landmarks.Select(e => (e.Kind, e.Count)).ToList(), proto.UniqueGroups.Select(e => (e.Group, e.Min, e.Max)).ToList(),
+            squads.Select(s => s.Members.Count).ToList());
         var layout = LocationLayout.Generate(useSeed, proto.Size, pool, proto.Density, options);
 
         yield return true;
@@ -482,6 +484,14 @@ public sealed partial class WorldSystem : EntitySystem
         foreach (var tile in layout.MobTiles)
         {
             Spawn(proto.Mobs[mobRng.Next(proto.Mobs.Count)], _map.GridTileToLocal(ground.Owner, ground.Comp, tile));
+        }
+
+        for (var i = 0; i < layout.Squads.Count; i++)
+        {
+            for (var m = 0; m < layout.Squads[i].Count; m++)
+            {
+                Spawn(squads[i].Members[m], _map.GridTileToLocal(ground.Owner, ground.Comp, layout.Squads[i][m]));
+            }
         }
 
         for (var i = 0; i < layout.SpawnTiles.Count; i++)
