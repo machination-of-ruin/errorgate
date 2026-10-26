@@ -9,7 +9,7 @@ using Robust.Shared.Map;
 namespace Content.Client._ERRORGATE.NPC;
 
 /// <summary>
-///     <c>showsquads</c>: draws every squad (a colour each: task, state, goal, the guard radius), its members with what they are doing
+///     <c>showsquads</c>: draws every squad (task, state, goal, the guard radius), all in red, its members with what they are doing
 ///     (the plan step) and where they are going, and the building points patrols pick from. Needs the debug admin flag.
 ///     The walking nodes of the pathfinder: the <c>pathfinder</c> window.
 /// </summary>
@@ -65,10 +65,7 @@ public sealed class SquadDebugSystem : EntitySystem
 
 public sealed class SquadDebugOverlay : Overlay
 {
-    private static readonly Color[] Palette =
-    {
-        Color.Red, Color.Cyan, Color.Yellow, Color.Lime, Color.Magenta, Color.Orange, Color.DeepSkyBlue, Color.Pink,
-    };
+    private static readonly Color Red = Color.FromHex("#FF0000");
 
     private readonly Font _font;
 
@@ -98,11 +95,10 @@ public sealed class SquadDebugOverlay : Overlay
             handle.DrawCircle(view.WorldToScreen(position), 4f, Color.White.WithAlpha(0.6f), false);
         }
 
-        var index = 0;
         foreach (var squad in Squads)
         {
             var alone = squad.Id == NetEntity.Invalid;
-            var color = alone ? Color.Gray : Palette[index++ % Palette.Length];
+            var color = Red;
             if (!alone && squad.Map != args.MapId)
                 continue;
 

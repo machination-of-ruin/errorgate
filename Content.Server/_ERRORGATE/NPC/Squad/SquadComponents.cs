@@ -57,6 +57,9 @@ public sealed partial class SquadComponent : Component
 
     public TimeSpan NextThink;
 
+    /// <summary>Since when the leader waits for a straggler; null while it does not.</summary>
+    public TimeSpan? WaitSince;
+
     public TimeSpan NextChatter;
 
     public EntityUid? Replier;
@@ -80,6 +83,9 @@ public sealed partial class NpcSquadMemberComponent : Component
     public EntityUid? LootTarget;
 
     public TimeSpan NextLoot;
+
+    /// <summary>When this member picks a new spot to check while the squad sweeps a building.</summary>
+    public TimeSpan SweepAt;
 }
 
 /// <summary>On a mob spawner: the mob it makes joins this squad in this slot.</summary>

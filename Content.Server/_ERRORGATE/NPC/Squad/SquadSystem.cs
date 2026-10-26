@@ -27,8 +27,10 @@ public sealed class SquadSystem : EntitySystem
     private static readonly TimeSpan Tick = TimeSpan.FromSeconds(0.5);
 
     private const float LegLength = 14f;
-    private const float StragglerRange = 22f;
-    private const float FollowRange = 14f;
+    // The squad keeps together: the leader waits when a member is further than StragglerRange (5 to 10 tiles is the aim)
+    private const float StragglerRange = 9f;
+    private const float FollowRange = 7f;
+    private static readonly TimeSpan MaxWait = TimeSpan.FromSeconds(15);
     private const float TrailStep = 3f;
 
     [Dependency] private readonly IGameTiming _timing = default!;
@@ -37,6 +39,7 @@ public sealed class SquadSystem : EntitySystem
     [Dependency] private readonly SharedMapSystem _map = default!;
     [Dependency] private readonly SharedTransformSystem _transform = default!;
     [Dependency] private readonly NpcSpeechSystem _speech = default!;
+    [Dependency] private readonly HTNSystem _htn = default!;
     [Dependency] private readonly PathfindingSystem _pathfinding = default!;
     [Dependency] public readonly IRobustRandom Random = default!;
 
@@ -334,9 +337,35 @@ public sealed class SquadSystem : EntitySystem
 
         UpdateTrail(comp, leaderPos);
         Formation(squad, leaderPos, now);
+        WakeIdlers(comp);
 
         if (comp.Holding && comp.Goal != null)
             Idle(squad, now);
+    }
+
+    /// <summary>
+    ///     A member that is in the middle of the idle plan (wandering, waiting several seconds) does not see its new place: the plan is
+    ///     dropped so that it takes up the squad's one.
+    /// </summary>
+    private void WakeIdlers(SquadComponent comp)
+    {
+        foreach (var uid in comp.Members)
+        {
+            if (!TryComp<NpcSquadMemberComponent>(uid, out var member) || member.MovePoint is not { } point
+                || !TryComp<HTNComponent>(uid, out var htn) || htn.Plan is not { } plan)
+                continue;
+
+            var first = plan.Tasks[0].Operator;
+            if (first is not Content.Server.NPC.HTN.PrimitiveTasks.Operators.PickAccessibleOperator)
+                continue;
+
+            if (_transform.GetMapCoordinates(uid).MapId != _transform.ToMapCoordinates(point).MapId
+                || (_transform.GetWorldPosition(uid) - _transform.ToMapCoordinates(point).Position).Length() > 2.5f)
+            {
+                _htn.ShutdownPlan(htn);
+                _htn.Replan(htn);
+            }
+        }
     }
 
     private int Slot(EntityUid member) => TryComp<NpcSquadMemberComponent>(member, out var comp) ? comp.Slot : int.MaxValue;
@@ -363,12 +392,31 @@ public sealed class SquadSystem : EntitySystem
             if (i == 0)
             {
                 // The leader waits for the ones who fell behind
-                var waits = comp.Members.Skip(1).Any(m => Distance(leaderPos, Transform(m).Coordinates) > StragglerRange);
+                var behind = comp.Members.Skip(1).Any(m => Distance(leaderPos, Transform(m).Coordinates) > StragglerRange);
+                if (!behind)
+                    comp.WaitSince = null;
+                else
+                    comp.WaitSince ??= now;
+
+                // A member that cannot come (stuck) does not stop the squad for ever
+                var waits = behind && now - comp.WaitSince < MaxWait;
                 member.MovePoint = (comp.Goal is { } goal && !waits ? UpdateLeg(squad, leaderPos, goal, now) : null) ?? _transform.ToCoordinates(leaderPos);
                 continue;
             }
 
             Vector2 offset;
+            if (comp.Holding && comp.GoalIsInside && comp.Goal is { } inside)
+            {
+                // Sweeping a building: every member checks a spot of its own inside, near the leader
+                if (member.SweepAt <= now || member.MovePoint == null)
+                {
+                    member.SweepAt = now + TimeSpan.FromSeconds(Random.Next(6, 12));
+                    member.MovePoint = RandomFreeTileAround(inside, 1.5f, 6f) ?? inside;
+                }
+
+                continue;
+            }
+
             if (comp.Holding || comp.Goal == null)
             {
                 var angle = Angle.FromDegrees(137.5 * i);
