@@ -20,6 +20,7 @@
     gloves: ClothingHandsGlovesFingerless
     belt: ClothingBeltHolster
     pocket1: Handcuffs
+    pocket2: FlashlightLantern
 
 - type: startingGear
   id: BanditMakarovGear
@@ -75,6 +76,7 @@
     belt: ClothingBeltHolster
     suitstorage: WeaponRifleAk
     pocket1: Handcuffs
+    pocket2: FlashlightLantern
   storage:
     belt:
     - WeaponPistolStechkin
@@ -91,6 +93,7 @@
     - Bandit
   - type: InputMover
   - type: MobMover
+  - type: NpcFlashlight
   - type: HTN
     rootTask:
       task: ErrorgateHumanoidHostileCompound

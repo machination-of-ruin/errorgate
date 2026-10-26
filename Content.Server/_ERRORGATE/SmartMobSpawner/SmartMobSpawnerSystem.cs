@@ -82,5 +82,12 @@ public sealed class SmartMobSpawnerSystem : EntitySystem
         component.SpawnedMob = SpawnAtPosition(component.MobPrototype, coordinates);
         var spawnedMobComp = EnsureComp<SmartMobSpawnerSpawnedComponent>(component.SpawnedMob);
         spawnedMobComp.SpawnedBy = uid;
+
+        var ev = new SmartMobSpawnedEvent(component.SpawnedMob);
+        RaiseLocalEvent(uid, ref ev);
     }
 }
+
+/// <summary>Raised on a spawner right after it made its mob.</summary>
+[ByRefEvent]
+public record struct SmartMobSpawnedEvent(EntityUid Mob);

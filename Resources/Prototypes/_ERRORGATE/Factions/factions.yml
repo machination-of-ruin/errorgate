@@ -30,11 +30,127 @@
         - !type:HTNCompoundTask
           task: ErrorgateGunCombatCompound
     - tasks:
+        - !type:HTNPrimitiveTask
+          operator: !type:UtilityOperator
+            proto: ErrorgateNearbyMeleeTargets
         - !type:HTNCompoundTask
-          task: MeleeCombatCompound
+          task: MeleeAttackTargetCompound
+    - tasks:
+        - !type:HTNCompoundTask
+          task: ErrorgateSquadCompound
+
+# What a soldier or a bandit does when no enemy is near: what the squad asks (an item to pick up, the place in the formation), else idling.
+- type: htnCompound
+  id: ErrorgateSquadCompound
+  branches:
+    - preconditions:
+        - !type:SquadPrecondition
+          mode: Loot
+      tasks:
+        - !type:HTNPrimitiveTask
+          operator: !type:PickLootOperator
+        - !type:HTNPrimitiveTask
+          operator: !type:MoveToOperator
+            pathfindInPlanning: false # the squad checked the way (SquadSystem legs); the steering finds the path itself
+            rangeKey: SquadRange
+        - !type:HTNPrimitiveTask
+          operator: !type:StowLootOperator
+    - preconditions:
+        - !type:SquadPrecondition
+          mode: Move
+      tasks:
+        - !type:HTNPrimitiveTask
+          operator: !type:PickSquadPositionOperator
+        - !type:HTNPrimitiveTask
+          operator: !type:MoveToOperator
+            pathfindInPlanning: false # the squad checked the way (SquadSystem legs); the steering finds the path itself
+            rangeKey: SquadRange
+        - !type:HTNPrimitiveTask
+          operator: !type:WaitOperator
+            key: SquadWait
     - tasks:
         - !type:HTNCompoundTask
           task: IdleCompound
+
+# Like NearbyGunTargets and NearbyMeleeTargets, but a target must also be sensed: lit, heard, close, or in the share of the range the daylight allows
+- type: utilityQuery
+  id: ErrorgateNearbyGunTargets
+  query:
+    - !type:NearbyHostilesQuery
+  considerations:
+    - !type:TargetIsAliveCon
+      curve: !type:BoolCurve
+    - !type:TargetIsCritCon
+      curve: !type:InverseBoolCurve
+    - !type:TurretTargetingCon
+      curve: !type:BoolCurve
+    - !type:TargetDistanceCon
+      curve: !type:PresetCurve
+        preset: TargetDistance
+    - !type:TargetHealthCon
+      curve: !type:PresetCurve
+        preset: TargetHealth
+    - !type:TargetAccessibleCon
+      curve: !type:BoolCurve
+    - !type:TargetInLOSOrCurrentCon
+      curve: !type:BoolCurve
+    - !type:TargetSensedCon
+      curve: !type:BoolCurve
+
+- type: utilityQuery
+  id: ErrorgateNearbyMeleeTargets
+  query:
+    - !type:NearbyHostilesQuery
+  considerations:
+    - !type:TargetIsAliveCon
+      curve: !type:BoolCurve
+    - !type:TargetDistanceCon
+      curve: !type:PresetCurve
+        preset: TargetDistance
+    - !type:TargetHealthCon
+      curve: !type:PresetCurve
+        preset: TargetHealth
+    - !type:TargetAccessibleCon
+      curve: !type:BoolCurve
+    - !type:TargetInLOSOrCurrentCon
+      curve: !type:BoolCurve
+    - !type:TargetSensedCon
+      curve: !type:BoolCurve
+
+# GunCombatCompound with the query above
+- type: htnCompound
+  id: ErrorgateGunFightCompound
+  branches:
+    - tasks:
+        - !type:HTNPrimitiveTask
+          operator: !type:UtilityOperator
+            proto: ErrorgateNearbyGunTargets
+
+        - !type:HTNPrimitiveTask
+          operator: !type:MoveToOperator
+            shutdownState: PlanFinished
+            pathfindInPlanning: true
+            removeKeyOnFinish: false
+            targetKey: TargetCoordinates
+            pathfindKey: TargetPathfind
+            stopOnLineOfSight: true
+            rangeKey: MeleeRange
+
+        - !type:HTNPrimitiveTask
+          operator: !type:JukeOperator
+            jukeType: AdjacentTile
+
+        - !type:HTNPrimitiveTask
+          preconditions:
+            - !type:KeyExistsPrecondition
+              key: Target
+          operator: !type:GunOperator
+            targetKey: Target
+          services:
+            - !type:UtilityService
+              id: RangedService
+              proto: ErrorgateNearbyGunTargets
+              key: Target
 
 - type: htnCompound
   id: ErrorgateGunCombatCompound
@@ -44,7 +160,7 @@
         - !type:GunLoadedPrecondition
       tasks:
         - !type:HTNCompoundTask
-          task: GunCombatCompound
+          task: ErrorgateGunFightCompound
 
     # An empty one: new ammunition, then on with the fight
     - preconditions:
@@ -57,7 +173,7 @@
         - !type:HTNPrimitiveTask
           operator: !type:ReloadGunOperator
         - !type:HTNCompoundTask
-          task: GunCombatCompound
+          task: ErrorgateGunFightCompound
 
     # No gun in the hand: draw one
     - preconditions:
@@ -69,4 +185,4 @@
         - !type:HTNPrimitiveTask
           operator: !type:DrawGunOperator
         - !type:HTNCompoundTask
-          task: GunCombatCompound
+          task: ErrorgateGunFightCompound

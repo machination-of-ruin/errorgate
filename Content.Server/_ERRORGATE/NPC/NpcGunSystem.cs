@@ -36,15 +36,11 @@ public sealed class NpcGunSystem : EntitySystem
         if (!TryFindGun(owner, out var gun))
             return false;
 
-        // Whatever is in the active hand makes room
-        if (TryComp<HandsComponent>(owner, out var hands) && hands.ActiveHandEntity != null)
-            _hands.TryDrop(owner, checkActionBlocker: false);
-
-        // A gun worn in a slot comes off by force first (a rack on the back or the suit has no one to take it off), then into the hand
+        // A gun worn in a slot comes off by force first (a rack on the back or the suit has no one to take it off), then into a free hand
         if (_inventory.TryGetContainingSlot(gun, out var worn))
             _inventory.TryUnequip(owner, worn.Name, out _, silent: true, force: true);
 
-        return _hands.TryPickupAnyHand(owner, gun, checkActionBlocker: false, animate: false);
+        return _hands.TryPickupAnyHand(owner, gun, checkActionBlocker: false, animate: false) && _hands.TrySelect(owner, gun);
     }
 
     private bool TryFindGun(EntityUid owner, out EntityUid gun)

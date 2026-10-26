@@ -22,6 +22,7 @@ public sealed partial class ReloadGunOperator : HTNOperator
         if (!blackboard.TryGetValue<float>(TimerKey, out var timer, _entManager))
         {
             guns.PlayReloadStart(owner);
+            _entManager.System<NpcSpeechSystem>().TrySay(owner, "reload", 0.6f);
             blackboard.SetValue(TimerKey, guns.ReloadTime(owner));
             return HTNOperatorStatus.Continuing;
         }

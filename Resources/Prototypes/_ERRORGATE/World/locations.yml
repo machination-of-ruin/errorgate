@@ -11,8 +11,8 @@
   spawnZone: true
   mobs: [ MobSpawnerRunner, MobSpawnerWalkerLiving ]
   mobCount: 8
-  squads:
-  - members: [ MobSpawnerBandit, MobSpawnerBandit, MobSpawnerBandit, MobSpawnerBanditBoss ]
+  squads: # two patrols; the bandit boss and his squad are at the resort (village-resort in structures.yml)
+  - members: [ MobSpawnerBandit, MobSpawnerBandit, MobSpawnerBandit ]
     count: 2
   walkway: FloorLowDesert
   fenceStraight: FenceWoodHighStraight
@@ -74,7 +74,7 @@
   mobs: [ MobSpawnerWalkerArmored, MobSpawnerRunner, MobSpawnerRunner, MobSpawnerWalkerArmoredMilitary ] # runners twice as often
   mobCount: 30 # was 14: the city felt empty
   squads:
-  - members: [ MobSpawnerBandit, MobSpawnerBandit, MobSpawnerBandit, MobSpawnerBanditBoss ]
+  - members: [ MobSpawnerBandit, MobSpawnerBandit, MobSpawnerBandit ]
     count: 1
   - members: [ MobSpawnerMilitaryOfficer, MobSpawnerMilitaryRifleman, MobSpawnerMilitaryRifleman, MobSpawnerMilitaryMedic ]
     count: 3
