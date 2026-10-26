@@ -55,6 +55,20 @@ public sealed class NpcGunSystem : EntitySystem
         return _hands.TryPickupAnyHand(owner, gun, checkActionBlocker: false, animate: false) && _hands.TrySelect(owner, gun);
     }
 
+    /// <summary>
+    ///     Out of combat: the NPC has no gun in hand and the one it dropped (a knockdown, an arc fault) lies near it: it picks that one up.
+    ///     Guns in the holster stay there. True if it picked it up.
+    /// </summary>
+    public bool TryPickUpDropped(EntityUid owner)
+    {
+        if (_gun.TryGetGun(owner, out _, out _) || !TryComp<NpcGunMemoryComponent>(owner, out var memory) || !Exists(memory.Gun)
+            || !HasComp<GunComponent>(memory.Gun) || _container.IsEntityOrParentInContainer(memory.Gun)
+            || !Transform(owner).Coordinates.TryDistance(EntityManager, Transform(memory.Gun).Coordinates, out var distance) || distance > 4f)
+            return false;
+
+        return _hands.TryPickupAnyHand(owner, memory.Gun, checkActionBlocker: false, animate: false) && _hands.TrySelect(owner, memory.Gun);
+    }
+
     private bool TryFindGun(EntityUid owner, out EntityUid gun)
     {
         // Dropped on the ground within reach

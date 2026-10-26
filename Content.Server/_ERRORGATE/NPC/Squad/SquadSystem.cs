@@ -5,6 +5,7 @@ using Content.Server._ERRORGATE.SmartMobSpawner;
 using Content.Server.NPC.Components;
 using Content.Server.NPC.HTN;
 using Content.Server.NPC.Pathfinding;
+using Content.Server.NPC.Systems;
 using Content.Shared.Item;
 using Content.Shared.Mobs;
 using Content.Shared.Mobs.Components;
@@ -32,6 +33,10 @@ public sealed class SquadSystem : EntitySystem
     private const float StragglerRange = 9f;
     private const float FollowRange = 7f;
     private const float CatchUpRange = 8f;
+    private const float LostRange = 25f;
+
+    /// <summary>No teleporting inside this distance of a player.</summary>
+    private const float SeenRange = 22f;
     private static readonly TimeSpan StuckTime = TimeSpan.FromSeconds(8);
     private static readonly TimeSpan MaxWait = TimeSpan.FromSeconds(15);
     private const float TrailStep = 3f;
@@ -43,6 +48,8 @@ public sealed class SquadSystem : EntitySystem
     [Dependency] private readonly SharedTransformSystem _transform = default!;
     [Dependency] private readonly NpcSpeechSystem _speech = default!;
     [Dependency] private readonly HTNSystem _htn = default!;
+    [Dependency] private readonly NPCSteeringSystem _steering = default!;
+    [Dependency] private readonly SquadFaultSystem _faults = default!;
     [Dependency] private readonly PathfindingSystem _pathfinding = default!;
     [Dependency] public readonly IRobustRandom Random = default!;
 
@@ -343,6 +350,7 @@ public sealed class SquadSystem : EntitySystem
         Formation(squad, leaderPos, now);
         WakeIdlers(comp);
         Pace(comp, leaderPos);
+        Unstick(squad, leaderPos, now);
 
         if (comp.Holding && comp.Goal != null)
             Idle(squad, now);
@@ -397,6 +405,100 @@ public sealed class SquadSystem : EntitySystem
         }
     }
 
+    // -- Stuck and lost ----------------------------------------------------------------------------------------------
+
+    /// <summary>
+    ///     A member that has a place to be, is not there and does not move gets a new plan after 5 s and again after 12 s; after 18 s,
+    ///     or 8 s if it is more than 25 tiles from the leader, it is put on a free tile near the leader (the leader: a few tiles on),
+    ///     but only when no player is near to see it. A member that stays far from the leader for 30 s is put near it the same way.
+    /// </summary>
+    private void Unstick(Entity<SquadComponent> squad, MapCoordinates leaderPos, TimeSpan now)
+    {
+        var comp = squad.Comp;
+        for (var i = 0; i < comp.Members.Count; i++)
+        {
+            var uid = comp.Members[i];
+            if (!TryComp<NpcSquadMemberComponent>(uid, out var member))
+                continue;
+
+            var here = _transform.GetMapCoordinates(uid);
+            var far = i > 0 && Distance(leaderPos, Transform(uid).Coordinates) > LostRange;
+            if (!far)
+                member.FarSince = null;
+            else
+                member.FarSince ??= now;
+
+            var wants = member.MovePoint is { } point && Distance(here, point) > 3f;
+            if (!wants || (here.Position - member.StuckPos).Length() > 0.7f)
+            {
+                member.StuckPos = here.Position;
+                member.StuckSince = now;
+                member.StuckStage = 0;
+            }
+
+            var stuck = wants ? now - member.StuckSince : TimeSpan.Zero;
+            if (stuck > TimeSpan.FromSeconds(5) && member.StuckStage < 1
+                || stuck > TimeSpan.FromSeconds(12) && member.StuckStage < 2)
+            {
+                member.StuckStage++;
+                if (TryComp<HTNComponent>(uid, out var htn))
+                {
+                    if (htn.Plan != null)
+                        _htn.ShutdownPlan(htn);
+
+                    _htn.Replan(htn);
+                }
+            }
+
+            var lost = far && stuck > TimeSpan.FromSeconds(8) || member.FarSince is { } since && now - since > TimeSpan.FromSeconds(30);
+            if (!(stuck > TimeSpan.FromSeconds(18) || lost))
+                continue;
+
+            var centre = i == 0 ? Transform(uid).Coordinates : _transform.ToCoordinates(leaderPos);
+            if (RandomFreeTileAround(centre, i == 0 ? 3f : 1.5f, i == 0 ? 5f : 4f) is { } destination && Teleport(uid, destination))
+            {
+                member.StuckPos = _transform.GetWorldPosition(uid);
+                member.StuckSince = now;
+                member.StuckStage = 0;
+                member.FarSince = null;
+            }
+        }
+    }
+
+    /// <summary>Puts the NPC on the coordinates if no player is near enough to see it vanish or appear.</summary>
+    private bool Teleport(EntityUid uid, EntityCoordinates destination)
+    {
+        var from = _transform.GetMapCoordinates(uid);
+        var to = _transform.ToMapCoordinates(destination);
+        if (PlayerNear(from, SeenRange) || PlayerNear(to, SeenRange))
+            return false;
+
+        _transform.SetCoordinates(uid, destination);
+        _steering.Unregister(uid);
+        if (TryComp<HTNComponent>(uid, out var htn))
+        {
+            if (htn.Plan != null)
+                _htn.ShutdownPlan(htn);
+
+            _htn.Replan(htn);
+        }
+
+        return true;
+    }
+
+    private bool PlayerNear(MapCoordinates point, float range)
+    {
+        var query = EntityQueryEnumerator<ActorComponent, MobStateComponent, TransformComponent>();
+        while (query.MoveNext(out _, out _, out var state, out var xform))
+        {
+            if (state.CurrentState == MobState.Alive && xform.MapID == point.MapId
+                && (_transform.GetWorldPosition(xform) - point.Position).Length() < range)
+                return true;
+        }
+
+        return false;
+    }
+
     /// <summary>Out of combat the squad walks; a member that has fallen behind the leader runs to catch up.</summary>
     private void Pace(SquadComponent comp, MapCoordinates leaderPos)
     {
@@ -442,6 +544,11 @@ public sealed class SquadSystem : EntitySystem
                 // A member that cannot come (stuck) does not stop the squad for ever
                 var waits = behind && now - comp.WaitSince < MaxWait;
                 member.MovePoint = (comp.Goal is { } goal && !waits ? UpdateLeg(squad, leaderPos, goal, now) : null) ?? _transform.ToCoordinates(leaderPos);
+
+                // Standing in the danger zone of a fault: out of it first
+                if (_faults.Outside(comp, leaderPos) is { } away)
+                    member.MovePoint = OnGround(comp.Members[0], new MapCoordinates(away, leaderPos.MapId));
+
                 continue;
             }
 
@@ -471,6 +578,9 @@ public sealed class SquadSystem : EntitySystem
             }
 
             var place = new MapCoordinates(leaderPos.Position + offset, leaderPos.MapId);
+            if (_faults.InZone(comp, place))
+                place = leaderPos;
+
             var here = _transform.GetMapCoordinates(comp.Members[i]);
 
             // Far behind: along the way the leader came
@@ -564,7 +674,8 @@ public sealed class SquadSystem : EntitySystem
             comp.LegCandidate = null;
         }
 
-        if (comp.Leg is { } leg && now - comp.LegAt < TimeSpan.FromSeconds(25) && Distance(from, leg) > 2.5f)
+        if (comp.Leg is { } leg && now - comp.LegAt < TimeSpan.FromSeconds(25) && Distance(from, leg) > 2.5f
+            && !_faults.Blocked(comp, from.Position, _transform.ToMapCoordinates(leg).Position, from.MapId))
             return leg;
 
         comp.Leg = null;
@@ -580,6 +691,14 @@ public sealed class SquadSystem : EntitySystem
         }
 
         var candidate = PickLeg(from, goal, comp.LegTries);
+
+        // Through a fault: another way (a turn away from the line on each try), and in the end another goal
+        if (_faults.Blocked(comp, from.Position, _transform.ToMapCoordinates(candidate).Position, from.MapId))
+        {
+            comp.LegTries++;
+            return null;
+        }
+
         comp.LegCandidate = candidate;
         comp.LegCancel?.Cancel();
         comp.LegCancel = new CancellationTokenSource();

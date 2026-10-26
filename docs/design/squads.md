@@ -34,6 +34,12 @@ Admin commands: `squads` lists them, `squadtask <squad or member id> patrol|guar
 - Hunger and thirst are held at "okay" (`NpcNeedsSystem`).
 - A dropped gun within 2.5 tiles is picked up again before another is drawn (`NpcGunMemoryComponent`).
 
+## >>> FAULTS, STUCK AND LOST
+
+- **World faults** (`anomalies.md`): a member within 8 tiles of a fault has a 50% chance per second to spot it (always within the danger radius plus 1); a member hurt by one learns of it at once. It says a line (`fault` / `faulthurt`, no lines yet: they need approval) and the whole squad knows the fault (`SquadComponent.KnownFaults`, `SquadFaultSystem`). From then on the squad does not choose a leg that crosses the danger zone plus 1.5 tiles (another heading, in the end another goal), keeps formation spots out of it and steps out of it if it stands in one. Only the straight line of a leg is checked: the walk the pathfinder picks between the points may still touch a zone.
+- **Stuck:** a member that has a place to be, is not there and has not moved 0.7 tiles gets a new plan after 5 s and again after 12 s. After 18 s, or after 8 s when it is more than 25 tiles from the leader, or after 30 s far from the leader, it is put on a free tile near the leader (the leader: 3 to 5 tiles on), but only if no player is within 22 tiles of either spot (`SquadSystem.Unstick`).
+- **Getting up:** `NpcStandSystem` stands lying soldiers and bandits up (when not knocked down) and picks up the dropped gun again (4 tiles) whether in combat or not.
+
 ## >>> RESPAWN
 
 Squads respawn per member: every `SmartMobSpawner` of a member keeps its `SquadSlotComponent`; when it spawns a new mob (after the usual respawn time, `3600 / spawnRate` seconds) `SmartMobSpawnedEvent` puts the mob back into its squad and slot. The squad entity stays on the map when all members are dead. Not tested over a full respawn cycle.

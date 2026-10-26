@@ -57,6 +57,9 @@ public sealed partial class SquadComponent : Component
 
     public TimeSpan NextThink;
 
+    /// <summary>World faults this squad has spotted or been hurt by; it keeps away from them.</summary>
+    public HashSet<EntityUid> KnownFaults = new();
+
     /// <summary>Since when the leader waits for a straggler; null while it does not.</summary>
     public TimeSpan? WaitSince;
 
@@ -91,6 +94,15 @@ public sealed partial class NpcSquadMemberComponent : Component
 
     /// <summary>When this member picks a new spot to check while the squad sweeps a building.</summary>
     public TimeSpan SweepAt;
+
+    // Stuck and lost: where the member was when it last moved, since when it has stood there, how far the unsticking has gone, since when it has been far from its leader
+    public Vector2 StuckPos;
+
+    public TimeSpan StuckSince;
+
+    public int StuckStage;
+
+    public TimeSpan? FarSince;
 }
 
 /// <summary>On a mob spawner: the mob it makes joins this squad in this slot.</summary>
