@@ -29,7 +29,8 @@ Admin commands: `squads` lists them, `squadtask <squad or member id> patrol|guar
 ## >>> MOVEMENT AND NEEDS
 
 - Out of combat squads walk, including the idle wander (`ErrorgateIdleCompound`); a member more than 8 tiles from the leader runs to catch up (`SquadSystem.Pace`). A leader that does not move for 8 s drops its leg and after 4 legs its goal (`CheckStuck`). Formation spots are snapped to a free tile on a grid (`OnGround`): a spot off the tiles made the HTN `MoveTo` fail, which left members standing in their idle plan. (`walk: true` on the `MoveTo` of `ErrorgateSquadCompound`, `NPCSteeringComponent.Walk`); combat movement still runs.
-- Soldiers and bandits open doors and airlocks (`NavInteract`, `NavPry`, `Prying` with `pryPowered`) (not fences: with `NavClimb` they got stuck on `FenceWoodHighStraight` and `FenceMetalStraight`, so the pathfinder routes around them).
+- Soldiers and bandits open doors and airlocks (`NavInteract`, `NavPry`, `Prying` with `pryPowered`) (not fences: with `NavClimb` they got stuck on them).
+- **Fences:** the pathfinder samples points 0.25 tiles apart and a fence (0.2 wide, in the tile centre) fell between them, so it was invisible and NPCs walked into `FenceWoodHighStraight` and `FenceMetalStraight`. `PathfindingSystem.Grid.cs` (marked `ERRORGATE`) now tests the whole sample cell for thin walls (under 0.5 wide, at least 0.8 long). Throwaway probe on real maps: 12 of 12 wood fences (village) and 12 of 12 metal fences (snow city) were walked straight through before, 0 of 12 after.
 - Loot goes into the first worn container it fits in; never into the hands.
 - Hunger and thirst are held at "okay" (`NpcNeedsSystem`).
 - A dropped gun within 2.5 tiles is picked up again before another is drawn (`NpcGunMemoryComponent`).
