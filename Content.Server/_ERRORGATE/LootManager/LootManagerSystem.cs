@@ -1,4 +1,3 @@
-using System.Linq;
 using Content.Shared.GameTicking;
 using Content.Shared._ERRORGATE.LootManager;
 using Robust.Shared.Prototypes;
@@ -157,18 +156,12 @@ public sealed class LootManagerSystem : EntitySystem
         return false;
     }
 
-    /// <summary>The entry that counts an item: its own, else that of its random-magazine variant (what the loot tables list, a gear gun is the plain one).</summary>
-    private static bool TryResolve(Dictionary<string, LootManagerEntry> entries, string proto, out LootManagerEntry entry)
-    {
-        return entries.TryGetValue(proto, out entry!) || entries.TryGetValue(proto + "RandomMag", out entry!);
-    }
-
     /// <summary>
     /// Counts one more of this item (and its children) as existing in the world.
     /// </summary>
     public void RegisterSpawn(string proto, EntityUid? source = null)
     {
-        if (EntriesFor(source) is not { } entries || !TryResolve(entries, proto, out var entry))
+        if (EntriesFor(source) is not { } entries || !entries.TryGetValue(proto, out var entry))
             return;
 
         entry.Count += 1;
@@ -181,65 +174,11 @@ public sealed class LootManagerSystem : EntitySystem
     }
 
     /// <summary>
-    /// An item that comes on top of the loot tables (the kit of an NPC): counts as existing and raises the cap of its entry (and its
-    /// children) by one, so it takes nothing away from what the spawners may hand out. Returns the key of the entry and the map that
-    /// counts it, for <see cref="ShrinkCap"/> when the item is gone.
-    /// </summary>
-    public bool TryExpandCap(string proto, EntityUid? source, out EntityUid owner, out string key)
-    {
-        owner = default;
-        key = string.Empty;
-        var entries = EntriesFor(source);
-        if (entries == null || !TryResolve(entries, proto, out var entry))
-            return false;
-
-        foreach (var (table, tableEntries) in _tables)
-        {
-            if (tableEntries != entries)
-                continue;
-
-            owner = table;
-            break;
-        }
-
-        key = entries.First(e => e.Value == entry).Key;
-        entry.MaxCount++;
-        entry.Count++;
-        foreach (var child in entry.ChildEntries)
-        {
-            if (!entries.TryGetValue(child, out var childEntry))
-                continue;
-
-            childEntry.MaxCount++;
-            childEntry.Count++;
-        }
-
-        return true;
-    }
-
-    /// <summary>The item that <see cref="TryExpandCap"/> counted is gone: the cap goes back down (the slot of the item itself is freed by <see cref="Refund"/>, those of its children here).</summary>
-    public void ShrinkCap(EntityUid owner, string key)
-    {
-        if (!_tables.TryGetValue(owner, out var entries) || !entries.TryGetValue(key, out var entry))
-            return;
-
-        entry.MaxCount = Math.Max(0, entry.MaxCount - 1);
-        foreach (var child in entry.ChildEntries)
-        {
-            if (!entries.TryGetValue(child, out var childEntry))
-                continue;
-
-            childEntry.MaxCount = Math.Max(0, childEntry.MaxCount - 1);
-            childEntry.Count = Math.Max(0, childEntry.Count - 1); // the count of a child is never refunded by its own item
-        }
-    }
-
-    /// <summary>
     /// An item is gone, its place in the cap is free again.
     /// </summary>
     public void Refund(string proto, EntityUid? source = null)
     {
-        if (EntriesFor(source) is { } entries && TryResolve(entries, proto, out var entry))
+        if (EntriesFor(source) is { } entries && entries.TryGetValue(proto, out var entry))
             entry.Count = Math.Max(0, entry.Count - 1);
     }
 }

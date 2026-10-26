@@ -5,10 +5,10 @@
 
     # Guns
     ## 9x19
-    WeaponPistolMakarovRandomMag: 4
+    WeaponPistolMakarovRandomMag: 9 # 4 for the spawners + what soldiers and bandits carry (NPC kits are not counted at runtime; see docs/design/squads.md)
     WeaponPistolP226RandomMag: 3
     WeaponPistolGlockRandomMag: 2
-    WeaponPistolStechkinRandomMag: 2
+    WeaponPistolStechkinRandomMag: 4 # 2 for the spawners + what soldiers and bandits carry (NPC kits are not counted at runtime; see docs/design/squads.md)
     WeaponPistolBerettaRandomMag: 1
 
     WeaponSubMachineGunMP5RandomMag: 3
@@ -56,13 +56,13 @@
     AmmoBox556x45: 4
     AmmoBox556x45Big: 2
     ## 7.62x39
-    WeaponSniperSKSRandomMag: 2
+    WeaponSniperSKSRandomMag: 29 # 2 for the spawners + what soldiers and bandits carry (NPC kits are not counted at runtime; see docs/design/squads.md)
     SpeedLoader762x39Random: 3
 
     WeaponRifleL1A1RandomMag: 2
     Magazine762x39ShortRandom: 4
 
-    WeaponRifleAkRandomMag: 2
+    WeaponRifleAkRandomMag: 4 # 2 for the spawners + what soldiers and bandits carry (NPC kits are not counted at runtime; see docs/design/squads.md)
     WeaponRifleASValRandomMag: 1
     Magazine762x39Random: 6
 
@@ -70,7 +70,7 @@
     AmmoBox762x39Big: 2
     ## Shotguns
     WeaponShotgunDoubleBarreledRandomMag: 3
-    WeaponShotgunSawnRandomMag: 2
+    WeaponShotgunSawnRandomMag: 7 # 2 for the spawners + what soldiers and bandits carry (NPC kits are not counted at runtime; see docs/design/squads.md)
     WeaponShotgunRemingtonRandomMag: 2
     WeaponShotgunBenelliRandomMag: 1
     WeaponShotgunBulldogRandomMag: 1
