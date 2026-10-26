@@ -32,6 +32,7 @@ public sealed class SquadSystem : EntitySystem
     private const float LegLength = 14f;
     // The squad keeps together: the leader waits when a member is further than StragglerRange (5 to 10 tiles is the aim)
     private static readonly TimeSpan InvestigateCooldown = TimeSpan.FromSeconds(45);
+    private static readonly float[] LegSpread = [0f, 20f, -20f, 40f, -40f, 60f, -60f];
     private const float StragglerRange = 9f;
     private const float FollowRange = 7f;
     private const float CatchUpRange = 8f;
@@ -773,12 +774,18 @@ public sealed class SquadSystem : EntitySystem
 
         var direction = new Angle(offset).RotateVec(Vector2.UnitX);
         var turn = Angle.FromDegrees(tries == 0 ? 0 : (tries % 2 == 1 ? 1 : -1) * 35 * ((tries + 1) / 2));
-        var heading = turn.RotateVec(direction);
-        for (var length = LegLength; length >= 4f; length -= 4f)
+
+        // The heading first, then a little to either side: a heading that runs into the void, a building or a fence line finds no free
+        // tile at any length, and the leg used to fall back to the goal itself, too far for the pathfinder
+        foreach (var spread in LegSpread)
         {
-            var point = _transform.ToCoordinates(new MapCoordinates(from.Position + heading * length, from.MapId));
-            if (RandomFreeTileAround(point, 0f, 2.5f) is { } free)
-                return free;
+            var heading = (turn + Angle.FromDegrees(spread)).RotateVec(direction);
+            for (var length = LegLength; length >= 4f; length -= 4f)
+            {
+                var point = _transform.ToCoordinates(new MapCoordinates(from.Position + heading * length, from.MapId));
+                if (RandomFreeTileAround(point, 0f, 2.5f) is { } free)
+                    return free;
+            }
         }
 
         return goal;
