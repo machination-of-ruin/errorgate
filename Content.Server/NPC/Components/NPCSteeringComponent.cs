@@ -22,6 +22,9 @@ public sealed partial class NPCSteeringComponent : Component
     [ViewVariables]
     public bool CanSeek = true;
 
+    /// <summary>ERRORGATE: move at walking speed (set by <c>MoveToOperator.Walk</c>).</summary>
+    public bool Walk;
+
     /// <summary>
     /// Radius for collision avoidance.
     /// </summary>

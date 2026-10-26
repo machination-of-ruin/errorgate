@@ -128,6 +128,7 @@ public sealed partial class NPCSteeringSystem : SharedNPCSteeringSystem
             foreach (var (comp, mover) in EntityQuery<NPCSteeringComponent, InputMoverComponent>())
             {
                 mover.CurTickSprintMovement = Vector2.Zero;
+                mover.CurTickWalkMovement = Vector2.Zero;
                 comp.PathfindToken?.Cancel();
                 comp.PathfindToken = null;
             }
@@ -218,6 +219,7 @@ public sealed partial class NPCSteeringSystem : SharedNPCSteeringSystem
         if (EntityManager.TryGetComponent(uid, out InputMoverComponent? controller))
         {
             controller.CurTickSprintMovement = Vector2.Zero;
+            controller.CurTickWalkMovement = Vector2.Zero;
 
             var ev = new SpriteMoveEvent(false);
             RaiseLocalEvent(uid, ref ev);
@@ -293,7 +295,9 @@ public sealed partial class NPCSteeringSystem : SharedNPCSteeringSystem
             Array.Clear(steering.Danger);
         }
 
-        component.CurTickSprintMovement = value;
+        // ERRORGATE: out of combat NPCs walk
+        component.CurTickSprintMovement = steering.Walk ? Vector2.Zero : value;
+        component.CurTickWalkMovement = steering.Walk ? value : Vector2.Zero;
         component.LastInputTick = _timing.CurTick;
         component.LastInputSubTick = ushort.MaxValue;
 

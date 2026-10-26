@@ -20,6 +20,20 @@ Extend `SquadTask` (`SquadTasks.cs`): `NextGoal`, `IsDone`, `HoldTime`, `GoalIsI
 
 Admin commands: `squads` lists them, `squadtask <squad or member id> patrol|guard|hunt|follow <id>|eliminate <id>` gives a task.
 
+## >>> DEBUGGING
+
+- `showsquads` (client console, needs the `Debug` admin flag): draws every squad in its own colour (state, task, goal ring, guard radius), each member with the step of its plan and a line to where it is going, the leader as a filled circle, soldiers and bandits without a squad in grey, and the building points patrols pick from as white rings. Code: `SquadDebugSystem` on both sides, `Content.Shared/_ERRORGATE/NPC/SquadDebug.cs`.
+- `pathfinder` (the NPC window): the walking nodes and polygons of the pathfinder. `showhtn`: the HTN plan text over each NPC.
+- `squads` and `squadtask` (server console): see above.
+
+## >>> MOVEMENT AND NEEDS
+
+- Out of combat squads walk (`walk: true` on the `MoveTo` of `ErrorgateSquadCompound`, `NPCSteeringComponent.Walk`); combat movement still runs.
+- Soldiers and bandits open doors and airlocks (`NavInteract`, `NavPry`, `Prying` with `pryPowered`) and climb obstacles.
+- Loot goes into the first worn container it fits in; never into the hands.
+- Hunger and thirst are held at "okay" (`NpcNeedsSystem`).
+- A dropped gun within 2.5 tiles is picked up again before another is drawn (`NpcGunMemoryComponent`).
+
 ## >>> OPEN
 
 - Formation quality: members still straggle on long patrols (spread of 13 to 35 tiles seen in tests).

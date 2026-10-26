@@ -11,6 +11,13 @@ using Robust.Shared.Containers;
 
 namespace Content.Server._ERRORGATE.NPC;
 
+/// <summary>The gun an NPC last held: it picks it up again from the ground near it (after a fall, a knock-down) in <see cref="NpcGunSystem.TryDraw"/>.</summary>
+[RegisterComponent]
+public sealed partial class NpcGunMemoryComponent : Component
+{
+    public EntityUid Gun;
+}
+
 /// <summary>
 ///     What a soldier or a bandit does with a gun: draws one from its clothes and bag when it has none in hand, and loads a new magazine
 ///     (or a full cylinder or a new pair of shells) out of nowhere when it is empty. Used by the HTN operators in this folder.
@@ -30,11 +37,16 @@ public sealed class NpcGunSystem : EntitySystem
     /// <summary>True if the NPC holds a gun after the call: it already did, or it took one out of its clothes or the bag it wears.</summary>
     public bool TryDraw(EntityUid owner)
     {
-        if (_gun.TryGetGun(owner, out _, out _))
+        if (_gun.TryGetGun(owner, out var held, out _))
+        {
+            EnsureComp<NpcGunMemoryComponent>(owner).Gun = held;
             return true;
+        }
 
         if (!TryFindGun(owner, out var gun))
             return false;
+
+        EnsureComp<NpcGunMemoryComponent>(owner).Gun = gun;
 
         // A gun worn in a slot comes off by force first (a rack on the back or the suit has no one to take it off), then into a free hand
         if (_inventory.TryGetContainingSlot(gun, out var worn))
@@ -45,6 +57,15 @@ public sealed class NpcGunSystem : EntitySystem
 
     private bool TryFindGun(EntityUid owner, out EntityUid gun)
     {
+        // Dropped on the ground within reach
+        if (TryComp<NpcGunMemoryComponent>(owner, out var memory) && Exists(memory.Gun) && HasComp<GunComponent>(memory.Gun)
+            && !_container.IsEntityOrParentInContainer(memory.Gun)
+            && Transform(owner).Coordinates.TryDistance(EntityManager, Transform(memory.Gun).Coordinates, out var distance) && distance <= 2.5f)
+        {
+            gun = memory.Gun;
+            return true;
+        }
+
         var slots = _inventory.GetSlotEnumerator(owner);
         while (slots.MoveNext(out var slot))
         {

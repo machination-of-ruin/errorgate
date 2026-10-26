@@ -74,6 +74,7 @@
         - !type:HTNPrimitiveTask
           operator: !type:MoveToOperator
             pathfindInPlanning: false # the squad checked the way (SquadSystem legs); the steering finds the path itself
+            walk: true
             rangeKey: SquadRange
         - !type:HTNPrimitiveTask
           operator: !type:StowLootOperator
@@ -86,6 +87,7 @@
         - !type:HTNPrimitiveTask
           operator: !type:MoveToOperator
             pathfindInPlanning: false # the squad checked the way (SquadSystem legs); the steering finds the path itself
+            walk: true
             rangeKey: SquadRange
         - !type:HTNPrimitiveTask
           operator: !type:WaitOperator

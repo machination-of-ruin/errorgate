@@ -6,6 +6,7 @@ using Content.Server.NPC.HTN.Preconditions;
 using Content.Server.NPC.HTN.PrimitiveTasks;
 using Content.Shared.Hands.EntitySystems;
 using Content.Shared.Inventory;
+using Content.Shared.Storage;
 using Content.Shared.Storage.EntitySystems;
 using Robust.Shared.Containers;
 
@@ -83,7 +84,7 @@ public sealed partial class PickLootOperator : HTNOperator
     }
 }
 
-/// <summary>Puts the item the NPC walked to into its backpack, or into a free hand.</summary>
+/// <summary>Puts the item the NPC walked to into the first of its worn containers (backpack, belt, ...) it fits in; never into the hands.</summary>
 public sealed partial class StowLootOperator : HTNOperator
 {
     [Dependency] private readonly IEntityManager _entManager = default!;
@@ -103,11 +104,14 @@ public sealed partial class StowLootOperator : HTNOperator
             return HTNOperatorStatus.Failed;
 
         var inventory = _entManager.System<InventorySystem>();
-        var stowed = inventory.TryGetSlotEntity(owner, "back", out var bag)
-            && _entManager.System<SharedStorageSystem>().Insert(bag.Value, item, out _, owner);
-
-        if (!stowed)
-            stowed = _entManager.System<SharedHandsSystem>().TryPickupAnyHand(owner, item, checkActionBlocker: false);
+        var storage = _entManager.System<SharedStorageSystem>();
+        var stowed = false;
+        var slots = inventory.GetSlotEnumerator(owner);
+        while (!stowed && slots.MoveNext(out var slot))
+        {
+            if (slot.ContainedEntity is { } bag && _entManager.HasComponent<StorageComponent>(bag))
+                stowed = storage.Insert(bag, item, out _, owner);
+        }
 
         if (stowed)
             _entManager.System<NpcSpeechSystem>().TrySay(owner, "loot", 0.5f);

@@ -12,8 +12,9 @@
     belt: ClothingBeltMilitaryWebbing
     back: ClothingBackpackSatchelLeather
     suitstorage: WeaponSniperSKS
+    mask: ClothingMaskGas
     neck: ClothingNeckDogtags
-    pocket1: FlashlightSeclite
+    id: FlashlightSeclite # the id slot is the light slot
   storage:
     back:
     - Tourniquet
@@ -31,8 +32,9 @@
     belt: ClothingBeltMilitaryWebbing
     back: ClothingBackpackSatchelMedical
     suitstorage: WeaponSniperSKS
+    mask: ClothingMaskGas
     neck: ClothingNeckDogtags
-    pocket1: FlashlightSeclite
+    id: FlashlightSeclite # the id slot is the light slot
   storage:
     back:
     - MedkitCombatFilled
@@ -53,8 +55,9 @@
     belt: ClothingBeltMilitaryWebbing
     back: ClothingBackpackSatchelLeather
     suitstorage: WeaponSniperSKS
+    mask: ClothingMaskGas
     neck: ClothingNeckDogtags
-    pocket1: FlashlightSeclite
+    id: FlashlightSeclite # the id slot is the light slot
   storage:
     belt:
     - WeaponRevolverInspector
@@ -76,9 +79,19 @@
   - type: InputMover
   - type: MobMover
   - type: NpcFlashlight
+  - type: NpcNeeds
   - type: HTN
     rootTask:
       task: ErrorgateHumanoidHostileCompound
+    blackboard:
+      NavInteract: !type:Bool
+        true
+      NavPry: !type:Bool
+        true
+      NavClimb: !type:Bool
+        true
+  - type: Prying # doors without power or access: pried open
+    pryPowered: true
 
 - type: entity
   parent: MobMilitaryBase

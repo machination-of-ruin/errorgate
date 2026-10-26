@@ -19,8 +19,9 @@
     shoes: ClothingShoesBootsWork
     gloves: ClothingHandsGlovesFingerless
     belt: ClothingBeltHolster
+    back: ClothingBackpackSatchelLeather
     pocket1: Handcuffs
-    pocket2: FlashlightLantern
+    id: FlashlightLantern # the id slot is the light slot
 
 - type: startingGear
   id: BanditMakarovGear
@@ -74,9 +75,10 @@
     shoes: ClothingShoesBootsWork
     gloves: ClothingHandsGlovesFingerless
     belt: ClothingBeltHolster
+    back: ClothingBackpackSatchelLeather
     suitstorage: WeaponRifleAk
     pocket1: Handcuffs
-    pocket2: FlashlightLantern
+    id: FlashlightLantern # the id slot is the light slot
   storage:
     belt:
     - WeaponPistolStechkin
@@ -94,9 +96,19 @@
   - type: InputMover
   - type: MobMover
   - type: NpcFlashlight
+  - type: NpcNeeds
   - type: HTN
     rootTask:
       task: ErrorgateHumanoidHostileCompound
+    blackboard:
+      NavInteract: !type:Bool
+        true
+      NavPry: !type:Bool
+        true
+      NavClimb: !type:Bool
+        true
+  - type: Prying # doors without power or access: pried open
+    pryPowered: true
 
 - type: entity
   parent: MobBanditBase
