@@ -347,6 +347,27 @@ public partial class SharedGunSystem
         }
     }
 
+    /// <summary>ERRORGATE: puts a full cylinder of live rounds in the revolver out of nowhere (for NPCs); the old cartridges and casings vanish.</summary>
+    public void RefillRevolver(EntityUid revolverUid, RevolverAmmoProviderComponent component)
+    {
+        for (var i = 0; i < component.Capacity; i++)
+        {
+            if (component.AmmoSlots[i] is { } slot)
+            {
+                component.AmmoSlots[i] = null;
+                Containers.Remove(slot, component.AmmoContainer);
+                if (!_netManager.IsClient)
+                    QueueDel(slot);
+            }
+
+            component.Chambers[i] = true;
+        }
+
+        UpdateAmmoCount(revolverUid, prediction: false);
+        UpdateRevolverAppearance(revolverUid, component);
+        Dirty(revolverUid, component);
+    }
+
     private void UpdateRevolverAppearance(EntityUid uid, RevolverAmmoProviderComponent component)
     {
         if (!TryComp<AppearanceComponent>(uid, out var appearance))

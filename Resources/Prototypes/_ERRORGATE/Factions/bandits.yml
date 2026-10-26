@@ -8,6 +8,7 @@
   name: striped shirt
   description: A striped shirt.
 
+# The clothes of every bandit; the gun comes with the variants below (one picked at random per bandit by the Loadout of MobBandit)
 - type: startingGear
   id: BanditGear
   equipment:
@@ -18,14 +19,48 @@
     shoes: ClothingShoesBootsWork
     gloves: ClothingHandsGlovesFingerless
     belt: ClothingBeltHolster
-    suitstorage: WeaponShotgunSawn
-    pocket1: Crowbar
-    pocket2: Handcuffs
+    pocket1: Handcuffs
+
+- type: startingGear
+  id: BanditMakarovGear
+  subGear:
+  - BanditGear
   storage:
     belt:
-    - WeaponRevolverPython
-    - SpeedLoader357Magnum
-    - SpeedLoader357Magnum
+    - WeaponPistolMakarov
+    - Magazine9x19
+    - Magazine9x19
+
+- type: startingGear
+  id: BanditIzhGear
+  subGear:
+  - BanditGear
+  equipment:
+    suitstorage: WeaponShotgunDoubleBarreled
+  storage:
+    belt:
+    - ShellShotgun
+    - ShellShotgun
+    - ShellShotgun
+    - ShellShotgun
+
+- type: startingGear
+  id: BanditObrezGear
+  subGear:
+  - BanditGear
+  equipment:
+    suitstorage: WeaponShotgunSawn
+  storage:
+    belt:
+    - ShellShotgun
+    - ShellShotgun
+
+- type: startingGear
+  id: BanditSimonovGear
+  subGear:
+  - BanditGear
+  equipment:
+    suitstorage: WeaponSniperSKS
 
 - type: startingGear
   id: BanditBossGear
@@ -39,13 +74,12 @@
     gloves: ClothingHandsGlovesFingerless
     belt: ClothingBeltHolster
     suitstorage: WeaponRifleAk
-    pocket1: Crowbar
-    pocket2: Handcuffs
+    pocket1: Handcuffs
   storage:
     belt:
-    - WeaponRevolverPython
-    - SpeedLoader357Magnum
-    - SpeedLoader357Magnum
+    - WeaponPistolStechkin
+    - Magazine9x19HighCapacity
+    - Magazine9x19HighCapacity
 
 - type: entity
   abstract: true
@@ -59,7 +93,7 @@
   - type: MobMover
   - type: HTN
     rootTask:
-      task: SimpleHumanoidHostileCompound
+      task: ErrorgateHumanoidHostileCompound
 
 - type: entity
   parent: MobBanditBase
@@ -68,7 +102,7 @@
   suffix: Bandit
   components:
   - type: Loadout
-    prototypes: [ BanditGear ]
+    prototypes: [ BanditMakarovGear, BanditIzhGear, BanditObrezGear, BanditSimonovGear ] # one at random
 
 - type: entity
   parent: MobBanditBase

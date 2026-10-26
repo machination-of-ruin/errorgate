@@ -20,3 +20,53 @@
   - SimpleHostile
   - Xeno
   - Zombie
+
+# Soldiers and bandits: shoot with the gun they carry. Draw it from the holster, belt or rack when the hands are empty and an enemy is
+# near, and when the gun runs dry load a new magazine out of nowhere. Melee and idling as the other humanoids.
+- type: htnCompound
+  id: ErrorgateHumanoidHostileCompound
+  branches:
+    - tasks:
+        - !type:HTNCompoundTask
+          task: ErrorgateGunCombatCompound
+    - tasks:
+        - !type:HTNCompoundTask
+          task: MeleeCombatCompound
+    - tasks:
+        - !type:HTNCompoundTask
+          task: IdleCompound
+
+- type: htnCompound
+  id: ErrorgateGunCombatCompound
+  branches:
+    # A loaded gun in the hand
+    - preconditions:
+        - !type:GunLoadedPrecondition
+      tasks:
+        - !type:HTNCompoundTask
+          task: GunCombatCompound
+
+    # An empty one: new ammunition, then on with the fight
+    - preconditions:
+        - !type:ActiveHandComponentPrecondition
+          components:
+            - type: Gun
+        - !type:GunLoadedPrecondition
+          invert: true
+      tasks:
+        - !type:HTNPrimitiveTask
+          operator: !type:ReloadGunOperator
+        - !type:HTNCompoundTask
+          task: GunCombatCompound
+
+    # No gun in the hand: draw one
+    - preconditions:
+        - !type:ActiveHandComponentPrecondition
+          components:
+            - type: Gun
+          invert: true
+      tasks:
+        - !type:HTNPrimitiveTask
+          operator: !type:DrawGunOperator
+        - !type:HTNCompoundTask
+          task: GunCombatCompound

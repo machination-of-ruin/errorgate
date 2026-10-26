@@ -84,7 +84,7 @@
   - type: MobMover
   - type: HTN
     rootTask:
-      task: SimpleHumanoidHostileCompound
+      task: ErrorgateHumanoidHostileCompound
 
 - type: entity
   parent: MobMilitaryBase
