@@ -2,6 +2,7 @@
   id: Blob
   hostile:
     - NanoTrasen
+    - Survivor # ERRORGATE: the players
     - Syndicate
     - Xeno
     - PetsNT

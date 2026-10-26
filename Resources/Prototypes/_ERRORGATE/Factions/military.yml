@@ -11,14 +11,10 @@
     gloves: ClothingHandsGlovesCombat
     belt: ClothingBeltMilitaryWebbing
     back: ClothingBackpackSatchelLeather
-    suitstorage: WeaponRifleSVT
+    suitstorage: WeaponSniperSKS
     neck: ClothingNeckDogtags
-    pocket1: FlashlightLantern
+    pocket1: FlashlightSeclite
   storage:
-    belt:
-    - Magazine762x39LowCapacity
-    - Magazine762x39LowCapacity
-    - Magazine762x39LowCapacity
     back:
     - Tourniquet
     - SmokeGrenade
@@ -34,13 +30,10 @@
     gloves: ClothingHandsGlovesCombat
     belt: ClothingBeltMilitaryWebbing
     back: ClothingBackpackSatchelMedical
-    suitstorage: WeaponRifleSVT
+    suitstorage: WeaponSniperSKS
     neck: ClothingNeckDogtags
-    pocket1: FlashlightLantern
+    pocket1: FlashlightSeclite
   storage:
-    belt:
-    - Magazine762x39LowCapacity
-    - Magazine762x39LowCapacity
     back:
     - MedkitCombatFilled
     - Tourniquet
@@ -59,14 +52,11 @@
     gloves: ClothingHandsGlovesCombat
     belt: ClothingBeltMilitaryWebbing
     back: ClothingBackpackSatchelLeather
-    suitstorage: WeaponRifleSVT
+    suitstorage: WeaponSniperSKS
     neck: ClothingNeckDogtags
-    pocket1: FlashlightLantern
+    pocket1: FlashlightSeclite
   storage:
     belt:
-    - Magazine762x39LowCapacity
-    - Magazine762x39LowCapacity
-    - Magazine762x39LowCapacity
     - WeaponRevolverInspector
     back:
     - Tourniquet

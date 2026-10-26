@@ -1,11 +1,32 @@
-# The NPC factions of the world (docs/design/factions.md). Players are on the Syndicate faction, the walkers and runners on SimpleHostile.
+# The NPC factions of the world (docs/design/factions.md). Players are Survivors, the walkers and runners the Ruined; the base game factions
+# (NanoTrasen, Syndicate) are not used by anything that ERRORGATE puts in the world; the wildlife stays on SimpleHostile.
 # Hostility is read from the side of the one who looks: who a soldier shoots, who a bandit shoots. Members of one faction are friends.
+
+# The players: everyone who walks into the waste.
+- type: npcFaction
+  id: Survivor
+  hostile:
+  - Ruined
+  - Military
+  - Bandit
+  - SimpleHostile
+  - Xeno
+  - Zombie
+
+# The walkers and runners: what the ruin made of people. They hate every living thing.
+- type: npcFaction
+  id: Ruined
+  hostile:
+  - Survivor
+  - Military
+  - Bandit
 
 # The Military: soldiers, by the book. Shot on sight for everyone who is not a friend yet (reputation will add friends, later).
 - type: npcFaction
   id: Military
   hostile:
-  - Syndicate
+  - Survivor
+  - Ruined
   - Bandit
   - SimpleHostile
   - Xeno
@@ -15,7 +36,8 @@
 - type: npcFaction
   id: Bandit
   hostile:
-  - Syndicate
+  - Survivor
+  - Ruined
   - Military
   - SimpleHostile
   - Xeno

@@ -1,4 +1,6 @@
 using Content.Server.Light.EntitySystems;
+using Content.Server.Power.EntitySystems;
+using Content.Server.PowerCell;
 using Content.Shared.Hands.Components;
 using Content.Shared.Hands.EntitySystems;
 using Content.Shared.Inventory;
@@ -23,7 +25,9 @@ public sealed class NpcFlashlightSystem : EntitySystem
 {
     private static readonly TimeSpan Interval = TimeSpan.FromSeconds(2);
 
+    [Dependency] private readonly BatterySystem _battery = default!;
     [Dependency] private readonly HandheldLightSystem _handheld = default!;
+    [Dependency] private readonly PowerCellSystem _powerCell = default!;
     [Dependency] private readonly SharedHandsSystem _hands = default!;
     [Dependency] private readonly InventorySystem _inventory = default!;
     [Dependency] private readonly NpcSenseSystem _sense = default!;
@@ -41,6 +45,7 @@ public sealed class NpcFlashlightSystem : EntitySystem
             flashlight.Next = now + Interval;
             var dim = _sense.IsDim(Transform(uid).MapID);
             var held = FindHeld(uid, hands);
+            Recharge(uid, held);
             if (held == null && dim)
                 held = TakeOut(uid);
 
@@ -52,6 +57,29 @@ public sealed class NpcFlashlightSystem : EntitySystem
             else if (!dim && handheld.Activated)
                 _handheld.TurnOff((light, handheld), false);
         }
+    }
+
+    /// <summary>The light of an NPC never runs flat: its cell is topped up (the flashlight in hand, or the one in the pocket).</summary>
+    private void Recharge(EntityUid uid, EntityUid? held)
+    {
+        if (held != null)
+        {
+            TopUp(held.Value);
+            return;
+        }
+
+        var slots = _inventory.GetSlotEnumerator(uid);
+        while (slots.MoveNext(out var slot))
+        {
+            if (slot.ContainedEntity is { } item && HasComp<HandheldLightComponent>(item))
+                TopUp(item);
+        }
+    }
+
+    private void TopUp(EntityUid light)
+    {
+        if (_powerCell.TryGetBatteryFromSlot(light, out var batteryEnt, out var battery) && battery.CurrentCharge < battery.MaxCharge)
+            _battery.SetCharge(batteryEnt.Value, battery.MaxCharge, battery);
     }
 
     private EntityUid? FindHeld(EntityUid uid, HandsComponent hands)

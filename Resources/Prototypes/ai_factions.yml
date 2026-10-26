@@ -2,6 +2,7 @@
   id: Dragon
   hostile:
   - NanoTrasen
+  - Survivor # ERRORGATE: the players
   - Syndicate
   - Xeno
   - PetsNT
@@ -62,6 +63,7 @@
   - Military # ERRORGATE: the walkers and runners go for soldiers and bandits too
   - Bandit
   - NanoTrasen
+  - Survivor # ERRORGATE: the players
   - Syndicate
   - Passive
   - PetsNT
@@ -87,6 +89,7 @@
   id: Syndicate
   hostile:
   - NanoTrasen
+  - Survivor # ERRORGATE: the players
   - SimpleHostile
   - Xeno
   - PetsNT
@@ -103,6 +106,7 @@
   id: Xeno
   hostile:
   - NanoTrasen
+  - Survivor # ERRORGATE: the players
   - Syndicate
   - Passive
   - PetsNT
@@ -123,6 +127,7 @@
   id: Zombie
   hostile:
   - NanoTrasen
+  - Survivor # ERRORGATE: the players
   - SimpleNeutral
   - SimpleHostile
   - Syndicate
@@ -145,6 +150,7 @@
   id: Revolutionary
   hostile:
   - NanoTrasen
+  - Survivor # ERRORGATE: the players
   - Zombie
   - SimpleHostile
   - Dragon
@@ -156,6 +162,7 @@
   id: AllHostile
   hostile:
   - NanoTrasen
+  - Survivor # ERRORGATE: the players
   - Dragon
   - Mouse
   - Passive
@@ -176,6 +183,7 @@
   id: Wizard
   hostile:
   - NanoTrasen
+  - Survivor # ERRORGATE: the players
   - Dragon
   - Mouse
   - Passive
@@ -280,6 +288,7 @@
   id: SAN
   hostile:
   - NanoTrasen
+  - Survivor # ERRORGATE: the players
   - SimpleHostile
   - Syndicate
   - Xeno

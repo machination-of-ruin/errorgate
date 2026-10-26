@@ -2,6 +2,7 @@
   id: GeometerOfBlood
   hostile:
   - NanoTrasen
+  - Survivor # ERRORGATE: the players
   - Syndicate
   - SimpleHostile
   - Xeno
