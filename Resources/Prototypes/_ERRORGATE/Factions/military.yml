@@ -59,14 +59,12 @@
     neck: ClothingNeckDogtags
     id: FlashlightSeclite # the id slot is the light slot
   storage:
-    belt:
+    back: # one storage slot only: StartingGearPrototypeStorageTest keeps the items of an earlier slot and fails on the second
     - WeaponRevolverInspector
-    back:
     - Tourniquet
     - Handcuffs
     - Handcuffs
-    - SmokeGrenade
-    - BoxMRE
+    - SmokeGrenade # the revolver and these fill the satchel; an MRE box on top fell on the floor
 
 - type: entity
   abstract: true
