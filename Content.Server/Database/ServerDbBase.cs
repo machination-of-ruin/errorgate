@@ -618,6 +618,44 @@ namespace Content.Server.Database
 
         #endregion
 
+        #region Faction reputation (ERRORGATE)
+
+        public async Task<List<FactionReputation>> GetFactionReputations(Guid player, CancellationToken cancel)
+        {
+            await using var db = await GetDb(cancel);
+
+            return await db.DbContext.FactionReputation
+                .Where(p => p.PlayerId == player)
+                .ToListAsync(cancel);
+        }
+
+        public async Task SetFactionReputations(IReadOnlyCollection<FactionReputationUpdate> updates)
+        {
+            await using var db = await GetDb();
+
+            var players = updates.Select(u => u.User.UserId).Distinct().ToArray();
+            var existing = (await db.DbContext.FactionReputation
+                    .Where(p => players.Contains(p.PlayerId))
+                    .ToArrayAsync())
+                .GroupBy(p => p.PlayerId)
+                .ToDictionary(g => g.Key, g => g.ToDictionary(p => p.Faction, p => p));
+
+            foreach (var (user, faction, value) in updates)
+            {
+                if (existing.TryGetValue(user.UserId, out var rows) && rows.TryGetValue(faction, out var row))
+                {
+                    row.Value = value;
+                    continue;
+                }
+
+                db.DbContext.FactionReputation.Add(new FactionReputation { PlayerId = user.UserId, Faction = faction, Value = value });
+            }
+
+            await db.DbContext.SaveChangesAsync();
+        }
+
+        #endregion
+
         #region Player Records
         /*
          * PLAYER RECORDS

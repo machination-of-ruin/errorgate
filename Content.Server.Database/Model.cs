@@ -43,6 +43,7 @@ namespace Content.Server.Database
         public DbSet<ServerRoleBan> RoleBan { get; set; } = default!;
         public DbSet<ServerRoleUnban> RoleUnban { get; set; } = default!;
         public DbSet<PlayTime> PlayTime { get; set; } = default!;
+        public DbSet<FactionReputation> FactionReputation { get; set; } = default!; // ERRORGATE
         public DbSet<UploadedResourceLog> UploadedResourceLog { get; set; } = default!;
         public DbSet<AdminNote> AdminNotes { get; set; } = null!;
         public DbSet<AdminWatchlist> AdminWatchlists { get; set; } = null!;
@@ -118,6 +119,10 @@ namespace Content.Server.Database
 
             modelBuilder.Entity<PlayTime>()
                 .HasIndex(v => new { v.PlayerId, Role = v.Tracker })
+                .IsUnique();
+
+            modelBuilder.Entity<FactionReputation>()
+                .HasIndex(v => new { v.PlayerId, v.Faction })
                 .IsUnique();
 
             modelBuilder.Entity<AdminLogPlayer>()
@@ -1005,6 +1010,21 @@ namespace Content.Server.Database
         public Guid? UnbanningAdmin { get; set; }
 
         public DateTime UnbanTime { get; set; }
+    }
+
+    /// <summary>ERRORGATE: the standing of an account with a faction of the world (docs/design/reputation.md).</summary>
+    [Table("faction_reputation")]
+    public sealed class FactionReputation
+    {
+        [Required, Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public int Id { get; set; }
+
+        [Required, ForeignKey("player")]
+        public Guid PlayerId { get; set; }
+
+        public string Faction { get; set; } = null!;
+
+        public int Value { get; set; }
     }
 
     [Table("play_time")]

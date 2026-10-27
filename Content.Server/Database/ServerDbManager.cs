@@ -184,6 +184,16 @@ namespace Content.Server.Database
 
         #endregion
 
+        #region Faction reputation (ERRORGATE)
+
+        /// <summary>The standing of a player with each faction they have one with.</summary>
+        Task<List<FactionReputation>> GetFactionReputations(Guid player, CancellationToken cancel = default);
+
+        /// <summary>Sets standings in bulk (new rows are added, existing ones overwritten).</summary>
+        Task SetFactionReputations(IReadOnlyCollection<FactionReputationUpdate> updates);
+
+        #endregion
+
         #region Player Records
         Task UpdatePlayerRecordAsync(
             NetUserId userId,
@@ -622,6 +632,22 @@ namespace Content.Server.Database
         {
             DbWriteOpsMetric.Inc();
             return RunDbCommand(() => _db.UpdatePlayTimes(updates));
+        }
+
+        #endregion
+
+        #region Faction reputation (ERRORGATE)
+
+        public Task<List<FactionReputation>> GetFactionReputations(Guid player, CancellationToken cancel)
+        {
+            DbReadOpsMetric.Inc();
+            return RunDbCommand(() => _db.GetFactionReputations(player, cancel));
+        }
+
+        public Task SetFactionReputations(IReadOnlyCollection<FactionReputationUpdate> updates)
+        {
+            DbWriteOpsMetric.Inc();
+            return RunDbCommand(() => _db.SetFactionReputations(updates));
         }
 
         #endregion
@@ -1266,6 +1292,8 @@ namespace Content.Server.Database
     }
 
     public sealed record PlayTimeUpdate(NetUserId User, string Tracker, TimeSpan Time);
+
+    public sealed record FactionReputationUpdate(NetUserId User, string Faction, int Value);
 
     internal sealed class SyncAsyncEnumerable<T> : IAsyncEnumerable<T>
     {

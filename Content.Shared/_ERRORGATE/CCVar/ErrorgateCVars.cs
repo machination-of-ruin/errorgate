@@ -31,4 +31,11 @@ public sealed class ErrorgateCVars
     /// </summary>
     public static readonly CVarDef<float> DistantGunfireRangeScale =
         CVarDef.Create("errorgate.distant_gunfire_range_scale", 3f, CVar.SERVER | CVar.ARCHIVE);
+
+    /// <summary>
+    ///     Players are told (a popup and a chat line) when their standing with a faction changes and when it crosses a band.
+    ///     The standing changes either way.
+    /// </summary>
+    public static readonly CVarDef<bool> ReputationNotifications =
+        CVarDef.Create("errorgate.reputation.notifications", true, CVar.SERVER | CVar.ARCHIVE);
 }
