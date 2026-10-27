@@ -489,12 +489,19 @@ public sealed partial class PathfindingSystem
                                 // Do an AABB check first as it's probably faster, then do an actual point check.
                                 var intersects = false;
 
+                                // ERRORGATE: a thin wall (a fence is 0.2 wide) can fall between the sample points of a tile, so it was
+                                // never seen and NPCs walked into it. The whole sample cell is tested for those, not just its centre.
+                                var cell = Box2.CenteredAround(localPos, new Vector2(1f / SubStep, 1f / SubStep));
+                                var thin = false;
+
                                 foreach (var proxy in fixture.Proxies)
                                 {
-                                    if (!proxy.AABB.Contains(localPos))
+                                    if (!proxy.AABB.Intersects(cell))
                                         continue;
 
                                     intersects = true;
+                                    var size = proxy.AABB.Size;
+                                    thin |= MathF.Min(size.X, size.Y) < 0.5f && MathF.Max(size.X, size.Y) >= 0.8f;
                                 }
 
                                 if (!intersects ||
@@ -503,7 +510,7 @@ public sealed partial class PathfindingSystem
                                     continue;
                                 }
 
-                                if (!_fixtures.TestPoint(fixture.Shape, new Transform(xform.LocalPosition, xform.LocalRotation), localPos))
+                                if (!thin && !_fixtures.TestPoint(fixture.Shape, new Transform(xform.LocalPosition, xform.LocalRotation), localPos))
                                 {
                                     continue;
                                 }

@@ -1,0 +1,160 @@
+# Military soldiers (docs/design/factions.md). The kits follow the Solar Alliance kits of the PvP prototypes (green BDUs, helmet, flak
+# vest, webbing), with what this repo has in place of the PvP-only items. Everything they wear and carry is real: it drops when they die.
+
+- type: startingGear
+  id: MilitaryRiflemanGear
+  equipment:
+    jumpsuit: ClothingUniformJumpsuitSolFatigueGreen
+    head: ClothingHeadHelmetBasic
+    outerClothing: ClothingOuterVestFlak
+    shoes: ClothingShoesBootsCombat
+    gloves: ClothingHandsGlovesCombat
+    belt: ClothingBeltMilitaryWebbing
+    back: ClothingBackpackSatchelLeather
+    suitstorage: WeaponSniperSKS
+    mask: ClothingMaskGas
+    neck: ClothingNeckDogtags
+    id: FlashlightSeclite # the id slot is the light slot
+  storage:
+    back:
+    - Tourniquet
+    - SmokeGrenade
+    - BoxMRE
+
+- type: startingGear
+  id: MilitaryMedicGear
+  equipment:
+    jumpsuit: ClothingUniformJumpsuitSolFatigueGreen
+    head: ClothingHeadHatBeretMedic
+    outerClothing: ClothingOuterCoatGreatcoat
+    shoes: ClothingShoesBootsCombat
+    gloves: ClothingHandsGlovesCombat
+    belt: ClothingBeltMilitaryWebbing
+    back: ClothingBackpackSatchelMedical
+    suitstorage: WeaponSniperSKS
+    mask: ClothingMaskGas
+    neck: ClothingNeckDogtags
+    id: FlashlightSeclite # the id slot is the light slot
+  storage:
+    back:
+    - MedkitCombatFilled
+    - Tourniquet
+    - Tourniquet
+    - Tourniquet
+    - SmokeGrenade
+    - SmokeGrenade
+
+- type: startingGear
+  id: MilitaryOfficerGear
+  equipment:
+    jumpsuit: ClothingUniformJumpsuitSolFatigueGreen
+    head: ClothingHeadHatSANArmyCapOfficer
+    outerClothing: ClothingOuterCoatGreatcoat
+    shoes: ClothingShoesBootsCombat
+    gloves: ClothingHandsGlovesCombat
+    belt: ClothingBeltMilitaryWebbing
+    back: ClothingBackpackSatchelLeather
+    suitstorage: WeaponSniperSKS
+    mask: ClothingMaskGas
+    neck: ClothingNeckDogtags
+    id: FlashlightSeclite # the id slot is the light slot
+  storage:
+    back: # one storage slot only: StartingGearPrototypeStorageTest keeps the items of an earlier slot and fails on the second
+    - WeaponRevolverInspector
+    - Tourniquet
+    - Handcuffs
+    - Handcuffs
+    - SmokeGrenade # the revolver and these fill the satchel; an MRE box on top fell on the floor
+
+- type: entity
+  abstract: true
+  parent: BaseMobHuman
+  id: MobMilitaryBase
+  components:
+  - type: NpcFactionMember
+    factions:
+    - Military
+  - type: InputMover
+  - type: MobMover
+  - type: NpcFlashlight
+  - type: NpcNeeds
+  - type: MindContainer
+    showExamineInfo: false # no "catatonic" in the examine text of an NPC
+  - type: HTN
+    rootTask:
+      task: ErrorgateHumanoidHostileCompound
+    blackboard:
+      NavInteract: !type:Bool
+        true
+      NavPry: !type:Bool
+        true
+  - type: Prying # doors without power or access: pried open
+    pryPowered: true
+
+- type: entity
+  parent: MobMilitaryBase
+  id: MobMilitaryRifleman
+  name: soldier
+  suffix: Military, rifleman
+  components:
+  - type: Loadout
+    prototypes: [ MilitaryRiflemanGear ]
+
+- type: entity
+  parent: MobMilitaryBase
+  id: MobMilitaryMedic
+  name: medic
+  suffix: Military
+  components:
+  - type: Loadout
+    prototypes: [ MilitaryMedicGear ]
+
+- type: entity
+  parent: MobMilitaryBase
+  id: MobMilitaryOfficer
+  name: officer
+  suffix: Military
+  components:
+  - type: Loadout
+    prototypes: [ MilitaryOfficerGear ]
+
+# One soldier comes back every two hours, and only while the one before is gone.
+- type: entity
+  abstract: true
+  parent: MobSpawnerBase
+  id: MobSpawnerMilitaryBase
+  components:
+  - type: SmartMobSpawner
+    spawnRate: 0.5
+  - type: Sprite
+    layers:
+    - state: red
+    - sprite: Mobs/Species/Human/parts.rsi
+      state: full
+
+- type: entity
+  parent: MobSpawnerMilitaryBase
+  id: MobSpawnerMilitaryRifleman
+  name: mob spawner
+  suffix: soldier, Military
+  components:
+  - type: SmartMobSpawner
+    mobPrototype: MobMilitaryRifleman
+
+- type: entity
+  parent: MobSpawnerMilitaryBase
+  id: MobSpawnerMilitaryMedic
+  name: mob spawner
+  suffix: medic, Military
+  components:
+  - type: SmartMobSpawner
+    mobPrototype: MobMilitaryMedic
+
+- type: entity
+  parent: MobSpawnerMilitaryBase
+  id: MobSpawnerMilitaryOfficer
+  name: mob spawner
+  suffix: officer, Military
+  components:
+  - type: SmartMobSpawner
+    mobPrototype: MobMilitaryOfficer

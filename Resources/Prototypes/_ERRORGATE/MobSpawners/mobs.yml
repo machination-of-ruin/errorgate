@@ -54,6 +54,9 @@
       types:
         Blunt: 5
         Slash: 5
+  - type: NpcFactionMember
+    factions:
+    - Ruined
   - type: MobLoot
     rarity: 1
     location: Living

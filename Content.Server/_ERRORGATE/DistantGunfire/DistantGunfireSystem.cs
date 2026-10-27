@@ -27,6 +27,10 @@ namespace Content.Server._ERRORGATE.DistantGunfire;
 ///     presets) are auxiliary slots bound to the audio entity and are not worth the trouble for global sounds,
 ///     so the muffled feel is pitch, volume and a delayed second copy.
 /// </remarks>
+/// <summary>A gun was fired at <see cref="Origin"/> and carries <see cref="Range"/> tiles (see <see cref="DistantGunfireSystem.GetRange"/>); silenced guns do not raise it.</summary>
+[ByRefEvent]
+public readonly record struct GunfireHeardEvent(MapCoordinates Origin, float Range, EntityUid Shooter);
+
 public sealed class DistantGunfireSystem : EntitySystem
 {
     [Dependency] private readonly IConfigurationManager _cfg = default!;
@@ -94,6 +98,10 @@ public sealed class DistantGunfireSystem : EntitySystem
 
         if (range <= 0f || !_enabled)
             return;
+
+        // What a player can hear from afar, the NPCs hear too (patrols go and look)
+        var heard = new GunfireHeardEvent(_xform.GetMapCoordinates(ent.Owner), range, args.User);
+        RaiseLocalEvent(ref heard);
 
         var pvsRange = GetHearingRange();
         if (range <= pvsRange)

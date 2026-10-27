@@ -1,6 +1,7 @@
 using Content.Server.Atmos.Components;
 using Content.Server.Fluids.EntitySystems;
 using Content.Server.NPC.Queries;
+using Content.Server._ERRORGATE.NPC;
 using Content.Server.NPC.Queries.Considerations;
 using Content.Server.NPC.Queries.Curves;
 using Content.Server.NPC.Queries.Queries;
@@ -315,6 +316,11 @@ public sealed class NPCUtilitySystem : EntitySystem
                 var radius = blackboard.GetValueOrDefault<float>(blackboard.GetVisionRadiusKey(EntityManager), EntityManager);
 
                 return _examine.InRangeUnOccluded(owner, targetUid, radius + 0.5f, null) ? 1f : 0f;
+            }
+            case TargetSensedCon: // ERRORGATE: light and sound limit what an NPC makes out
+            {
+                var radius = blackboard.GetValueOrDefault<float>(blackboard.GetVisionRadiusKey(EntityManager), EntityManager);
+                return EntityManager.System<NpcSenseSystem>().CanSense(owner, targetUid, radius) ? 1f : 0f;
             }
             case TargetInLOSOrCurrentCon:
             {

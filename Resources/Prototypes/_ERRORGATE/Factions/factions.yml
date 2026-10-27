@@ -1,0 +1,252 @@
+# The NPC factions of the world (docs/design/factions.md). Players are Survivors, the walkers and runners the Ruined; the base game factions
+# (NanoTrasen, Syndicate) are not used by anything that ERRORGATE puts in the world; the wildlife stays on SimpleHostile.
+# Hostility is read from the side of the one who looks: who a soldier shoots, who a bandit shoots. Members of one faction are friends.
+
+# The players: everyone who walks into the waste.
+- type: npcFaction
+  id: Survivor
+  hostile:
+  - Ruined
+  - Military
+  - Bandit
+  - SimpleHostile
+  - Xeno
+  - Zombie
+
+# The walkers and runners: what the ruin made of people. They hate every living thing.
+- type: npcFaction
+  id: Ruined
+  hostile:
+  - Survivor
+  - Military
+  - Bandit
+
+# The Military: soldiers, by the book. Shot on sight for everyone who is not a friend yet (reputation will add friends, later).
+- type: npcFaction
+  id: Military
+  hostile:
+  - Survivor
+  - Ruined
+  - Bandit
+  - SimpleHostile
+  - Xeno
+  - Zombie
+
+# Bandits: no side but their own. Everybody else is prey, soldiers included.
+- type: npcFaction
+  id: Bandit
+  hostile:
+  - Survivor
+  - Ruined
+  - Military
+  - SimpleHostile
+  - Xeno
+  - Zombie
+
+# Soldiers and bandits: shoot with the gun they carry. Draw it from the holster, belt or rack when the hands are empty and an enemy is
+# near, and when the gun runs dry load a new magazine out of nowhere. Melee and idling as the other humanoids.
+- type: htnCompound
+  id: ErrorgateHumanoidHostileCompound
+  branches:
+    - tasks:
+        - !type:HTNCompoundTask
+          task: ErrorgateGunCombatCompound
+
+    # No enemy to shoot at (it ducked out of sight, the fight is over) and the gun is dry: load it anyway
+    - preconditions:
+        - !type:ActiveHandComponentPrecondition
+          components:
+            - type: Gun
+        - !type:GunLoadedPrecondition
+          invert: true
+      tasks:
+        - !type:HTNPrimitiveTask
+          operator: !type:ReloadGunOperator
+    - tasks:
+        - !type:HTNPrimitiveTask
+          operator: !type:UtilityOperator
+            proto: ErrorgateNearbyMeleeTargets
+        - !type:HTNCompoundTask
+          task: MeleeAttackTargetCompound
+    - tasks:
+        - !type:HTNCompoundTask
+          task: ErrorgateSquadCompound
+
+# What a soldier or a bandit does when no enemy is near: what the squad asks (an item to pick up, the place in the formation), else idling.
+- type: htnCompound
+  id: ErrorgateSquadCompound
+  branches:
+    - preconditions:
+        - !type:SquadPrecondition
+          mode: Loot
+      tasks:
+        - !type:HTNPrimitiveTask
+          operator: !type:PickLootOperator
+        - !type:HTNPrimitiveTask
+          operator: !type:MoveToOperator
+            pathfindInPlanning: false # the squad checked the way (SquadSystem legs); the steering finds the path itself
+            walk: true
+            rangeKey: SquadRange
+        - !type:HTNPrimitiveTask
+          operator: !type:StowLootOperator
+    - preconditions:
+        - !type:SquadPrecondition
+          mode: Move
+      tasks:
+        - !type:HTNPrimitiveTask
+          operator: !type:PickSquadPositionOperator
+        - !type:HTNPrimitiveTask
+          operator: !type:MoveToOperator
+            pathfindInPlanning: false # the squad checked the way (SquadSystem legs); the steering finds the path itself
+            walk: true
+            rangeKey: SquadRange
+        - !type:HTNPrimitiveTask
+          operator: !type:WaitOperator
+            key: SquadWait
+    - tasks:
+        - !type:HTNCompoundTask
+          task: ErrorgateIdleCompound
+
+# IdleCompound at a walk: out of combat soldiers and bandits do not run
+- type: htnCompound
+  id: ErrorgateIdleCompound
+  branches:
+    - preconditions:
+        - !type:BuckledPrecondition
+          isBuckled: false
+        - !type:PulledPrecondition
+          isPulled: false
+      tasks:
+        - !type:HTNPrimitiveTask
+          operator: !type:PickAccessibleOperator
+            rangeKey: IdleRange
+        - !type:HTNPrimitiveTask
+          operator: !type:MoveToOperator
+            pathfindInPlanning: false
+            walk: true
+        - !type:HTNPrimitiveTask
+          operator: !type:RandomOperator
+            targetKey: IdleTime
+            minKey: MinimumIdleTime
+            maxKey: MaximumIdleTime
+        - !type:HTNPrimitiveTask
+          operator: !type:WaitOperator
+            key: IdleTime
+          preconditions:
+            - !type:KeyExistsPrecondition
+              key: IdleTime
+
+# Like NearbyGunTargets and NearbyMeleeTargets, but a target must also be sensed: lit, heard, close, or in the share of the range the daylight allows
+- type: utilityQuery
+  id: ErrorgateNearbyGunTargets
+  query:
+    - !type:NearbyHostilesQuery
+  considerations:
+    - !type:TargetIsAliveCon
+      curve: !type:BoolCurve
+    - !type:TargetIsCritCon
+      curve: !type:InverseBoolCurve
+    - !type:TurretTargetingCon
+      curve: !type:BoolCurve
+    - !type:TargetDistanceCon
+      curve: !type:PresetCurve
+        preset: TargetDistance
+    - !type:TargetHealthCon
+      curve: !type:PresetCurve
+        preset: TargetHealth
+    - !type:TargetAccessibleCon
+      curve: !type:BoolCurve
+    - !type:TargetInLOSOrCurrentCon
+      curve: !type:BoolCurve
+    - !type:TargetSensedCon
+      curve: !type:BoolCurve
+
+- type: utilityQuery
+  id: ErrorgateNearbyMeleeTargets
+  query:
+    - !type:NearbyHostilesQuery
+  considerations:
+    - !type:TargetIsAliveCon
+      curve: !type:BoolCurve
+    - !type:TargetDistanceCon
+      curve: !type:PresetCurve
+        preset: TargetDistance
+    - !type:TargetHealthCon
+      curve: !type:PresetCurve
+        preset: TargetHealth
+    - !type:TargetAccessibleCon
+      curve: !type:BoolCurve
+    - !type:TargetInLOSOrCurrentCon
+      curve: !type:BoolCurve
+    - !type:TargetSensedCon
+      curve: !type:BoolCurve
+
+# GunCombatCompound with the query above
+- type: htnCompound
+  id: ErrorgateGunFightCompound
+  branches:
+    - tasks:
+        - !type:HTNPrimitiveTask
+          operator: !type:UtilityOperator
+            proto: ErrorgateNearbyGunTargets
+
+        - !type:HTNPrimitiveTask
+          operator: !type:MoveToOperator
+            shutdownState: PlanFinished
+            pathfindInPlanning: true
+            removeKeyOnFinish: false
+            targetKey: TargetCoordinates
+            pathfindKey: TargetPathfind
+            stopOnLineOfSight: true
+            rangeKey: MeleeRange
+
+        - !type:HTNPrimitiveTask
+          operator: !type:JukeOperator
+            jukeType: AdjacentTile
+
+        - !type:HTNPrimitiveTask
+          preconditions:
+            - !type:KeyExistsPrecondition
+              key: Target
+          operator: !type:GunOperator
+            targetKey: Target
+          services:
+            - !type:UtilityService
+              id: RangedService
+              proto: ErrorgateNearbyGunTargets
+              key: Target
+
+- type: htnCompound
+  id: ErrorgateGunCombatCompound
+  branches:
+    # A loaded gun in the hand
+    - preconditions:
+        - !type:GunLoadedPrecondition
+      tasks:
+        - !type:HTNCompoundTask
+          task: ErrorgateGunFightCompound
+
+    # An empty one: new ammunition, then on with the fight
+    - preconditions:
+        - !type:ActiveHandComponentPrecondition
+          components:
+            - type: Gun
+        - !type:GunLoadedPrecondition
+          invert: true
+      tasks:
+        - !type:HTNPrimitiveTask
+          operator: !type:ReloadGunOperator
+        - !type:HTNCompoundTask
+          task: ErrorgateGunFightCompound
+
+    # No gun in the hand: draw one
+    - preconditions:
+        - !type:ActiveHandComponentPrecondition
+          components:
+            - type: Gun
+          invert: true
+      tasks:
+        - !type:HTNPrimitiveTask
+          operator: !type:DrawGunOperator
+        - !type:HTNCompoundTask
+          task: ErrorgateGunFightCompound

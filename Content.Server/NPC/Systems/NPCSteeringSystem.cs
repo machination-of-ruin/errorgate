@@ -14,6 +14,7 @@ using Content.Shared.Climbing.Systems;
 using Content.Shared.CombatMode;
 using Content.Shared.Doors.Components;
 using Content.Shared.Interaction;
+using Content.Shared.Maps;
 using Content.Shared.Movement.Components;
 using Content.Shared.Movement.Events;
 using Content.Shared.Movement.Systems;
@@ -25,6 +26,7 @@ using Content.Shared.Physics;
 using Content.Shared.Weapons.Melee;
 using Robust.Shared.Configuration;
 using Robust.Shared.Map;
+using Robust.Shared.Map.Components;
 using Robust.Shared.Physics;
 using Robust.Shared.Physics.Components;
 using Robust.Shared.Physics.Systems;
@@ -50,6 +52,7 @@ public sealed partial class NPCSteeringSystem : SharedNPCSteeringSystem
      */
 
     [Dependency] private readonly IAdminManager _admin = default!;
+    [Dependency] private readonly ITileDefinitionManager _tileDefinitions = default!;
     [Dependency] private readonly IConfigurationManager _configManager = default!;
     [Dependency] private readonly IGameTiming _timing = default!;
     [Dependency] private readonly IRobustRandom _random = default!;
@@ -128,6 +131,7 @@ public sealed partial class NPCSteeringSystem : SharedNPCSteeringSystem
             foreach (var (comp, mover) in EntityQuery<NPCSteeringComponent, InputMoverComponent>())
             {
                 mover.CurTickSprintMovement = Vector2.Zero;
+                mover.CurTickWalkMovement = Vector2.Zero;
                 comp.PathfindToken?.Cancel();
                 comp.PathfindToken = null;
             }
@@ -218,6 +222,7 @@ public sealed partial class NPCSteeringSystem : SharedNPCSteeringSystem
         if (EntityManager.TryGetComponent(uid, out InputMoverComponent? controller))
         {
             controller.CurTickSprintMovement = Vector2.Zero;
+            controller.CurTickWalkMovement = Vector2.Zero;
 
             var ev = new SpriteMoveEvent(false);
             RaiseLocalEvent(uid, ref ev);
@@ -293,7 +298,9 @@ public sealed partial class NPCSteeringSystem : SharedNPCSteeringSystem
             Array.Clear(steering.Danger);
         }
 
-        component.CurTickSprintMovement = value;
+        // ERRORGATE: out of combat NPCs walk
+        component.CurTickSprintMovement = steering.Walk ? Vector2.Zero : value;
+        component.CurTickWalkMovement = steering.Walk ? value : Vector2.Zero;
         component.LastInputTick = _timing.CurTick;
         component.LastInputSubTick = ushort.MaxValue;
 
@@ -380,6 +387,7 @@ public sealed partial class NPCSteeringSystem : SharedNPCSteeringSystem
         DebugTools.Assert(!float.IsNaN(danger[0]));
 
         Separation(uid, offsetRot, worldPos, agentRadius, layer, mask, body, xform, danger);
+        AvoidHazards(offsetRot, worldPos, xform, danger); // ERRORGATE
 
         // Blend last and current tick
         Blend(steering, frameTime, interest, danger);
@@ -408,7 +416,33 @@ public sealed partial class NPCSteeringSystem : SharedNPCSteeringSystem
 
         steering.LastSteerDirection = resultDirection;
         DebugTools.Assert(!float.IsNaN(resultDirection.X));
+        resultDirection = BrakeOnIce(xform, body, offsetRot, resultDirection);
         SetDirection(uid, mover, steering, resultDirection, false);
+    }
+
+    /// <summary>
+    ///     ERRORGATE: on a slippery tile (ice) the NPC cannot turn: it overshoots, turns back and circles its goal forever. While it moves
+    ///     fast and the way it wants to go is across or against its motion, it pushes against its motion until it has slowed down.
+    /// </summary>
+    private Vector2 BrakeOnIce(TransformComponent xform, PhysicsComponent body, Angle offsetRot, Vector2 desired)
+    {
+        if (desired == Vector2.Zero || xform.GridUid is not { } gridUid || !TryComp<MapGridComponent>(gridUid, out var grid))
+            return desired;
+
+        var speed = body.LinearVelocity.Length();
+        if (speed < 0.8f)
+            return desired;
+
+        var tile = _map.GetTileRef(gridUid, grid, xform.Coordinates).Tile;
+        if (_tileDefinitions[tile.TypeId] is not ContentTileDefinition { MobAcceleration: < 6f })
+            return desired;
+
+        // The steering works in the frame of the grid, the velocity is the world's
+        var velocity = offsetRot.RotateVec(body.LinearVelocity);
+        if (Vector2.Dot(Vector2.Normalize(velocity), desired) > 0.5f)
+            return desired;
+
+        return Vector2.Normalize(-velocity);
     }
 
     private EntityCoordinates GetCoordinates(PathPoly poly)

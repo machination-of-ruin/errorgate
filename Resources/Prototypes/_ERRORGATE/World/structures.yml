@@ -281,3 +281,7 @@
   unique: true
   shore: true # on the land at the water, fenced, with a park in front
   openFront: east # the front is the 3 wide gap in the east wall, not a door
+  squads: # the only bandit boss of the village: his squad stays at the resort
+  - members: [ MobSpawnerBanditBoss, MobSpawnerBandit, MobSpawnerBandit, MobSpawnerBandit ]
+    task: guard
+    radius: 10

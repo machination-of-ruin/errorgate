@@ -2,6 +2,7 @@
   id: Shadowling
   hostile:
   - NanoTrasen
+  - Survivor # ERRORGATE: the players
   - Syndicate
   - Zombie
   - Revolutionary

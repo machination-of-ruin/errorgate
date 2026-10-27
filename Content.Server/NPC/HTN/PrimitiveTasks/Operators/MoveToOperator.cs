@@ -61,6 +61,10 @@ public sealed partial class MoveToOperator : HTNOperator, IHtnConditionalShutdow
     [DataField("stopOnLineOfSight")]
     public bool StopOnLineOfSight;
 
+    /// <summary>ERRORGATE: walk instead of run.</summary>
+    [DataField]
+    public bool Walk;
+
     private const string MovementCancelToken = "MovementCancelToken";
 
     public override void Initialize(IEntitySystemManager sysManager)
@@ -145,6 +149,7 @@ public sealed partial class MoveToOperator : HTNOperator, IHtnConditionalShutdow
         // Re-use the path we may have if applicable.
         var comp = _steering.Register(uid, targetCoordinates);
         comp.ArriveOnLineOfSight = StopOnLineOfSight;
+        comp.Walk = Walk;
 
         if (blackboard.TryGetValue<float>(RangeKey, out var range, _entManager))
         {

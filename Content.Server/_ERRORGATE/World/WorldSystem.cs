@@ -5,6 +5,8 @@ using Content.Server.Atmos.Components;
 using Content.Server.Atmos.EntitySystems;
 using Content.Server._ERRORGATE.Anomalies;
 using Content.Server._ERRORGATE.LootManager;
+using Content.Server._ERRORGATE.NPC.Squad;
+using Content.Server._ERRORGATE.SmartMobSpawner;
 using Content.Server.Decals;
 using Content.Server.Gravity;
 using Content.Shared._ERRORGATE.World;
@@ -59,6 +61,7 @@ public sealed partial class WorldSystem : EntitySystem
     [Dependency] private readonly IGameTiming _timing = default!;
     [Dependency] private readonly MetaDataSystem _meta = default!;
     [Dependency] private readonly LootManagerSystem _lootManager = default!;
+    [Dependency] private readonly SquadSystem _squads = default!;
     [Dependency] private readonly EntityLookupSystem _lookup = default!;
     [Dependency] private readonly Content.Server.Chat.Systems.ChatSystem _chat = default!;
 
@@ -66,10 +69,53 @@ public sealed partial class WorldSystem : EntitySystem
     ///     Puts the mob spawners a building asks for (the runners of a factory) on free floor inside it: a tile with floor and nothing
     ///     anchored on it, so not in a wall or under a machine, a few steps from the others.
     /// </summary>
+    /// <summary>
+    ///     The pathfinder only walks within a grid, so every outer door of a building gets a portal to the ground tile in front of it.
+    ///     Without it nobody could path indoors.
+    /// </summary>
+    private void LinkDoors(Entity<MapGridComponent> building, Entity<MapGridComponent> ground)
+    {
+        var path = EntityManager.System<Content.Server.NPC.Pathfinding.PathfindingSystem>();
+        var doors = new List<Vector2>();
+        var query = EntityQueryEnumerator<DoorComponent, TransformComponent>();
+        while (query.MoveNext(out _, out _, out var xform))
+        {
+            if (xform.ParentUid == building.Owner)
+                doors.Add(xform.LocalPosition);
+        }
+
+        var buildingXform = Transform(building);
+        var groundInv = _transform.GetInvWorldMatrix(ground.Owner);
+        foreach (var door in doors)
+        {
+            var doorTile = new Vector2i((int) MathF.Floor(door.X), (int) MathF.Floor(door.Y));
+            foreach (var dir in new[] { Vector2i.Right, Vector2i.Left, Vector2i.Up, Vector2i.Down })
+            {
+                var outside = doorTile + dir;
+                if (!_map.GetTileRef(building.Owner, building.Comp, outside).Tile.IsEmpty)
+                    continue;
+
+                var outsideWorld = _transform.GetWorldPosition(buildingXform) + new Vector2(outside.X + 0.5f, outside.Y + 0.5f);
+                var groundLocal = Vector2.Transform(outsideWorld, groundInv);
+                var groundTile = new Vector2i((int) MathF.Floor(groundLocal.X), (int) MathF.Floor(groundLocal.Y));
+                if (_map.GetTileRef(ground.Owner, ground.Comp, groundTile).Tile.IsEmpty)
+                    continue;
+
+                path.TryCreatePortal(
+                    new EntityCoordinates(ground.Owner, new Vector2(groundTile.X + 0.5f, groundTile.Y + 0.5f)),
+                    new EntityCoordinates(building.Owner, new Vector2(doorTile.X + 0.5f, doorTile.Y + 0.5f)),
+                    out _);
+                break;
+            }
+        }
+    }
+
     private void PlaceStructureMobs(Entity<MapGridComponent> grid, StructurePlacement placement, int seed)
     {
         var info = placement.Info;
-        if (info.Mobs is not { Count: > 0 } mobs || info.MobCount <= 0)
+        var mobs = info.Mobs ?? Array.Empty<string>();
+        var squads = info.Squads ?? Array.Empty<WorldSquad>();
+        if (mobs.Count == 0 && squads.Count == 0)
             return;
 
         var free = new List<Vector2i>();
@@ -91,9 +137,29 @@ public sealed partial class WorldSystem : EntitySystem
 
         var rng = new Random(seed ^ 0x6A57 ^ placement.Min.X * 31 ^ placement.Min.Y * 17);
         var chosen = new List<Vector2i>();
+
+        // Squads first: a cluster of free tiles within a few steps, one for each member
+        foreach (var squad in squads)
+        {
+            for (var attempt = 0; attempt < 20; attempt++)
+            {
+                if (free.Count == 0)
+                    break;
+
+                var centre = free[rng.Next(free.Count)];
+                var cluster = free.Where(t => (t - centre).Length <= 4.5f).OrderBy(t => (t - centre).Length + rng.NextDouble()).Take(squad.Members.Count).ToList();
+                if (cluster.Count < squad.Members.Count)
+                    continue;
+
+                SpawnSquad(grid, squad, cluster);
+                free.RemoveAll(cluster.Contains);
+                break;
+            }
+        }
+
         foreach (var tile in free.OrderBy(_ => rng.Next()))
         {
-            if (chosen.Count >= info.MobCount)
+            if (mobs.Count == 0 || chosen.Count >= info.MobCount)
                 break;
 
             // A few steps apart, so they do not come out as a pack on one spot
@@ -102,6 +168,31 @@ public sealed partial class WorldSystem : EntitySystem
 
             chosen.Add(tile);
             Spawn(mobs[rng.Next(mobs.Count)], _map.GridTileToLocal(grid.Owner, grid.Comp, tile));
+        }
+    }
+
+    /// <summary>
+    ///     Makes a squad of the spawners in <paramref name="spec"/> on the tiles: the squad entity on the map, a spawner per tile that
+    ///     joins its mob to the squad (also the mobs that replace the dead ones).
+    /// </summary>
+    private void SpawnSquad(Entity<MapGridComponent> grid, WorldSquad spec, IReadOnlyList<Vector2i> tiles)
+    {
+        if (Transform(grid).MapUid is not { } map || tiles.Count == 0)
+            return;
+
+        var first = _map.GridTileToLocal(grid.Owner, grid.Comp, tiles[0]);
+        SquadTask task = spec.Task == "guard" ? new GuardTask(first, spec.Radius) : new PatrolTask();
+        var squad = _squads.CreateSquad(new EntityCoordinates(map, _transform.ToMapCoordinates(first).Position), task);
+        for (var m = 0; m < Math.Min(tiles.Count, spec.Members.Count); m++)
+        {
+            var spawner = Spawn(spec.Members[m], _map.GridTileToLocal(grid.Owner, grid.Comp, tiles[m]));
+            var slot = EnsureComp<SquadSlotComponent>(spawner);
+            slot.Squad = squad.Owner;
+            slot.Slot = m;
+
+            // The spawner may have made its mob already, before it knew its squad
+            if (TryComp<SmartMobSpawnerComponent>(spawner, out var spawnerComp) && Exists(spawnerComp.SpawnedMob))
+                _squads.AddMember(squad, spawnerComp.SpawnedMob, m);
         }
     }
 
@@ -262,9 +353,11 @@ public sealed partial class WorldSystem : EntitySystem
         var watch = System.Diagnostics.Stopwatch.StartNew();
         var entitiesBefore = EntityManager.EntityCount;
         var useSeed = seed ?? _random.Next();
+        var squads = proto.Squads.SelectMany(s => Enumerable.Repeat(s, s.Count)).ToList();
         var options = new LocationLayout.Options(proto.Style, proto.Shape, proto.Rocks, proto.TreeClumps, proto.TreeSingles, proto.Shore,
             proto.Props.Select(e => (e.Count, e.Clump)).ToList(), proto.Decals.Select(e => (e.Count, e.Clump)).ToList(), proto.RubbleEnd ? gates.Append("~rubble").ToList() : gates, proto.Mobs.Count > 0 ? proto.MobCount : 0, proto.SpawnZone, proto.RoadblockProtos.Count > 0 ? proto.Roadblocks : 0, proto.RubbleEnd ? proto.BorderGates.Append("~rubble").ToList() : proto.BorderGates,
-            proto.Landmarks.Select(e => (e.Kind, e.Count)).ToList(), proto.UniqueGroups.Select(e => (e.Group, e.Min, e.Max)).ToList());
+            proto.Landmarks.Select(e => (e.Kind, e.Count)).ToList(), proto.UniqueGroups.Select(e => (e.Group, e.Min, e.Max)).ToList(),
+            squads.Select(s => s.Members.Count).ToList());
         var layout = LocationLayout.Generate(useSeed, proto.Size, pool, proto.Density, options);
 
         yield return true;
@@ -357,6 +450,7 @@ public sealed partial class WorldSystem : EntitySystem
             placed++;
             built.Add((grid.Value.Owner, p));
             PlaceStructureMobs(grid.Value, p, useSeed);
+            LinkDoors(grid.Value, ground);
             yield return true;
         }
 
@@ -482,6 +576,11 @@ public sealed partial class WorldSystem : EntitySystem
         foreach (var tile in layout.MobTiles)
         {
             Spawn(proto.Mobs[mobRng.Next(proto.Mobs.Count)], _map.GridTileToLocal(ground.Owner, ground.Comp, tile));
+        }
+
+        for (var i = 0; i < layout.Squads.Count; i++)
+        {
+            SpawnSquad(ground, squads[i], layout.Squads[i]);
         }
 
         for (var i = 0; i < layout.SpawnTiles.Count; i++)
@@ -803,6 +902,7 @@ public sealed partial class WorldSystem : EntitySystem
         var mobCount = 0;
         var shore = false;
         var frontWidth = 1;
+        IReadOnlyList<WorldSquad>? squads = null;
         if (_proto.TryIndex<WorldStructurePrototype>(id, out var structure))
         {
             role = structure.Role;
@@ -813,11 +913,12 @@ public sealed partial class WorldSystem : EntitySystem
             mobs = structure.Mobs;
             mobCount = structure.MobCount;
             shore = structure.Shore;
+            squads = structure.Squads;
             if (structure.OpenFront != string.Empty && FindOpenFront(grid, min, max, structure.OpenFront) is { } open)
                 (front, door, frontWidth) = open;
         }
 
-        return new StructureInfo(path.ToString(), width, height, min, front, door, role, weight, unique, group, cut, mobs, mobCount, shore, frontWidth);
+        return new StructureInfo(path.ToString(), width, height, min, front, door, role, weight, unique, group, cut, mobs, mobCount, shore, frontWidth, squads);
     }
 
     /// <summary>

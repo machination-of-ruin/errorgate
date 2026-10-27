@@ -6,6 +6,8 @@ using Content.Shared._White.Projectile;
 using Content.Shared.Damage;
 using Content.Shared.DoAfter;
 using Content.Shared.Examine;
+using Content.Shared.NPC;
+using Content.Shared.NPC.Systems;
 using Content.Shared.Hands.EntitySystems;
 using Content.Shared.IdentityManagement;
 using Content.Shared.Interaction;
@@ -32,6 +34,7 @@ public abstract partial class SharedProjectileSystem : EntitySystem
     public const string ProjectileFixture = "projectile";
 
     [Dependency] private readonly INetManager _net = default!;
+    [Dependency] private readonly NpcFactionSystem _npcFactions = default!;
     [Dependency] private readonly SharedAudioSystem _audio = default!;
     [Dependency] private readonly SharedDoAfterSystem _doAfter = default!;
     [Dependency] private readonly SharedHandsSystem _hands = default!;
@@ -281,6 +284,10 @@ public abstract partial class SharedProjectileSystem : EntitySystem
         if (component.Penetrate && component.IgnoredEntities.Contains(args.OtherEntity))
             args.Cancelled = true;
         // WWDP edit end
+
+        // ERRORGATE: a bullet an NPC fired flies through the members of its own side
+        if (component.Shooter is { } shooter && HasComp<ActiveNPCComponent>(shooter) && _npcFactions.IsEntityFriendly(shooter, args.OtherEntity))
+            args.Cancelled = true;
     }
 
     public void SetShooter(EntityUid id, ProjectileComponent component, EntityUid shooterId)

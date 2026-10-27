@@ -15,6 +15,7 @@ using Content.Shared.Interaction.Events;
 using Content.Shared.Inventory;
 using Content.Shared.Inventory.VirtualItem;
 using Content.Shared.Popups;
+using Content.Shared.NPC;
 using Content.Shared.Strip.Components;
 using Content.Shared.Verbs;
 using Robust.Shared.Utility;
@@ -57,7 +58,7 @@ public abstract class SharedStrippableSystem : EntitySystem
 
     private void AddStripVerb(EntityUid uid, StrippableComponent component, GetVerbsEvent<Verb> args)
     {
-        if (args.Hands == null || !args.CanAccess || !args.CanInteract || args.Target == args.User)
+        if (args.Hands == null || !args.CanAccess || !args.CanInteract || args.Target == args.User || IsLivingNpc(uid))
             return;
 
         Verb verb = new()
@@ -72,7 +73,7 @@ public abstract class SharedStrippableSystem : EntitySystem
 
     private void AddStripExamineVerb(EntityUid uid, StrippableComponent component, GetVerbsEvent<ExamineVerb> args)
     {
-        if (args.Hands == null || !args.CanAccess || !args.CanInteract || args.Target == args.User)
+        if (args.Hands == null || !args.CanAccess || !args.CanInteract || args.Target == args.User || IsLivingNpc(uid))
             return;
 
         ExamineVerb verb = new()
@@ -89,7 +90,8 @@ public abstract class SharedStrippableSystem : EntitySystem
     private void OnStripButtonPressed(Entity<StrippableComponent> strippable, ref StrippingSlotButtonPressed args)
     {
         if (args.Actor is not { Valid: true } user ||
-            !TryComp<HandsComponent>(user, out var userHands))
+            !TryComp<HandsComponent>(user, out var userHands) ||
+            IsLivingNpc(strippable))
             return;
 
         if (args.IsHand)
@@ -635,9 +637,15 @@ public abstract class SharedStrippableSystem : EntitySystem
             args.Handled = true;
     }
 
+    /// <summary>ERRORGATE: a mob an NPC is playing (soldiers, bandits) cannot be stripped while it is up; a dead or downed one loses its active state and can.</summary>
+    private bool IsLivingNpc(EntityUid target) => HasComp<ActiveNPCComponent>(target);
+
     public bool TryOpenStrippingUi(EntityUid user, Entity<StrippableComponent> target, bool openInCombat = false)
     {
         if (!openInCombat && TryComp<CombatModeComponent>(user, out var mode) && mode.IsInCombatMode)
+            return false;
+
+        if (IsLivingNpc(target))
             return false;
 
         if (!HasComp<StrippingComponent>(user))

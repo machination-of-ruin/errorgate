@@ -196,7 +196,7 @@
   - type: CanHostGuardian
   - type: NpcFactionMember
     factions:
-    - NanoTrasen
+    - Survivor # ERRORGATE: was NanoTrasen
   - type: CreamPied
   - type: Stripping
   - type: UserInterface

@@ -2,6 +2,7 @@
   id: DevilFaction
   hostile:
   - NanoTrasen
+  - Survivor # ERRORGATE: the players
   - Syndicate
   - Zombie
   - Revolutionary

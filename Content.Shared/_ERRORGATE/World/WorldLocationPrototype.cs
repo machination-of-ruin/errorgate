@@ -157,6 +157,10 @@ public sealed partial class WorldLocationPrototype : IPrototype
     [DataField]
     public int MobCount = 4;
 
+    /// <summary>Squads of mobs standing together on the open ground: each entry is a mob spawner for every member, <c>count</c> times.</summary>
+    [DataField]
+    public List<WorldSquad> Squads = new();
+
     /// <summary>A weather that never ends in this location.</summary>
     [DataField]
     public ProtoId<WeatherPrototype>? Weather;
@@ -220,6 +224,25 @@ public sealed partial class WorldUniqueGroup
 
     [DataField]
     public int Max = 1;
+}
+
+[DataDefinition]
+public sealed partial class WorldSquad
+{
+    /// <summary>One mob spawner per member; the first is the leader.</summary>
+    [DataField]
+    public List<EntProtoId> Members = new();
+
+    /// <summary>What the squad does: <c>patrol</c> (walks the map and the buildings) or <c>guard</c> (stays within <see cref="Radius"/> of where it stands).</summary>
+    [DataField]
+    public string Task = "patrol";
+
+    [DataField]
+    public float Radius = 8f;
+
+    /// <summary>How many squads of this kind.</summary>
+    [DataField]
+    public int Count = 1;
 }
 
 [DataDefinition]
@@ -296,6 +319,10 @@ public sealed partial class WorldStructurePrototype : IPrototype
     /// </summary>
     [DataField]
     public List<string> Mobs = new();
+
+    /// <summary>Squads that stand inside the building (the bandit boss and a squad at the resort); each member spawner goes on a free floor tile.</summary>
+    [DataField]
+    public List<WorldSquad> Squads = new();
 
     /// <summary>How many of the <see cref="Mobs"/> go inside, a few steps apart.</summary>
     [DataField]
