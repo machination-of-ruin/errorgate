@@ -1,5 +1,5 @@
 # What soldiers and bandits say (NpcSpeechSystem): npc-speech-{faction}-{category}-{n}, n from 1 up with no gaps.
-# Categories: contact (sees an enemy), clear (the fight is over), reload, mandown, arrive (going into a building), loot (picked something up), chatter (the squad stands and talks), investigate (a patrol heard gunfire and goes to look), investigatedone (it found nothing and goes back to patrol).
+# Categories: contact (sees an enemy), clear (the fight is over), reload, mandown, arrive (going into a building), loot (picked something up), chatter (the squad stands and talks), investigate (a patrol heard gunfire and goes to look), investigatedone (it found nothing and goes back to patrol), fault (a member spots a world fault), faulthurt (a member is hurt by one).
 
 npc-speech-military-contact-1 = Contact!
 npc-speech-military-contact-2 = Hostile spotted!
@@ -83,3 +83,15 @@ npc-speech-bandit-investigate-4 = Go look. Quietly.
 
 npc-speech-bandit-investigatedone-1 = Nothing. Let's go.
 npc-speech-bandit-investigatedone-2 = Whoever it was, they're gone.
+
+npc-speech-military-fault-1 = Fault ahead, stay clear!
+npc-speech-military-fault-2 = Anomaly. Go around it.
+
+npc-speech-military-faulthurt-1 = It got me! Back off!
+npc-speech-military-faulthurt-2 = Fault! Everyone back!
+
+npc-speech-bandit-fault-1 = Something's wrong there. Don't go near.
+npc-speech-bandit-fault-2 = Not walking through that.
+
+npc-speech-bandit-faulthurt-1 = Damn thing got me! Stay away!
+npc-speech-bandit-faulthurt-2 = What the hell was that?!
