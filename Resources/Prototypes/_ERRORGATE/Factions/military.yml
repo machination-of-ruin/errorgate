@@ -74,6 +74,10 @@
   - type: NpcFactionMember
     factions:
     - Military
+  - type: ReputationReward
+    standing:
+      Military: -20
+      Bandit: 15
   - type: InputMover
   - type: MobMover
   - type: NpcFlashlight

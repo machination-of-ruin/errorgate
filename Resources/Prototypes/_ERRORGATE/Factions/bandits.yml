@@ -93,6 +93,10 @@
   - type: NpcFactionMember
     factions:
     - Bandit
+  - type: ReputationReward
+    standing:
+      Military: 15
+      Bandit: -15
   - type: InputMover
   - type: MobMover
   - type: NpcFlashlight
@@ -125,6 +129,10 @@
   name: bandit boss
   suffix: Bandit
   components:
+  - type: ReputationReward
+    standing:
+      Military: 30
+      Bandit: -80
   - type: Loadout
     prototypes: [ BanditBossGear ]
 

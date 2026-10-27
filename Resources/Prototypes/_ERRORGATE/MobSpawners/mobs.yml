@@ -57,6 +57,9 @@
   - type: NpcFactionMember
     factions:
     - Ruined
+  - type: ReputationReward
+    standing:
+      Military: 5
   - type: MobLoot
     rarity: 1
     location: Living

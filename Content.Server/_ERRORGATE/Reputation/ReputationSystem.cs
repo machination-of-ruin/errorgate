@@ -18,7 +18,7 @@ namespace Content.Server._ERRORGATE.Reputation;
 /// <summary>Where a standing puts a player with a faction (docs/design/reputation.md).</summary>
 public enum Standing
 {
-    /// <summary>Shot on sight. Everybody starts here (standing 0).</summary>
+    /// <summary>Shot on sight. Everybody starts here (standing -100).</summary>
     Hostile,
 
     /// <summary>The faction's NPCs ignore the player.</summary>
@@ -30,7 +30,7 @@ public enum Standing
 
 /// <summary>
 ///     The standing of every player with the factions of the world, from -1000 to +1000, stored per account (table
-///     <c>faction_reputation</c>). Standing 0 is hostile: a faction shoots a player on sight until they earn their way up. The NPCs
+///     <c>faction_reputation</c>). Everybody starts at -100, which is hostile: a faction shoots a player on sight until they earn their way up to 0. The NPCs
 ///     read it through marker factions (<c>HostileToMilitary</c>, <c>HostileToBandit</c>): the faction lists the marker as hostile, and
 ///     a player carries the marker exactly while their standing with that faction is hostile. Loaded when the player connects (before
 ///     they can join the round), saved every minute, at disconnect and at shutdown. Guests are never saved.
@@ -41,10 +41,13 @@ public sealed class ReputationSystem : EntitySystem
     public const int Max = 1000;
 
     /// <summary>The first standing that is neutral (below it: hostile).</summary>
-    public const int NeutralFrom = 100;
+    public const int NeutralFrom = 0;
 
     /// <summary>The first standing that is friendly.</summary>
     public const int FriendlyFrom = 400;
+
+    /// <summary>The standing of a player who has never earned or lost any.</summary>
+    public const int Start = -100;
 
     /// <summary>The factions a player has a standing with.</summary>
     public static readonly string[] Factions = ["Military", "Bandit"];
@@ -97,7 +100,7 @@ public sealed class ReputationSystem : EntitySystem
 
     public int GetStanding(NetUserId user, string faction)
     {
-        return _standing.TryGetValue(user, out var standings) && standings.TryGetValue(faction, out var value) ? value : 0;
+        return _standing.TryGetValue(user, out var standings) && standings.TryGetValue(faction, out var value) ? value : Start;
     }
 
     public Standing GetBand(NetUserId user, string faction) => BandOf(GetStanding(user, faction));
@@ -132,6 +135,22 @@ public sealed class ReputationSystem : EntitySystem
             Notify(session, faction, old, value);
 
         return value;
+    }
+
+    /// <summary>The standing with every faction as lines to show ("Military: 60 (neutral).").</summary>
+    public List<string> GetLines(NetUserId user)
+    {
+        var lines = new List<string>();
+        foreach (var faction in Factions)
+        {
+            var value = GetStanding(user, faction);
+            lines.Add(Loc.GetString("reputation-standing",
+                ("faction", Loc.GetString($"reputation-faction-{faction.ToLowerInvariant()}")),
+                ("value", value),
+                ("band", Loc.GetString($"reputation-name-{BandOf(value).ToString().ToLowerInvariant()}"))));
+        }
+
+        return lines;
     }
 
     private void Notify(ICommonSession session, string faction, int old, int value)

@@ -20,14 +20,8 @@ public sealed class ReputationCommand : LocalizedEntityCommands
             return;
         }
 
-        foreach (var faction in ReputationSystem.Factions)
-        {
-            var value = _reputation.GetStanding(player.UserId, faction);
-            shell.WriteLine(Loc.GetString("reputation-standing",
-                ("faction", Loc.GetString($"reputation-faction-{faction.ToLowerInvariant()}")),
-                ("value", value),
-                ("band", Loc.GetString($"reputation-name-{ReputationSystem.BandOf(value).ToString().ToLowerInvariant()}"))));
-        }
+        foreach (var line in _reputation.GetLines(player.UserId))
+            shell.WriteLine(line);
     }
 }
 

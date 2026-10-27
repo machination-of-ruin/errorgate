@@ -16,3 +16,5 @@ reputation-name-friendly = friendly
 
 cmd-reputation-desc = Shows your standing with the factions of the world.
 cmd-reputation-help = reputation
+
+character-info-reputation-label = Reputation

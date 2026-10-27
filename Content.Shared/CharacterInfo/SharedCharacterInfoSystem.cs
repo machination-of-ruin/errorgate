@@ -22,11 +22,15 @@ public sealed class CharacterInfoEvent : EntityEventArgs
     public readonly Dictionary<string, List<ObjectiveInfo>> Objectives;
     public readonly string? Briefing;
 
-    public CharacterInfoEvent(NetEntity netEntity, string jobTitle, Dictionary<string, List<ObjectiveInfo>> objectives, string? briefing)
+    /// <summary>ERRORGATE: the standing with each faction, as lines ready to show.</summary>
+    public readonly List<string> Reputation;
+
+    public CharacterInfoEvent(NetEntity netEntity, string jobTitle, Dictionary<string, List<ObjectiveInfo>> objectives, string? briefing, List<string> reputation)
     {
         NetEntity = netEntity;
         JobTitle = jobTitle;
         Objectives = objectives;
         Briefing = briefing;
+        Reputation = reputation;
     }
 }

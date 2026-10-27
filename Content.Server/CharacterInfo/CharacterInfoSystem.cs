@@ -1,4 +1,5 @@
-﻿using Content.Server.Mind;
+﻿using Content.Server._ERRORGATE.Reputation;
+using Content.Server.Mind;
 using Content.Server.Roles;
 using Content.Server.Roles.Jobs;
 using Content.Shared.CharacterInfo;
@@ -14,6 +15,7 @@ public sealed class CharacterInfoSystem : EntitySystem
     [Dependency] private readonly MindSystem _minds = default!;
     [Dependency] private readonly RoleSystem _roles = default!;
     [Dependency] private readonly SharedObjectivesSystem _objectives = default!;
+    [Dependency] private readonly ReputationSystem _reputation = default!; // ERRORGATE
 
     public override void Initialize()
     {
@@ -56,6 +58,6 @@ public sealed class CharacterInfoSystem : EntitySystem
             briefing = _roles.MindGetBriefing(mindId);
         }
 
-        RaiseNetworkEvent(new CharacterInfoEvent(GetNetEntity(entity), jobTitle, objectives, briefing), args.SenderSession);
+        RaiseNetworkEvent(new CharacterInfoEvent(GetNetEntity(entity), jobTitle, objectives, briefing, _reputation.GetLines(args.SenderSession.UserId)), args.SenderSession);
     }
 }

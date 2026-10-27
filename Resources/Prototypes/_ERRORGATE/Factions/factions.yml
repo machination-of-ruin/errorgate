@@ -22,7 +22,7 @@
   - Bandit
 
 # Marker factions of the reputation system (docs/design/reputation.md). A player carries one exactly while their standing with that faction
-# is hostile (below 100, and everybody starts at 0); the faction lists it as hostile instead of listing every Survivor.
+# is hostile (below 0, and everybody starts at -100); the faction lists it as hostile instead of listing every Survivor.
 - type: npcFaction
   id: HostileToMilitary
 

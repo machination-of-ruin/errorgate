@@ -135,7 +135,7 @@ public sealed class CharacterUIController : UIController, IOnStateEntered<Gamepl
             return;
         }
 
-        var (entity, job, objectives, briefing, entityName) = data;
+        var (entity, job, objectives, briefing, entityName, reputation) = data;
 
         _window.SpriteView.SetEntity(entity);
 
@@ -143,6 +143,10 @@ public sealed class CharacterUIController : UIController, IOnStateEntered<Gamepl
 
         _window.NameLabel.Text = entityName;
         _window.SubText.Text = job;
+        _window.Reputation.RemoveAllChildren(); // ERRORGATE
+        foreach (var line in reputation)
+            _window.Reputation.AddChild(new Label { Text = line, HorizontalAlignment = Control.HAlignment.Center });
+
         _window.Objectives.RemoveAllChildren();
         _window.ObjectivesLabel.Visible = objectives.Any();
 
