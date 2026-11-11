@@ -1,3 +1,6 @@
+using Content.Shared.NPC.Prototypes;
+using Robust.Shared.Prototypes;
+
 namespace Content.Shared._ERRORGATE.Reputation;
 
 /// <summary>
@@ -9,7 +12,7 @@ namespace Content.Shared._ERRORGATE.Reputation;
 public sealed partial class ReputationRewardComponent : Component
 {
     [DataField]
-    public Dictionary<string, int> Standing = new();
+    public Dictionary<ProtoId<NpcFactionPrototype>, int> Standing = new();
 
     /// <summary>Already paid out (a revived mob does not pay twice).</summary>
     public bool Paid;

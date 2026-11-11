@@ -33,7 +33,8 @@ public enum Standing
 ///     <c>faction_reputation</c>). Everybody starts at -100, which is hostile: a faction shoots a player on sight until they earn their way up to 0. The NPCs
 ///     read it through marker factions (<c>HostileToMilitary</c>, <c>HostileToBandit</c>): the faction lists the marker as hostile, and
 ///     a player carries the marker exactly while their standing with that faction is hostile. Loaded when the player connects (before
-///     they can join the round), saved every minute, at disconnect and at shutdown. Guests are never saved.
+///     they can join the round), saved every minute, at disconnect and at shutdown, one save after the other; a save that fails is logged
+///     and tried again with the next one. Guests are never saved.
 /// </summary>
 public sealed class ReputationSystem : EntitySystem
 {
@@ -65,7 +66,12 @@ public sealed class ReputationSystem : EntitySystem
 
     private readonly Dictionary<NetUserId, Dictionary<string, int>> _standing = new();
     private readonly HashSet<NetUserId> _dirty = new();
-    private readonly List<Task> _saving = new();
+
+    /// <summary>Standings of a save that failed, to be written again with the next save (the player may have left since).</summary>
+    private readonly Dictionary<(NetUserId User, string Faction), int> _failed = new();
+
+    /// <summary>The last save that was started. Saves run one after the other, so two never insert the same row.</summary>
+    private Task _lastSave = Task.CompletedTask;
     private TimeSpan _nextSave;
     private bool _notify = true;
 
@@ -82,7 +88,7 @@ public sealed class ReputationSystem : EntitySystem
     public override void Shutdown()
     {
         base.Shutdown();
-        _task.BlockWaitOnTask(Task.WhenAll(Save(), Task.WhenAll(_saving)));
+        _task.BlockWaitOnTask(Save());
     }
 
     public override void Update(float frameTime)
@@ -91,7 +97,7 @@ public sealed class ReputationSystem : EntitySystem
             return;
 
         _nextSave = _timing.RealTime + SaveInterval;
-        Track(Save());
+        Save();
     }
 
     // -- Standing ----------------------------------------------------------------------------------------------------
@@ -114,6 +120,12 @@ public sealed class ReputationSystem : EntitySystem
     /// <summary>Sets a standing (clamped to the range) and tells the player. Returns the new standing.</summary>
     public int Set(NetUserId user, string faction, int value, bool notify = true)
     {
+        if (!Factions.Contains(faction))
+        {
+            Log.Error($"No standing with faction {faction}: it is not one of {string.Join(", ", Factions)}.");
+            return Start;
+        }
+
         value = Math.Clamp(value, Min, Max);
         var old = GetStanding(user, faction);
         if (value == old)
@@ -195,38 +207,58 @@ public sealed class ReputationSystem : EntitySystem
                 standings[row.Faction] = Math.Clamp(row.Value, Min, Max);
         }
 
+        // The player left while the standings were loading: nothing to keep
+        cancel.ThrowIfCancellationRequested();
         _standing[session.UserId] = standings;
     }
 
     private void PlayerDisconnected(ICommonSession session)
     {
-        Track(Save(session.UserId));
+        if (_dirty.Contains(session.UserId))
+            Save(session.UserId);
+
         _standing.Remove(session.UserId);
-        _dirty.Remove(session.UserId);
     }
 
+    /// <summary>Writes the standings that changed (of one player, or of everybody) after the save that is running, if any.</summary>
     private Task Save(NetUserId? only = null)
     {
-        var updates = new List<FactionReputationUpdate>();
+        var updates = new Dictionary<(NetUserId User, string Faction), int>(_failed);
+        _failed.Clear();
+
         foreach (var user in only is { } one ? [one] : _dirty.ToArray())
         {
+            _dirty.Remove(user);
             if (!_standing.TryGetValue(user, out var standings) || IsGuest(user))
                 continue;
 
             foreach (var (faction, value) in standings)
-                updates.Add(new FactionReputationUpdate(user, faction, value));
-
-            _dirty.Remove(user);
+                updates[(user, faction)] = value;
         }
 
-        return updates.Count == 0 ? Task.CompletedTask : _db.SetFactionReputations(updates);
+        if (updates.Count == 0)
+            return _lastSave;
+
+        return _lastSave = Write(_lastSave, updates);
+    }
+
+    private async Task Write(Task previous, Dictionary<(NetUserId User, string Faction), int> updates)
+    {
+        await previous; // never throws: failures are caught below
+
+        try
+        {
+            await _db.SetFactionReputations(updates.Select(u => new FactionReputationUpdate(u.Key.User, u.Key.Faction, u.Value)).ToArray());
+        }
+        catch (Exception e)
+        {
+            Log.Error($"Saving {updates.Count} faction standings failed, they are tried again with the next save: {e}");
+
+            // A standing that changed again since is saved from the cache; the others would be lost without this
+            foreach (var (key, value) in updates)
+                _failed.TryAdd(key, value);
+        }
     }
 
     private bool IsGuest(NetUserId user) => _players.TryGetSessionById(user, out var session) && session.AuthType == LoginType.GuestAssigned;
-
-    private void Track(Task task)
-    {
-        _saving.RemoveAll(t => t.IsCompleted);
-        _saving.Add(task);
-    }
 }

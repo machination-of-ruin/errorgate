@@ -1,4 +1,4 @@
-# Standing with the factions of the world (ReputationSystem). Draft lines, pending approval; see docs/design/reputation.md.
+# Standing with the factions of the world (ReputationSystem). Every line approved; see docs/design/reputation.md.
 
 reputation-faction-military = Military
 reputation-faction-bandit = Bandits

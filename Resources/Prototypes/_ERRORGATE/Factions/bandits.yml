@@ -93,6 +93,8 @@
   - type: NpcFactionMember
     factions:
     - Bandit
+  - type: NPCRetaliation # shot by somebody they tolerate: the whole squad turns on the shooter, for five minutes
+    attackMemoryLength: 300
   - type: ReputationReward
     standing:
       Military: 15

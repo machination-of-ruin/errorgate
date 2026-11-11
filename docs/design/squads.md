@@ -56,3 +56,7 @@ Squads respawn per member: every `SmartMobSpawner` of a member keeps its `SquadS
 - Formation quality: members still straggle on long patrols (spread of 13 to 35 tiles seen in tests).
 - Loot pickup and the stow step are not confirmed in a running game.
 - Server cost of many squads is unmeasured.
+
+## >>> RETALIATION
+
+A squad member hurt by a mob it does not already hate (a player the faction tolerates, see [reputation.md](reputation.md)) turns on the attacker for 5 minutes (`NPCRetaliation`), and so does every other member of its squad (`SquadFaultSystem.OnDamaged`). Hits from its own faction are ignored.

@@ -1,4 +1,6 @@
 using System.Numerics;
+using Content.Server.NPC.Components;
+using Content.Server.NPC.Systems;
 using Content.Shared._ERRORGATE.Anomalies;
 using Content.Shared.Damage;
 using Content.Shared.Damage.Systems;
@@ -35,6 +37,7 @@ public sealed class SquadFaultSystem : EntitySystem
     [Dependency] private readonly IGameTiming _timing = default!;
     [Dependency] private readonly IRobustRandom _random = default!;
     [Dependency] private readonly NpcSpeechSystem _speech = default!;
+    [Dependency] private readonly NPCRetaliationSystem _retaliation = default!;
     [Dependency] private readonly SharedTransformSystem _transform = default!;
 
     private TimeSpan _next;
@@ -47,8 +50,20 @@ public sealed class SquadFaultSystem : EntitySystem
 
     private void OnDamaged(EntityUid uid, NpcSquadMemberComponent member, DamageChangedEvent args)
     {
-        if (!args.DamageIncreased || args.Origin is not { } origin || !HasComp<ErrorgateAnomalyComponent>(origin)
-            || !TryComp<SquadComponent>(member.Squad, out var squad))
+        if (!args.DamageIncreased || args.Origin is not { } origin || !TryComp<SquadComponent>(member.Squad, out var squad))
+            return;
+
+        // Hurt by somebody: the whole squad turns on them, as the one who was hit does (NPCRetaliation)
+        if (origin != uid && HasComp<MobStateComponent>(origin))
+        {
+            foreach (var other in squad.Members)
+            {
+                if (other != uid && TryComp<NPCRetaliationComponent>(other, out var retaliation))
+                    _retaliation.TryRetaliate((other, retaliation), origin);
+            }
+        }
+
+        if (!HasComp<ErrorgateAnomalyComponent>(origin))
             return;
 
         Learn((member.Squad, squad), origin, uid, "faulthurt");
